@@ -1,103 +1,411 @@
 {
-  "schema_version": 1,
-  "kind": "g5-j8-local-preparation",
-  "status": "PREPARED_LOCAL_NOT_COMMITTED",
-  "prepared_observed_utc": "2026-10-09T19:13:24.308345+00:00",
-  "source_head": "c54b4a464ac00c3b9e2af4e8b4081ca101aae262",
-  "row_baseline_head": "503c470149069caaf2bf9c87f24caa38091ce3a6",
-  "scope": "J8 F1 and TA-N1..N12 only; no J4 row or population change, commit, push, real packet draw or model run",
-  "sources": {
-    "native_protocol": {
-      "path": "tools/sota-convergence/compact_manifest.py",
-      "sha256": "7a0ebf0c99e2587de1c7fdad6ffca8a23bc6ad29f721a67f16a86607745ee558",
-      "revision": "c54b4a464ac00c3b9e2af4e8b4081ca101aae262"
+  "canonical_asset": {
+    "bytes": 56463125,
+    "coverage_member": "compact/coverage.json",
+    "coverage_sha256": "75933405909eb689c399c1613a88872b64a2fa521016593a663032dba2a1aa07",
+    "format": "tar.zst",
+    "name": "g5-landscape-evidence-2026-10-08.tar.zst",
+    "published": false,
+    "rows_member": "compact/rows.json",
+    "rows_sha256": "28ee7d08e4df79a6bb5f386b3f7c6d8706adcf3ff72ae3c8288f01684da9d2c7",
+    "sha256": "0aeb16e1142a22a69d2e1bcded70a74df2db3e81fe6c01d42771d00589d3d35a"
+  },
+  "committed_head": "b5c215ac53ed1705a078d2832e4458627f481025",
+  "failed_attempts": [
+    {
+      "correction": "Guessed mise 3.14.4 path absent; installed uv python find and /usr/bin/python3 identify existing CPython3.14.4. No installation.",
+      "exit_code": 127,
+      "kind": "runtime_path_probe"
     },
-    "sealed_r3": {
-      "path": "tools/sota-convergence/sealed_r3_generator.py",
-      "sha256": "759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7"
+    {
+      "correction": "Consecutive source-read hook blocked one sed before mutation; symbolic source fallback used.",
+      "kind": "local_read_hook"
     },
-    "runtime": "CPython 3.14.4 /usr/bin/python3",
-    "reference_primitives": [
-      "git/git v2.53.0 native hashing/tree lookup",
-      "python/cpython v3.14.4 Lib/random.py",
-      "GNU tar 1.35 / facebook/zstd v1.5.7 supported CLI"
+    {
+      "correction": "Root graph transport closed; stale/excluded coverage and exact source fallback qualified.",
+      "kind": "graph_transport"
+    },
+    {
+      "correction": "Canonical/Python numeric equality mismatch corrected and native-fixture regression passed.",
+      "kind": "critic_diagnostic_bug"
+    }
+  ],
+  "files": {
+    "catalogs/landscape/grand-catalog-20261008.json": {
+      "bytes": 28389911,
+      "sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb"
+    },
+    "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json": {
+      "bytes": 2666,
+      "sha256": "bae10cadcfe61166087f8bf79609ed0896d0760eb71721392297fb5515fc30a3"
+    },
+    "evidence/artifacts/g5-start-closure-1-20261009/origin-map.json": {
+      "bytes": 3064963,
+      "sha256": "50a577cb25fc0650355c3ddf9b709b18d0fadb5a426415b6f497c1e78fe83e7a"
+    },
+    "tests/test_start_closure_sampler.py": {
+      "bytes": 57351,
+      "sha256": "a8f03d94473cf64a537c137d9f99361d92ef25233661180f2192fd416239a1c1"
+    },
+    "tools/sota-convergence/start_closure_sampler.py": {
+      "bytes": 41767,
+      "sha256": "6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a"
+    }
+  },
+  "finding_dispositions": {
+    "F1": "Canonical prepared asset now bound and qualified by native --write/--check.",
+    "SFH": "Both reviewer namespaces mapped in lane status; paired findings use the same controls.",
+    "TA_N1": "Full native capture/coverage qualification and exact manifest reproduction replace rows-only rebinding.",
+    "TA_N10": "Malformed asset object returns clean error.",
+    "TA_N11": "Historical receipt SHA256 separator corrected.",
+    "TA_N12": "Sanitized native rebuild command/member evidence now reviewable in Git.",
+    "TA_N2": "Compare native-computed output; immutable input/witness contract preserved.",
+    "TA_N3": "Correct explicit pin plus all semantic/count/order mutants rejected before selection.",
+    "TA_N4": "Explicit wrong/invalid/uppercase/truncated pins tested.",
+    "TA_N5": "Native CLI wiring and clean exits tested on genuine synthetic assets; real production packet command stays co-op-owned and NOT_RUN here.",
+    "TA_N6": "Preparation modes explicitly refuse asset flags.",
+    "TA_N7": "Required packet controls fail on absent zstd; final test run records 41 tests and zero skips.",
+    "TA_N8": "Changed-manifest fixtures rebind origin-map SHA consistently.",
+    "TA_N9": "Measured ordered-row difference count and safe canonical index/field/hash diagnostics."
+  },
+  "gates": {
+    "commit": "COMMITTED_B5_CLASS_FIX_PREPARED",
+    "followups_open": [
+      "G5-F1",
+      "G5-F2",
+      "G5-F3",
+      "G5-F4"
+    ],
+    "g5": "NOT_MET",
+    "j4_final_keys": "CONFIRMED_FOUR_APPLIED_IN_B5; subsequent CC note class preserves NOT verdicts",
+    "push": "B5_PUSHED_CLASS_FIX_PENDING",
+    "required": [
+      "designated code/delta reads",
+      "trading acknowledgement",
+      "final-head CI",
+      "pre-cue",
+      "explicit CC cue",
+      "release cue"
     ]
   },
-  "canonical_asset": {
-    "name": "g5-landscape-evidence-2026-10-08.tar.zst",
-    "sha256": "a996bfd60cdd16a673d51c46f88cce5bf4b3e8fe59c861b1c5c96d60eb94d3b6",
-    "bytes": 56466790,
-    "published": false,
-    "rows_member_sha256": "fb8f6d40bc00a9ec5fc6cc6aadc8921c5baf0d020f1827177925b29bbfb4a398",
-    "coverage_member_sha256": "6c0535a581b5788a1fb2c61587db01f6dd5769084814b8641cc703b8b488caa9"
+  "historical_preparation": {
+    "canonical_asset": {
+      "bytes": 56466790,
+      "coverage_member_sha256": "6c0535a581b5788a1fb2c61587db01f6dd5769084814b8641cc703b8b488caa9",
+      "name": "g5-landscape-evidence-2026-10-08.tar.zst",
+      "published": false,
+      "rows_member_sha256": "fb8f6d40bc00a9ec5fc6cc6aadc8921c5baf0d020f1827177925b29bbfb4a398",
+      "sha256": "a996bfd60cdd16a673d51c46f88cce5bf4b3e8fe59c861b1c5c96d60eb94d3b6"
+    },
+    "failed_attempts": [
+      {
+        "correction": "Guessed mise 3.14.4 path absent; installed uv python find and /usr/bin/python3 identify existing CPython3.14.4. No installation.",
+        "exit_code": 127,
+        "kind": "runtime_path_probe"
+      },
+      {
+        "correction": "Consecutive source-read hook blocked one sed before mutation; symbolic source fallback used.",
+        "kind": "local_read_hook"
+      },
+      {
+        "correction": "Root graph transport closed; stale/excluded coverage and exact source fallback qualified.",
+        "kind": "graph_transport"
+      },
+      {
+        "correction": "Canonical/Python numeric equality mismatch corrected and native-fixture regression passed.",
+        "kind": "critic_diagnostic_bug"
+      }
+    ],
+    "files": {
+      "catalogs/landscape/grand-catalog-20261008.json": {
+        "bytes": 28382652,
+        "sha256": "7871d9eaff03fce316dddddf1e447da65ff6d8349206974a0042d206c81fa7a6"
+      },
+      "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json": {
+        "bytes": 2667,
+        "sha256": "bae10cadcfe61166087f8bf79609ed0896d0760eb71721392297fb5515fc30a3"
+      },
+      "evidence/artifacts/g5-start-closure-1-20261009/origin-map.json": {
+        "bytes": 3064954,
+        "sha256": "b2ac99bbcf0feb661d6bcdb1f393b266572f6158c885869c6d9555f33eaa0e23"
+      },
+      "tests/test_start_closure_sampler.py": {
+        "bytes": 56150,
+        "sha256": "0bc62e279933c5ed543dcda65d53836ce09c27545dd00404f647108b19cce34c"
+      },
+      "tools/sota-convergence/start_closure_sampler.py": {
+        "bytes": 41767,
+        "sha256": "6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a"
+      }
+    },
+    "finding_dispositions": {
+      "F1": "Canonical prepared asset now bound and qualified by native --write/--check.",
+      "SFH": "Both reviewer namespaces mapped in lane status; paired findings use the same controls.",
+      "TA_N1": "Full native capture/coverage qualification and exact manifest reproduction replace rows-only rebinding.",
+      "TA_N10": "Malformed asset object returns clean error.",
+      "TA_N11": "Historical receipt SHA256 separator corrected.",
+      "TA_N12": "Sanitized native rebuild command/member evidence now reviewable in Git.",
+      "TA_N2": "Compare native-computed output; immutable input/witness contract preserved.",
+      "TA_N3": "Correct explicit pin plus all semantic/count/order mutants rejected before selection.",
+      "TA_N4": "Explicit wrong/invalid/uppercase/truncated pins tested.",
+      "TA_N5": "Native CLI wiring and clean exits tested on genuine synthetic assets; real production packet command stays co-op-owned and NOT_RUN here.",
+      "TA_N6": "Preparation modes explicitly refuse asset flags.",
+      "TA_N7": "Required packet controls fail on absent zstd; final test run records 41 tests and zero skips.",
+      "TA_N8": "Changed-manifest fixtures rebind origin-map SHA consistently.",
+      "TA_N9": "Measured ordered-row difference count and safe canonical index/field/hash diagnostics."
+    },
+    "gates": {
+      "commit": "HELD",
+      "followups_open": [
+        "G5-F1",
+        "G5-F2",
+        "G5-F3",
+        "G5-F4"
+      ],
+      "g5": "NOT_MET",
+      "j4_final_keys": "PENDING_COOP",
+      "push": "HELD",
+      "required": [
+        "designated code/delta reads",
+        "trading acknowledgement",
+        "final-head CI",
+        "pre-cue",
+        "explicit CC cue",
+        "release cue"
+      ]
+    },
+    "historical_rebuild": {
+      "original_private_receipt_sha256": "35a5ad7595f1c35148d0ac35b84c622bc24532e2ad18d88c42dcd0365f624fc8",
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json",
+      "scope": "Retained 08:25 native archive/member comparison; not a new rebuild",
+      "sha256": "bae10cadcfe61166087f8bf79609ed0896d0760eb71721392297fb5515fc30a3"
+    },
+    "kind": "g5-j8-local-preparation",
+    "manifest": {
+      "action_rows": 83,
+      "after_sha256": "7871d9eaff03fce316dddddf1e447da65ff6d8349206974a0042d206c81fa7a6",
+      "all_other_metadata_deep_equal": true,
+      "before_sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
+      "changed_fields": [
+        "asset.bytes",
+        "asset.rows_sha256",
+        "asset.sha256"
+      ],
+      "computed_rows_deep_equal": true,
+      "ordered_rows_sha256": "214d1c580c4912fb7afa6511942eec52edbd6caf6a4cf643cc7d8149d1e67084",
+      "path": "catalogs/landscape/grand-catalog-20261008.json",
+      "rows": 4606
+    },
+    "native_qualification": {
+      "blockers": 0,
+      "check_exit_code": 0,
+      "check_exit_observed_utc": "2026-10-09T19:04:57Z",
+      "commands": [
+        [
+          "/usr/bin/python3",
+          "tools/sota-convergence/compact_manifest.py",
+          "--profile",
+          "start-closure/1",
+          "--asset",
+          "$G5_J8_CANONICAL_ASSET",
+          "--release-tag",
+          "v2026.10.08",
+          "--manifest",
+          "$G5_J8_NATIVE_MANIFEST",
+          "--write"
+        ],
+        [
+          "/usr/bin/python3",
+          "tools/sota-convergence/compact_manifest.py",
+          "--profile",
+          "start-closure/1",
+          "--asset",
+          "$G5_J8_CANONICAL_ASSET",
+          "--release-tag",
+          "v2026.10.08",
+          "--manifest",
+          "catalogs/landscape/grand-catalog-20261008.json",
+          "--check"
+        ]
+      ],
+      "cwd": "repository root",
+      "evidence_class": "local_integration",
+      "native_manifest_file_mtime_utc": "2026-10-09T18:47:33.151545+00:00",
+      "resource_prefix": [
+        "timeout",
+        "600",
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7"
+      ],
+      "returned_combined_output_sha256": "db875195a4da0b252450e07104eb4aec167827cc30313c356c9e725e4500b663",
+      "status": "PASS",
+      "stream_boundary": "Complete returned check JSON retained privately; separate stdout/stderr byte hashes not claimed for this initial CLI capture.",
+      "write_exit_code": 0
+    },
+    "population_receipt": {
+      "baseline": "503c470149069caaf2bf9c87f24caa38091ce3a6",
+      "required_unit": "Every native stratum's population_key_sha256 and stratum contract, membership/disposition population before/after final fix",
+      "rule": "Unchanged populations retain draws/reads; changed populations alone receive co-op new-seed redraw and both reads. No ad-hoc hash unit.",
+      "status": "DEFERRED_FINAL_CONFIRMED_J4_SET_AND_ONE_COMMIT"
+    },
+    "prepared_observed_utc": "2026-10-09T19:13:24.308345+00:00",
+    "read_boundary": {
+      "actual_model_read": "NOT_RUN",
+      "actual_production_sampler_packet": "NOT_RUN",
+      "historical_manifest_bound_verdict_sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
+      "old_reads_not_promoted_to_new_acceptance": true,
+      "prepared_manifest_sha256": "7871d9eaff03fce316dddddf1e447da65ff6d8349206974a0042d206c81fa7a6",
+      "raw_asset_input_is_not_computed_row_authority": true
+    },
+    "row_baseline_head": "503c470149069caaf2bf9c87f24caa38091ce3a6",
+    "schema_version": 1,
+    "scope": "J8 F1 and TA-N1..N12 only; no J4 row or population change, commit, push, real packet draw or model run",
+    "source_head": "c54b4a464ac00c3b9e2af4e8b4081ca101aae262",
+    "sources": {
+      "native_protocol": {
+        "path": "tools/sota-convergence/compact_manifest.py",
+        "revision": "c54b4a464ac00c3b9e2af4e8b4081ca101aae262",
+        "sha256": "7a0ebf0c99e2587de1c7fdad6ffca8a23bc6ad29f721a67f16a86607745ee558"
+      },
+      "reference_primitives": [
+        "git/git v2.53.0 native hashing/tree lookup",
+        "python/cpython v3.14.4 Lib/random.py",
+        "GNU tar 1.35 / facebook/zstd v1.5.7 supported CLI"
+      ],
+      "runtime": "CPython 3.14.4 /usr/bin/python3",
+      "sealed_r3": {
+        "path": "tools/sota-convergence/sealed_r3_generator.py",
+        "sha256": "759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7"
+      }
+    },
+    "status": "PREPARED_LOCAL_NOT_COMMITTED",
+    "synthetic_controls": {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_start_closure_sampler"
+      ],
+      "cwd": "repository root",
+      "environment": {
+        "G5_R3_GENERATOR": "tools/sota-convergence/sealed_r3_generator.py"
+      },
+      "evidence_class": "synthetic",
+      "exit_code": 0,
+      "fixture_source": "Existing tests.test_compact_manifest.CompactManifestTests, real native build; no qualification mocks",
+      "negative_conditions": [
+        "correct explicit pin plus closure/origin/disposition/count/order drift",
+        "capture/coverage corruption with correct explicit outer pin",
+        "missing compact/rows.json",
+        "invalid/uppercase/truncated pins and malformed asset object",
+        "native CLI missing asset and clean error code",
+        "asset flags in preparation/proof modes",
+        "required zstd absent fails rather than skips",
+        "canonical JSON count 1 vs 1.0/true"
+      ],
+      "observed_utc": "2026-10-09T19:13:24.308345+00:00",
+      "resource_prefix": [
+        "timeout",
+        "600",
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7"
+      ],
+      "skipped": 0,
+      "stderr_sha256": "e75d7aea77701e0231a69eb2f8b88ef4ab5bd40178a14a47f9379f9c23b66d30",
+      "stdout_sha256": "063db481565dc504673da733358ef2fc0c76c68045cd58e5f718c22ca41a0fcc",
+      "tests": 41
+    }
   },
+  "historical_rebuild": {
+    "original_private_receipt_sha256": "35a5ad7595f1c35148d0ac35b84c622bc24532e2ad18d88c42dcd0365f624fc8",
+    "path": "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json",
+    "scope": "Retained 08:25 native archive/member comparison; not a new rebuild",
+    "sha256": "bae10cadcfe61166087f8bf79609ed0896d0760eb71721392297fb5515fc30a3"
+  },
+  "kind": "g5-j8-local-preparation",
   "manifest": {
-    "path": "catalogs/landscape/grand-catalog-20261008.json",
-    "before_sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
-    "after_sha256": "7871d9eaff03fce316dddddf1e447da65ff6d8349206974a0042d206c81fa7a6",
-    "computed_rows_deep_equal": true,
-    "all_other_metadata_deep_equal": true,
+    "action_rows": 83,
+    "after_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+    "all_other_metadata_deep_equal": false,
+    "before_sha256": "4d453182cd177d042d137fe7d0fbf5810731eee2d2d9b7248dfd3203ee95e0f6",
     "changed_fields": [
+      "rows/90 notes",
       "asset.bytes",
       "asset.rows_sha256",
       "asset.sha256"
     ],
-    "rows": 4606,
-    "action_rows": 83,
-    "ordered_rows_sha256": "214d1c580c4912fb7afa6511942eec52edbd6caf6a4cf643cc7d8149d1e67084"
+    "computed_rows_deep_equal": false,
+    "current_changed_row_fields": [
+      "note"
+    ],
+    "current_changed_rows": 90,
+    "current_row_baseline": "b5c215ac53ed1705a078d2832e4458627f481025",
+    "ordered_rows_sha256": "52cb8f96b04b63003dc88ab5992db62cc7ecb7ec74e3e96052aca8aabcf6a25f",
+    "path": "catalogs/landscape/grand-catalog-20261008.json",
+    "rows": 4606
   },
   "native_qualification": {
-    "evidence_class": "local_integration",
-    "resource_prefix": [
-      "timeout",
-      "600",
-      "nice",
-      "-n",
-      "10",
-      "ionice",
-      "-c2",
-      "-n7"
-    ],
-    "commands": [
-      [
-        "/usr/bin/python3",
-        "tools/sota-convergence/compact_manifest.py",
-        "--profile",
-        "start-closure/1",
-        "--asset",
-        "$G5_J8_CANONICAL_ASSET",
-        "--release-tag",
-        "v2026.10.08",
-        "--manifest",
-        "$G5_J8_NATIVE_MANIFEST",
-        "--write"
-      ],
-      [
-        "/usr/bin/python3",
-        "tools/sota-convergence/compact_manifest.py",
-        "--profile",
-        "start-closure/1",
-        "--asset",
-        "$G5_J8_CANONICAL_ASSET",
-        "--release-tag",
-        "v2026.10.08",
-        "--manifest",
-        "catalogs/landscape/grand-catalog-20261008.json",
-        "--check"
-      ]
-    ],
-    "cwd": "repository root",
-    "write_exit_code": 0,
-    "check_exit_code": 0,
-    "status": "PASS",
     "blockers": 0,
-    "native_manifest_file_mtime_utc": "2026-10-09T18:47:33.151545+00:00",
-    "check_exit_observed_utc": "2026-10-09T19:04:57Z",
-    "returned_combined_output_sha256": "db875195a4da0b252450e07104eb4aec167827cc30313c356c9e725e4500b663",
-    "stream_boundary": "Complete returned check JSON retained privately; separate stdout/stderr byte hashes not claimed for this initial CLI capture."
+    "check_exit_code": 0,
+    "check_stderr_bytes": 0,
+    "check_stdout_sha256": "03f52ece73e324e0e6e867653cfa798b9c69894691c12d76e9c78bd094dc58ad",
+    "commands": [
+      "compact_manifest.py --profile start-closure/1 --asset $G5_NOTE_CLASS_ASSET --manifest catalogs/landscape/grand-catalog-20261008.json --write",
+      "compact_manifest.py --profile start-closure/1 --asset $G5_NOTE_CLASS_ASSET --manifest catalogs/landscape/grand-catalog-20261008.json --check"
+    ],
+    "evidence_class": "local_integration",
+    "observed_utc": "2026-10-10T00:23:53.111932+00:00",
+    "resource_prefix": [],
+    "status": "PASS",
+    "write_exit_code": 0,
+    "write_stderr_bytes": 0,
+    "write_stdout_sha256": "03f52ece73e324e0e6e867653cfa798b9c69894691c12d76e9c78bd094dc58ad"
   },
+  "population_receipt": {
+    "bytes": 317521,
+    "changed": 0,
+    "path": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
+    "redraw_required": false,
+    "sha256": "8598ca152de68c7d6aef20278afaf04bfc104c0e43573fe4b2fada996433b6fe",
+    "strata": 414,
+    "unchanged": 414
+  },
+  "prepared_observed_utc": "2026-10-09T19:13:24.308345+00:00",
+  "read_boundary": "Current native synthetic controls and archive qualification pass. They establish neither a new model verdict nor G5 MET, readiness, landing or publication. Historical records below retain their original inputs and commands.",
+  "refreshed_observed_utc": "2026-10-10T00:23:53.111932+00:00",
+  "row_baseline_head": "503c470149069caaf2bf9c87f24caa38091ce3a6",
+  "schema_version": 1,
+  "scope": "J8 F1 and TA-N1..N12 were committed/pushed in b5c215ac. Current bindings include the four confirmed rows and the later CC-authorized 90-note class; historical preparation and failed attempts retain their exact time/input scopes.",
+  "source_head": "c54b4a464ac00c3b9e2af4e8b4081ca101aae262",
+  "sources": {
+    "native_protocol": {
+      "bytes": 147149,
+      "path": "tools/sota-convergence/compact_manifest.py",
+      "revision_scope": "Current uncommitted class fix on b5c215ac; exact source hash binds the native qualification.",
+      "sha256": "2a9c9ffbacab66bfe6f4b0c789bd854ccbc77d61558870d9a24c78c805d02886"
+    },
+    "reference_primitives": [
+      "git/git v2.53.0 native hashing/tree lookup",
+      "python/cpython v3.14.4 Lib/random.py",
+      "GNU tar 1.35 / facebook/zstd v1.5.7 supported CLI"
+    ],
+    "runtime": "CPython 3.14.4 /usr/bin/python3",
+    "sealed_r3": {
+      "path": "tools/sota-convergence/sealed_r3_generator.py",
+      "sha256": "759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7"
+    }
+  },
+  "status": "COMMITTED_AND_PUSHED_IN_B5_CURRENT_BINDINGS_REFRESHED",
   "synthetic_controls": {
-    "evidence_class": "synthetic",
     "command": [
       "/usr/bin/python3",
       "-m",
@@ -109,23 +417,10 @@
     "environment": {
       "G5_R3_GENERATOR": "tools/sota-convergence/sealed_r3_generator.py"
     },
-    "resource_prefix": [
-      "timeout",
-      "600",
-      "nice",
-      "-n",
-      "10",
-      "ionice",
-      "-c2",
-      "-n7"
-    ],
+    "evidence_class": "synthetic",
     "exit_code": 0,
-    "tests": 41,
-    "skipped": 0,
-    "stdout_sha256": "063db481565dc504673da733358ef2fc0c76c68045cd58e5f718c22ca41a0fcc",
-    "stderr_sha256": "e75d7aea77701e0231a69eb2f8b88ef4ab5bd40178a14a47f9379f9c23b66d30",
-    "observed_utc": "2026-10-09T19:13:24.308345+00:00",
     "fixture_source": "Existing tests.test_compact_manifest.CompactManifestTests, real native build; no qualification mocks",
+    "input_source_sha256": "a8f03d94473cf64a537c137d9f99361d92ef25233661180f2192fd416239a1c1",
     "negative_conditions": [
       "correct explicit pin plus closure/origin/disposition/count/order drift",
       "capture/coverage corruption with correct explicit outer pin",
@@ -135,103 +430,12 @@
       "asset flags in preparation/proof modes",
       "required zstd absent fails rather than skips",
       "canonical JSON count 1 vs 1.0/true"
-    ]
-  },
-  "historical_rebuild": {
-    "path": "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json",
-    "sha256": "bae10cadcfe61166087f8bf79609ed0896d0760eb71721392297fb5515fc30a3",
-    "original_private_receipt_sha256": "35a5ad7595f1c35148d0ac35b84c622bc24532e2ad18d88c42dcd0365f624fc8",
-    "scope": "Retained 08:25 native archive/member comparison; not a new rebuild"
-  },
-  "files": {
-    "catalogs/landscape/grand-catalog-20261008.json": {
-      "bytes": 28382652,
-      "sha256": "7871d9eaff03fce316dddddf1e447da65ff6d8349206974a0042d206c81fa7a6"
-    },
-    "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json": {
-      "bytes": 2667,
-      "sha256": "bae10cadcfe61166087f8bf79609ed0896d0760eb71721392297fb5515fc30a3"
-    },
-    "evidence/artifacts/g5-start-closure-1-20261009/origin-map.json": {
-      "bytes": 3064954,
-      "sha256": "b2ac99bbcf0feb661d6bcdb1f393b266572f6158c885869c6d9555f33eaa0e23"
-    },
-    "tests/test_start_closure_sampler.py": {
-      "bytes": 56150,
-      "sha256": "0bc62e279933c5ed543dcda65d53836ce09c27545dd00404f647108b19cce34c"
-    },
-    "tools/sota-convergence/start_closure_sampler.py": {
-      "bytes": 41767,
-      "sha256": "6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a"
-    }
-  },
-  "finding_dispositions": {
-    "F1": "Canonical prepared asset now bound and qualified by native --write/--check.",
-    "TA_N1": "Full native capture/coverage qualification and exact manifest reproduction replace rows-only rebinding.",
-    "TA_N2": "Compare native-computed output; immutable input/witness contract preserved.",
-    "TA_N3": "Correct explicit pin plus all semantic/count/order mutants rejected before selection.",
-    "TA_N4": "Explicit wrong/invalid/uppercase/truncated pins tested.",
-    "TA_N5": "Native CLI wiring and clean exits tested on genuine synthetic assets; real production packet command stays co-op-owned and NOT_RUN here.",
-    "TA_N6": "Preparation modes explicitly refuse asset flags.",
-    "TA_N7": "Required packet controls fail on absent zstd; final test run records 41 tests and zero skips.",
-    "TA_N8": "Changed-manifest fixtures rebind origin-map SHA consistently.",
-    "TA_N9": "Measured ordered-row difference count and safe canonical index/field/hash diagnostics.",
-    "TA_N10": "Malformed asset object returns clean error.",
-    "TA_N11": "Historical receipt SHA256 separator corrected.",
-    "TA_N12": "Sanitized native rebuild command/member evidence now reviewable in Git.",
-    "SFH": "Both reviewer namespaces mapped in lane status; paired findings use the same controls."
-  },
-  "read_boundary": {
-    "historical_manifest_bound_verdict_sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
-    "prepared_manifest_sha256": "7871d9eaff03fce316dddddf1e447da65ff6d8349206974a0042d206c81fa7a6",
-    "raw_asset_input_is_not_computed_row_authority": true,
-    "actual_model_read": "NOT_RUN",
-    "actual_production_sampler_packet": "NOT_RUN",
-    "old_reads_not_promoted_to_new_acceptance": true
-  },
-  "population_receipt": {
-    "status": "DEFERRED_FINAL_CONFIRMED_J4_SET_AND_ONE_COMMIT",
-    "baseline": "503c470149069caaf2bf9c87f24caa38091ce3a6",
-    "required_unit": "Every native stratum's population_key_sha256 and stratum contract, membership/disposition population before/after final fix",
-    "rule": "Unchanged populations retain draws/reads; changed populations alone receive co-op new-seed redraw and both reads. No ad-hoc hash unit."
-  },
-  "gates": {
-    "j4_final_keys": "PENDING_COOP",
-    "commit": "HELD",
-    "push": "HELD",
-    "g5": "NOT_MET",
-    "followups_open": [
-      "G5-F1",
-      "G5-F2",
-      "G5-F3",
-      "G5-F4"
     ],
-    "required": [
-      "designated code/delta reads",
-      "trading acknowledgement",
-      "final-head CI",
-      "pre-cue",
-      "explicit CC cue",
-      "release cue"
-    ]
-  },
-  "failed_attempts": [
-    {
-      "kind": "runtime_path_probe",
-      "exit_code": 127,
-      "correction": "Guessed mise 3.14.4 path absent; installed uv python find and /usr/bin/python3 identify existing CPython3.14.4. No installation."
-    },
-    {
-      "kind": "local_read_hook",
-      "correction": "Consecutive source-read hook blocked one sed before mutation; symbolic source fallback used."
-    },
-    {
-      "kind": "graph_transport",
-      "correction": "Root graph transport closed; stale/excluded coverage and exact source fallback qualified."
-    },
-    {
-      "kind": "critic_diagnostic_bug",
-      "correction": "Canonical/Python numeric equality mismatch corrected and native-fixture regression passed."
-    }
-  ]
+    "observed_utc": "2026-10-10T00:23:53.111932+00:00",
+    "resource_prefix": [],
+    "skipped": 0,
+    "stderr_sha256": "dc27751dfc7c2e0c726d2282063ddedde00bd19673c46e6dd6d270161d7f93dc",
+    "stdout_sha256": "3c1023292c8630fceef816bdf2d219ede0dcd9ef1c07b34c7221865c6949c4bc",
+    "tests": 42
+  }
 }

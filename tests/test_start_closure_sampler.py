@@ -740,6 +740,24 @@ class NativeSamplerTests(unittest.TestCase):
             sampler.build_packet(**kwargs)
             self.assertEqual((root / "packet/inputs/manifest.json").read_bytes(), kwargs["manifest_path"].read_bytes())
 
+    def test_explicit_asset_rebinding_cannot_replace_manifest_binding(self):
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        self.add_row("PENDING", conflict=True)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, origins, _, kwargs = self.packet_inputs(root)
+            actual_sha = manifest["asset"]["sha256"]
+            manifest["asset"]["sha256"] = digest(b"historical prepared asset")
+            self.rewrite_packet_manifest(kwargs, manifest, origins)
+            manifest_raw = kwargs["manifest_path"].read_bytes()
+            kwargs["asset_sha256"] = actual_sha
+            with mock.patch.object(sampler, "select") as selection:
+                with self.assertRaisesRegex(ValueError, "differs from manifest binding"):
+                    sampler.build_packet(**kwargs)
+                selection.assert_not_called()
+            self.assertEqual(kwargs["manifest_path"].read_bytes(), manifest_raw)
+            self.assertFalse((root / "packet").exists())
+
     def test_explicit_pin_cannot_waive_added_or_removed_computed_rows(self):
         self.add_row("TRIAL")
         for added in (False, True):
@@ -795,7 +813,8 @@ class NativeSamplerTests(unittest.TestCase):
                 self.rewrite_packet_manifest(kwargs, manifest, origins)
                 kwargs["asset_sha256"] = actual_pin
                 with mock.patch.object(sampler, "select") as selection:
-                    with self.assertRaises(ValueError):
+                    diagnostic = "capture is missing or hash-mismatched" if condition == "capture" else "native qualification blocked"
+                    with self.assertRaisesRegex(ValueError, diagnostic):
                         sampler.build_packet(**kwargs)
                     selection.assert_not_called()
                 self.assertFalse((root / "packet").exists())

@@ -158,6 +158,50 @@ class CompactManifestTests(unittest.TestCase):
             row["primary_sources"][0]["locator"] = "UNKNOWN"
             row["closure"]["pending_locator"] = {"reason_code": "unsupported-transport", "measurement": "establish the source repository file locator from primary evidence"}
 
+    def test_note_cannot_claim_null_row_pin_when_source_entry_revision_is_recorded(self):
+        self.closure_pending()
+        row = self.rows[0]
+        row["pin"]["subject"] = "source-entry"
+        row["note"] = "Original candidate-entry binding is unestablished; row pin stays null/PENDING."
+        index = {name: {"sha256": digest(data)} for name, data in self.files.items()}
+        for profile in (None, compact.START_CLOSURE_PROFILE):
+            with self.subTest(profile=profile):
+                candidate = deepcopy(row)
+                if profile is None:
+                    candidate.pop("closure")
+                with self.assertRaisesRegex(compact.CompactError, "note claims a null row pin"):
+                    compact.validate_row(candidate, index, profile=profile)
+
+    def test_corrected_source_entry_note_and_actual_null_pin_remain_valid(self):
+        self.closure_pending(pin_residue=True)
+        row = self.rows[0]
+        row["note"] = "Original candidate-entry binding is unestablished; row pin stays null/PENDING."
+        index = {name: {"sha256": digest(data)} for name, data in self.files.items()}
+        compact.validate_row(deepcopy(row), index, profile=compact.START_CLOSURE_PROFILE)
+        row["pin"] = pin(row["repository_or_entry"], subject="source-entry")
+        row["primary_sources"][0]["pin"] = deepcopy(row["pin"])
+        row["note"] = "row pin records a source-entry list revision; candidate implementation pin remains UNESTABLISHED/PENDING."
+        row["closure"] = {}
+        compact.validate_row(row, index, profile=compact.START_CLOSURE_PROFILE)
+
+    def test_explicit_note_sync_preserves_all_other_facts_and_actual_null_notes(self):
+        self.closure_pending(pin_residue=True)
+        row = self.rows[0]
+        row["note"] = "Original candidate-entry binding is unestablished; row pin stays null/PENDING."
+        original = deepcopy(row)
+        self.assertEqual(compact.sync_source_entry_note(row), original)
+        row["pin"] = pin(row["repository_or_entry"], subject="source-entry")
+        row["primary_sources"][0]["pin"] = deepcopy(row["pin"])
+        row["closure"] = {}
+        original = deepcopy(row)
+        corrected = compact.sync_source_entry_note(row)
+        self.assertEqual(row, original)
+        self.assertEqual({key: value for key, value in corrected.items() if key != "note"},
+                         {key: value for key, value in original.items() if key != "note"})
+        self.assertIn("row pin records a source-entry list revision; candidate implementation pin remains UNESTABLISHED/PENDING", corrected["note"])
+        compact.validate_row(corrected, {name: {"sha256": digest(data)} for name, data in self.files.items()},
+                             profile=compact.START_CLOSURE_PROFILE)
+
     def closure_counted(self):
         population = self.coverage["list_populations"][0]
         population["expected_occurrences"].pop()

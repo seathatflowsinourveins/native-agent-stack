@@ -50,7 +50,7 @@ After a population changes, the production sampler accepts an explicit new `--re
 
 `occurrences-outside-declared-union` is partitioned by the mapped row's final disposition. Every ADOPT-NOW or TRIAL mapping blocks under every profile. Only non-action mappings can enter G5-F3, with their measured count and sorted occurrence-ID-list hash. Their resolution is to complete the union declaration or exclude each source with its reason. Duplicate or stale declarations fail. The previous 803-mapping census included six logical source/field-provenance IDs on five TRIAL rows; their retained records show that they are not physical mined-list entries. Removing only the erroneous list-occurrence labels, preserving each exact source reference and recording its reason, leaves 797 non-action mappings and zero action mappings outside the union. No disposition was demoted. Default qualification continues to block the omission.
 
-The manifest face records `validation.profile`, every class and bucket count, and the exact non-action G5-F3 ID-list hash. PENDING-PIN and PENDING-LOCATOR count distinct rows with either explicit flags or residue in that bucket, with G5-F4 rows excluded from the counted PENDING-PIN union even when they retain historical pin flags. Their `pending_pin` and `pending_locator` units are declared in `count_units`. Other row-level counters sum append events, so qualification-specific mappings remain distinct. G5-F2 overlaps its pin/locator bucket. `f1` and `f2` count row-level field/skill residue separately from declared omissions; `f3` counts only non-action outside-union mappings. `origin_unresolved` is the declared alias for distinct original claim IDs plus legacy unresolved rows without claim IDs. A separate row counter preserves the 47-claim/51-row mapping. These overlapping units must not be added.
+The manifest face records `validation.profile`, every class and bucket count, and the exact non-action G5-F3 ID-list hash. PENDING-PIN and PENDING-LOCATOR count distinct rows with either explicit flags or residue in that bucket, with G5-F4 rows excluded from the counted PENDING-PIN union even when they retain historical pin flags. Their `pending_pin` and `pending_locator` units are declared in `count_units`. Other row-level counters sum append events, so qualification-specific mappings remain distinct. G5-F2 overlaps its pin/locator bucket. `f1` and `f2` count row-level field/skill residue separately from declared omissions; `f3` counts only non-action outside-union mappings. `origin_unresolved` is the declared alias for distinct original claim IDs plus legacy unresolved rows without claim IDs. A separate row counter preserves the current 47-claim/50-row mapping after the confirmed OpenHands slot correction; the preceding 51-row count is historical. These overlapping units must not be added.
 
 The G5-F2 omission's 4,091 unit is historical PENDING decision rows at preparation, computed by `prepare_inventory.py` (SHA256 `7c7e981270148ba35a72eb1193b65701159aee5e90f87e80c2c2e1d628ce09c9`) from retained `provenance/r4-input-rows.original.json`, SHA256 `3f9db58d7082cac1165813a6a33d48474d1089fdb043ff8df8ad6bfe42212243`. That snapshot has 4,582 rows, 4,091 PENDING. It is separate from current PENDING decision rows (4,058), pin/locator buckets (3,340/2,117) and F2 residue events (166). `count_units` declares this historical unit; it does not claim that 4,091 is a fresh primary-evidence qualification count.
 
@@ -104,7 +104,7 @@ SDK/workers. The other three current notes now distinguish their retained
 source-entry list revision from an unestablished candidate implementation pin.
 Their immutable original null-pin source notes remain intact.
 
-The current qualified archive is
+The four-row fix qualified archive at b5c215ac is
 `bcba48bab1aa8371c2b8ea8ce7812528fb4cb85818018d2c883d14c59f73171d`
 (50,333,229 bytes), with native manifest
 `4d453182cd177d042d137fe7d0fbf5810731eee2d2d9b7248dfd3203ee95e0f6`.
@@ -122,3 +122,37 @@ still require the designated reads. The [fix receipt](../../evidence/artifacts/g
 retains input/code bindings, archive-member delta, failed qualification and
 remaining gates. No generation result establishes G5 MET or authorizes landing
 or publication.
+
+## CC note-class correction, 2026-10-10
+
+The subsequent CC ruling extends only the null-pin note contradiction to the
+remaining 90 PENDING rows: 39 backtesting-engine, 23 execution-broker,
+17 agents-models-workers, seven identity-provenance and four
+evaluation-experiments. The native `sync_source_entry_note` operation applies
+the same source-entry-list versus candidate-implementation wording as the
+three confirmed note fixes. Every other row field and original capture remains
+identical. The four affected NOT units retain their adjudicated verdicts. An
+actual null-pin row keeps its null-pin note. The strict validator rejects an
+unsynced note that claims a null row pin despite a recorded source-entry revision.
+
+The resulting unpublished archive is
+`0aeb16e1142a22a69d2e1bcded70a74df2db3e81fe6c01d42771d00589d3d35a`
+(56,463,125 bytes), with native manifest
+`afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb`.
+The [class-fix receipt](../../evidence/artifacts/g5-start-closure-1-20261009/note-class-fix.json)
+records the exact GNU tar/zstd build arguments, native sync source, all 90 keys,
+changed-member comparison and fresh checks. Only `compact/rows.json` and
+`SHA256SUMS` change from the preceding archive; coverage and every original
+capture retain their hashes. Compressed sizes alone establish no missing data
+or causal compression claim. The tracked compact rows now match the current
+archive's immutable rows member, from which the native manifest is recomputed.
+
+The [new native population table](../../evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json)
+records all 414 membership/disposition hashes at b5c215ac and after this
+correction, plus selected-key equality from native replay. Those hashes also
+match the pinned 503c4701 populations.
+All are unchanged: no redraw seed, sampled re-read or re-adjudication is required.
+The designated code/class micros, final-head CI and separate CC landing rebase
+remain pending. The current J8 receipt retains its historical preparation and
+records the fresh pinned sampler run: 42 tests, zero skips, with
+`G5_R3_GENERATOR` set. These checks establish no new model verdict or G5 MET.

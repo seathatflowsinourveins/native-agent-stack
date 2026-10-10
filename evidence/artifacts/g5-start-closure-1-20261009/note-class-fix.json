@@ -1,0 +1,948 @@
+{
+  "adjudication_boundary": "The four NOT units retain their verdicts. Only the CC-authorized note class changes; no re-adjudication or model run.",
+  "after_manifest_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+  "all_original_capture_members_byte_identical": true,
+  "archive_build": {
+    "compression_boundary": "The prior repack reduced compressed size; exact member hashes establish that only rows, coverage and checksum bytes changed. No capture was dropped. No cause beyond the retained serializer/compressor recipe is inferred.",
+    "driver_sha256": "559d903b728a393fe62eb7271d84ee59d42e1f1ad9da450505b5b9e4d75b72db",
+    "historical_rows_sync_bytes": 56466790,
+    "prior_archive_bytes": 50333229,
+    "prior_repack_size_decrease_bytes": 6133561,
+    "reference_recipe_sha256": "b9fa9c6a1925e26ac75f1e8457746db89ba5547825bfda3ff78c9d9616c61821",
+    "tar_argv": [
+      "tar",
+      "--create",
+      "--file",
+      "-",
+      "--format=posix",
+      "--sort=name",
+      "--mtime=2026-10-08T00:00:00Z",
+      "--owner=0",
+      "--group=0",
+      "--numeric-owner",
+      "--pax-option=delete=atime,delete=ctime",
+      "-C",
+      "$G5_NOTE_SYNC_STAGE",
+      "--null",
+      "--files-from",
+      "$G5_NOTE_SYNC_MEMBERS"
+    ],
+    "zstd_argv": [
+      "zstd",
+      "-T1",
+      "-q",
+      "--stdout"
+    ]
+  },
+  "archive_members": 13486,
+  "asset": {
+    "bytes": 56463125,
+    "published": false,
+    "sha256": "0aeb16e1142a22a69d2e1bcded70a74df2db3e81fe6c01d42771d00589d3d35a"
+  },
+  "before_manifest_sha256": "4d453182cd177d042d137fe7d0fbf5810731eee2d2d9b7248dfd3203ee95e0f6",
+  "by_slot": {
+    "agents-models-workers": 17,
+    "backtesting-engine": 39,
+    "evaluation-experiments": 4,
+    "execution-broker": 23,
+    "identity-provenance": 7
+  },
+  "changed": 90,
+  "changed_members": [
+    "SHA256SUMS",
+    "compact/rows.json"
+  ],
+  "checks": {
+    "compact_module": {
+      "command": "/usr/bin/python3 -m unittest -v tests.test_compact_manifest",
+      "exit_code": 0,
+      "skip_reasons": [
+        "Immutable original native-skills capture not supplied",
+        "Immutable external native-example packet not supplied"
+      ],
+      "skipped": 2,
+      "stderr_sha256": "95448404dc1465b2c93e84c9375308318b5d6b806eb517e41020ece9a54f0b19",
+      "tests": 92
+    },
+    "full_validation": {
+      "boundary": "Actual complete checker pass before recording final check and critic facts; repeated FULL after final registration before commit.",
+      "command": "/usr/bin/python3 scripts/validate.py",
+      "components": 70,
+      "exit_code": 0,
+      "hashed_files": 10917,
+      "mode": "FULL",
+      "profiles": 4,
+      "receipts": 237,
+      "stderr_bytes": 0,
+      "stdout_sha256": "66829ef2f1e88f505d34b84a364e14a37c12e6df0b09cc7349e49f63bb54e913"
+    },
+    "sampler_module": {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_start_closure_sampler"
+      ],
+      "cwd": "repository root",
+      "environment": {
+        "G5_R3_GENERATOR": "tools/sota-convergence/sealed_r3_generator.py"
+      },
+      "evidence_class": "synthetic",
+      "exit_code": 0,
+      "fixture_source": "Existing tests.test_compact_manifest.CompactManifestTests, real native build; no qualification mocks",
+      "input_source_sha256": "a8f03d94473cf64a537c137d9f99361d92ef25233661180f2192fd416239a1c1",
+      "negative_conditions": [
+        "correct explicit pin plus closure/origin/disposition/count/order drift",
+        "capture/coverage corruption with correct explicit outer pin",
+        "missing compact/rows.json",
+        "invalid/uppercase/truncated pins and malformed asset object",
+        "native CLI missing asset and clean error code",
+        "asset flags in preparation/proof modes",
+        "required zstd absent fails rather than skips",
+        "canonical JSON count 1 vs 1.0/true"
+      ],
+      "observed_utc": "2026-10-10T00:23:53.111932+00:00",
+      "resource_prefix": [],
+      "skipped": 0,
+      "stderr_sha256": "dc27751dfc7c2e0c726d2282063ddedde00bd19673c46e6dd6d270161d7f93dc",
+      "stdout_sha256": "3c1023292c8630fceef816bdf2d219ede0dcd9ef1c07b34c7221865c6949c4bc",
+      "tests": 42
+    },
+    "validator_regression_red": {
+      "exit_code": 1,
+      "failed_subtests": 2,
+      "parent": "b5c215ac53ed1705a078d2832e4458627f481025",
+      "scope": "Unchanged b5 compact validator with the new regression; both default and START reject expectation failed before implementation.",
+      "stderr_sha256": "36a3d6425a6357da5dd3c90b9906f43ad994557c19e90d6770f27fff515bdbbe",
+      "tests": 1
+    }
+  },
+  "corrected_keys": [
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/0b01/tectonicdb",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/advancingtitans/stock-analysis",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/ai4finance-foundation/fingpt",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/ai4finance-foundation/finrl",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/ai4finance-foundation/finrl",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/al1enjesus/polyclawster",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "identity-provenance"
+      },
+      "repository_or_entry": "https://github.com/apache/kafka",
+      "slot": "identity-provenance"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/autonomous-asset-management-agents/autonomous_",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/bitrinjani/r2",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/botcrypto-io/awesome-crypto-trading-bots",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/brndnmtthws/thetagang",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/butor/blackbird",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/byrnexu/betterquant",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/caoruicn/openalpha",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/ccxt/ccxt",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/chrism2671/pytrendfollow",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/compendiumfi/pendax-sdk",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/cryptosun2049/openfinclaw",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/depthsight-pro/depthsight",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "identity-provenance"
+      },
+      "repository_or_entry": "https://github.com/dgunning/edgartools",
+      "slot": "identity-provenance"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/dragon1086/prism-insight",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "identity-provenance"
+      },
+      "repository_or_entry": "https://github.com/duckdb/duckdb",
+      "slot": "identity-provenance"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/dunkinguys/bullbear",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/erdewit/ib_insync",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/eternahybridexchange/eterna-ai",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "evaluation-experiments"
+      },
+      "repository_or_entry": "https://github.com/eyenoticeall/lacuna",
+      "slot": "evaluation-experiments"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/featherenvy/botvana",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/finhackcn/finhack",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "identity-provenance"
+      },
+      "repository_or_entry": "https://github.com/gerrymanoim/exchange_calendars",
+      "slot": "identity-provenance"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/gobacktest/gobacktest",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/happydasch/btplotting",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/hephaestlab/traderharness",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/hfqr/flashfunk",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/hkuds/vibe-trading",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/hkuds/vibe-trading",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/hugues31/coinnect",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/initial-d/ml-quant-trading",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/jmargieh/tradingview-screener",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/kentmswood-ui/stockkit",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/kernc/backtesting.py",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/kernc/backtesting.py",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/leosmigel/analyzingalpha",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/letianzj/quanttrader",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/lumiwealth/lumibot",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/lumiwealth/lumibot",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "identity-provenance"
+      },
+      "repository_or_entry": "https://github.com/man-group/arcticdb",
+      "slot": "identity-provenance"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/maxme/bitcoin-arbitrage",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/mementum/backtrader",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/microsoft/qlib",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/microsoft/qlib",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/mirror29/inalpha",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "evaluation-experiments"
+      },
+      "repository_or_entry": "https://github.com/morluto/jacobian",
+      "slot": "evaluation-experiments"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/nanvel/cipher-bt",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/neuzhou/finclaw",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/neuzhou/finclaw",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/nkaz001/hftbacktest",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/nymath/torchquantum",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "identity-provenance"
+      },
+      "repository_or_entry": "https://github.com/pandas-dev/pandas",
+      "slot": "identity-provenance"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/pmxt-dev/pmxt",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/polakowo/vectorbt",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/pskrunner14/trading-bot",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/pyportfolio/pyportfolioopt",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/pyportfolio/pyportfolioopt",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/quantaxis/quantaxis",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/quantfabric/quantfabric",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "evaluation-experiments"
+      },
+      "repository_or_entry": "https://github.com/ranaroussi/quantstats",
+      "slot": "evaluation-experiments"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "identity-provenance"
+      },
+      "repository_or_entry": "https://github.com/ranaroussi/yfinance",
+      "slot": "identity-provenance"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/rburkholder/trade-frame",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/rmbell09-lang/tradesight",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/robcarver17/pysystemtrade",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/rundef/async_rithmic",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/shashankvemuri/finance",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/sher1096/klinepic-agent-api-examples",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/skfolio/skfolio",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/skfolio/skfolio",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/squidkid-deluxe/qtradex-algo-trading-sdk",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/sreenivasdoosa/sdoosa-algo-trade-python",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/sstoikov/microprice",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/stefan-jansen/machine-learning-for-trading",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/stefan-jansen/zipline-reloaded",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/sunshowerc/fund-strategy",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/tauricresearch/tradingagents",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/tauricresearch/tradingagents",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/ufund-me/qbot",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/ufund-me/qbot",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "agents-models-workers"
+      },
+      "repository_or_entry": "https://github.com/virattt/ai-hedge-fund",
+      "slot": "agents-models-workers"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "evaluation-experiments"
+      },
+      "repository_or_entry": "https://github.com/wangzhe3224/alphalens",
+      "slot": "evaluation-experiments"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/wondertrader/wondertrader",
+      "slot": "backtesting-engine"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "execution-broker"
+      },
+      "repository_or_entry": "https://github.com/yichengyang-ethan/oracle3",
+      "slot": "execution-broker"
+    },
+    {
+      "qualification": {
+        "catalog": "us-equities",
+        "slot": "backtesting-engine"
+      },
+      "repository_or_entry": "https://github.com/yvictor/tradinggym",
+      "slot": "backtesting-engine"
+    }
+  ],
+  "current_artifacts": {
+    "catalogs/landscape/grand-catalog-20261008.json": {
+      "bytes": 28389911,
+      "sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb"
+    },
+    "evidence/artifacts/g5-start-closure-1-20261009/compact/rows.json": {
+      "bytes": 25027104,
+      "sha256": "28ee7d08e4df79a6bb5f386b3f7c6d8706adcf3ff72ae3c8288f01684da9d2c7"
+    },
+    "evidence/artifacts/g5-start-closure-1-20261009/origin-map.json": {
+      "bytes": 3064963,
+      "sha256": "50a577cb25fc0650355c3ddf9b709b18d0fadb5a426415b6f497c1e78fe83e7a"
+    },
+    "tests/test_compact_manifest.py": {
+      "bytes": 104328,
+      "sha256": "545c29ebd3f0dda427989516c7afae1386091152640100693a811bacd43c3064"
+    },
+    "tests/test_start_closure_sampler.py": {
+      "bytes": 57351,
+      "sha256": "a8f03d94473cf64a537c137d9f99361d92ef25233661180f2192fd416239a1c1"
+    },
+    "tools/sota-convergence/compact_manifest.py": {
+      "bytes": 147149,
+      "sha256": "2a9c9ffbacab66bfe6f4b0c789bd854ccbc77d61558870d9a24c78c805d02886"
+    },
+    "tools/sota-convergence/start_closure_sampler.py": {
+      "bytes": 41767,
+      "sha256": "6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a"
+    }
+  },
+  "failed_attempts": [
+    {
+      "condition": "Unpinned python3 resolved to CI3.13.16 without jsonschema",
+      "exit_code": 1,
+      "resolution": "Use the sealed sampler required /usr/bin/python3.14.4 with existing jsonschema; no dependency installation.",
+      "stderr_sha256": "17a480bd562d9b5064990e0176f69d05deb109156a83d34781bb93dea7e83f84"
+    },
+    {
+      "condition": "Two new positive fixture controls retained pending_pin after replacing every null pin",
+      "exit_code": 1,
+      "resolution": "Clear the synthetic pending_pin flag when the fixture establishes its pin; full module rerun passed.",
+      "stderr_sha256": "04cb7b131254b629824098383a0f18254a944e391489137e06e251be2c2c957f"
+    },
+    {
+      "condition": "Overbroad single diagnostic expectation for two distinct native qualification failures",
+      "exit_code": 1,
+      "resolution": "Assert capture hash mismatch for capture corruption and native qualification blocked for coverage corruption; whole sampler rerun passed42/0skip.",
+      "stderr_sha256": "d78033fa3365f71e5e635c4194e85f2ea5cdd3b0eae25bd02ece97100da8f54f"
+    },
+    {
+      "condition": "First sync driver rejected native archive directory metadata before any output asset or manifest write",
+      "exit_code": 1,
+      "resolution": "Validate and skip directory entries, retain the partial stage and retry the same confined file members.",
+      "stderr_sha256": "37c8b077b4b652e9cce2db787a5dec5cc2cf3b3d03f9155525cf75984d543030"
+    }
+  ],
+  "fields": [
+    "note"
+  ],
+  "gates": {
+    "designated_reads": "PENDING",
+    "final_head_ci": "PENDING",
+    "g5": "NOT_MET",
+    "landing_rebase": "PENDING_SEPARATE_CC_CUE",
+    "publication": "HELD"
+  },
+  "j8_current_receipt": {
+    "bytes": 19305,
+    "path": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json",
+    "sha256": "c147f0c2b5f3186b65f7905d72f18cc7abf2994b3f6d72da6bc22c5818adb81b"
+  },
+  "kind": "g5-native-note-class-sync",
+  "origin_map_sha256": "50a577cb25fc0650355c3ddf9b709b18d0fadb5a426415b6f497c1e78fe83e7a",
+  "parent": "b5c215ac53ed1705a078d2832e4458627f481025",
+  "population_receipt": {
+    "bytes": 317521,
+    "counts": {
+      "changed": 0,
+      "matches_503c4701_population": 414,
+      "selected_native_keys_equal": 414,
+      "strata": 414,
+      "unchanged": 414
+    },
+    "new_redraw_seed": null,
+    "path": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
+    "redraw_required": false,
+    "sha256": "8598ca152de68c7d6aef20278afaf04bfc104c0e43573fe4b2fada996433b6fe"
+  },
+  "profile": "start-closure/1",
+  "qualification": {
+    "blockers": 0,
+    "check_exit_code": 0,
+    "status": "PASS",
+    "write_exit_code": 0
+  },
+  "rows": 4606,
+  "sampling": "Population table is measured separately with the packet native tooling; no production draw or new seed.",
+  "schema_version": 1,
+  "source": {
+    "function": "sync_source_entry_note",
+    "path": "tools/sota-convergence/compact_manifest.py",
+    "sha256": "2a9c9ffbacab66bfe6f4b0c789bd854ccbc77d61558870d9a24c78c805d02886"
+  },
+  "unchanged_rows": 4516
+}

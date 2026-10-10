@@ -548,6 +548,22 @@ def closure_locator(source, label, closure, blockers):
     return False
 
 
+def sync_source_entry_note(row):
+    """Apply the CC's note class correction without changing bound row facts.
+
+    This explicit sync is separate from qualification: an unsynced contradiction
+    must fail validation. The original source captures and null-pin rows remain
+    unchanged, and the candidate implementation still has no established pin.
+    """
+    pin = row.get("pin")
+    note = row.get("note", "")
+    if pin and pin["subject"] == "source-entry" and "row pin stays null/PENDING" in note:
+        return {**row, "note": note.replace(
+            "row pin stays null/PENDING",
+            "row pin records a source-entry list revision; candidate implementation pin remains UNESTABLISHED/PENDING")}
+    return row
+
+
 def validate_row(row, index, profile=None, *, record_residue=True):
     start_closure = validation_profile(profile)
     if not record_residue:
@@ -657,6 +673,9 @@ def validate_row(row, index, profile=None, *, record_residue=True):
     for name in ("searched", "reopen_when", "note"):
         if name in row:
             text(row[name], name)
+    require(not (row["pin"] and row["pin"]["subject"] == "source-entry"
+                 and "row pin stays null" in row.get("note", "").lower()),
+            "note claims a null row pin despite a recorded source-entry revision")
     require(row["disposition"] != "REJECT" or bool(row.get("searched")), "REJECT must name its searched source/surface")
     require((row["disposition"] == "PENDING") == ("pending" in row), "PENDING must retain its measurement; other rows must not carry pending")
     if "pending" in row:
