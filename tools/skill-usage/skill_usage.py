@@ -197,11 +197,13 @@ def parse_claude_output(raw: str) -> dict:
 
 
 # /skill-doctor is a local command (0 turns, $0), so these fences change nothing while the client recognises it:
-# measured 2026-10-10 on Claude Code 2.1.295, the same table (sha256-identical) at $0 and 0 turns with and without them.
-# If a client stopped recognising it, they would keep the prompt from reaching a model with tools or MCP servers under
-# the host's inherited bypassPermissions and cap what the run spends (untested: no such client exists). Each fence is a
-# documented 2.1.295 flag (`claude --help`): no tools, no MCP servers, deny anything not pre-approved without prompting
-# (the repository's rule PERM-03, docs/harness-rules-convergence-20260922.md), one turn, a budget cap.
+# measured 2026-10-10 on Claude Code 2.1.295 and 2.1.296, each client's table sha256-identical at $0 and 0 turns with
+# the fences of b2189ba0 and with these. If a client stopped recognising it, they would keep the prompt from reaching a
+# model with tools or MCP servers under the host's inherited bypassPermissions and cap what the run spends (untested: no
+# such client exists). Sources: `claude --help` (2.1.295, 2.1.296) lists --permission-mode, --permission-prompts,
+# --tools, --strict-mcp-config and --max-budget-usd; --max-turns is accepted but hidden from --help and documented in
+# the CLI reference, https://code.claude.com/docs/en/cli-reference. Denying anything not pre-approved without prompting
+# is the repository's rule PERM-03 (docs/harness-rules-convergence-20260922.md).
 SKILL_DOCTOR_ARGV = ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
                      "--permission-prompts", "none", "--tools", "", "--strict-mcp-config", "--max-turns", "1",
                      "--max-budget-usd", "0.05"]
@@ -2225,14 +2227,13 @@ def render_lanes_text(report: dict) -> str:
 # --------------------------------------------------------------------------- CLI
 
 
-def main(argv=None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     claude_source = parser.add_mutually_exclusive_group()
     claude_source.add_argument("--claude-skill-doctor", type=Path, metavar="FILE",
-                                help="Parse a captured 'claude -p \"/skill-doctor\" --output-format "
-                                     "json' result object or JSON array (its result event's "
-                                     "'result' text), or a plain-text /skill-doctor table, from "
+                                help=f"Parse a captured '{shlex.join(SKILL_DOCTOR_ARGV)}' result object or JSON array "
+                                     "(its result event's 'result' text), or a plain-text /skill-doctor table, from "
                                      "this file")
     claude_source.add_argument("--run-skill-doctor", action="store_true",
                                 help=f"Run '{shlex.join(SKILL_DOCTOR_ARGV)}' now (stdin from /dev/null); refused "
@@ -2272,6 +2273,11 @@ def main(argv=None) -> int:
                        help="Also write the private per-call ledger (codex-call-ledger/1 JSONL: thread and call ids with "
                             "each call's state) to this new file, mode 0600; refused inside any git work tree, over an "
                             "existing path, or with a measurement kernel that exports no callLedger (--lanes)")
+    return parser
+
+
+def main(argv=None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     try:

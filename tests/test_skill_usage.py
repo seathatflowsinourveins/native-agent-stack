@@ -225,11 +225,47 @@ class RunSkillDoctor(unittest.TestCase):
         for name, text in copies.items():
             with self.subTest(copy=name):
                 self.assertIn(command, flat(text))
-        # argparse wraps help text at hyphens ("--max- budget-usd"), so the help copy is compared without whitespace.
-        help_out = io.StringIO()
-        with contextlib.redirect_stdout(help_out), self.assertRaises(SystemExit):
-            S.main(["--help"])
-        self.assertIn("".join(command.split()), "".join(help_out.getvalue().split()))
+
+    def test_each_cli_help_entry_names_the_exact_command(self):
+        # Checked per option, not over the whole --help output: a correct copy in one entry must not hide a stale copy
+        # in the other (co-op GPT read of #925 at 2c8fc61b, P2).
+        command = shlex.join(S.SKILL_DOCTOR_ARGV)
+        helps = {option: action.help for action in S.build_parser()._actions for option in action.option_strings}
+        for option in ("--claude-skill-doctor", "--run-skill-doctor"):
+            with self.subTest(option=option):
+                self.assertIn(command, helps[option])
+        # Negative control: the bare command of b2189ba0 in one entry fails even while the other entry is correct.
+        stale = "Parse a captured 'claude -p \"/skill-doctor\" --output-format json' result object"
+        self.assertNotIn(command, stale)
+
+    def test_the_fence_comment_names_its_sources(self):
+        # The comment above SKILL_DOCTOR_ARGV must cite where each fence is documented: the client's --help does not
+        # list --max-turns (hidden in 2.1.295 and 2.1.296), so the CLI reference is cited for it, and the
+        # no-prompting rule is PERM-03. An unlanded record is no source (co-op GPT reads of #925).
+        source = (ROOT / "tools/skill-usage/skill_usage.py").read_text(encoding="utf-8").split("\n")
+        start = next(i for i, line in enumerate(source) if line.startswith("SKILL_DOCTOR_ARGV = "))
+        comment = []
+        for line in reversed(source[:start]):
+            if not line.startswith("#"):
+                break
+            comment.insert(0, line)
+        comment = " ".join(comment)
+        self.assertIn("https://code.claude.com/docs/en/cli-reference", comment)
+        self.assertIn("--max-turns is accepted but hidden from --help", comment)
+        self.assertIn("PERM-03 (docs/harness-rules-convergence-20260922.md)", comment)
+        self.assertNotIn("practice record", comment)
+
+    def test_the_windows_decision_cites_the_ledger_refusal_lines(self):
+        # docs/decisions/2026-10-04-pwsh7-windows-guidance.md cites the lines that refuse a ledger path inside a git
+        # work tree. Lines are counted by "\n", as editors, grep -n and GitHub count them: str.splitlines() also
+        # breaks at U+2028 and U+2029, which this module holds in one line, and would shift the count.
+        decision = (ROOT / "docs/decisions/2026-10-04-pwsh7-windows-guidance.md").read_text(encoding="utf-8")
+        cited = re.findall(r"tools/skill-usage/skill_usage\.py:(\d+)-(\d+)", decision)
+        self.assertEqual(len(cited), 1, cited)
+        start, end = (int(n) for n in cited[0])
+        lines = (ROOT / "tools/skill-usage/skill_usage.py").read_text(encoding="utf-8").split("\n")[start - 1:end]
+        self.assertTrue(lines[0].startswith("def ledger_path_issue("), lines[0])
+        self.assertIn("refusing a path inside a git work tree", "\n".join(lines))
 
     def test_uses_the_sample_fixture_stdout(self):
         sample = (FIXTURES / "skill-doctor-sample.json").read_text()
