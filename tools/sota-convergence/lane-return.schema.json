@@ -130,7 +130,10 @@
         "codex_lane_py_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
         "prompt_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
         "transcript_audit_py_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-        "repo_tree_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        "repo_tree_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "provider": {"type": "string", "enum": ["native", "omniroute"]},
+        "pass_through": {"type": "string", "const": "not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)"},
+        "provider_base_url": {"type": "string", "pattern": "^https?://(127\\.0\\.0\\.1|localhost|\\[::1\\])(:[0-9]{1,5})?/v1$"}
       }
     }
   }

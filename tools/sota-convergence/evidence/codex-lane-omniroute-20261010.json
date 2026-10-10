@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-10T09:45:29Z",
+  "base_commit": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
+  "original_base_commit": "4d345267866403d75edece400fde6cd35ec4d05c",
+  "codex_lane_py_sha256": "3ed9524ca7523b30a1258a18a06b1c7c7cc6d5f9826c2c14edfbc91394148d7a",
+  "status": "cc_authorized_proceed_with_not_attested_disclosure",
+  "cc_ruling": {
+    "at": "2026-10-10T07:51Z",
+    "provider": "omniroute",
+    "pass_through": "not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)",
+    "native_preferred": true,
+    "attestation_owner": "CC",
+    "rerun_rule": "If later attestation shows global system prompt, compression/adaptive budget, plugins or payload rules apply, OmniRoute-provider verdicts are re-run."
+  },
+  "native_default": true,
+  "native_receipt_contract": {
+    "cc_ruling_at": "2026-10-10T09:38Z",
+    "transport_fields": [],
+    "original_test_blob": "3f1132b46706001ab917c3d36d51a6cddc4b63ab",
+    "exact_provenance_assertion_restored_unedited": true,
+    "covers": ["absent provider flag", "explicit native provider", "native receipt fields", "all native usage attempts including failed retries"],
+    "original_suite_replay": {"class": "synthetic", "method": "Original Git test blob compiled in-memory against the fixed working-tree runner; actual test path retained for fixtures.", "tests": 81, "passed": 81, "exit_code": 0, "failures": 0, "errors": 0, "skips": 0}
+  },
+  "opt_in": "--provider omniroute",
+  "endpoint_env_addition": ["OMNIROUTE_BASE_URL"],
+  "keyless": true,
+  "native_auth_access_in_omniroute_mode": false,
+  "isolation_args_unchanged": true,
+  "receipt_transport_fields": ["provenance.provider", "provenance.provider_base_url", "provenance.pass_through"],
+  "usage_transport_fields": ["provider", "provider_base_url", "pass_through"],
+  "transport_fields_apply_to": "omniroute only",
+  "fail_before": {
+    "fixture_class": "synthetic",
+    "main_provider_class": {
+      "tests": 15,
+      "exit_code": 1,
+      "failures": 1,
+      "errors": 18,
+      "command": "python3 -m unittest tests.test_codex_lane.OmniRouteProviderTests -v",
+      "core_revision": "c8a29c3ee9b4337564165d9e588b3fe81e8ba817",
+      "core_sha256": "5b089c486a061d2aeb7fff75ac80e219a82929997f7961e8b00fef1cd88345f9",
+      "fixture_revision": "c83cea134fb6749f8e504b2759afca954492918b",
+      "sealer_revision": "c83cea134fb6749f8e504b2759afca954492918b",
+      "replay_scope": "Unchanged main codex_lane.py with the c83 provider fixture and feature sealer retained; the core is byte-identical at original main 4d345267866403d75edece400fde6cd35ec4d05c.",
+      "reason": "No provider flag or native provider provenance in unchanged core."
+    },
+    "full_baseline_provider_class": {
+      "tests": 15,
+      "exit_code": 1,
+      "failures": 3,
+      "errors": 18,
+      "command": "python3 -m unittest tests.test_codex_lane.OmniRouteProviderTests -v",
+      "baseline_revision": "c8a29c3ee9b4337564165d9e588b3fe81e8ba817",
+      "fixture_revision": "c83cea134fb6749f8e504b2759afca954492918b",
+      "replay_scope": "Full unchanged main archive with only tests/test_codex_lane.py overlaid from c83.",
+      "reason": "The unchanged main sealer adds two failures by rejecting native and OmniRoute provider provenance."
+    },
+    "endpoint_normalization": {"exit_code": 1, "observed": "HTTP://LOCALHOST:021128/v1", "expected": "http://localhost:21128/v1"},
+    "malformed_endpoint_json": {"exit_code": 1, "endpoint": 1, "observed": "AttributeError from urllib.parse.urlsplit", "expected": "Graceful loopback endpoint refusal"},
+    "model_route_identity": {"exit_code": 1, "observed": "cx/gpt-6.1-sol", "expected": "gpt-6.1-sol"},
+    "not_attested_disclosure": {"exit_code": 1, "failed_subtests": 5, "receipts": 2, "usage_attempts": 3, "includes_failed_attempt": true, "observed": "missing pass_through", "expected": "exact CC not_attested literal"},
+    "native_transport_metadata": {
+      "fixture_class": "synthetic",
+      "core_sha256": "6515b05e0a64b00a735d832e904dd2865b8a73d3df925fee7c0cdf540c258b1b",
+      "rebased_head": "1ce5c1c914ae4d9a32b40d3a0b6bad72413ef730",
+      "tests": 3, "exit_code": 1, "failures": 8, "errors": 0,
+      "observed": "provider=native added without opt-in to native provenance and every usage row",
+      "expected": "original exact provenance and native receipt/usage fields without transport metadata",
+      "includes_implicit_and_explicit_native": true,
+      "includes_failed_attempt": true,
+      "after_fix": {"tests": 3, "exit_code": 0, "failures": 0, "errors": 0, "elapsed_seconds": 0.160}
+    }
+  },
+  "required_tests": {
+    "command": "python3 -m unittest tests.test_codex_lane tests.test_verdict_lane_vendoring -v",
+    "exit_code": 0,
+    "tests": 112,
+    "failures": 0,
+    "errors": 0,
+    "elapsed_seconds": 6.235,
+    "class": "local_integration",
+    "covers": ["native default", "original exact native provenance assertion", "implicit and explicit native receipts/usage omit transport fields including failed retries", "loopback refusal", "credential/query/fragment/port refusal", "extra environment exclusion", "unchanged blind environment audit", "fresh keyless homes", "OmniRoute provider/family receipts", "exact not_attested disclosure on every Omni packet/attempt", "model disclosure spoof overwrite", "native/Claude disclosure refusal", "provider and endpoint resume invalidation", "canonical endpoint/model identity", "malformed metadata refusal", "legacy native sealer compatibility", "isolation args guard", "README block guard", "append-only code registries"]
+  },
+  "tier1_dry_run": {
+    "fixture_class": "synthetic",
+    "test": "tests.test_codex_lane.OmniRouteProviderTests.test_omniroute_dry_run_on_a_synthetic_tier1_packet_writes_nothing",
+    "packet": "foundation__native-clients",
+    "tier": 1,
+    "provider": "omniroute",
+    "exit_code": 0,
+    "model_turns": 0,
+    "output_files_created": 0,
+    "homes_created": 0
+  },
+  "client_http_canary": {
+    "class": "local_integration",
+    "receiver": "synthetic loopback HTTP capture",
+    "client": "codex-cli 0.162.1",
+    "checked_at": "2026-10-10T08:03:31Z",
+    "captured_requests": 1,
+    "prompt_bytes": 81,
+    "prompt_sha256": "77349a9f9ef7ed30bd56f9bdd702a22775aeb7bcd47af3942e764a3899809cb1",
+    "prompt_utf8_exact_match": true,
+    "model": "cx/gpt-6.1-sol",
+    "reasoning_effort": "max",
+    "policy_headers": {"no_memory": "true", "compression": "off"},
+    "instructions_nonblank": false,
+    "auth_link_present": false,
+    "client_exit_code": 1,
+    "intentional_receiver_http_status": 400,
+    "upstream_model_turns": 0,
+    "provider_received_body_comparison": "not performed; live gateway call-log detail is forbidden"
+  },
+  "native_quota": [
+    {"checked_at": "2026-10-10T07:53:36Z", "exit_code": 0, "ordinaryUsageAllowed": false, "primaryResetUtc": "2026-10-14T03:28Z", "secondaryResetUtc": null},
+    {"checked_at": "2026-10-10T08:22:46Z", "exit_code": 0, "ordinaryUsageAllowed": false, "primaryResetUtc": "2026-10-14T03:28Z", "secondaryResetUtc": null}
+  ],
+  "gateway_metadata": {"checked_at": "2026-10-10T07:33:37Z", "models_http_status": 200, "provider_limits_http_status": 200, "sol_cx_routes_present": true},
+  "gateway_source_review": {
+    "class": "source_review",
+    "recorded_base_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+    "recorded_pr15167_pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+    "recorded_affinity_pin": "045aa81f3",
+    "recorded_build": "5f4b3d577",
+    "recorded_tree": "f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f",
+    "native_passthrough_guarantees_format_only": true,
+    "memory_optout_supported": true,
+    "compression_off_can_be_overridden_by_adaptive_planning": true,
+    "global_instructions_payload_plugin_mutations_configuration_dependent": true,
+    "actual_post_october9_deployed_identity": "unverified",
+    "prompt_preservation_status": "unproved"
+  },
+  "limitations": [
+    "The gateway source does not supply an unconditional no-rewrite/no-injection guarantee. The CC permits proceeding under the exact not_attested disclosure and adverse-attestation re-run rule.",
+    "Client-boundary byte capture does not establish the body a live gateway forwards to its upstream provider.",
+    "No settings or call-log detail endpoint was read. Permitted list metadata cannot attest upstream prompt bytes.",
+    "No live verdict wave, gateway model inference or provider-quality parity test was run.",
+    "The native quota helper uses standard native-client auth/config loading internally; the agent did not inspect or copy credential or config contents."
+  ]
+}

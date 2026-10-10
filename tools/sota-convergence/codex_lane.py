@@ -64,6 +64,7 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from urllib.parse import urlsplit
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_PROMPT = HERE / "lane-prompt.md"
@@ -138,6 +139,54 @@ def write_strict_schema(schema_path: Path, codex_dir: Path) -> Path:
 DEFAULT_TIMEOUT = 900.0
 DEFAULT_EFFORT = "max"
 LANE = "codex"
+OMNIROUTE_BASE_URL_ENV = "OMNIROUTE_BASE_URL"
+DEFAULT_OMNIROUTE_BASE_URL = "http://127.0.0.1:21128/v1"
+# OmniRoute@0585aba5589d5a1f49243a13a8db249558e7c9e3
+# open-sse/config/providers/registry/codex/index.ts:9-17,71-74 (cx Responses route).
+DEFAULT_OMNIROUTE_MODEL = "gpt-6.1-sol"
+# CC 2026-10-10T07:51Z disclosure ruling; verified against the pinned primary sources.
+OMNIROUTE_PASS_THROUGH = (
+    "not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, "
+    "systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)")
+
+
+def omniroute_endpoint(value: str) -> str:
+    """A keyless loopback /v1 endpoint; never echo a rejected URL, which may contain a credential."""
+    if not isinstance(value, str):
+        raise ValueError("OmniRoute requires a keyless loopback http(s) /v1 endpoint with a valid port")
+    try:
+        parsed = urlsplit(value)
+        port = parsed.port
+        valid = (isinstance(value, str) and not any(character.isspace() for character in value)
+                 and parsed.scheme in ("http", "https") and parsed.hostname in ("127.0.0.1", "localhost", "::1")
+                 and parsed.username is None and parsed.password is None and "?" not in value and "#" not in value
+                 and parsed.path in ("/v1", "/v1/") and (port is None or 1 <= port <= 65535))
+    except (TypeError, ValueError):
+        valid = False
+    if not valid:
+        raise ValueError("OmniRoute requires a keyless loopback http(s) /v1 endpoint with a valid port")
+    host = "[::1]" if parsed.hostname == "::1" else parsed.hostname
+    authority = f"{host}:{port}" if port is not None else host
+    return f"{parsed.scheme}://{authority}/v1"
+
+
+def omniroute_config(endpoint: str) -> list:
+    """Transport-only CLI overrides, following landscape-sweep/codex_job.py:695-703 at main 4d345267.
+
+    Keep ISOLATION_ARGS and the blind environment rather than the sweep's profile/API-key setup.
+    The memory header is an upstream opt-out; compression off is a request, not a guarantee against
+    the pinned gateway's adaptive planning. Global prompt/payload/plugin configuration remains
+    an independently reviewed boundary (docs/decisions/2026-10-10-codex-lane-omniroute.md).
+    """
+    endpoint = omniroute_endpoint(endpoint)
+    return ["-c", 'model_provider="omniroute"',
+            "-c", 'model_providers.omniroute.name="OmniRoute loopback"',
+            "-c", "model_providers.omniroute.base_url=" + json.dumps(endpoint),
+            "-c", 'model_providers.omniroute.wire_api="responses"',
+            "-c", "model_providers.omniroute.requires_openai_auth=false",
+            "-c", 'model_providers.omniroute.http_headers={"x-omniroute-no-memory"="true",'
+                  '"x-omniroute-compression"="off"}',
+            "-c", "features.shell_snapshot=false"]
 
 # Recognized directly on an event dict or anywhere nested under it (e.g. a
 # ``turn.completed`` event's ``usage`` object). Extra keys on the event are
@@ -249,7 +298,11 @@ def fill_prompt(template: str, packet_path: Path, repo_root: Path) -> str:
 
 
 def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str, prompt_text: str,
-                  model: str = None, isolation=()) -> list:
+                  model: str = None, isolation=(), *, provider="native", omniroute_base_url=None) -> list:
+    provider_args = omniroute_config(omniroute_base_url) if provider == "omniroute" else []
+    if provider == "omniroute":
+        model = model or DEFAULT_OMNIROUTE_MODEL
+        model = model if model.startswith("cx/") else "cx/" + model
     return [
         "codex", "exec",
         *(["-m", model] if model else []),
@@ -262,6 +315,7 @@ def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str
         "--json",
         "-c", f"model_reasoning_effort={effort}",
         *isolation,
+        *provider_args,
         prompt_text,
     ]
 
@@ -532,7 +586,7 @@ def _overlap(first: Path, second: Path) -> bool:
     return any(_contains(a, b) or _contains(b, a) for a, b in spellings)
 
 
-def codex_home_issue(work_dir: Path, repo: Path = None):
+def codex_home_issue(work_dir: Path, repo: Path = None, *, provider="native"):
     """Why a run-scoped Codex home cannot be set up, or None; creates nothing, so a dry run and the lock run it first
     (round 6, ISO-R6-5). Refused: a base that is, holds or sits inside the native Codex home (either spelling), a
     base overlapping the work dir or ``repo``, and no native auth.json: a blind child never gets an API key, which
@@ -546,10 +600,11 @@ def codex_home_issue(work_dir: Path, repo: Path = None):
         if _overlap(base, place):
             return (f"the run-scoped Codex homes' base {base} overlaps {place}; set {CODEX_HOME_BASE_ENV} to a "
                     "directory outside the work dir and the export")
-    native = native_auth_path()
-    if not native.is_file():
-        return (f"no native Codex credential at {native}; sign in natively with `codex login` (with an API key: "
-                "`codex login --with-api-key`); a blind child is never given an API key variable")
+    if provider == "native":
+        native = native_auth_path()
+        if not native.is_file():
+            return (f"no native Codex credential at {native}; sign in natively with `codex login` (with an API key: "
+                    "`codex login --with-api-key`); a blind child is never given an API key variable")
     for key in PROXY_VARIABLES:
         if PROXY_USERINFO.match(os.environ.get(key) or ""):
             # Every variable a child gets is exported into the model's shell (round 7, ISO-R7-5).
@@ -600,7 +655,7 @@ def sweep_stale_links(work_dir: Path) -> None:
             remove_codex_home_link(home)
 
 
-def isolated_codex_home(work_dir: Path, repo: Path = None) -> Path:
+def isolated_codex_home(work_dir: Path, repo: Path = None, *, provider="native") -> Path:
     """Create a fresh run-scoped CODEX_HOME (mode 0700) under codex_home_base, holding only a symlink to the native
     ``auth.json`` (never a copy), the child's empty HOME and an empty TMPDIR. ``--ignore-user-config`` skips
     config.toml but not ``$CODEX_HOME/AGENTS.md``, the user's global instructions, which name adopted tools
@@ -615,11 +670,12 @@ def isolated_codex_home(work_dir: Path, repo: Path = None) -> Path:
     CLI's bundled skills). Its TMPDIR is the empty ``<run home>/tmp``, not the caller's (round 6, REG6-3).
 
     Raises CodexHomeRefused, creating nothing, for any codex_home_issue."""
-    issue = codex_home_issue(work_dir, repo)
+    # The keyless OmniRoute provider keeps this private home/lock lifecycle but never
+    # resolves, reads, copies or links the native auth path.
+    issue = codex_home_issue(work_dir, repo, provider=provider)
     if issue:
         raise CodexHomeRefused(issue)
     base = codex_home_base()
-    native = native_auth_path()
     import fcntl
     global IN_USE_HANDLE
     private_dir(base)
@@ -629,8 +685,10 @@ def isolated_codex_home(work_dir: Path, repo: Path = None) -> Path:
     (home / "tmp").mkdir(mode=0o700)
     IN_USE_HANDLE = open(home / IN_USE_NAME, "a", encoding="utf-8")
     fcntl.flock(IN_USE_HANDLE, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    if native.is_file():
-        (home / "auth.json").symlink_to(native)
+    if provider == "native":
+        native = native_auth_path()
+        if native.is_file():
+            (home / "auth.json").symlink_to(native)
     return home
 
 
@@ -755,14 +813,18 @@ def terminate_on_signal():
             signal.signal(signum, handler)
 
 
-def child_env(codex_home: Path) -> dict:
+def child_env(codex_home: Path, *, provider="native", omniroute_base_url=None) -> dict:
     """The whole environment of a blind child: the allowlisted variables, CODEX_HOME, the empty HOME and TMPDIR, and
     BLIND_CHILD_PATH instead of the caller's PATH. No API key variable: the child authenticates through the linked
     native auth.json (round 6, ISO-R6-4)."""
+    # Opt-in OmniRoute adds only its validated public endpoint; no gateway key,
+    # auth/account variable, coordinator variable or other ambient provider setting.
     env = {key: value for key, value in os.environ.items()
            if key in CHILD_ENV_ALLOWLIST or (CHILD_ENV_EXTRA_PREFIXES and key.startswith(CHILD_ENV_EXTRA_PREFIXES))}
     env.update({"CODEX_HOME": str(codex_home), "HOME": str(child_home(codex_home)),
                 "TMPDIR": str(Path(codex_home) / "tmp"), "PATH": BLIND_CHILD_PATH})
+    if provider == "omniroute":
+        env[OMNIROUTE_BASE_URL_ENV] = omniroute_endpoint(omniroute_base_url)
     return env
 
 
@@ -917,12 +979,15 @@ def child_home(codex_home: Path) -> Path:
     return Path(codex_home) / "home"
 
 
-def run_attempt(cmd: list, timeout: float) -> dict:
+def run_attempt(cmd: list, timeout: float, *, provider="native", omniroute_base_url=None) -> dict:
     """Run one child to completion or ``timeout``; after a stop (STOP) none starts and ``stopped`` is true."""
     started = time.monotonic()
     if STOP.is_set():
         return {"exit_code": None, "stdout": "", "stderr": "", "elapsed": 0.0, "timed_out": False, "stopped": True}
-    env = child_env(CHILD_CODEX_HOME) if CHILD_CODEX_HOME is not None else None
+    if provider == "omniroute" and CHILD_CODEX_HOME is None:
+        raise CodexHomeRefused("OmniRoute requires a fresh keyless Codex home")
+    env = child_env(CHILD_CODEX_HOME, provider=provider, omniroute_base_url=omniroute_base_url) \
+        if CHILD_CODEX_HOME is not None else None
     # A blind child's PATH has no codex (BLIND_CHILD_PATH), so it runs the one the caller's PATH resolves.
     cmd = blind_child_argv(cmd) if env is not None else cmd
     # The in-use lock rides along (round 7, ISO-R7-2); no stdin (round 5, ISO-R5-3): codex exec appends a
@@ -1093,12 +1158,17 @@ def tree_sha256(repo: Path, allow_escaping_links: bool = False) -> str:
     return digest.hexdigest()
 
 
-def lane_provenance(prompt_path: Path, repo: Path = None, allow_escaping_links: bool = False) -> dict:
+def lane_provenance(prompt_path: Path, repo: Path = None, allow_escaping_links: bool = False,
+                    *, provider="native", omniroute_base_url=None) -> dict:
     """What produced a return: this runner file's and the filled prompt template's sha256, and (given
     ``repo``) the digest of the evidence tree the lane read, so a resume against another export reruns
     (Codex review of #145)."""
     provenance = {"codex_lane_py_sha256": sha256_file(Path(__file__).resolve()),
                   "prompt_sha256": sha256_file(Path(prompt_path))}
+    if provider == "omniroute":
+        provenance["provider"] = provider
+        provenance["provider_base_url"] = omniroute_endpoint(omniroute_base_url)
+        provenance["pass_through"] = OMNIROUTE_PASS_THROUGH
     if repo is not None:
         provenance["repo_tree_sha256"] = tree_sha256(Path(repo), allow_escaping_links)
     return provenance
@@ -1130,7 +1200,14 @@ def parse_args(argv=None):
                         help="model_reasoning_effort passed via -c (default max, the standing GPT-6 lane setting; a return made at another effort is not reused).")
     parser.add_argument("--model", default=None,
                         help="Model passed to codex exec -m and recorded as the return's model.name "
-                             "(default: Codex's configured model, recorded from the event stream).")
+                             "(native default: Codex's configured model from events; OmniRoute default: "
+                             "gpt-6.1-sol on the pinned cx route).")
+    parser.add_argument("--provider", choices=("native", "omniroute"), default="native",
+                        help="Explicit transport opt-in; native stays the default. OmniRoute needs a reviewed "
+                             "keyless loopback route and does not by itself prove upstream prompt preservation.")
+    parser.add_argument("--omniroute-base-url", default=None,
+                        help="Keyless loopback /v1 endpoint for --provider omniroute; defaults to "
+                             "OMNIROUTE_BASE_URL or http://127.0.0.1:21128/v1.")
     parser.add_argument("--jobs", type=int, default=1, help="Concurrent codex exec invocations.")
     parser.add_argument("--dry-run", action="store_true", help="Print the command per pending layer; write nothing.")
     parser.add_argument("--allow-git-history", action="store_true",
@@ -1148,6 +1225,23 @@ def parse_args(argv=None):
 
 def main(argv=None) -> int:
     args = parse_args(argv)
+    if args.provider == "omniroute":
+        try:
+            args.omniroute_base_url = omniroute_endpoint(args.omniroute_base_url
+                or os.environ.get(OMNIROUTE_BASE_URL_ENV) or DEFAULT_OMNIROUTE_BASE_URL)
+        except ValueError as error:
+            print(f"codex_lane: {error}", file=sys.stderr)
+            return 2
+        # The cx/ prefix selects gateway routing, not an OpenAI model identity.
+        # Keep canonical model names in receipts and resume checks; build_command
+        # adds the prefix only to the CLI's routed model.
+        args.model = (args.model or DEFAULT_OMNIROUTE_MODEL).removeprefix("cx/")
+        if not args.model or "/" in args.model:
+            print("codex_lane: OmniRoute --model needs a bare model or its cx/ route spelling", file=sys.stderr)
+            return 2
+    elif args.omniroute_base_url is not None:
+        print("codex_lane: --omniroute-base-url requires --provider omniroute", file=sys.stderr)
+        return 2
     work_dir = args.work_dir.resolve()
     repo = args.repo.resolve()
     prompt_path = args.prompt
@@ -1199,11 +1293,13 @@ def main(argv=None) -> int:
     try:
         # A deliberately non-blind run (--allow-git-history) may read a checkout whose ignored .venv links leave
         # it (re-review L2); a blind export never has such links.
-        provenance = lane_provenance(prompt_path, repo, allow_escaping_links=args.allow_git_history)
+        provenance = lane_provenance(prompt_path, repo, allow_escaping_links=args.allow_git_history,
+                                    provider=args.provider, omniroute_base_url=args.omniroute_base_url)
     except ValueError as error:  # an escaping symlink: not a blind export
         print(f"codex_lane: {error}", file=sys.stderr)
         return 2
     blind = not args.allow_git_history
+    isolated = blind or args.provider == "omniroute"
     audit_roots = [str(repo), str((work_dir / "packets").resolve())]
     pending = []
     for catalog, layer_id, packet_path in packets:
@@ -1215,9 +1311,11 @@ def main(argv=None) -> int:
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 
-    if blind:
+    if isolated:
         # The home refusals create nothing, so they run before the dry run and the lock (round 6, ISO-R6-5).
-        issue = codex_home_issue(work_dir, repo) or blind_path_issue() or codex_launch_issue()
+        issue = codex_home_issue(work_dir, repo, provider=args.provider)
+        if blind:
+            issue = issue or blind_path_issue() or codex_launch_issue()
         if issue:
             print(f"codex_lane: {issue}", file=sys.stderr)
             return 2
@@ -1226,18 +1324,20 @@ def main(argv=None) -> int:
         print(f"# --dry-run writes nothing; a real run first writes {strict_display}", file=sys.stderr)
         # A blind child's environment is printed with its command; the dry run creates no home (OPS-4).
         run_home = codex_home_base() / f"{codex_home_prefix(work_dir)}-<run>"
-        if blind:
+        if isolated:
             print(f"# a real run creates a fresh {run_home} (mkdtemp) and runs each child with only this environment",
                   file=sys.stderr)
         # Never an API key value on stdout: the printed environment omits the key variables.
-        env_prefix = ["env", "-i", *(f"{key}={redact_userinfo(value)}" for key, value in child_env(run_home).items()
-                                     if key not in ("CODEX_API_KEY", "OPENAI_API_KEY"))] if blind else []
+        env_prefix = ["env", "-i", *(f"{key}={redact_userinfo(value)}" for key, value in child_env(
+            run_home, provider=args.provider, omniroute_base_url=args.omniroute_base_url).items()
+            if key not in ("CODEX_API_KEY", "OPENAI_API_KEY"))] if isolated else []
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
-            cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS)
+            cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS,
+                                provider=args.provider, omniroute_base_url=args.omniroute_base_url)
             # The child's PATH has no codex, so the printed command names the one this PATH resolves.
-            print(shlex.join(env_prefix + (blind_child_argv(cmd) if blind else cmd)))
+            print(shlex.join(env_prefix + (blind_child_argv(cmd) if isolated else cmd)))
         return 0
 
     if pending and shutil.which("codex") is None:
@@ -1257,11 +1357,11 @@ def main(argv=None) -> int:
                 return 2
             stack.enter_context(terminate_on_signal())
             sweep_stale_links(work_dir)
-        if pending and blind:
+        if pending and isolated:
             # Blind children never load the user's global Codex instructions or user skills (isolated_codex_home),
             # set up only once every refusal has passed, the run holds its lock and something is to run (R4-REG-3).
             try:
-                CHILD_CODEX_HOME = isolated_codex_home(work_dir, repo)
+                CHILD_CODEX_HOME = isolated_codex_home(work_dir, repo, provider=args.provider)
             except CodexHomeRefused as error:
                 print(f"codex_lane: {error}", file=sys.stderr)
                 return 2
@@ -1304,7 +1404,7 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
         tmp_out = codex_dir / f"{name}.out.tmp"
         cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model,
-                            ISOLATION_ARGS)
+                            ISOLATION_ARGS, provider=args.provider, omniroute_base_url=args.omniroute_base_url)
         events_path = events_dir / f"{name}.jsonl"
         if STOP.is_set():
             return
@@ -1322,7 +1422,11 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             # that exits 0 without writing -o is never misread as having
             # produced a stale earlier attempt's (or run's) output.
             tmp_out.unlink(missing_ok=True)
-            result = run_attempt(cmd, args.timeout)
+            if args.provider == "omniroute":
+                result = run_attempt(cmd, args.timeout, provider=args.provider,
+                                     omniroute_base_url=args.omniroute_base_url)
+            else:
+                result = run_attempt(cmd, args.timeout)
             if result.get("stopped") and not result["stdout"]:
                 return  # stopped before a child ran
             events = parse_events(result["stdout"])
@@ -1340,6 +1444,10 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
                 "exit_code": result["exit_code"], "timed_out": result["timed_out"],
                 "model": model_name, "seconds": round(result["elapsed"], 3),
             }
+            if args.provider == "omniroute":
+                usage_row["provider"] = args.provider
+                usage_row["provider_base_url"] = args.omniroute_base_url
+                usage_row["pass_through"] = OMNIROUTE_PASS_THROUGH
             usage_row.update(usage)
             with usage_lock, usage_path.open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(usage_row, sort_keys=True) + "\n")

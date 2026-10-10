@@ -1376,6 +1376,349 @@ class EscapingSymlinkTreeTests(CodexLaneFixture):
         self.assertIsInstance(codex_lane.tree_sha256(self.repo, allow_escaping_links=True), str)
 
 
+class OmniRouteProviderTests(CodexLaneFixture):
+    """The insurance provider is opt-in, keyless, loopback-only, and keeps blind-child isolation.
+
+    All executions use the fixture CLI; the prompt canary observes only the runner/client boundary,
+    never an upstream gateway body or a gateway settings/log-detail route.
+    """
+
+    ENDPOINT = "http://127.0.0.1:21128/v1"
+    PASS_THROUGH = ("not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, "
+                    "systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)")
+
+    def setUp(self):
+        super().setUp()
+        # A real caller's endpoint cannot affect these synthetic cases.
+        os.environ.pop("OMNIROUTE_BASE_URL", None)
+
+    def assert_isolation_args(self, argv):
+        required = list(codex_lane.ISOLATION_ARGS)
+        self.assertTrue(any(argv[index:index + len(required)] == required
+                            for index in range(len(argv))), "OmniRoute must retain every isolation argument")
+
+    def test_the_absent_provider_flag_keeps_the_legacy_native_metadata(self):
+        self.write_packet("foundation", "native-clients")
+        # An endpoint in the parent environment does not opt a wave into failover.
+        with mock.patch.dict(os.environ, {"OMNIROUTE_BASE_URL": self.ENDPOINT}):
+            self.assertEqual(self.run_lane(), 0)
+        [argv] = self.argv_calls()
+        self.assertFalse(any(value.startswith("model_provider=") or value.startswith("model_providers.")
+                             for value in argv))
+        data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+        self.assertEqual(set(data["provenance"]), {"codex_lane_py_sha256", "prompt_sha256", "repo_tree_sha256"})
+        self.assertFalse({"provider", "provider_base_url", "pass_through"} & set(self.usage_rows()[0]))
+
+    def test_implicit_and_explicit_native_omit_transport_fields_on_receipts_and_retries(self):
+        self.write_packet("foundation", "native-clients")
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        legacy_keys = {"codex_lane_py_sha256", "prompt_sha256", "repo_tree_sha256"}
+        transport_keys = {"provider", "provider_base_url", "pass_through"}
+        for args in ([], ["--provider", "native"]):
+            selection = "explicit" if args else "implicit"
+            self.counter_file.unlink(missing_ok=True)
+            self.out_path("foundation", "native-clients").unlink(missing_ok=True)
+            previous_calls, previous_rows = len(self.argv_calls()), len(self.usage_rows())
+            with mock.patch.dict(os.environ, {"OMNIROUTE_BASE_URL": self.ENDPOINT}):
+                self.assertEqual(self.run_lane(args), 0)
+            argv_calls = self.argv_calls()[previous_calls:]
+            self.assertEqual(len(argv_calls), 2, "the failed native attempt must retry")
+            for argv in argv_calls:
+                self.assertFalse(any(value.startswith("model_provider=") or value.startswith("model_providers.")
+                                     for value in argv), "native selection must retain native client config")
+            data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+            with self.subTest(selection=selection, receipt=True):
+                self.assertEqual(set(data["provenance"]), legacy_keys)
+            rows = self.usage_rows()[previous_rows:]
+            self.assertEqual([row["attempt"] for row in rows], [1, 2])
+            self.assertNotEqual(rows[0]["exit_code"], 0)
+            self.assertEqual(rows[1]["exit_code"], 0)
+            for row in rows:
+                with self.subTest(selection=selection, attempt=row["attempt"]):
+                    self.assertFalse(transport_keys & set(row), "native usage keeps the legacy metadata shape")
+
+    def test_omniroute_dry_run_on_a_synthetic_tier1_packet_writes_nothing(self):
+        self.write_packet("foundation", "native-clients", {
+            "schema_version": 1, "catalog": "foundation", "layer_id": "native-clients", "tier": 1,
+        })
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.object(codex_lane, "native_auth_path", side_effect=AssertionError("native auth lookup")), \
+                contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            self.assertEqual(self.run_lane(["--provider", "omniroute", "--dry-run"]), 0)
+        # shlex.join quotes the filled prompt as one argument while preserving its embedded newlines.
+        argv = shlex.split(out.getvalue())
+        self.assertEqual(argv[:2], ["env", "-i"])
+        self.assertIn("OMNIROUTE_BASE_URL=" + self.ENDPOINT, argv)
+        self.assert_isolation_args(argv)
+        self.assertTrue(any(value in ('model_provider="omniroute"', "model_provider='omniroute'")
+                            for value in argv))
+        self.assertTrue(any(value.startswith("model_providers.omniroute.base_url=")
+                            and self.ENDPOINT in value for value in argv))
+        self.assertTrue(any(value == 'model_providers.omniroute.wire_api="responses"'
+                            or value == "model_providers.omniroute.wire_api='responses'" for value in argv))
+        self.assertFalse(any("env_key" in value or "API_KEY" in value or "Bearer " in value for value in argv))
+        self.assertFalse((self.work_dir / "codex").exists())
+        self.assertFalse(codex_lane.codex_home_base().exists())
+        self.assertEqual(self.argv_calls(), [])
+
+    def test_omniroute_records_the_provider_per_family_without_native_auth(self):
+        families = [("foundation", "native-clients"), ("runtime", "bounded-workers")]
+        for catalog, layer_id in families:
+            self.write_packet(catalog, layer_id)
+        self.return_file.write_text(json.dumps(canned_return(provenance={"provider": "native"})),
+                                    encoding="utf-8")
+        env_log = self.work_dir.parent / "omniroute-homes.jsonl"
+        os.environ["CODEX_FAKE_ENV_LOG"] = str(env_log)
+        with mock.patch.object(codex_lane, "native_auth_path", side_effect=AssertionError("native auth lookup")):
+            self.assertEqual(self.run_lane(["--provider", "omniroute"]), 0)
+        for catalog, layer_id in families:
+            data = json.loads(self.out_path(catalog, layer_id).read_text(encoding="utf-8"))
+            self.assertEqual(data["provenance"].get("provider"), "omniroute")
+            self.assertEqual(data["model"]["family"], "openai")
+        self.assertEqual({(row["catalog"], row["layer"], row.get("provider")) for row in self.usage_rows()},
+                         {(catalog, layer_id, "omniroute") for catalog, layer_id in families})
+        for row in self.usage_rows():
+            self.assertEqual(row.get("provider_base_url"), self.ENDPOINT)
+        for argv in self.argv_calls():
+            self.assert_isolation_args(argv)
+        seen = [json.loads(line) for line in env_log.read_text(encoding="utf-8").splitlines()]
+        self.assertEqual(len(seen), 2)
+        for row in seen:
+            home = Path(row["CODEX_HOME"])
+            self.assertFalse(row["auth_link"])
+            self.assertFalse((home / "auth.json").exists())
+            self.assertEqual(row["HOME"], str(home / "home"))
+            self.assertEqual(list((home / "home").iterdir()), [])
+            self.assertEqual(oct(home.stat().st_mode & 0o777), "0o700")
+
+    def test_omniroute_disclosure_is_runner_owned_on_every_packet_and_attempt(self):
+        families = [("foundation", "native-clients"), ("runtime", "bounded-workers")]
+        for catalog, layer_id in families:
+            self.write_packet(catalog, layer_id)
+        self.return_file.write_text(json.dumps(canned_return(provenance={
+            "provider": "native", "pass_through": "fixture-spoofed-attestation",
+        })), encoding="utf-8")
+        # Retain a failed attempt as well as both successful packets: every usage row needs the disclosure.
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        self.assertEqual(self.run_lane(["--provider", "omniroute"]), 0)
+        for catalog, layer_id in families:
+            with self.subTest(packet=f"{catalog}__{layer_id}"):
+                data = json.loads(self.out_path(catalog, layer_id).read_text(encoding="utf-8"))
+                self.assertEqual(data["provenance"].get("provider"), "omniroute")
+                self.assertEqual(data["provenance"].get("pass_through"), self.PASS_THROUGH)
+        rows = self.usage_rows()
+        self.assertEqual(len(rows), 3)
+        self.assertTrue(any(row["exit_code"] != 0 for row in rows))
+        for row in rows:
+            with self.subTest(usage=(row["catalog"], row["layer"], row["attempt"])):
+                self.assertEqual(row.get("provider"), "omniroute")
+                self.assertEqual(row.get("pass_through"), self.PASS_THROUGH)
+
+    def test_omniroute_uses_a_fresh_keyless_home_for_each_run(self):
+        self.write_packet("foundation", "native-clients")
+        env_log = self.work_dir.parent / "fresh-omniroute-homes.jsonl"
+        os.environ["CODEX_FAKE_ENV_LOG"] = str(env_log)
+        (self.native_codex / "auth.json").unlink()
+        with mock.patch.object(codex_lane, "native_auth_path", side_effect=AssertionError("native auth lookup")):
+            self.assertEqual(self.run_lane(["--provider", "omniroute"]), 0)
+            self.out_path("foundation", "native-clients").unlink()
+            self.assertEqual(self.run_lane(["--provider", "omniroute"]), 0)
+        seen = [json.loads(line) for line in env_log.read_text(encoding="utf-8").splitlines()]
+        self.assertEqual(len({row["CODEX_HOME"] for row in seen}), 2)
+        self.assertFalse(any(row["auth_link"] for row in seen))
+
+    def test_nonloopback_or_credential_bearing_endpoints_are_refused_before_a_child(self):
+        self.write_packet("foundation", "native-clients")
+        endpoints = [
+            "https://example.invalid/v1", "http://192.0.2.1:21128/v1",
+            "http://fixture-user:fixture-password@127.0.0.1:21128/v1",
+            "http://127.0.0.1:21128/v1?token=fixture-query",
+            "http://127.0.0.1:21128/v1#fixture-fragment", "http://127.0.0.1:99999/v1",
+            "http://127.0.0.1:invalid/v1", "file:///v1",
+        ]
+        for endpoint in endpoints:
+            with self.subTest(endpoint=endpoint), contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(self.run_lane(["--provider", "omniroute", "--omniroute-base-url", endpoint]), 2)
+                self.assertIn("loopback", err.getvalue().lower())
+                self.assertNotIn(endpoint, err.getvalue())
+                self.assertNotIn("fixture-password", err.getvalue())
+                self.assertNotIn("fixture-query", err.getvalue())
+        self.assertEqual(self.argv_calls(), [])
+        self.assertFalse((self.work_dir / "codex").exists())
+        self.assertFalse(codex_lane.codex_home_base().exists())
+
+    def test_an_endpoint_from_the_environment_is_checked_and_cli_override_takes_precedence(self):
+        self.write_packet("foundation", "native-clients")
+        with mock.patch.dict(os.environ, {"OMNIROUTE_BASE_URL": "https://example.invalid/v1"}), \
+                contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_lane(["--provider", "omniroute"]), 2)
+        self.assertIn("loopback", err.getvalue().lower())
+        self.assertEqual(self.argv_calls(), [])
+        with mock.patch.dict(os.environ, {"OMNIROUTE_BASE_URL": "https://example.invalid/v1"}):
+            self.assertEqual(self.run_lane(["--provider", "omniroute", "--omniroute-base-url", self.ENDPOINT]), 0)
+        [argv] = self.argv_calls()
+        self.assertFalse(any("example.invalid" in value for value in argv))
+        self.assertTrue(any(value.startswith("model_providers.omniroute.base_url=")
+                            and self.ENDPOINT in value for value in argv))
+
+    def test_the_endpoint_is_canonical_in_command_environment_and_provenance(self):
+        self.write_packet("foundation", "native-clients")
+        raw = "HTTP://LOCALHOST:021128/v1/"
+        canonical = "http://localhost:21128/v1"
+        seen = []
+        real_popen = subprocess.Popen
+
+        def capture_popen(cmd, **kwargs):
+            if "-o" in cmd:
+                seen.append(kwargs["env"])
+            return real_popen(cmd, **kwargs)
+
+        with mock.patch.object(codex_lane.subprocess, "Popen", side_effect=capture_popen):
+            self.assertEqual(self.run_lane(["--provider", "omniroute", "--omniroute-base-url", raw]), 0)
+        [argv] = self.argv_calls()
+        base_config = next(value for value in argv if value.startswith("model_providers.omniroute.base_url="))
+        self.assertEqual(base_config.split("=", 1)[1].strip('\"\''), canonical)
+        self.assertEqual(seen[0]["OMNIROUTE_BASE_URL"], canonical)
+        data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+        self.assertEqual(data["provenance"]["provider_base_url"], canonical)
+
+    def test_only_the_keyless_endpoint_is_added_to_the_blind_child_environment(self):
+        self.write_packet("foundation", "native-clients")
+        seen = []
+        real_popen = subprocess.Popen
+
+        def capture_popen(cmd, **kwargs):
+            if "-o" in cmd:
+                seen.append(kwargs)
+            return real_popen(cmd, **kwargs)
+
+        with mock.patch.dict(os.environ, {
+            "OMNIROUTE_BASE_URL": self.ENDPOINT, "OMNIROUTE_API_KEY": "fixture-omniroute-value",
+            "OPENAI_API_KEY": "fixture-openai-value", "CODEX_API_KEY": "fixture-codex-value",
+            "UNRELATED_PROVIDER_EXTRA": "fixture-extra-value", "OMNIROUTE_MEMORY": "fixture-memory-value",
+        }), mock.patch.object(codex_lane.subprocess, "Popen", side_effect=capture_popen):
+            self.assertEqual(self.run_lane(["--provider", "omniroute"]), 0)
+        [child] = seen
+        env = child["env"]
+        self.assertEqual(env["OMNIROUTE_BASE_URL"], self.ENDPOINT)
+        baseline = {
+            "PATH", "LANG", "LC_ALL", "LC_CTYPE", "TERM", "SSL_CERT_FILE", "SSL_CERT_DIR",
+            "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "ALL_PROXY", "https_proxy", "http_proxy", "no_proxy",
+            "all_proxy", "CODEX_HOME", "HOME", "TMPDIR",
+        }
+        self.assertLessEqual({key for key in env if not key.startswith("CODEX_FAKE_")},
+                             baseline | {"OMNIROUTE_BASE_URL"})
+        self.assertFalse({"OMNIROUTE_API_KEY", "OPENAI_API_KEY", "CODEX_API_KEY", "UNRELATED_PROVIDER_EXTRA",
+                          "OMNIROUTE_MEMORY"} & set(env))
+        self.assertIs(child["stdin"], subprocess.DEVNULL)
+        self.assertEqual(env["HOME"], str(Path(env["CODEX_HOME"]) / "home"))
+        self.assertEqual(list(Path(env["HOME"]).iterdir()), [])
+        self.assertEqual(list(Path(env["TMPDIR"]).iterdir()), [])
+
+    def test_the_endpoint_allowlist_does_not_allow_environment_reads_in_the_blind_audit(self):
+        events = self.work_dir / "omniroute-env-audit.jsonl"
+        for command in ("printenv OMNIROUTE_BASE_URL", "printenv UNRELATED_PROVIDER_EXTRA", "env"):
+            with self.subTest(command=command):
+                events.write_text(json.dumps({"type": "item.completed", "item": {
+                    "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
+                report = codex_lane.blind_audit(events, [str(self.repo)])
+                self.assertTrue(report["flagged_commands"])
+
+    def test_the_client_boundary_canary_preserves_prompt_utf8_bytes(self):
+        # This canary proves what the runner gives its CLI, not what a live gateway forwards upstream.
+        self.write_packet("foundation", "native-clients")
+        prompt = self.work_dir / "canary-prompt.md"
+        prompt_bytes = 'OmniRoute canary Ω café\nLiteral "$dollar" and \\backslash\nFinal newline.\n'.encode("utf-8")
+        prompt.write_bytes(prompt_bytes)
+        self.assertEqual(self.run_lane(["--provider", "omniroute", "--prompt", str(prompt)]), 0)
+        [argv] = self.argv_calls()
+        self.assertEqual(argv[-1].encode("utf-8"), prompt_bytes)
+
+    def test_switching_from_native_to_omniroute_reruns_a_packet_and_records_the_new_provider(self):
+        self.write_packet("foundation", "native-clients")
+        self.assertEqual(self.run_lane(), 0)
+        self.assertEqual(len(self.argv_calls()), 1)
+        self.assertEqual(self.run_lane(), 0)
+        self.assertEqual(len(self.argv_calls()), 1, "same native provider resumes the clean return")
+        self.assertEqual(self.run_lane(["--provider", "omniroute"]), 0)
+        self.assertEqual(len(self.argv_calls()), 2, "a provider change must rerun the packet")
+        data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+        self.assertEqual(data["provenance"]["provider"], "omniroute")
+        self.assertEqual([row.get("provider") for row in self.usage_rows()], [None, "omniroute"])
+        self.assertEqual(self.run_lane(["--provider", "omniroute"]), 0)
+        self.assertEqual(len(self.argv_calls()), 2, "the same OmniRoute provider resumes the clean return")
+
+    def test_changing_the_omniroute_endpoint_reruns_instead_of_reusing_a_packet(self):
+        self.write_packet("foundation", "native-clients")
+        args = ["--provider", "omniroute", "--omniroute-base-url", self.ENDPOINT]
+        self.assertEqual(self.run_lane(args), 0)
+        self.assertEqual(len(self.argv_calls()), 1)
+        self.assertEqual(self.run_lane(args), 0)
+        self.assertEqual(len(self.argv_calls()), 1, "same endpoint resumes the clean return")
+        changed = "http://127.0.0.1:21129/v1"
+        self.assertEqual(self.run_lane(["--provider", "omniroute", "--omniroute-base-url", changed]), 0)
+        self.assertEqual(len(self.argv_calls()), 2, "an endpoint change must rerun the packet")
+        data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+        self.assertEqual(data["provenance"]["provider"], "omniroute")
+        self.assertEqual(data["provenance"]["provider_base_url"], changed)
+
+    def test_the_cx_model_route_is_transported_but_canonicalized_for_receipt_and_resume(self):
+        self.write_packet("foundation", "native-clients")
+        self.assertEqual(self.run_lane(["--provider", "omniroute", "--model", "cx/gpt-6.1-sol"]), 0)
+        [argv] = self.argv_calls()
+        self.assertEqual(argv[argv.index("-m") + 1], "cx/gpt-6.1-sol")
+        data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+        self.assertEqual(data["model"]["name"], "gpt-6.1-sol")
+        self.assertEqual(data["model"]["family"], "openai")
+        self.assertEqual(self.run_lane(["--provider", "omniroute", "--model", "gpt-6.1-sol"]), 0)
+        self.assertEqual(len(self.argv_calls()), 1, "the bare model resumes its canonical receipt")
+
+    def test_the_sealer_accepts_legacy_native_and_current_provider_receipts(self):
+        from scripts.landscape import lane_provenance_issue
+
+        legacy = {"codex_lane_py_sha256": "a" * 64, "prompt_sha256": "b" * 64, "repo_tree_sha256": "c" * 64}
+        omniroute = {**legacy, "provider": "omniroute", "provider_base_url": self.ENDPOINT,
+                     "pass_through": self.PASS_THROUGH}
+        accepted = [legacy, {**legacy, "provider": "native"}, omniroute]
+        for provenance in accepted:
+            with self.subTest(provenance=provenance):
+                self.assertIsNone(lane_provenance_issue("codex", provenance))
+        refused = [
+            {**legacy, "provider": "unknown"},
+            {**legacy, "provider": "omniroute"},
+            {**omniroute, "provider_base_url": "https://example.invalid/v1"},
+            {**legacy, "provider": "native", "provider_base_url": self.ENDPOINT},
+            {**legacy, "provider_base_url": self.ENDPOINT},
+            {**omniroute, "extra_env": "not-allowed"},
+            {"codex_lane_py_sha256": "a" * 64, "prompt_sha256": "b" * 64, "provider": "native"},
+            {**legacy, "provider": "native", "prompt_sha256": "malformed"},
+            {**legacy, "provider": "omniroute", "provider_base_url": self.ENDPOINT},
+            {**omniroute, "pass_through": "fixture-spoofed-attestation"},
+            {**omniroute, "pass_through": None},
+            {**legacy, "provider": "native", "pass_through": self.PASS_THROUGH},
+            {**legacy, "pass_through": self.PASS_THROUGH},
+        ]
+        refused.extend({**omniroute, "provider_base_url": value}
+                       for value in (None, False, 0, 1, [self.ENDPOINT], {"url": self.ENDPOINT}))
+        for provenance in refused:
+            with self.subTest(provenance=provenance):
+                self.assertIsNotNone(lane_provenance_issue("codex", provenance))
+
+    def test_provider_metadata_is_refused_on_a_claude_receipt(self):
+        from scripts.landscape import lane_provenance_issue
+
+        claude = {
+            "workflow_path": "tools/sota-convergence/lane.js", "workflow_sha256": "a" * 64,
+            "agentlab_commit": "b" * 40, "agent_sha256": "c" * 64, "prompt_sha256": "d" * 64,
+            "transcript_audit_py_sha256": "e" * 64, "repo_tree_sha256": "f" * 64,
+        }
+        self.assertIsNone(lane_provenance_issue("claude", claude))
+        for extra in ({"provider": "native"}, {"provider": "omniroute", "provider_base_url": self.ENDPOINT},
+                      {"pass_through": self.PASS_THROUGH}):
+            with self.subTest(extra=extra):
+                self.assertIsNotNone(lane_provenance_issue("claude", {**claude, **extra}))
+
+
 class IsolatedCodexHomeTests(CodexLaneFixture):
     """2026-09-24 blindness: --ignore-user-config does not skip $CODEX_HOME/AGENTS.md, so blind children run
     with a fresh run-scoped CODEX_HOME that links, never copies, the native auth.json, an empty HOME and only an
