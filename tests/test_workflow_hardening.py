@@ -1751,6 +1751,30 @@ class BetterleaksTrialJobTests(unittest.TestCase):
                     self.assertEqual((rc, status.group(2)), (1, "1"), quoted)
                     self.assertRegex(status.group(1), r"^FAILED \(errors=[1-9]\d*(?:, skipped=\d+)?\)$", quoted)
 
+    @unittest.skipUnless(shutil.which("bash") and shutil.which("git"), "bash and git required")
+    def test_fixture_step_skips_population_receipts_absent_from_the_isolated_checkout(self):
+        """The native fixture step may report detection differences without receipt files.
+
+        It still runs the real fixture classes. Repository-evidence tests name
+        the missing receipts as skips; they must not become FileNotFoundError
+        errors that change the completed-scanner step's exit code.
+        """
+        checkout = Path(tempfile.mkdtemp()).resolve()
+        self.addCleanup(shutil.rmtree, checkout, ignore_errors=True)
+        (checkout / "tests").mkdir()
+        (checkout / "tests" / "__init__.py").write_text("", encoding="utf-8")
+        for name in ("tests/test_gitleaks_config.py", ".gitleaks.toml", ".gitleaksignore"):
+            shutil.copyfile(ROOT / name, checkout / name)
+        rc, output, summary = self.run_step(
+            self.FIXTURE_STEP, self.SCAN_END_STUB,
+            {"GITLEAKS_TESTS_REQUIRED": "1", "GIT_CEILING_DIRECTORIES": str(checkout.parent),
+             "STUB_MODE": "detections-missing"}, cwd=checkout)
+        self.assertEqual(rc, 0, textwrap.indent(output, "    | "))
+        self.assertRegex(summary, r"FAILED \(failures=[1-9]\d*, skipped=\d+\); unittest exit status 1")
+        self.assertNotIn("FileNotFoundError", output)
+        for name in ("confirmed-four", "note-class"):
+            self.assertIn(f"repository population receipt absent from isolated fixture: {name}", output)
+
     def test_fixture_tests_leave_out_the_unredacted_history_class(self):
         """Exactly the three fixture classes run. GitleaksBranchAncestryHistoryTests is left out: the job's
         redacted history scan covers that ground. Until 2026-09-28 that class also scanned without --redact

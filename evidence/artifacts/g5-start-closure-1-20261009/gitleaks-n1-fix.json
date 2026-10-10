@@ -162,7 +162,7 @@
       "878"
     ],
     "new_file_registration_rows": 1,
-    "grants_count": "Take the next available count only at the separately cued landing rebase; no grants-count edit in this fix.",
+    "grants_count": "#878 adds no grants-selected path under scripts/local_pages_policy_grants.py:46-65 and takes no grants count. Evidence registry file rows are a separate denominator.",
     "g5": "NOT_MET",
     "archive": "UNPUBLISHED"
   },
@@ -202,7 +202,7 @@
       "installed_version": "8.30.1",
       "primary_files": [
         "sources/file.go:21,166-246",
-        "sources/common.go:58-129",
+        "sources/common.go:16,56-125",
         "config/allowlist.go:148-157",
         "detect/detect.go"
       ],
@@ -211,6 +211,7 @@
     "decision": {
       "action": "Use the pinned upstream reader's supported double-newline boundaries between stratum objects",
       "config_changed": false,
+      "config_comparison_baseline": "Direct parent 43d1bc1ad31a528b11e693d0901be50004fc7497. That revision includes the narrow G5 allowlist added by N1; equality to main was not asserted by this receipt.",
       "population_values_changed": false,
       "new_sampler_or_model_run": false,
       "redraw_required": false,
@@ -309,7 +310,7 @@
     "completeness_critic": {
       "missed_modality": "The original N1 acceptance covered git-diff fragments and small file fixtures, leaving large native file-fragment boundaries untested",
       "candidate_classes_checked": "Pinned maintainer-native allowlist configuration, native safe-boundary serialization, and existing hosted betterleaks result. A broader allowlist was rejected by a reproduced negative control; no new scanner or runtime was adopted",
-      "remaining_boundaries": "Hosted acceptance on the new head, co-op and CC micros, inherited shard-5 failure repair, separately cued landing and grants count remain pending",
+      "remaining_boundaries": "At this follow-up's observation: hosted acceptance on the new head, co-op and CC micros, inherited shard-5 failure repair and separately cued landing remained pending. #878 takes no grants count.",
       "next_sweep_input": "Secret-scan changes need both bounded PR history and the native file-fragment fixture relevant to the changed public evidence; preserve negative controls at the same boundary",
       "anti_pattern_log": "docs/harness-defaults.md#anti-pattern-log"
     },
@@ -323,7 +324,63 @@
       "g5": "NOT_MET",
       "archive": "UNPUBLISHED",
       "landing_owner": "CC",
-      "landing_position": "Last in the grants count order; no grants count or release transition in this fix"
+      "landing_position": "CC controls the landing order. #878 takes no grants count; no readiness or release transition in this fix."
+    }
+  },
+  "shard4_fixture_followup": {
+    "kind": "g5-isolated-betterleaks-fixture-repair",
+    "evidence_class": "Local integration regression using the unchanged native workflow fixture-step driver and a synthetic scanner",
+    "baseline_head": "ecad2a496c7a646bb05942c33d86a6c429683db8",
+    "hosted_failure": {
+      "run_id": 38028499190,
+      "job_id": 114144576688,
+      "test": "tests.test_workflow_hardening.BetterleaksTrialJobTests.test_fixture_step_fails_when_a_scan_does_not_complete_in_the_real_fixture_module",
+      "observed_fixture_step_exit_code": 1,
+      "expected_fixture_step_exit_code": 0,
+      "file_not_found_errors": 2,
+      "classification": "Real isolated-checkout integration regression; separate from the inherited shard-5 flake"
+    },
+    "decision": {
+      "missing_receipts": "Use native unittest SkipTest with the receipt identity in the reason when the public receipt is absent from the isolated tree",
+      "complete_checkout": "Both real public population receipts still execute their native file-fragment checks",
+      "workflow_modified": false,
+      "scanner_errors": "Remain unittest errors and keep the fixture step failing; detection differences remain reported assertion failures",
+      "real_history_scope": "Actual merge-base..HEAD only; reject HEAD/--all overrides. Explicitly skip the empty main range or a checkout without origin/main, with no history scanned"
+    },
+    "primary_sources": [
+      "Installed CPython 3.13.16 Lib/unittest/case.py: TestCase.skipTest raises SkipTest",
+      "gitleaks/gitleaks@83d9cd684c87d95d656c1458ef04895a7f1cbd8e sources/common.go:16,56-125",
+      "Existing .github/workflows/validate.yml secret-scan-betterleaks fixture step and tests/test_workflow_hardening.py native step driver",
+      "scripts/local_pages_policy_grants.py:46-65: evidence registration rows are not grants-selected paths"
+    ],
+    "before_fix": {
+      "original_reproducer": "python3 -m unittest -v tests.test_workflow_hardening.BetterleaksTrialJobTests.test_fixture_step_fails_when_a_scan_does_not_complete_in_the_real_fixture_module",
+      "exit_code": 1,
+      "actual_summary": "Ran 1 test in 3.863s; FAILED (failures=1), detections-missing subcase, two FileNotFoundError errors in the isolated fixture module",
+      "new_regression_group": "Missing-receipt native fixture-step exit code plus empty-range and missing-origin/main history cases",
+      "new_regression_exit_code": 1,
+      "new_regression_summary": "Ran 3 tests in 0.595s; FAILED (failures=2, errors=1)"
+    },
+    "after_fix": {
+      "targeted_regressions": "Ran 12 tests in 4.634s; OK; exit 0",
+      "full_modules_command": "GITLEAKS_TESTS_REQUIRED=1 GITLEAKS_TEST_RANGE=15d82bcc8871206476dc8c4c7bf45d347e74b2b7..HEAD python3 -m unittest -v tests.test_workflow_hardening tests.test_gitleaks_config",
+      "full_modules_exit_code": 0,
+      "full_modules_actual_summary": "Ran 179 tests in 53.406s; OK (skipped=1)",
+      "released_full_modules_rerun": "After the 07:11Z release, the same FULL modules returned 0: Ran 179 tests in 68.242s; OK (skipped=1), same existing workflow-only skip",
+      "full_modules_skip": "Existing workflow-hardening hash-frozen exemption test: no workflow is hash-frozen, empty since 2026-09-26",
+      "gitleaks_receipt_checks_skipped_in_complete_checkout": false
+    },
+    "record_corrections": {
+      "fragment_source_citation": "sources/common.go:16,56-125; the pinned file ends at 125",
+      "config_byte_identity": "Identical between 43d1bc1a and ecad2a49. The narrow G5 allowlist introduced by 43d1bc1a differs from main",
+      "grants_count": "#878 takes no grants count; no grants-selected path is added",
+      "jcodemunch_order": "CC measured 3993 of cap 4000 on its local merge; the cap PR must land before or right after #878, ahead of other file-adding PRs. No new repository file is added by this repair"
+    },
+    "completeness_critic": {
+      "missed_consumer": "The complete-checkout receipt fixture did not exercise the betterleaks trial's receipt-free temporary tree",
+      "regression_boundary": "Real workflow step, real copied fixture module, supported missing-receipt skips and unchanged scanner-error controls",
+      "next_sweep_input": "Run every existing isolated consumer of a shared test module when adding repository-dependent evidence checks",
+      "pending": "The 07:11Z release authorizes this one forward commit and push. The earlier co-op GPT micro continues; its findings belong to a later delta micro over ecad2a49..this fix, alongside CC review and fresh hosted CI"
     }
   }
 }

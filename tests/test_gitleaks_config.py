@@ -144,14 +144,21 @@ def _finding_fields(findings):
 
 def _pr_scan_range():
     """Use the actual main merge base; never expand into HEAD ancestry."""
-    base = subprocess.run(["git", "merge-base", "HEAD", "refs/remotes/origin/main"],
-                          cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    try:
+        base = subprocess.run(["git", "merge-base", "HEAD", "refs/remotes/origin/main"],
+                              cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    except subprocess.CalledProcessError as exc:
+        raise unittest.SkipTest("PR-range history check requires HEAD and origin/main; no history scanned") from exc
     if not re.fullmatch(r"[0-9a-f]{40}", base):
         raise _ScannerError("Cannot establish the PR merge base for the bounded scan")
     expected = f"{base}..HEAD"
     configured = os.environ.get("GITLEAKS_TEST_RANGE", expected)
     if configured != expected:
         raise _ScannerError("GITLEAKS_TEST_RANGE must equal the actual merge-base..HEAD range")
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
+                          capture_output=True, text=True, check=True).stdout.strip()
+    if head == base:
+        raise unittest.SkipTest("empty PR range on main; no history scanned")
     return expected
 
 
@@ -325,7 +332,7 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                     self.assertEqual(self._scan(target), [], "reviewed population digests are not credentials")
 
     def test_population_fragment_boundary_rejects_partial_matches_and_accepts_safe_separators(self):
-        # gitleaks v8.30.1 sources/file.go:21,166-246 and sources/common.go:58-129:
+        # gitleaks v8.30.1 sources/file.go:21,166-246 and sources/common.go:16,56-125:
         # a 100,000-byte read peeks up to 25,000 more bytes. Put the digest's
         # last byte in the next fragment, matching the hosted findings.
         # Retain the complete-digest allowlist and use the upstream reader's
@@ -357,9 +364,12 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             with self.subTest(receipt=name), tempfile.TemporaryDirectory() as tmp:
                 target = Path(tmp)
                 relative = f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                source = ROOT / relative
+                if not source.is_file():
+                    self.skipTest(f"repository population receipt absent from isolated fixture: {name}")
                 path = target / relative
                 path.parent.mkdir(parents=True)
-                shutil.copyfile(ROOT / relative, path)
+                shutil.copyfile(source, path)
                 self.assertEqual(self._scan(target), [],
                                  "the actual population receipt must scan clean in native file mode")
 
@@ -980,7 +990,9 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
 
     The historical test name is retained. The current scan is bounded to
     merge-base..HEAD; an explicit GITLEAKS_TEST_RANGE must name that same range.
-    Scanner errors remain errors, never an empty passing result.
+    Main's empty range and checkouts without origin/main are explicit skips,
+    with no history scanned. HEAD/--all remain rejected. Scanner errors remain
+    errors, never an empty passing result.
     """
 
     def setUp(self):
@@ -1137,10 +1149,25 @@ class ScannerErrorTests(unittest.TestCase):
 
     def test_h_history_range_uses_the_actual_merge_base(self):
         completed = subprocess.CompletedProcess([], 0, "b" * 40 + "\n", "")
+        head = subprocess.CompletedProcess([], 0, "c" * 40 + "\n", "")
         with mock.patch.dict(os.environ, {"GITLEAKS_TEST_RANGE": "b" * 40 + "..HEAD"}), \
-                mock.patch.object(subprocess, "run", return_value=completed) as run:
+                mock.patch.object(subprocess, "run", side_effect=[completed, head]) as run:
             self.assertEqual(_pr_scan_range(), "b" * 40 + "..HEAD")
-        self.assertEqual(run.call_args.args[0], ["git", "merge-base", "HEAD", "refs/remotes/origin/main"])
+        self.assertEqual([call.args[0] for call in run.call_args_list],
+                         [["git", "merge-base", "HEAD", "refs/remotes/origin/main"],
+                          ["git", "rev-parse", "HEAD"]])
+
+    def test_i_history_range_skips_an_empty_main_range(self):
+        completed = subprocess.CompletedProcess([], 0, "b" * 40 + "\n", "")
+        with mock.patch.dict(os.environ, {"GITLEAKS_TEST_RANGE": "b" * 40 + "..HEAD"}), \
+                mock.patch.object(subprocess, "run", return_value=completed):
+            with self.assertRaisesRegex(unittest.SkipTest, "empty PR range"):
+                _pr_scan_range()
+
+    def test_j_history_range_skips_a_checkout_without_origin_main(self):
+        with mock.patch.object(subprocess, "run", side_effect=subprocess.CalledProcessError(128, ["git"])), \
+                self.assertRaisesRegex(unittest.SkipTest, "origin/main"):
+            _pr_scan_range()
 
 
 class GithubAutomationDocConsistencyTests(unittest.TestCase):
