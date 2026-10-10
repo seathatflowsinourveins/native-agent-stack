@@ -259,7 +259,8 @@ class LlmNativeListingTests(unittest.TestCase):
     def test_codex_disables_only_the_skill_codex_ships_natively(self):
         # Codex installs its own skill-creator into CODEX_HOME/skills/.system from
         # codex-rs/skills/src/assets/samples (codex-rs/skills/src/lib.rs L55-69 at rust-v0.157.1).
-        self.assertEqual({s["name"] for s in self.skills if not s["codex_enabled"]}, {"skill-creator"})
+        self.assertEqual({s["name"] for s in self.skills if not s["codex_enabled"] and not s.get("native_plugin")}, {"skill-creator"})
+        self.assertEqual({s["name"] for s in self.skills if s.get("native_plugin")}, {"claude-api"})
 
     def test_skill_creator_is_pinned_from_anthropics_and_the_openai_copy_stays_excluded(self):
         by_name = {skill["name"]: skill for skill in self.skills}
@@ -318,7 +319,8 @@ class TemplateSkillOverridesConsistencyTests(unittest.TestCase):
         cls.template = load_json(SETTINGS_TEMPLATE_PATH)
 
     def test_skill_overrides_equals_name_to_claude_listing(self):
-        expected = {skill["name"]: skill["claude_listing"] for skill in self.manifest["skills"]}
+        # Native plugin skills use their own namespace and are outside skillOverrides.
+        expected = {skill["name"]: skill["claude_listing"] for skill in self.manifest["skills"] if not skill.get("native_plugin")}
         expected.update({entry["skills"]: "off" for entry in self.manifest["excluded"] if "retired" in entry})
         self.assertEqual(self.template.get("skillOverrides"), expected)
 

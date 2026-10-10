@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "kind": "claude_skill_trigger_cases",
+  "methodology_owner": "cc-native-practice",
+  "wiring": "These cases compare the current native skill descriptions with the authored security-audit invocation cue; the other six skill routes remain unchanged.",
+  "cases": [
+    {
+      "id": "security-audit-positive",
+      "skill": "security-audit",
+      "prompt": "Audit this API for security vulnerabilities. Its download handler passes a request filename directly to a shell command. Identify exploitable paths and evidence needed to confirm them.",
+      "negative": false
+    },
+    {
+      "id": "gh-fix-ci-positive",
+      "skill": "gh-fix-ci",
+      "prompt": "Help fix a failing GitHub Actions PR check reporting ModuleNotFoundError for yaml. The workflow installs only requirements.txt. This is a synthetic PR example.",
+      "negative": false
+    },
+    {
+      "id": "gh-address-comments-positive",
+      "skill": "gh-address-comments",
+      "prompt": "Address a GitHub PR review comment requesting that fetchUser be renamed to fetchAccount and a migration note be added. This is a synthetic PR example.",
+      "negative": false
+    },
+    {
+      "id": "frontend-design-positive",
+      "skill": "frontend-design",
+      "prompt": "Build a distinctive responsive landing page for a ceramics studio using warm editorial typography, earthy colors and an asymmetric gallery.",
+      "negative": false
+    },
+    {
+      "id": "typesafe-ai-positive",
+      "skill": "typesafe-ai",
+      "prompt": "Add a typed AI decision routing support messages among billing, technical support and account access, with confidence, using TypeSafe System One and Jev.",
+      "negative": false
+    },
+    {
+      "id": "security-best-practices-positive",
+      "skill": "security-best-practices",
+      "prompt": "Review a Python FastAPI design for security best practices: credentialed CORS allows every origin and responses reveal full exception text.",
+      "negative": false
+    },
+    {
+      "id": "security-threat-model-positive",
+      "skill": "security-threat-model",
+      "prompt": "Create a threat model for a document-upload service with parsing workers and authenticated stored results. Identify assets, trust boundaries, attacker capabilities and abuse paths.",
+      "negative": false
+    },
+    {
+      "id": "security-audit-near-miss",
+      "prompt": "Explain what a security audit is in one sentence for a vocabulary quiz. No repository, API or code is being reviewed.",
+      "negative": true
+    },
+    {
+      "id": "gh-fix-ci-near-miss",
+      "prompt": "Explain the difference between GitHub Actions and a pull request in two sentences. No check is failing and no workflow fix is requested.",
+      "negative": true
+    },
+    {
+      "id": "gh-address-comments-near-miss",
+      "prompt": "Rewrite this sentence politely: Please review the pull request. Do not inspect a repository or address review comments.",
+      "negative": true
+    },
+    {
+      "id": "frontend-design-near-miss",
+      "prompt": "Fix a Python CSV parser that trims trailing commas. There is no frontend, website, UI or visual design task.",
+      "negative": true
+    },
+    {
+      "id": "typesafe-ai-near-miss",
+      "prompt": "Define a TypeScript union type for three literal routing labels. Use deterministic types only; no AI model or TypeSafe service.",
+      "negative": true
+    },
+    {
+      "id": "security-best-practices-near-miss",
+      "prompt": "Calculate 12 plus 5 for an arithmetic worksheet. There is no code or security review request.",
+      "negative": true
+    },
+    {
+      "id": "security-threat-model-near-miss",
+      "prompt": "Format this list alphabetically: uploads, queues, results. Do not analyze a system, threats, trust boundaries or abuse paths.",
+      "negative": true
+    },
+    {
+      "id": "security-audit-injection-review",
+      "skill": "security-audit",
+      "negative": false,
+      "prompt": "Find exploitable security issues in a file-download API that sends an untrusted filename to a shell command. Identify the attack path and the evidence needed to verify it."
+    },
+    {
+      "id": "security-audit-vulnerability-check",
+      "skill": "security-audit",
+      "negative": false,
+      "prompt": "Check whether our repository has vulnerabilities around request parsing, subprocess commands and authorization. Give source-backed findings and verification gaps."
+    },
+    {
+      "id": "security-audit-comprehensive",
+      "skill": "security-audit",
+      "negative": false,
+      "prompt": "Perform a comprehensive security assessment of an HTTP service and its CLI. Track coverage and distinguish confirmed issues from candidates that need validation."
+    },
+    {
+      "id": "gh-fix-ci-indirect",
+      "skill": "gh-fix-ci",
+      "negative": false,
+      "prompt": "My pull request is red after a Python import change. The GitHub workflow test step cannot import yaml; help get it green."
+    },
+    {
+      "id": "gh-address-comments-indirect",
+      "skill": "gh-address-comments",
+      "negative": false,
+      "prompt": "A GitHub reviewer left two unresolved threads on my pull request: rename a helper and explain the migration. Help finish the review."
+    },
+    {
+      "id": "frontend-design-indirect",
+      "skill": "frontend-design",
+      "negative": false,
+      "prompt": "Our studio website feels generic and the gallery breaks on phones. Give it a warm, distinctive visual redesign and a responsive layout."
+    },
+    {
+      "id": "typesafe-ai-indirect",
+      "skill": "typesafe-ai",
+      "negative": false,
+      "prompt": "Our support router guesses labels with ad-hoc prompt parsing. Replace this with a typed confidence-bearing decision using Jev."
+    },
+    {
+      "id": "security-best-practices-indirect",
+      "skill": "security-best-practices",
+      "negative": false,
+      "prompt": "We are about to publish a FastAPI endpoint. Review its secure defaults: wildcard credentialed CORS and full exception details worry me."
+    },
+    {
+      "id": "security-threat-model-indirect",
+      "skill": "security-threat-model",
+      "negative": false,
+      "prompt": "Before building a document ingestion service, map what attackers can abuse as uploads cross the queue, parser and customer results boundary."
+    },
+    {
+      "id": "security-audit-real-repository-path",
+      "skill": "security-audit",
+      "negative": false,
+      "prompt": "Review tools/skill-usage/skill_usage.py in this repository for security vulnerabilities. Assess input parsing, file paths and subprocess invocation; identify exploitable paths and evidence needed to confirm them."
+    }
+  ],
+  "comparability_base": "60004bb1dd581e00e3303c54d93435bb72f76952"
+}
+

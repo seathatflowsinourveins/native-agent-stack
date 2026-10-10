@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily skill invocation measurement
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=15m
+Unit=skill-invoke-rate.service
+
+[Install]
+WantedBy=timers.target

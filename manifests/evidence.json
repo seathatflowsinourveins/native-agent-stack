@@ -4995,6 +4995,11 @@
       "bytes": 7087
     },
     {
+      "path": ".claude/skills/native-skill-routing/SKILL.md",
+      "sha256": "19cb95fce7b82c7d21ed4098d08b61bfebb7741514433f0ddda0a3ac4de23bf5",
+      "bytes": 782
+    },
+    {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
       "sha256": "feacd5b6324649e3fff16d4f7f469f994e2984dccbb462f84e6fa8bf8e93da48",
       "bytes": 3840
@@ -5625,14 +5630,114 @@
       "bytes": 77578
     },
     {
+      "path": "adoption/skills/claude-routing/README.md",
+      "sha256": "4934779119e5d51f683cdb13240c00dc094203ae1723158468b55953631b39b0",
+      "bytes": 3451
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/frontend-design/graders/target-used.md",
+      "sha256": "ff11aa91bfa593df7f4f3bb91a23015d1674c5e73fd4935619b553126e3d1c53",
+      "bytes": 116
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/frontend-design/prompt.md",
+      "sha256": "264fbaa4a7fe7c8bb284826f79e95e42c3c15012b9d3d640bdade0f29c4d5169",
+      "bytes": 422
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/gh-address-comments/graders/target-used.md",
+      "sha256": "6a728fdfdc6f9544dd272739fdbbdeef23b7b97920aab59c491ce582acbf1df1",
+      "bytes": 120
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/gh-address-comments/prompt.md",
+      "sha256": "42817d89ee009674a77ec573a2272a5158fb2be58079560339bfe72e121877d5",
+      "bytes": 466
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/gh-fix-ci/graders/target-used.md",
+      "sha256": "21f1a112447aa766932e4e734889f2996af72fc15ea98a5d4bbd8d3262b86e4d",
+      "bytes": 110
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/gh-fix-ci/prompt.md",
+      "sha256": "f886bd43ef58b465010ce053fbb0914afdb32ebfc0806cea7a522342544b2252",
+      "bytes": 477
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-audit/graders/target-used.md",
+      "sha256": "624f90316bffc938f8b6e03192cd5fded4e986d17b34456bdf553a798cc07cd8",
+      "bytes": 115
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-audit/prompt.md",
+      "sha256": "772103b32e539716b627afab7bb297d2b6e9a4e3cbe1dd1d805f840716509e47",
+      "bytes": 489
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-best-practices/graders/target-used.md",
+      "sha256": "cdc8772b31d339a962b29daf034e591b3b779593e05ba3b6193a7b3c7dab5452",
+      "bytes": 124
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-best-practices/prompt.md",
+      "sha256": "3e2279a0afd2fed13ede7e0b1958d9186b3bf0572fac0a16a26573ae5b51dea8",
+      "bytes": 445
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-threat-model/graders/target-used.md",
+      "sha256": "06603f1d6c6c5446f2f00e680e9122ae0eed2a2d5de8f14722af0ed7b35ff565",
+      "bytes": 122
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-threat-model/prompt.md",
+      "sha256": "41c67e6448e1e400a0ab9fe40df0b5387da9e7bd5cdc3d3bb695a1cf32161d82",
+      "bytes": 493
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/typesafe-ai/graders/target-used.md",
+      "sha256": "b53ab9ae78d4b582bd9719d99f926c74dfa180ae823f0a8d4ea762b07d34afde",
+      "bytes": 112
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/typesafe-ai/prompt.md",
+      "sha256": "1ce1feb354c4c7628ef85969c813f8cf6a33df162d89ce5ab9016ea293563068",
+      "bytes": 445
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-baseline.json",
+      "sha256": "41577eb8f8fc960de6a55f51daa7ff9926a425f1de5c279aee7aaace5d12d58a",
+      "bytes": 835
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-cases-v2.json",
+      "sha256": "abe9e10ad73dfe149c9d14f308908b7ceb52e23c8a632c38b03fd5420a479dbf",
+      "bytes": 3871
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-cases-v3.json",
+      "sha256": "090622e86512918f436b6c298fafa86da667990498a6705235615c6e03801b4a",
+      "bytes": 6338
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-cases-v4.json",
+      "sha256": "61fc5e5a2f61778afc6b43cb9b50f2f9a4f4f1a1b79ce3bfb83e679a5d14c1ab",
+      "bytes": 6759
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-cases.json",
+      "sha256": "7c43985f523ed555e389dbd14155493603b36cdc8ab3a60f8161844be34452f2",
+      "bytes": 2326
+    },
+    {
       "path": "adoption/skills/lifecycle.md",
       "sha256": "164f4a30bbf0838c65b229885455693539a96f1e7b32ce6c9f563fdbbddb59e6",
       "bytes": 20171
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "53298efae3fb0d9f86e30ed92d512c2ac693ab9891e10156ec9adb28ff29092c",
-      "bytes": 61133
+      "sha256": "d0b951db22ff74882a49cfa8edc0764c263e758eea14eaf99eac05081de44ecb",
+      "bytes": 62876
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -5703,6 +5808,16 @@
       "path": "adoption/templates/systemd/omniroute.service",
       "sha256": "eedbec27fd53bb0eb8ef8f61ff2bc7ed874b657144ae6317e8476d2a8a218947",
       "bytes": 7463
+    },
+    {
+      "path": "adoption/templates/systemd/skill-invoke-rate.service",
+      "sha256": "9297270957f82b401d82afa99663d41381bf708ab9992b88e3aa8416ac099a5c",
+      "bytes": 731
+    },
+    {
+      "path": "adoption/templates/systemd/skill-invoke-rate.timer",
+      "sha256": "b1f9eded28471df410105cb841ef1d4537c2da71efe2ad794aac32d413a0719a",
+      "bytes": 184
     },
     {
       "path": "adoption/templates/systemd/stack-currency.service",
@@ -18212,7 +18327,7 @@
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
-      "sha256": "54adce07e1970736e12bcf50fa036515356e4694a4c0fad62ad351bd98654de5",
+      "sha256": "13e52370c813ef64cd8c3404bfb991b2f975f0c81ee60383faa2a7123c0e75e4",
       "bytes": 16799
     },
     {
@@ -18564,6 +18679,11 @@
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
       "sha256": "4158df8208e2beb10694778866f9f3e94dcbaed0df5df82842e53ec9f197a709",
       "bytes": 9146
+    },
+    {
+      "path": "docs/decisions/2026-10-10-daily-skill-invoke-rate.md",
+      "sha256": "2348111551655d298d64c7498574d915d6c31b360bd1daa658600db351501740",
+      "bytes": 11322
     },
     {
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
@@ -59662,8 +59782,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "eeb462e9b6b2b4acb6cc39af42ea96bf4a6dd14892a45a71d9fa61db229b806d",
-      "bytes": 42439
+      "sha256": "c15549048c60c737b1e3283218d61ed8003931571ccadab8575bbef256ff1d34",
+      "bytes": 44849
     },
     {
       "path": "scripts/trading_gates.py",
@@ -60621,9 +60741,19 @@
       "bytes": 74274
     },
     {
+      "path": "tests/test_local_pages_fleet_data.py",
+      "sha256": "b3a17d47fdbf49ecce6bad308f3eab1979ca558843b7a03025c5fadff516865c",
+      "bytes": 34060
+    },
+    {
       "path": "tests/test_local_pages_fleet_regressions.py",
       "sha256": "4601bbba4a6c1cf04352a484670b1601b468e9aa879c8ac5f55eee6c3fd5dd94",
       "bytes": 20940
+    },
+    {
+      "path": "tests/test_local_pages_fleet_view.py",
+      "sha256": "27773a2d4c2e9cde3011b499f1de6e1c24f731e7f129f2856a11f83f387831af",
+      "bytes": 6966
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
@@ -61036,14 +61166,24 @@
       "bytes": 103131
     },
     {
+      "path": "tests/test_skill_routing.py",
+      "sha256": "76e518a90658e33cdbfc1b01475d45d1da2b4039b7f62e28f07e6fcaeeb0ea74",
+      "bytes": 5744
+    },
+    {
       "path": "tests/test_skill_usage.py",
       "sha256": "8d330d1446c4a06e6b77df60b28063882af54a0b1ae498fce3706495d532c2ce",
       "bytes": 265105
     },
     {
+      "path": "tests/test_skill_usage_daily.py",
+      "sha256": "40bc859242c608b0bc2f2b9d71c1cff1ade86d718578228838b0f384d16f9238",
+      "bytes": 8830
+    },
+    {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "9020a7c87958c36df3c81e42e94869c5c49accde595e619c012e2f46d66d266e",
-      "bytes": 19524
+      "sha256": "c2c90fce8cdd1f29852fe98a26b2abaf7ce072c8cbc31bd78b7b712910162e7d",
+      "bytes": 19777
     },
     {
       "path": "tests/test_skills_status.py",
@@ -61277,13 +61417,13 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "aacf9c7e02560732b42b74f0eab27ed5a5546fd8659c5dd04d3ad044d95bf4ba",
-      "bytes": 25134
+      "sha256": "187daeaf965192bdbae4551c4af7f288835d7a3f41314a74d0a8f5bc2e46aa40",
+      "bytes": 26080
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "c068934f1aa56204558e1b5b9898db6356a5682acca68b09ebaf49f3d9d7d538",
-      "bytes": 46809
+      "sha256": "ee27a9c2e65450a22a012b386e53cb46dfa4f72d24cde64655704684c89d6dc5",
+      "bytes": 47545
     },
     {
       "path": "tools/adoption/managed_block.py",
@@ -61441,6 +61581,21 @@
       "bytes": 5161
     },
     {
+      "path": "tools/local-pages/README.md",
+      "sha256": "b6ff02f24e9f4e325b865ca015eae2c382c7ab15225714274ff9178a4598a96d",
+      "bytes": 30751
+    },
+    {
+      "path": "tools/local-pages/fleet_data.py",
+      "sha256": "4eb64c8766e3a5de0aa9aca5ca3272c415435d2d14f1d0db9569b80dbcd98e32",
+      "bytes": 62686
+    },
+    {
+      "path": "tools/local-pages/fleet_view.py",
+      "sha256": "f0d54549a32f383a120361ec4d1e3ed650d6701aa60b81ddd99ab898f6018847",
+      "bytes": 26780
+    },
+    {
       "path": "tools/local-pages/source_policy.json",
       "sha256": "3e65408d5fab88cb3ab7a3167b738ba207d053f37bbe25c5e4890ac6e3ed82b9",
       "bytes": 755702
@@ -61487,13 +61642,23 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "1dba321ff638013a83c5a4107b76b14ee88a0176469ee8307795d6f7dc34c693",
-      "bytes": 55795
+      "sha256": "4a603c06bef574515481b8794c1ae264dd2e5bff1911e96e2adb2ec1b97e3277",
+      "bytes": 57941
+    },
+    {
+      "path": "tools/skill-usage/daily_skill_usage.py",
+      "sha256": "9d30e2b02c64d95fffdd2d58eb64ba5ad178b3a2a1c741a5ae20e8b48e15e0a6",
+      "bytes": 10604
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "ca647358c22a1b7709c1ec0a9d300bf3009b048411f1f929c7c897daa925ba17",
-      "bytes": 152377
+      "sha256": "3499bfe2f7a435b5cbf8bc40999b2d7dcb6337bc7c10d2f0e5239ec72bdb0057",
+      "bytes": 157252
+    },
+    {
+      "path": "tools/skill-usage/stage_routing_eval.py",
+      "sha256": "fdb0fde9f5a2a8768c9877d2514faafe6c84aa5739bffbbe1bb98ca23f252150",
+      "bytes": 2271
     },
     {
       "path": "tools/sota-convergence/README.md",

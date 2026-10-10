@@ -1,0 +1,13 @@
+# Render @REPOSITORY@ to the live main clone, matching stack-currency.service.
+# Render @PYTHON@ and @NODE@ to installed interpreter paths. The CC installs
+# this file after landing; the authoring lane runs fixture tests only.
+[Unit]
+Description=Daily native skill invocation report
+
+[Service]
+Type=oneshot
+WorkingDirectory=@REPOSITORY@
+UMask=0077
+Environment=PATH=%h/.local/bin:%h/.local/share/mise/shims:/usr/local/bin:/usr/bin:/bin
+TimeoutStartSec=65min
+ExecStart="@PYTHON@" "@REPOSITORY@/tools/skill-usage/daily_skill_usage.py" --node "@NODE@" --codex-root %h/.codex/sessions --claude-root %h/.claude/projects --window 7 --out %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-latest.json

@@ -1,5 +1,45 @@
 # Skill invoke-rate report
 
+Codex reports both raw SKILL.md reads and de-inflated `use_counts`: at most
+once per native session/skill, from own reads or explicit `$name` mentions,
+excluding sessions with more than 26 distinct SKILL.md names in that window.
+Copied parent records contribute raw counts but no additional use. The dated
+daily-use decision records the measured distribution and cut-point rationale.
+Pages and zero-use decisions use the de-inflated count; reads remain visible.
+
+## Daily host and lane results
+
+`daily_skill_usage.py` runs the existing host report, Codex `--lanes` report and
+Claude `child-usage.mjs --lanes-sweep` with a common seven-day window. Its
+private output contains names/counts only, plus timestamps and measurement
+flags. Fleet reads `coordination/command-center/skills/skill-invoke-rate-latest.json`
+under its state root; it labels lifetime Claude host uses, windowed native
+Claude Skill calls and Codex skill-file reads separately.
+
+Render the timer for the selected live main clone into a review directory:
+
+```sh
+python3 tools/skill-usage/daily_skill_usage.py \
+  --render-units /tmp/skill-invoke-rate-units \
+  --repository <absolute-live-main-clone> \
+  --python /usr/bin/python3 --node <absolute-node-executable>
+```
+
+The CC verifies/installs/enables these files after landing, following the
+existing user-timer procedure. Rendering does not load or start a unit.
+Live scheduled collection refuses a checkout whose branch is not main.
+Both transcript roots are explicit in the rendered service. Offline replay
+accepts `--host-report`, `--codex-lanes-report` and `--claude-lanes-report`
+captures; an omitted client remains UNKNOWN, with a nonzero run status.
+
+The official `claude-api@anthropic-agent-skills` entry stays a native plugin;
+it is checked against its registry commit and unchanged SKILL.md hash and is
+not installed as a second Vercel skills copy. The trial age reads the native
+`installedAt`; the doctor join uses its `claude-api:claude-api` namespace.
+Parent routing and CC-owned trigger cases are documented in
+`adoption/skills/claude-routing/README.md` and the
+`2026-10-10-daily-skill-invoke-rate.md` decision.
+
 Join `adoption/skills/manifest.json` with real, per-host measurements of whether each pinned
 skill is actually invoked, on each client that lists it. It is the measurement half of the 30-day
 skills trial (`trial.measurement` in the manifest); the trial's own `prune_rule` decides what a

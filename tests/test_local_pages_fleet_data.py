@@ -106,9 +106,26 @@ class FleetDataTests(unittest.TestCase):
         self.assertEqual(sdk["ceiling_usd"], 200)
         self.assertEqual(sdk["stop_and_report_at_usd"], 150)
         self.assertIsNone(sdk["spend_usd"])
+
         self.assertEqual(sdk["status"], "ledger unavailable")
         self.assertNotIn("PRIVATE-FORBIDDEN", json.dumps(sdk))
         self.assertEqual(sdk["ceiling_read_utc"], "2026-10-08T22:02:00Z")
+
+    def test_skill_usage_projects_only_names_and_counts_and_preserves_unknown(self):
+        self.write_json("coordination/command-center/skills/skill-invoke-rate-latest.json", {
+            "schema": "skill-invoke-rate-daily/1", "generated_at": "2026-10-08T22:01:00Z", "window_days": 7,
+            "host": [{"name": "gh-fix-ci", "claude_uses_lifetime": 0, "codex_skill_md_reads": 4,
+                      "codex_name_mentions": None, "prompt": "PRIVATE"}],
+            "lanes": [{"client": "claude", "lane": "workflow:security-reviewer", "metric": "skill_calls",
+                       "skills": [{"name": "security-audit", "count": 2, "account": "PRIVATE"}],
+                       "path": "/private/transcript"}],
+            "measured": {"host": True, "claude": True, "codex": False}, "prompt": "PRIVATE"})
+        report = self.collect()["skill_usage"]
+        self.assertEqual(0, report["host"][0]["claude_uses_lifetime"])
+        self.assertEqual(2, report["lanes"][0]["skills"][0]["count"])
+        self.assertIsNone(report["host"][0]["codex_name_mentions"])
+        self.assertNotIn("PRIVATE", json.dumps(report))
+        self.assertNotIn("transcript", json.dumps(report))
 
     def test_native_ledger_actual_sum_is_used_without_counting_reserved_caps(self):
         self.direct["api_spend_ledger"] = {"rows": 368, "last": "2026-10-08T22:09:00Z", "sums": {"actual_usd": 17.4321, "max_usd": 800}}

@@ -59,6 +59,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 DEFAULT_MANIFEST = ROOT / "adoption" / "skills" / "manifest.json"
 DEFAULT_WINDOWS = (7, 30)
+DEFAULT_BULK_SCAN_LIMIT = 26  # Measured 7d histogram and gap to 36; dated daily-use decision.
 ROLLOUT_GLOB = "rollout-*.jsonl"
 
 # codex-rs/history/src/rollout_payload.rs (RolloutItemWire, #[serde(tag = "type")]) at
@@ -325,7 +326,7 @@ def _empty_counts(names, windows) -> dict:
 
 
 def _score_line(record: dict, names, mention_patterns: dict, now: datetime, windows,
-                 counts: dict) -> None:
+                 counts: dict, signals=None) -> None:
     """Mutate `counts` in place for one decoded rollout line, or raise to have the caller count
     it as a parse error. Only response_item lines are scored: RolloutItem::ResponseItem is
     persisted unconditionally in both Legacy and Paginated history modes
@@ -345,19 +346,30 @@ def _score_line(record: dict, names, mention_patterns: dict, now: datetime, wind
         return
     payload_type = payload.get("type")
     if payload_type in CALL_PAYLOAD_TYPES:
-        for name in skillmd_hits(payload, names):
+        hits = skillmd_hits(payload, names)
+        if signals is not None:
+            distinct = {name for text in _walk_strings(payload)
+                        for name in re.findall(r"/([A-Za-z0-9_.:-]+)/SKILL\.md\b", text)}
+            for window in applicable:
+                signals["reads"][window].update(hits)
+                signals["distinct"][window].update(distinct)
+        for name in hits:
             for window in applicable:
                 counts[name][window]["skill_md_reads"] += 1
     elif payload_type == "message" and payload.get("role") == "user":
         text = user_message_text(payload)
         if text:
-            for name in mention_hits(text, mention_patterns):
+            hits = mention_hits(text, mention_patterns)
+            if signals is not None:
+                for window in applicable:
+                    signals["mentions"][window].update(hits)
+            for name in hits:
                 for window in applicable:
                     counts[name][window]["name_mentions"] += 1
 
 
 def scan_rollout_file(path: Path, names, mention_patterns: dict, now: datetime, windows,
-                      codex_off=()) -> tuple[dict, dict, int, bool]:
+                      codex_off=(), signals=None) -> tuple[dict, dict, int, bool]:
     """(own counts, copied counts, parse errors, user config ignored). Records a spawned sub-agent's
     rollout copied from its parent (ordinal below session_meta.subagent_history_start_ordinal) are
     scored into the copied counts, apart from the session's own records; both are part of the
@@ -386,12 +398,19 @@ def scan_rollout_file(path: Path, names, mention_patterns: dict, now: datetime, 
                     meta = record.get("payload") if isinstance(record.get("payload"), dict) else {}
                     start = meta.get("subagent_history_start_ordinal")
                     history_start = start if isinstance(start, int) and not isinstance(start, bool) else None
+                    if signals is not None:
+                        signals["id"] = meta.get("id") if isinstance(meta.get("id"), str) else None
+                        signals["kind"] = codex_session_kind(meta)
+                        signals["role"] = session_role(meta, signals["kind"])
+                if signals is not None and _at_or_before(record, now) and catalog_texts(record):
+                    signals["catalog_seen"] = True
                 if codex_off and not ignored and _at_or_before(record, now):
                     ignored = any(f"/{name}/SKILL.md" in text for text in catalog_texts(record)
                                   for name in codex_off)
                 inherited = (history_start is not None and isinstance(record.get("ordinal"), int)
                              and record["ordinal"] < history_start)
-                _score_line(record, names, mention_patterns, now, windows, copied if inherited else counts)
+                _score_line(record, names, mention_patterns, now, windows, copied if inherited else counts,
+                            signals=None if inherited else signals)
             except Exception:
                 parse_errors += 1
     return counts, copied, parse_errors, ignored
@@ -405,7 +424,8 @@ def _at_or_before(record: dict, now: datetime) -> bool:
         return False
 
 
-def scan_codex_roots(roots, names, *, now: datetime, windows, codex_off=()) -> dict:
+def scan_codex_roots(roots, names, *, now: datetime, windows, codex_off=(),
+                     max_distinct_skill_reads=DEFAULT_BULK_SCAN_LIMIT) -> dict:
     """Invoke-rate counts over rollout files. `counts` holds every record of every session, the
     measurement the skills trial pins. Two disjoint parts of it are reported beside it and never
     subtracted from it: of_which_user_config_ignored, the own records of sessions whose catalog lists
@@ -419,9 +439,23 @@ def scan_codex_roots(roots, names, *, now: datetime, windows, codex_off=()) -> d
     copied_all = _empty_counts(names, windows)
     files = iter_rollout_files(roots)
     parse_errors = ignored_sessions = 0
+    sessions = {}
     for path in files:
+        signals = {key: {window: set() for window in windows} for key in ("reads", "mentions", "distinct")}
+        signals.update(id=None, kind="other", role="(none)", catalog_seen=False, ignored=False)
         own, copied, file_errors, ignored = scan_rollout_file(path, names, mention_patterns, now,
-                                                              windows, codex_off)
+                                                              windows, codex_off, signals)
+        signals["ignored"] = ignored
+        key = signals["id"] or str(path)  # Session identities stay in memory only.
+        if key not in sessions:
+            sessions[key] = signals
+        else:
+            saved = sessions[key]
+            for field in ("reads", "mentions", "distinct"):
+                for window in windows:
+                    saved[field][window].update(signals[field][window])
+            saved["ignored"] |= ignored
+            saved["catalog_seen"] |= signals["catalog_seen"]
         parse_errors += file_errors
         ignored_sessions += ignored
         for name in names:
@@ -431,11 +465,36 @@ def scan_codex_roots(roots, names, *, now: datetime, windows, codex_off=()) -> d
                     copied_all[name][window][metric] += copied[name][window][metric]
                     if ignored:
                         ignored_own[name][window][metric] += own[name][window][metric]
+    uses = {name: {window: 0 for window in windows} for name in names}
+    groups = {window: {"workers": {}, "negative_controls": {}, "unclassified": {},
+                       "workers_by_kind": {}, "workers_by_role": {}} for window in windows}
+    policy = {}
+    for window in windows:
+        histogram, excluded = {}, 0
+        for session in sessions.values():
+            distinct = len(session["distinct"][window])
+            histogram[distinct] = histogram.get(distinct, 0) + 1
+            if distinct > max_distinct_skill_reads:
+                excluded += 1
+                continue
+            group = "negative_controls" if session["ignored"] else "workers" if session["catalog_seen"] else "unclassified"
+            buckets = [groups[window][group]]
+            if group == "workers":
+                for field in ("kind", "role"):
+                    buckets.append(groups[window]["workers_by_" + field].setdefault(session[field], {}))
+            for name in session["reads"][window] | session["mentions"][window]:
+                uses[name][window] += 1
+                for bucket in buckets:
+                    bucket[name] = bucket.get(name, 0) + 1
+        policy[str(window)] = {"sessions_scanned": len(sessions), "bulk_scan_sessions_excluded": excluded,
+                               "distinct_skill_read_histogram": {str(k): histogram[k] for k in sorted(histogram)}}
     return {"roots_count": len(roots or []), "files_scanned": len(files),
             "parse_errors": parse_errors, "windows": list(windows), "counts": totals,
             "sessions_user_config_ignored": ignored_sessions,
             "of_which_user_config_ignored": ignored_own,
-            "of_which_copied_from_parent": copied_all}
+            "of_which_copied_from_parent": copied_all, "uses": uses,
+            "use_groups": {str(window): value for window, value in groups.items()},
+            "use_policy": {"max_distinct_skill_reads": max_distinct_skill_reads, "windows": policy}}
 
 
 # --------------------------------------------------------------------------- manifest and lock
@@ -548,7 +607,8 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
             claude_zero = None
             claude_evaluated = False
         else:
-            row = claude["rows"].get(name)
+            # Native plugin:skill identity; see Claude skills docs, "Where skills live".
+            row = claude["rows"].get(skill.get("claude_skill_name", name))
             if row is None:
                 # Absent from this capture is unmeasured, never a fabricated zero -- the same
                 # "never scanned reads as unmeasured" rule applied to Codex windows above. This
@@ -581,13 +641,14 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
                             if window in codex_scanned_windows else None)
                         for window in windows}
             codex_out = {"enabled": codex_enabled, "counts": per_window,
+                         "use_counts": {str(window): codex_scan.get("uses", {}).get(name, {}).get(window)
+                                        if window in codex_scanned_windows else None for window in windows},
                          "of_which_user_config_ignored": part("of_which_user_config_ignored"),
                          "of_which_copied_from_parent": part("of_which_copied_from_parent")}
             codex_evaluated = codex_enabled
             if isinstance(trial_window_days, int) and trial_window_days in codex_scanned_windows:
-                trial_counts = per_window[str(trial_window_days)]
-                codex_zero_at_trial = (trial_counts["skill_md_reads"] == 0
-                                        and trial_counts["name_mentions"] == 0)
+                trial_use = codex_out["use_counts"][str(trial_window_days)]
+                codex_zero_at_trial = trial_use == 0 if trial_use is not None else None
 
         evaluated_clients = []
         zero_flags = []
@@ -634,6 +695,8 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
                    "parse_errors": codex_scan["parse_errors"],
                    "sessions_user_config_ignored": codex_scan.get("sessions_user_config_ignored", 0)},
         "skills": skills_out,
+        "codex_use_groups": codex_scan.get("use_groups"),
+        "codex_use_policy": codex_scan.get("use_policy"),
         "prune_candidates": prune_candidates,
         "verdict_recheck": verdict_recheck,
         "limits": (
@@ -641,7 +704,10 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
             "column is): the same lifetime count is reused for every window's zero-usage check, "
             "a documented gap, not a measured per-window value. Codex counts are windowed from "
             "each rollout line's own timestamp and hold every session's records, the measurement "
-            "the trial pins; every flag reads them. Two disjoint parts of them are reported beside "
+            "the raw-read baseline. Zero-use flags read use_counts: at most once per session and "
+            "skill from own reads or explicit $name mentions; sessions over the distinct-read limit "
+            "are excluded, including their mentions. Inherited copied records do not add use. "
+            "Two disjoint raw-count parts are reported beside "
             "them, never subtracted: of_which_user_config_ignored (own records of sessions whose "
             "catalog lists a codex_enabled=false skill, as under --ignore-user-config: a different "
             "listing state) and of_which_copied_from_parent (records a spawned sub-agent's rollout "
@@ -672,7 +738,7 @@ def render_text(report: dict) -> str:
     lines.append("")
     windows = report["windows_days"]
     lines.append(f"{'skill':<34} {'status':<6} {'age_days':>9} {'claude_uses':>11} "
-                 + " ".join(f"codex_{w}d(md/$)".rjust(16) for w in windows) + "  flag")
+                 + " ".join(f"codex_{w}d(use/md/$)".rjust(20) for w in windows) + "  flag")
     for entry in report["skills"]:
         claude_entry = entry["claude"]
         claude_uses = "-" if claude_entry == "not-measured" or claude_entry["uses"] is None \
@@ -681,7 +747,8 @@ def render_text(report: dict) -> str:
         cells = []
         for window in windows:
             counted = None if codex_entry == "not-measured" else codex_entry["counts"][str(window)]
-            cells.append("-" if counted is None else f"{counted['skill_md_reads']}/{counted['name_mentions']}")
+            use = None if codex_entry == "not-measured" else codex_entry.get("use_counts", {}).get(str(window))
+            cells.append("-" if counted is None else f"{use if use is not None else '-'}/{counted['skill_md_reads']}/{counted['name_mentions']}")
         age = "-" if entry["age_days"] is None else f"{entry['age_days']:.1f}"
         flag = ("PRUNE-CANDIDATE" if entry["prune_eligible"] and entry["status"] == "trial" else
                 "VERDICT-RE-RECORD" if entry["prune_eligible"] else "")
@@ -2359,6 +2426,14 @@ def main(argv=None) -> int:
     windows = effective_windows(args.window or list(DEFAULT_WINDOWS), manifest)
 
     lock_installed_at = load_lock_installed_at(skill_lock_path(home=args.home))
+    if any(skill.get("native_plugin") for skill in manifest["skills"]):
+        sys.path.insert(0, str(ROOT))
+        from scripts.skills_status import native_plugin_status
+        for skill in manifest["skills"]:
+            if skill.get("native_plugin"):
+                plugin = native_plugin_status(skill, Path(args.home) if args.home else Path.home(), os.environ)
+                if plugin["state"] == "ok" and plugin["installed_at"]:
+                    lock_installed_at[skill["name"]] = plugin["installed_at"]
     codex_off = [skill["name"] for skill in manifest["skills"]
                  if isinstance(skill, dict) and skill.get("codex_enabled") is False and "name" in skill]
     codex_scan = scan_codex_roots(args.codex_root, names, now=now, windows=windows, codex_off=codex_off)

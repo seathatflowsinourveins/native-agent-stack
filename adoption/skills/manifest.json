@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
-  "checked_at": "2026-10-08",
+  "checked_at": "2026-10-10",
   "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
   "cli": {
     "package": "skills",
@@ -26,17 +26,47 @@
     "started": "2026-09-25",
     "window_days": 30,
     "review_after": "2026-10-25",
-    "on_description_char_cap": 10500,
+    "on_description_char_cap": 12000,
     "prune_rule": "A trial skill installed for at least window_days with zero invocations in the last window_days is a prune candidate: the review keeps it or removes it through a dated decision record. Zero use no longer demotes a listing: under the user's 2026-09-30 directive every model-invocable skill stays listed so the model can invoke it. Kept verdict winners change status only through a verdict re-record, and their listing only through a dated decision record.",
     "confound": "name-only and user-invocable-only listings depress proactive invocation; compare only within a listing state.",
     "measurement": {
-      "claude": "native /skill-doctor (claude -p \"/skill-doctor\"), run by hand per host",
-      "codex": "tools/skill-usage/skill_usage.py over explicitly passed rollout roots"
+      "claude": "Daily tools/skill-usage/daily_skill_usage.py on main: native /skill-doctor lifetime uses for the host; child-usage.mjs --lanes-sweep Skill calls in the explicit seven-day workflow window",
+      "codex": "Daily tools/skill-usage/skill_usage.py over explicitly passed rollout roots; --lanes groups publish SKILL.md read counts separately from Claude Skill calls"
     },
     "verdict_boundary": "Trial skills are not verdict winners; catalogs/landscape/foundation.json instructions-skills is unchanged until a sealed re-record."
   },
   "settings_propagation": "adoption/templates/claude.settings.template.json skillOverrides and skillListingBudgetFraction, applied by tools/adoption/apply_claude_settings.py (deep merge; an omitted host key stays). The new-WSL apply step keeps the 0.05 listing fraction under the user's 2026-09-30 directive; it does not retire this key (2026-10-05 harness-context-budget repair round 3).",
   "skills": [
+    {
+      "name": "claude-api",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/claude-api",
+      "ref": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "path": "skills/claude-api",
+      "tree_sha": "523da4b0c36e7e79fcbf9e81e748e374efa3a6c1",
+      "skill_md_sha256": "40537cca17c4aa86e4ce83ced39efcbfb1204905e3cf4c4ff98f2eab011e4b7f",
+      "skill_md_bytes": 105146,
+      "description_chars": 1068,
+      "upstream_disable_model_invocation": false,
+      "license": "Apache-2.0 (per-skill LICENSE.txt)",
+      "official": true,
+      "audits": {
+        "gen_agent_trust_hub": "Not measured",
+        "socket": "Not measured",
+        "snyk": "Not measured",
+        "url": "https://skills.sh/anthropics/skills/claude-api",
+        "checked_at": "2026-10-10"
+      },
+      "status": "trial",
+      "gap": "Track the installed official Claude API plugin through the same 30-day per-skill measurement as the selected skills; native plugin namespace and installedAt supply identity and trial age.",
+      "claude_listing": "on",
+      "codex_enabled": false,
+      "agents": ["claude-code"],
+      "native_plugin": "claude-api@anthropic-agent-skills",
+      "claude_skill_name": "claude-api:claude-api",
+      "added": "2026-10-10",
+      "marketplace_entry": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/.claude-plugin/marketplace.json#L46"
+    },
     {
       "name": "typesafe-ai",
       "source": "typesafe-ai/skills",
@@ -754,8 +784,8 @@
     }
   ],
   "budget": {
-    "claude_on_description_chars": 10374,
-    "claude_on_cap": 10500,
+    "claude_on_description_chars": 11442,
+    "claude_on_cap": 12000,
     "codex_enabled_description_chars": 10055,
     "codex_catalog_description_chars": 10055,
     "codex_configured_budget_tokens": 6000,
@@ -825,9 +855,9 @@
       "overturn": "agent-browser fails a browser acceptance that one of these passes."
     },
     {
-      "skills": "pdf, docx, xlsx, pptx, claude-api",
+      "skills": "pdf, docx, xlsx, pptx",
       "source": "anthropics/skills",
-      "reason": "Duplicates of synced anthropic-skills and the bundled claude-api skill.",
+      "reason": "Document skill duplicates; the official claude-api plugin is now registered separately at its installed immutable pin for the 30-day trial.",
       "overturn": "Never while the native copies exist."
     },
     {

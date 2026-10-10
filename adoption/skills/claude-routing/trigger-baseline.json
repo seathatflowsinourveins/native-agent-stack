@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "kind": "claude_skill_trigger_baseline",
+  "observed_at": "2026-10-10",
+  "client_version": "2.1.296",
+  "measurement": "CC-owned native BEFORE trigger runs; explicit task prompts, three repeats",
+  "skills": [
+    {"name": "gh-fix-ci", "invoked": 3, "runs": 3, "status": "wired"},
+    {"name": "gh-address-comments", "invoked": 3, "runs": 3, "status": "wired"},
+    {"name": "frontend-design", "invoked": 3, "runs": 3, "status": "wired"},
+    {"name": "typesafe-ai", "invoked": 3, "runs": 3, "status": "wired"},
+    {"name": "security-best-practices", "invoked": 3, "runs": 3, "status": "wired"},
+    {"name": "security-threat-model", "invoked": 3, "runs": 3, "status": "wired"},
+    {"name": "security-audit", "invoked": 16, "runs": 23, "invoked_in_first_turn": 6, "status": "trigger-check-pending"}
+  ]
+}

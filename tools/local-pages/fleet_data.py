@@ -889,6 +889,37 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
                             "Missing, stale or unqualified zero rates remain UNKNOWN; reported service zeros remain zero."]}
 
 
+def _skill_usage(raw):
+    """Whitelist the daily native collector's names/counts, never transcript fields."""
+    if not isinstance(raw, dict) or raw.get("schema") != "skill-invoke-rate-daily/1":
+        return None
+    def name(value):
+        return value if isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,100}", value) else None
+    host = raw.get("host")
+    host_rows = [{"name": name(row.get("name")), "wiring": row.get("wiring") if row.get("wiring") in ("wired", "trigger-check-pending") else None,
+                 **{key: _count(row.get(key)) for key in
+                 ("claude_uses_lifetime", "codex_use", "codex_skill_md_reads", "codex_name_mentions")}}
+                 for row in host[:100] if isinstance(row, dict) and name(row.get("name"))] if isinstance(host, list) else None
+    lanes = raw.get("lanes")
+    lane_rows = [] if isinstance(lanes, list) else None
+    for row in lanes[:200] if isinstance(lanes, list) else []:
+        if (not isinstance(row, dict) or row.get("client") not in ("claude", "codex")
+                or not name(row.get("lane")) or not isinstance(row.get("skills"), list)):
+            continue
+        lane_rows.append({"client": row["client"], "lane": row["lane"],
+                          "metric": "skill_calls" if row["client"] == "claude" else "use",
+                          "skills": [{"name": name(s.get("name")), "count": _count(s.get("count")),
+                                      "raw_reads": _count(s.get("raw_reads"))}
+                                     for s in row["skills"][:100] if isinstance(s, dict) and name(s.get("name"))]})
+    measured = raw.get("measured") if isinstance(raw.get("measured"), dict) else {}
+    return {"generated_at": _stamp(raw.get("generated_at")), "window_days": _count(raw.get("window_days")),
+            "codex_bulk_scan_limit": _count(raw.get("codex_bulk_scan_limit")),
+            "zero_use": {"codex": [row["name"] for row in host_rows or [] if row["codex_use"] == 0],
+                         "claude_host_lifetime": [row["name"] for row in host_rows or [] if row["claude_uses_lifetime"] == 0]},
+            "host": host_rows, "lanes": lane_rows,
+            "measured": {client: measured.get(client) is True for client in ("host", "codex", "claude")}}
+
+
 def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., Any] | None = None,
             *, tracking_run=None, tracking_fetch=None, tracking_probe=None) -> dict[str, Any]:
     """Collect once per page refresh; returned data contains no source free text.
@@ -901,6 +932,8 @@ def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., An
     now = time.time()
     observed = _utc(now)
     inputs = {}
+    skill_usage = _skill_usage(_read_json(state_root / "coordination/command-center/skills/skill-invoke-rate-latest.json",
+                                         state_root, inputs, kind="daily skill name/count report"))
     # Publish the independently cached Actions observation before attempting
     # a native producer that may consume its whole timeout budget.
     actions = _actions(cache_dir, root, run, now, inputs)
@@ -1018,4 +1051,5 @@ def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., An
         "errors": (["Fleet collection not reported."] if source == "unavailable" else []),
         "API_errors": actions["API_errors"],
         "tracking": tracking,
+        "skill_usage": skill_usage,
     }

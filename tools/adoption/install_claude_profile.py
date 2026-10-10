@@ -86,6 +86,7 @@ HELD_OUT_HOOKS = {
 }
 ALL_HOOKS = {**HOOKS, **HELD_OUT_HOOKS}
 AGENTS_SRC_DIR = ROOT / "adoption" / "agents" / "claude"
+ROUTING_SKILL_SRC = ROOT / ".claude/skills/native-skill-routing/SKILL.md"
 MCP_TEMPLATE = ROOT / "adoption" / "mcp" / "claude-user.json"
 WORKFLOWS_SRC_DIR = ROOT / "examples" / "claude-native" / "workflows"
 WORKFLOWS_SHA256SUMS = WORKFLOWS_SRC_DIR / "SHA256SUMS"
@@ -188,6 +189,23 @@ def install_agents(home: Path, dry_run: bool, names: list[str] | None = None) ->
         print(f"agents: installed {dest}")
         results.append("installed")
     return results
+
+
+def install_routing_skill(home: Path, dry_run: bool) -> str:
+    """Publish the authored parent router to Claude's native personal skill root."""
+    destination = home / ".claude/skills/native-skill-routing/SKILL.md"
+    raw = ROUTING_SKILL_SRC.read_bytes()
+    if destination.is_file() and destination.read_bytes() == raw:
+        return "skipped"
+    if destination.exists() or destination.is_symlink():
+        raise InstallError("skills: local native-skill-routing differs; preserved")
+    if dry_run:
+        print("skills: would install native-skill-routing")
+        return "planned"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(raw)
+    print("skills: installed native-skill-routing")
+    return "installed"
 
 
 def checked_workflows() -> dict[str, bytes]:
@@ -447,8 +465,8 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Ecosystem prefix for ${ECO_ROOT} (default: $ECO_INSTALL_ROOT or <home>/.local/share/codex-ecosystem)")
     parser.add_argument("--replace-mcp", action="store_true",
                          help="Re-register a same-named MCP server whose existing config differs (default: leave it)")
-    parser.add_argument("--only", choices=["guard", "agents", "workflows", "mcp"], action="append",
-                         help="Run only the named step(s); default: guard, agents, mcp (workflows is opt-in)")
+    parser.add_argument("--only", choices=["guard", "agents", "skills", "workflows", "mcp"], action="append",
+                         help="Run only the named step(s); default: guard, agents, skills, mcp (workflows is opt-in)")
     parser.add_argument("--remove-workflows", action="store_true",
                          help="With --only workflows, remove selected byte-matching scripts; preserve edits and custom entries")
     parser.add_argument("--hook", action="append", metavar="NAME",
@@ -469,13 +487,15 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.remove_workflows and (args.only != ["workflows"] or args.replace_mcp):
         parser.error("--remove-workflows requires exactly --only workflows and cannot use --replace-mcp")
-    steps = args.only or ["guard", "agents", "mcp"]
+    steps = args.only or ["guard", "agents", "skills", "mcp"]
     home = Path(args.home)
     try:
         if "guard" in steps:
             install_guards(home, args.dry_run, args.hook)
         if "agents" in steps:
             install_agents(home, args.dry_run, args.agent)
+        if "skills" in steps:
+            install_routing_skill(home, args.dry_run)
         if "workflows" in steps:
             if args.remove_workflows:
                 results = remove_workflows(home, args.dry_run)

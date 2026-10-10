@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "kind": "claude_skill_trigger_cases",
+  "methodology_owner": "cc-native-practice",
+  "scope": "Seven synthetic requests; no workflow execution, account or credential access",
+  "cases": [
+    {
+      "skill": "security-audit",
+      "prompt": "Audit this API for security vulnerabilities. Its download handler passes a request filename directly to a shell command. Identify exploitable paths and evidence needed to confirm them.",
+      "expected_tool": "Skill",
+      "expected_skill": "security-audit"
+    },
+    {
+      "skill": "gh-fix-ci",
+      "prompt": "Help fix a failing GitHub Actions PR check reporting ModuleNotFoundError for yaml. The workflow installs only requirements.txt. This is a synthetic PR example.",
+      "expected_tool": "Skill",
+      "expected_skill": "gh-fix-ci"
+    },
+    {
+      "skill": "gh-address-comments",
+      "prompt": "Address a GitHub PR review comment requesting that fetchUser be renamed to fetchAccount and a migration note be added. This is a synthetic PR example.",
+      "expected_tool": "Skill",
+      "expected_skill": "gh-address-comments"
+    },
+    {
+      "skill": "frontend-design",
+      "prompt": "Build a distinctive responsive landing page for a ceramics studio using warm editorial typography, earthy colors and an asymmetric gallery.",
+      "expected_tool": "Skill",
+      "expected_skill": "frontend-design"
+    },
+    {
+      "skill": "typesafe-ai",
+      "prompt": "Add a typed AI decision routing support messages among billing, technical support and account access, with confidence, using TypeSafe System One and Jev.",
+      "expected_tool": "Skill",
+      "expected_skill": "typesafe-ai"
+    },
+    {
+      "skill": "security-best-practices",
+      "prompt": "Review a Python FastAPI design for security best practices: credentialed CORS allows every origin and responses reveal full exception text.",
+      "expected_tool": "Skill",
+      "expected_skill": "security-best-practices"
+    },
+    {
+      "skill": "security-threat-model",
+      "prompt": "Create a threat model for a document-upload service with parsing workers and authenticated stored results. Identify assets, trust boundaries, attacker capabilities and abuse paths.",
+      "expected_tool": "Skill",
+      "expected_skill": "security-threat-model"
+    }
+  ]
+}
+

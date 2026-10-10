@@ -1,5 +1,13 @@
 # Local engineering pages
 
+The Fleet skill-use section reads the daily native projection from
+`coordination/command-center/skills/skill-invoke-rate-latest.json`. It shows
+only names/counts per native group, with measurement date and client meaning:
+Claude host uses are lifetime, Claude lane counts are native Skill calls in
+the stated window, and Codex counts are SKILL.md reads. Groups overlap. Missing
+client measurements stay UNKNOWN. The section is refreshed by the existing
+page builder after the CC deploys the daily timer.
+
 `build_pages.py` presents the CC current view, native readiness receipts,
 gap board, roadmap, fleet, architecture and sources as seven complete local HTML documents. It uses the existing
 `tools/north-star/build_readiness.py` functions `build`, `render` and

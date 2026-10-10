@@ -233,6 +233,45 @@ def _tracking(data: dict) -> str:
     return '<div id="fleet-tracking"><p class="fleet-stamp">Tracking evaluated ' + text(tracking.get('observed_utc')) + '</p>' + source_reason + roster + telemetry + services + _grafana_links(tracking.get('grafana')) + notes + '</div>'
 
 
+def _skill_usage(data):
+    report = data.get("skill_usage")
+    if not isinstance(report, dict):
+        return '<section class="fleet-skills"><h2>Skill use</h2><p>UNKNOWN — daily measurement not reported.</p></section>'
+    host = report.get("host")
+    host_rows = []
+    for row in host if isinstance(host, list) else []:
+        wiring = "wired, no demand" if row.get("wiring") == "wired" and row.get("claude_uses_lifetime") == 0 else row.get("wiring")
+        host_rows.append('<tr><th scope="row">' + text(row.get("name")) + '</th>' +
+                         ''.join('<td>' + number(row.get(key)) + '</td>' for key in
+                                 ("claude_uses_lifetime", "codex_use", "codex_skill_md_reads", "codex_name_mentions")) +
+                         '<td>' + text(wiring) + '</td></tr>')
+    lanes = report.get("lanes")
+    lane_rows = []
+    for row in lanes if isinstance(lanes, list) else []:
+        metric = "Native Skill calls" if row.get("client") == "claude" else "Use (once per session)"
+        for skill in row.get("skills", []):
+            lane_rows.append('<tr><td>' + text(row.get("client")) + '</td><td>' + text(row.get("lane")) +
+                             '</td><th scope="row">' + text(skill.get("name")) + '</th><td>' +
+                             number(skill.get("count")) + '</td><td>' +
+                             (number(skill.get("raw_reads")) if row.get("client") == "codex" else '—') +
+                             '</td><td>' + metric + '</td></tr>')
+        if not row.get("skills"):
+            lane_rows.append('<tr><td>' + text(row.get("client")) + '</td><td>' + text(row.get("lane")) +
+                             '</td><td>No recorded skill names</td><td>0</td><td>0</td><td>' + metric + '</td></tr>')
+    measured = report.get("measured", {})
+    missing = ', '.join(client for client in ("host", "codex", "claude") if measured.get(client) is not True)
+    zero = report.get("zero_use", {})
+    zero_text = 'UNKNOWN' if measured.get("codex") is not True else ', '.join(text(name) for name in zero.get("codex", [])) or 'none'
+    return ('<section class="fleet-skills"><h2>Skill use</h2><p>' + number(report.get("window_days")) +
+            '-day window · collected ' + text(report.get("generated_at")) +
+            ('. UNKNOWN: ' + missing if missing else '') +
+            '. Claude host uses are lifetime; lane counts are windowed. Codex use excludes sessions reading more than ' +
+            number(report.get("codex_bulk_scan_limit")) + ' distinct skills and counts each session/skill once, including $name mentions. Groups overlap.</p>' +
+            '<p>Zero Codex use: ' + zero_text + '</p>' +
+            _tracking_table("Host skill counts", ["Skill", "Claude uses (lifetime)", "Codex use", "Codex SKILL.md reads", "Codex name mentions", "Claude trigger disposition"], host_rows) +
+            _tracking_table("Skill counts by native lane group", ["Client", "Lane group", "Skill", "Use / calls", "Raw Codex reads", "Measurement"], lane_rows) + '</section>')
+
+
 def render(data: dict[str, Any]) -> str:
     lane_source, parked_source, session_source = (data.get(key) for key in ("lanes_live", "lanes_parked", "claude_sessions"))
     lanes = lane_source if isinstance(lane_source, list) else []
@@ -294,6 +333,7 @@ def render(data: dict[str, Any]) -> str:
 <div class="fleet-counts"><p><strong>{len(lanes) if known("lanes_live", lane_source) else "UNKNOWN"}</strong> live Codex lanes</p><p><strong>{len(parked) if known("lanes_parked", parked_source) else "UNKNOWN"}</strong> parked</p><p><strong>{worker_count if known("claude_sessions", session_source) else "UNKNOWN"}</strong> Claude worker sessions{f' + {owner_count} owner session' if owner_count else ''}</p><p><strong>{number(data.get("fresh_total_pct"), "%")}</strong> sum of per-account fresh-pool percentages (reference 200)</p></div>
 <ul class="fleet-source-note">{section_notes}</ul>
 {_tracking(data)}
+{_skill_usage(data)}
 <div class="fleet-grid"><div class="fleet-left">
 <section class="fleet-codex"><h2>Codex lanes</h2><div class="table-wrap fleet-table-wrap" tabindex="0" role="region" aria-label="Codex lanes; scroll horizontally on narrow screens"><table class="fleet-table"><thead><tr><th>Lane</th><th>State</th><th>Tier: running / map</th><th>CLI: running / map</th><th>Subagents running</th><th>Subagents' uncached share</th></tr></thead><tbody>{''.join(lane_rows)}</tbody></table></div></section>
 <section class="fleet-parked"><h2>Parked lanes</h2><ul>{parked_items}</ul></section>

@@ -465,6 +465,18 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         if not quiet:
             print(message)
 
+    if skill.get("native_plugin"):
+        # A native plugin stays in its own marketplace namespace. Never create
+        # a Vercel skills copy that shadows it; installation remains CC-owned.
+        sys.path.insert(0, str(ROOT))
+        from scripts.skills_status import native_plugin_status
+        status = native_plugin_status(skill, home, {})
+        if status["state"] == "ok":
+            note(f"{name}: ok (native plugin at the pinned revision)")
+            return "ok"
+        note(f"{name}: native plugin {status['state']}; use the reviewed Claude plugin install path")
+        return "missing-or-drifted"
+
     try:
         state = classify_skill(skill, home, project_dir, agent)
     except InstallError as error:
@@ -755,7 +767,8 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
     try:
-        verify_skills_bin(args.skills_bin, manifest["cli"], home)
+        if not skills or any(not isinstance(skill, dict) or not skill.get("native_plugin") for skill in skills):
+            verify_skills_bin(args.skills_bin, manifest["cli"], home)
     except InstallError as error:
         print(f"install-skills failed: {error}", file=sys.stderr)
         return 1

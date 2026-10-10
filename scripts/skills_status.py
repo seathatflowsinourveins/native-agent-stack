@@ -378,6 +378,10 @@ def folder_tree_summary(skills_report: list[dict]) -> dict:
     summary = {"ok": 0, "runtime_artifacts": [], "drift": [], "missing": [], "unreadable": [], "held": []}
     for skill in skills_report:
         state = skill["folder_tree"]["state"]
+        if state == "native-plugin":
+            # Plugin registry/pin and SKILL.md bytes are checked separately;
+            # no Vercel canonical-folder tree attestation is claimed.
+            continue
         if state == "ok":
             summary["ok"] += 1
         else:
@@ -587,6 +591,32 @@ def check_cli_version(binary: str, manifest_version: str) -> dict:
 # Orchestration.
 # ---------------------------------------------------------------------------
 
+def native_plugin_status(skill: dict, home: Path, env=None) -> dict:
+    """Read the native user-plugin registry, never credentials or client settings.
+
+    Claude Code 2.1.296 installed_plugins v2 schema: installedAt is installation
+    age, gitCommitSha is the source pin, installPath holds the unchanged plugin.
+    """
+    plugin = skill["native_plugin"]
+    config = claude_skills_dir(home, {} if env is None else env).parent
+    result = {"state": "missing", "installed_at": None}
+    try:
+        registry = json.loads((config / "plugins/installed_plugins.json").read_text())
+        entries = registry.get("plugins", {}).get(plugin, [])
+        entries = [entries] if isinstance(entries, dict) else entries
+        entry = next(row for row in entries if isinstance(row, dict) and row.get("scope") == "user")
+        result["installed_at"] = entry.get("installedAt") if isinstance(entry.get("installedAt"), str) else None
+        if entry.get("gitCommitSha") != skill["ref"]:
+            return {**result, "state": "pin_mismatch"}
+        path = Path(entry["installPath"])
+        if not path.is_absolute() or not path.resolve().is_relative_to((config / "plugins/cache").resolve()):
+            return {**result, "state": "invalid_install_path"}
+        raw = (path / skill["path"] / "SKILL.md").read_bytes()
+        return {**result, "state": "ok" if hashlib.sha256(raw).hexdigest() == skill["skill_md_sha256"] else "hash_mismatch"}
+    except (OSError, ValueError, TypeError, KeyError, StopIteration):
+        return result
+
+
 def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None) -> dict:
     env = os.environ if env is None else env
     agents_skills = agents_skills_dir(home)
@@ -601,6 +631,15 @@ def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None)
     skills_report = []
     for skill in manifest["skills"]:
         name = skill["name"]
+        if skill.get("native_plugin"):
+            plugin = native_plugin_status(skill, home, env)
+            skills_report.append({"name": name, "pass": plugin["state"] == "ok", "scope": "native Claude plugin",
+                                  "canonical": plugin, "lock": plugin,
+                                  "claude_link": {"state": "ok", "kind": "native-plugin"},
+                                  "claude_listing": {"state": "native-plugin", "actual": None},
+                                  "codex_disable": {"state": "ok", "disable_entry_present": False},
+                                  "folder_tree": {"state": "native-plugin"}})
+            continue
         if skill.get("status") == "held":
             # Not installed while held (tools/adoption/install_skills.py skips it); a folder left from an earlier
             # install is reported, never failed.
