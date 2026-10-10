@@ -60322,8 +60322,8 @@
     },
     {
       "path": "tests/test_local_pages_fleet_regressions.py",
-      "sha256": "72d7e709ab952664b798b9afa84de3558108066ed5c8eec55ac56ffa205132df",
-      "bytes": 20631
+      "sha256": "4601bbba4a6c1cf04352a484670b1601b468e9aa879c8ac5f55eee6c3fd5dd94",
+      "bytes": 20940
     },
     {
       "path": "tests/test_managed_block.py",
