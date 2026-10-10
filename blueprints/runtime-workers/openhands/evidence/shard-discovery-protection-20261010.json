@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "measured_at": "2026-10-10T06:04:14Z",
+  "base_commit": "a30c2188e4423f05a7448e5f7a3bcfd858e0f5b8",
+  "pr957_head": "7df900f7dd6f24b20e3d9e54cfd21aba318d75e8",
+  "claim": "Recognising the native validate_shards.py run command restores discovery protection independently of other workflow runners or test-directory mentions.",
+  "evidence_class": "local_integration",
+  "python_version": "3.13.16",
+  "sources": [
+    {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "pin": "a30c2188e4423f05a7448e5f7a3bcfd858e0f5b8",
+      "file": "scripts/validate_shards.py",
+      "lines": "94-96,186-197",
+      "mechanism": "The run subcommand discovers from the working directory with pattern test*.py and the same top-level directory."
+    },
+    {
+      "repository": "https://github.com/python/cpython",
+      "pin": "v3.12.3",
+      "file": "Lib/unittest/loader.py",
+      "lines": "229-233,344-374,419-444",
+      "mechanism": "Native discovery loads matching modules at the root and traverses importable packages."
+    }
+  ],
+  "fail_before": {
+    "test": "tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests.test_validate_shards_alone_protects_a_new_test_module",
+    "fixture_class": "synthetic",
+    "fixture": "Real repository tree and real shard suite step, with other workflows removed and a new tests/test_brand_new_module.py injected.",
+    "main_command": "python3 -m unittest tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests.test_validate_shards_alone_protects_a_new_test_module -v",
+    "main_exit_code": 1,
+    "main_tests": 1,
+    "main_failures": 1,
+    "main_errors": 0,
+    "pr957_replay": "Compile the exact push_gate.py source from pr957_head in a fresh gate module; run the same TestCase with GitTree at pr957_head. Resolver dependencies match main at this head.",
+    "pr957_tests": 1,
+    "pr957_failures": 1,
+    "pr957_errors": 0,
+    "observed_file_and_path_rules": [null, null],
+    "required_file_and_path_rules": ["ci_discovered", "ci_discovered"],
+    "fixed_command_exit_code": 0
+  },
+  "repository_tree_measurements": [
+    {"tree": "main", "gate": "before", "total_test_files": 321, "rules": {"ci_named": 263, "workflow_policy_test": 58}, "new_module_rule": "ci_named"},
+    {"tree": "pr957_head", "gate": "before", "total_test_files": 321, "rules": {"ci_named": 5, "workflow_policy_test": 58, "unprotected": 258}, "new_module_rule": null},
+    {"tree": "pr957_head", "gate": "fixed", "total_test_files": 321, "rules": {"ci_discovered": 262, "ci_named": 1, "workflow_policy_test": 58}, "new_module_rule": "ci_discovered"},
+    {"tree": "main", "gate": "fixed", "total_test_files": 321, "rules": {"ci_discovered": 262, "ci_named": 1, "workflow_policy_test": 58}, "new_module_rule": "ci_discovered"}
+  ],
+  "git_free_regression": {
+    "test": "tests.test_runtime_worker_openhands_push_gate.WorkflowReaderTests.test_validate_shards_discovery_keeps_memory_trees_git_free",
+    "fixture_class": "synthetic",
+    "boundary": "MemoryTree derivation with subprocess.run raising on any attempted process launch",
+    "covered": ["continued run arguments", "python3.12 with ./script path", "aggregate", "runner", "run-again"],
+    "exit_code": 0
+  },
+  "monitoring_correction": {
+    "historical_receipt": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
+    "historical_count": 330,
+    "live_count": 322,
+    "removed_locations": ["tests/test_catalogs.py:166", "tests/test_catalogs.py:176", "tests/test_catalogs.py:287", "tests/test_catalogs.py:288", "tests/test_catalogs.py:292", "tests/test_catalogs.py:293", "tests/test_catalogs.py:294", "tests/test_catalogs.py:435"],
+    "added_locations": [],
+    "reason": "The existing derivation contract excludes discovered test modules from gate-script import tracing. test_catalogs.py is now correctly classified ci_discovered.",
+    "historical_receipt_unchanged": true,
+    "remaining_script_counts_and_all_shapes_match": true
+  },
+  "required_tests": {
+    "command": "python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands tests.test_runtime_worker_openhands_resolver -v",
+    "tests": 389,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "unittest_elapsed_seconds": 71.812
+  },
+  "limitations": [
+    "The new-module and command-variant regressions use synthetic fixtures executed by the installed unittest client; the full tree comparisons are local integration measurements.",
+    "CPython v3.12.3 is the requested mechanism pin; execution used the installed Python 3.13.16 client.",
+    "No production resolver, broker, model or live provider was exercised.",
+    "Coverage follows the existing package-discovery policy; this does not claim arbitrary non-package directories are discovered."
+  ]
+}
