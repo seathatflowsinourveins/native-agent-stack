@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-arose26-pinescript-langium",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/arose26/pinescript-langium",
+ "reviewed_commit": "152d3e8a5fa31c68c27499ece17c1d8216640a0e",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "backtesting-engine"
+ ],
+ "claim": "Source and documentation review of arose26/pinescript-langium at commit 152d3e8a5fa31c68c27499ece17c1d8216640a0e (license MIT), read from README.md at that commit. Repository description: \"PineScript parser, language server, and transpiler to JavaScript via ESTree\". Survived the landscape-sweep-20261009-pine facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 0,
+  "pushed_at": "2026-08-16T16:31:34Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@152d3e8a5fa31c68c27499ece17c1d8216640a0e",
+   "text": "A parser, language server, and **PineScript → JavaScript transpiler**, built on [Langium](https://langium.org/). It takes TradingView's PineScript — an indentation-sensitive language with no public grammar — and compiles it to runnable JavaScript through a standard ESTree intermediate representation."
+  },
+  {
+   "source": "README.md@152d3e8a5fa31c68c27499ece17c1d8216640a0e",
+   "text": "```js var a = 1; var b = 2; var c = a + b; if (c > 2) { c = c + 1; } else { c = c - 1; } function f(x) { var y = x * 2; return y + 1; } var result = f(c); ```"
+  },
+  {
+   "source": "README.md@152d3e8a5fa31c68c27499ece17c1d8216640a0e",
+   "text": "Note what that involves: indentation became braces, PineScript's `:=` reassignment became `=`, and `f(x) =>` — a block-bodied function whose final expression is its return value — became a real JavaScript function with an explicit `return`."
+  }
+ ]
+}

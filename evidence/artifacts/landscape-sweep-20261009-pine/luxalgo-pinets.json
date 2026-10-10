@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-luxalgo-pinets",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/LuxAlgo/PineTS",
+ "reviewed_commit": "c5e6b0efee7e42d78b42d96f14173f38be082551",
+ "readme_path": "README.md",
+ "license": "AGPL-3.0",
+ "layers": [
+  "backtesting-engine"
+ ],
+ "claim": "Source and documentation review of LuxAlgo/PineTS at commit c5e6b0efee7e42d78b42d96f14173f38be082551 (license AGPL-3.0), read from README.md at that commit. Repository description: \"Run Pine Script® anywhere. PineTS is an open-source transpiler and runtime that brings Pine Script® logic to Node.js and the browser with 1:1 syntax compatibility. Reliably write, port, and run indicators or strategies on your own infrastructure.\". Survived the landscape-sweep-20261009-pine facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 851,
+  "pushed_at": "2026-10-09T14:26:54Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@c5e6b0efee7e42d78b42d96f14173f38be082551",
+   "text": "PineTS is a TypeScript runtime for [Pine Script®](https://www.TradingView.com/pine-script-docs/welcome/). It transpiles native v6 or v5 source and executes it with the same time series model: lookbacks, incremental TA, and plot outputs you can read from code."
+  },
+  {
+   "source": "README.md@c5e6b0efee7e42d78b42d96f14173f38be082551",
+   "text": "You write the indicator once. PineTS runs it on your data, in your process."
+  },
+  {
+   "source": "README.md@c5e6b0efee7e42d78b42d96f14173f38be082551",
+   "text": "**[Documentation](https://docs.luxalgo.com/developers/pinets)**"
+  }
+ ]
+}

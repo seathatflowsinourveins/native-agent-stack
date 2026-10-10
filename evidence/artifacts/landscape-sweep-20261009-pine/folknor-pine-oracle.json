@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-folknor-pine-oracle",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/folknor/pine-oracle",
+ "reviewed_commit": "a8df6386b6b4fc24f8851070c33f6c24703c522d",
+ "readme_path": "README.md",
+ "license": "MPL-2.0",
+ "layers": [
+  "backtesting-engine"
+ ],
+ "claim": "Source and documentation review of folknor/pine-oracle at commit a8df6386b6b4fc24f8851070c33f6c24703c522d (license MPL-2.0), read from README.md at that commit. Repository description: \"Single-binary CLI that answers Pine Script v6 semantic questions: identifier lookups, User Manual search, and validation, with no runtime state.\". Survived the landscape-sweep-20261009-pine facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2,
+  "pushed_at": "2026-10-08T11:07:49Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@a8df6386b6b4fc24f8851070c33f6c24703c522d",
+   "text": "A single-binary CLI that answers Pine Script v6 semantic questions. Structured-signature lookups (with BM25 \"did you mean ...?\" recovery), Pine User Manual prose search, and an authored Pine cookbook - all baked into one Rust binary with no on-disk state, no network calls, no runtime configuration. The one exception is `po verdict`, a record of measured TradingView behavior that lives in a directory the caller names explicitly on every command. It answers questions *about* Pine; it never execute"
+  },
+  {
+   "source": "README.md@a8df6386b6b4fc24f8851070c33f6c24703c522d",
+   "text": "Output is text-only across the board. Text output accepts `--quiet` to suppress non-data headers and status lines where a command emits them."
+  },
+  {
+   "source": "README.md@a8df6386b6b4fc24f8851070c33f6c24703c522d",
+   "text": "Every answer is served from data **compiled into the binary at build time** - `po search` queries an embedded snapshot of the Pine User Manual, not the live website, and `po lookup` reads embedded JSON, not a remote API. There are no network calls, no on-disk index, and no cache to warm."
+  }
+ ]
+}

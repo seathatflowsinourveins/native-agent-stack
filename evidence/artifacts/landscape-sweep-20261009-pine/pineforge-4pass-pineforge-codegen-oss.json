@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-pineforge-4pass-pineforge-codegen-oss",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+ "reviewed_commit": "15294ebb3a03035876674c476d81b3dd2ba73d81",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "backtesting-engine"
+ ],
+ "claim": "Source and documentation review of pineforge-4pass/pineforge-codegen-oss at commit 15294ebb3a03035876674c476d81b3dd2ba73d81 (license NOASSERTION), read from README.md at that commit. Repository description: \"Pine Script v6 to C++ transpiler for the pineforge-engine runtime. Pure Python; source-available under the PineForge Source License 1.2: free for noncommercial use and personal trading, commercial use needs a license.\". Survived the landscape-sweep-20261009-pine facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 5,
+  "pushed_at": "2026-10-09T12:09:01Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@15294ebb3a03035876674c476d81b3dd2ba73d81",
+   "text": "> PineScript v6 → C++ transpiler that emits against the [pineforge-engine](https://github.com/pineforge-4pass/pineforge-engine) runtime."
+  },
+  {
+   "source": "README.md@15294ebb3a03035876674c476d81b3dd2ba73d81",
+   "text": "A pure-Python library that turns a PineScript v6 strategy into a complete C++ source file you can compile against the [`pineforge-engine`](https://github.com/pineforge-4pass/pineforge-engine) runtime."
+  },
+  {
+   "source": "README.md@15294ebb3a03035876674c476d81b3dd2ba73d81",
+   "text": "**Measured <!-- pf:scoreboard.date -->2026-10-07<!-- /pf -->** on main engine <!-- pf:scoreboard.engineCommit|short-code -->`b3192bfc`<!-- /pf --> with codegen-oss <!-- pf:scoreboard.codegenCommit|short-code -->`bfc4ddce`<!-- /pf --> (baseline <!-- pf:scoreboard.id|code -->`pineforge-parity-baseline-20261007-engine-b3192bfc`<!-- /pf -->, snapshot <!-- pf:scoreboard.snapshotSha256|short-code -->`28ba8dbd`<!-- /pf -->): <!-- pf:scoreboard.excellent|int -->7,983<!-- /pf --> of <!-- pf:scoreboard.gr"
+  }
+ ]
+}

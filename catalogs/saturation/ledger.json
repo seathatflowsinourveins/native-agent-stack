@@ -10913,7 +10913,254 @@
      ]
     }
    ]
+  },
+  {
+   "sweep_id": "landscape-sweep-20261009-pine",
+   "date": "2026-10-09",
+   "workflow_run": "wf_638ac506-e83",
+   "status": "completed",
+   "manifest_ref": "catalogs/sota-convergence/manifest-20261009.json",
+   "manifest_sha256": "3f061eeb261a91e8eec0f586bc135179e56bacd6216adcf9ddfa526877879153",
+   "lane": "landscape-sweep-20261009-pine",
+   "prompts_sha256": "105bd0780573e0a731c04a043ccf072e9fcfb87a4a274fccdee7072f9c0ac66e",
+   "usage_ref": "evidence/artifacts/landscape-sweep-20261009-pine-attempts/child-usage-wf_638ac506-e83.json",
+   "usage_sha256": "13a2760dc905fb85f9ac6cc083389af066f32adf465c7864a8e88c6f2168d3d0",
+   "lower_bound_usage": false,
+   "returns_ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json",
+   "returns_sha256": "8b91d1acc81d71d8a911916cd1869a4d0a5742f95bb529c76d321c9793e2f961",
+   "prev_sha256": "d6d5695f02c2404b38476be33f5be536e47bbe1c4793ab03ffd4bc0c43abb7b2",
+   "layers": [
+    {
+     "catalog": "us-equities",
+     "layer_id": "backtesting-engine",
+     "requirement_sha256": "05654fcd99ad74800f9912a667b3e6ec90af3014531c71fea9511dbba1bd72fd",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/discovery/backtesting-engine",
+     "calls": {
+      "web_search": 8,
+      "web_fetch": 13,
+      "gh_api": 66,
+      "gpt6_web_search": 24,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 80
+     },
+     "proposed": [
+      "https://github.com/luxalgo/pinets",
+      "https://github.com/pineforge-4pass/pineforge-engine",
+      "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+      "https://github.com/pynesys/pynecore",
+      "https://github.com/mihakralj/quantalib",
+      "https://github.com/lumiwealth/lumibot",
+      "https://github.com/elbakramer/pynescript",
+      "https://github.com/heyphat/piner",
+      "https://github.com/hoox-sh/pyne",
+      "https://github.com/s7cret/pine2ast",
+      "https://github.com/folknor/pine-oracle",
+      "https://github.com/folknor/pine-tools",
+      "https://github.com/helenananaa/pine-compat-runtime",
+      "https://github.com/s7cret/backtest_engine",
+      "https://github.com/arose26/pinescript-langium"
+     ],
+     "known": [
+      "https://github.com/lumiwealth/lumibot"
+     ],
+     "new": [
+      "https://github.com/luxalgo/pinets",
+      "https://github.com/pineforge-4pass/pineforge-engine",
+      "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+      "https://github.com/pynesys/pynecore",
+      "https://github.com/mihakralj/quantalib",
+      "https://github.com/elbakramer/pynescript",
+      "https://github.com/heyphat/piner",
+      "https://github.com/hoox-sh/pyne",
+      "https://github.com/s7cret/pine2ast",
+      "https://github.com/folknor/pine-oracle",
+      "https://github.com/folknor/pine-tools",
+      "https://github.com/helenananaa/pine-compat-runtime",
+      "https://github.com/s7cret/backtest_engine",
+      "https://github.com/arose26/pinescript-langium"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/luxalgo/pinets",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/0/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json"
+      },
+      {
+       "repo": "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/2/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/2/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json"
+      },
+      {
+       "repo": "https://github.com/pynesys/pynecore",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/3/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/3/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json"
+      },
+      {
+       "repo": "https://github.com/elbakramer/pynescript",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/6/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/6/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json"
+      },
+      {
+       "repo": "https://github.com/folknor/pine-oracle",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/10/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/10/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json"
+      },
+      {
+       "repo": "https://github.com/s7cret/backtest_engine",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/13/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/13/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json"
+      },
+      {
+       "repo": "https://github.com/arose26/pinescript-langium",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/14/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/14/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/pineforge-4pass/pineforge-engine",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/1/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/mihakralj/quantalib",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/lumiwealth/lumibot",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/heyphat/piner",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/7/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/hoox-sh/pyne",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/8/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/s7cret/pine2ast",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/9/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/folknor/pine-tools",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/11/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/helenananaa/pine-compat-runtime",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/12/fit"
+       }
+      }
+     ],
+     "reopen": []
+    }
+   ]
   }
  ],
- "head_sha256": "d6d5695f02c2404b38476be33f5be536e47bbe1c4793ab03ffd4bc0c43abb7b2"
+ "head_sha256": "ec575b95c05587504ff5da7b298cece2f28ef97a159141b92f5a5db82997f886"
 }
