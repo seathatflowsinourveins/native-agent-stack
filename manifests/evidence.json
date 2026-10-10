@@ -60126,6 +60126,11 @@
       "bytes": 22270
     },
     {
+      "path": "tests/test_anthropic_key_health.py",
+      "sha256": "0a2462b43c8d9ab6fe2b3c441f7cbe396dc2a769acb8504a9ecb2d690c5289bf",
+      "bytes": 24953
+    },
+    {
       "path": "tests/test_apply_claude_settings.py",
       "sha256": "4c40b74a699fa29a307935c1b309edc7869e7b50e390c5b5d8613ae74ea6a5d3",
       "bytes": 47548
@@ -61384,6 +61389,11 @@
       "path": "tools/capability-gate/run_gate.py",
       "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7",
       "bytes": 22476
+    },
+    {
+      "path": "tools/credentials/anthropic_key_health.py",
+      "sha256": "4d4160a4d8a3db7b83aa9c232532f68d67aa088a64e4d18dca24ef66c89f58c3",
+      "bytes": 17424
     },
     {
       "path": "tools/credentials/canary_lane_consumer.sh",
