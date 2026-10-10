@@ -117,9 +117,9 @@ records the evidence and the alternatives.
 A prefix is the first eight characters of the id of the organization that a
 slot's key belongs to. The prefixes are the command center's reading of
 2026-10-10 at 14:14Z with its own health script, which injects each key per
-command and never prints one; this change did not measure them. The same reading found every stored
-key to be a regular API key of a separate individual account. Account names
-and credit balances are not recorded here.
+command and never prints one; this change did not measure them. The same
+reading found every stored key to be a regular API key of a separate
+individual account. Account names and credit balances are not recorded here.
 
 1. **Scope.** The Claude API serves work that needs its quality and the
    north star's multi-model QA; routine work stays on the subscription and
@@ -167,9 +167,8 @@ and credit balances are not recorded here.
    ledger records each charge per key and workload in dollars; per-call
    token counts with cache reads and writes are being added, to give per-key
    cache hit rates. An account's credit balance shows in that account's
-   Console. There are no admin
-   keys: every slot's account is an individual account (the command center's
-   reading), and Anthropic's
+   Console. There are no admin keys: every slot's account is an individual
+   account (the command center's reading), and Anthropic's
    [Admin API](https://docs.anthropic.com/en/api/administration-api) and
    [Usage and Cost API](https://docs.anthropic.com/en/api/usage-cost-api)
    pages both state "The Admin API is unavailable for individual accounts."
