@@ -26,8 +26,14 @@ On 2026-10-09 a side agent told the owner that every agent session, Claude and C
 3. **Tokens.** Each post mints an installation access token through the credential runner: a JWT signed with the App's key, then `POST /app/installations/{installation_id}/access_tokens` [install-token]. api-actions builds the minting into the local review worker.
 4. **Key custody.** The private key is a 0600 file outside every worktree, reached by pointer through the credential runner's inventory. The owner moves the downloaded file into custody. No agent reads, prints or copies it.
 5. **Landing predicate.** For an essential PR, the CC's landing script resolves the PR's current head SHA at landing time. It then lists that head's check runs by name, with `filter=all` [checks-list], and keeps only runs whose `app.id` equals the App's ID.
-   - **Which run counts:** among those runs, the one with the latest `completed_at` is authoritative (ties go to the higher run id). It counts only with `status` `completed` and `conclusion` `success`.
-   - **What blocks:** a queued or in-progress App run, an authoritative `failure`, or no App run at all. A failure posted after a success supersedes it.
+   - **Which run counts:** the publisher numbers each verdict for a (head, check name) pair under a per-head lock: attempt 1, 2, 3 and so on. It writes the number into the check run's `external_id` as `attempt-<n>` and publishes only after the previous attempt has finished. The run with the **highest attempt number** is authoritative, and it counts only with `status` `completed` and `conclusion` `success`.
+   - **Why not time:** `completed_at` and `started_at` are values the poster supplies when it creates the check run [checks], so they can't show publication order. A later attempt therefore supersedes an earlier one whatever their timestamps say, and an older attempt that completes late never overrides a newer failure.
+   - **What blocks:**
+     - an App run that is queued or in progress;
+     - an authoritative `failure`;
+     - a missing or malformed attempt number, or a gap in the numbers;
+     - two runs sharing a number;
+     - no App run at all.
    - **Rulesets:** pinning the App as the ruleset's expected source of the status check [rulesets] is optional, because a ruleset can't express the essential-path condition.
    - **#42's statuses:** `claude-pr-review` statuses (us-equities-trading #42) come from github-actions[bot]. For those, the script also verifies that the status's run is a trusted `schedule` or `workflow_dispatch` run on main.
    - **Nothing is waived:** an App verdict adds a gate. The co-op GPT read, the non-author trading acknowledgement, CI and the landing script's own readiness decision all still apply. The CC's independent review is preserved.
@@ -50,17 +56,18 @@ The CC implemented this on 2026-10-09:
 
 ## Transition
 
-The landing script moves from the interim rule to the App predicate only after the CC has verified enforcement on a non-production PR and recorded a dated receipt. The receipt must show five things:
+The landing script moves from the interim rule to the App predicate only after the CC has verified enforcement on a non-production PR and recorded a dated receipt. The receipt must show six things:
 1. A `success` App check on the current head admits landing.
-2. A later App `failure` on the same head blocks it.
+2. A later App `failure` on the same head blocks it. That includes a failure that is published after an earlier success but carries an earlier `completed_at`, and an older attempt's success that completes after a newer failure.
 3. A queued App run blocks it.
 4. A `success` check or status from any other source, including the owner token, is ignored.
 5. A success on a superseded head doesn't count.
+6. A missing, malformed, duplicated or gapped attempt number blocks.
 
 ## Compromise and rotation
 
 Credentials are referred to by inventory id and pointer only, never by value.
-1. **On suspected compromise, the CC stops trusting App verdicts at once.** The landing script falls back to the interim rule, and the CC records the time.
+1. **On suspected compromise, the CC stops trusting App verdicts at once.** Since the attempt numbers are written by whoever holds the key, they are only as trustworthy as the key. The landing script falls back to the interim rule, and the CC records the time.
 2. **The owner suspends the installation.** While it is suspended, "the GitHub App cannot access resources owned by that installation account", and GitHub gives leaked credentials as a reason to do this [suspend]. Suspension also covers any outstanding installation tokens. A token still held by a trusted process can be revoked with `DELETE /installation/token` [installations].
 3. **The owner generates a new key, then deletes the old one** under Credentials → Key pairs. GitHub requires a new key before an existing one can be deleted, and "Private keys do not expire and instead need to be manually revoked" [keys]. Deleting the local PEM file revokes nothing; only deletion on GitHub does.
 4. **The owner places the new key in custody** through the credential tooling, under the same pointer, as in Owner steps 3. The CC verifies the key's fingerprint against the one GitHub shows, using the documented `openssl` command [keys], without printing the key.
