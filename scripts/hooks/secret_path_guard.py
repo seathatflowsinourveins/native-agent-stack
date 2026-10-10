@@ -1615,14 +1615,16 @@ def launcher_chain(words: list[str], appended: set[str] | None = None) -> tuple[
     return entries, at, moved
 
 
-def expand(command: str, depth: int = 0) -> list[list[str]]:
+def expand(command: str, depth: int = 0, inherited: set[str] | None = None) -> list[list[str]]:
     """Command segments of the command, and of the command substitutions that the shell runs inside its double
     quotes (scan_shell: `echo "$(printenv)"` runs printenv), at any nesting up to MAX_SUBSTITUTION_NESTING and while
     the bodies read stay within SUBSTITUTION_BUDGET_FACTOR times the command's length (plus SUBSTITUTION_BUDGET_FLOOR):
     every level is read again from the start, so quotes nested n deep would otherwise cost n times the command. A segment
     that comes up more than once is returned once (identical segments get identical verdicts, and each copy would be
-    analysed again)."""
+    analysed again). An inherited xargs state follows shell/eval text and its command substitutions: GNU findutils
+    4.10.0 xargs.1 -I substitutes occurrences in the initial arguments, including a shell's program string."""
     result: list[list[str]] = []
+    inherited = inherited.copy() if inherited else set()
     level = [command]
     budget = SUBSTITUTION_BUDGET_FACTOR * len(command) + SUBSTITUTION_BUDGET_FLOOR
     spent = 0
@@ -1630,7 +1632,7 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
         following: list[str] = []
         for text in level:
             bodies, comments, protected, ansi_c = scan_shell(text)
-            result.extend(command_segments(text, depth, comments, protected, ansi_c))
+            result.extend(command_segments(text, depth, comments, protected, ansi_c, inherited))
             following.extend(bodies)
         spent += sum(map(len, following))
         if not following or spent > budget:
@@ -1682,7 +1684,8 @@ def note_identity_collision(kept: list[str], dropped: list[str]) -> None:
 
 
 def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int]] | tuple = (),
-                     protected: list[int] | tuple = (), ansi_c: list[tuple[int, int]] | tuple = ()) -> list[list[str]]:
+                     protected: list[int] | tuple = (), ansi_c: list[tuple[int, int]] | tuple = (),
+                     inherited: set[str] | None = None) -> list[list[str]]:
     """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command`, of the
     command that a keyring exec starts, of the command an `rtk` invocation runs and of the command a
     `systemd-run` starts (each launcher's own segment stays in the result, for the rules on its options). Read twice
@@ -1714,7 +1717,8 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                 seen.setdefault(key, raw)
             emit(raw)  # as written, before any launcher walk: a redirection is checked wherever the walk would put it
             skipped: list[str] = []
-            appended: set[str] = set()  # operand provenance belongs to this raw command, never an independent segment
+            # Descendants of an xargs-controlled string inherit its provenance; independent raw commands only get their own copy.
+            appended = inherited.copy() if inherited else set()
             words = raw[prefix_end(raw, 0, skipped, appended=appended):]
             while words:
                 entries, start, moved = launcher_chain(words, appended)
@@ -1758,9 +1762,9 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                     if program in SHELLS:
                         inline = shell_parts(words)[1]
                         if inline is not None:
-                            result.extend(expand(inline, depth + 1))
+                            result.extend(expand(inline, depth + 1, appended))
                     elif program == "eval" and len(words) > 1:
-                        result.extend(expand(" ".join(words[1:]), depth + 1))
+                        result.extend(expand(" ".join(words[1:]), depth + 1, appended))
                 if not _baseline:
                     runner = k4_runner_start(words)
                     if runner is not None:
@@ -1779,9 +1783,9 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                     if program in SHELLS:
                         inline = shell_parts(words)[1]
                         if inline is not None:
-                            result.extend(expand(inline, depth + 1))
+                            result.extend(expand(inline, depth + 1, appended))
                     elif program == "eval" and len(words) > 1:
-                        result.extend(expand(" ".join(words[1:]), depth + 1))
+                        result.extend(expand(" ".join(words[1:]), depth + 1, appended))
                 break
     return result
 
@@ -1951,6 +1955,63 @@ def is_env_file_word(word: str) -> bool:
     return bool(ENV_FILE_WORD.search(word)) and not word.endswith(".example")
 
 
+def jq_filter_reads_environment(program: str) -> bool:
+    """jq 1.8.1 src/lexer.l:41-46,99-133 distinguishes code from literal text.
+
+    This is a conservative scan for the env/$ENV primitives, not a jq parser.
+    The installed jq 1.8.1 manual:2235-2239 defines their environment access.
+    """
+    k4_charge(program)
+    modes = [("code", 0)]
+    at = 0
+    while at < len(program):
+        mode, depth = modes[-1]
+        character = program[at]
+        if mode == "string":
+            if character == "\\":
+                if program[at:at + 2] == "\\(":
+                    modes.append(("interpolation", 1))
+                at += 2
+                continue
+            if character == '"':
+                modes.pop()
+        elif character == '"':
+            modes.append(("string", 0))
+        elif character == "#":
+            # jq comments can continue over a backslash-escaped newline.
+            at += 1
+            while at < len(program):
+                if program[at] == "\\" and program[at + 1:at + 2] in {"\\", "\n"}:
+                    at += 2
+                elif program[at] == "\\" and program[at + 1:at + 3] == "\r\n":
+                    at += 3
+                elif program[at] in "\r\n":
+                    break
+                else:
+                    at += 1
+            continue
+        elif mode == "interpolation" and character in "()":
+            depth += 1 if character == "(" else -1
+            if depth:
+                modes[-1] = (mode, depth)
+            else:
+                modes.pop()
+        else:
+            match = JQ_ENVIRONMENT.match(program, at)
+            if match:
+                # The unquoted object key env: names a member; $ENV always
+                # remains a binding. A .env FIELD is excluded by the pattern.
+                following = match.end()
+                while following < len(program) and program[following].isspace():
+                    following += 1
+                if match.group() != "env" or program[following:following + 1] != ":":
+                    return True
+                at = following
+                continue
+        at += 1
+    return False
+
+
 def is_dotenv_read(words: list[str], arguments: list[str]) -> bool:
     """jq 1.8.1 src/main.c: its filter is code, every input/file option stays a read.
 
@@ -1988,6 +2049,11 @@ def is_dotenv_read(words: list[str], arguments: list[str]) -> bool:
         at += 1
     if at >= len(words):
         return any(is_env_file_word(item) for item in arguments)
+    # Keep an existing dotenv refusal when the recognized filter executes an
+    # environment primitive. Literal member/string text is still exempt, and
+    # bare environment filters retain the pre-S6 classification.
+    if is_env_file_word(words[at]) and jq_filter_reads_environment(words[at]):
+        return True
     # Remove by position: an identical .env input before a redirection/filter
     # must never be removed by a value-based search. Write targets still follow
     # read_operands' existing handling; input redirections remain in its output.
@@ -2049,7 +2115,10 @@ def is_environment_dump(words: list[str]) -> bool:
 def dumps_after_source(words: list[str]) -> bool:
     """Forms that print values once a credential file is sourced, even with a name filter."""
     program = program_of(words)
-    if is_environment_dump(words):
+    # Bash 5.3.9: source executes in this shell, and prefix assignments are in
+    # the child's environment. TMPDIR's name cannot establish a safe value once
+    # a credential source is present (bash.1 L5917-5923, L9016-9020).
+    if program == "printenv" or is_environment_dump(words):
         return True
     return program in {"declare", "typeset", "export", "readonly", "local"} and any(
         w.startswith("-") and not w.startswith("--") and set(w[1:]) & set("px") for w in words[1:])
@@ -2350,7 +2419,7 @@ def prior_keyring_exec(words: list[str]) -> tuple[str | None, list[str]] | None:
     return None
 
 
-def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
+def prior_expand(command: str, depth: int = 0, inherited: set[str] | None = None) -> list[list[str]]:
     """The command segments that c26800f3 read: of the command, of `sh -c '...'`, `eval ...`, `env ... command`, the command that a
     keyring exec starts and the command an `rtk` invocation runs, plus the GNU and uutils env candidates. Each text is one `texts` and each
     distinct segment its words and one `words` of the work budget. A work list keeps every candidate when another branch continues or
@@ -2364,7 +2433,7 @@ def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
         pending.append((prior_strip_prefix(words, inherited) if strip else words, inherited))
 
     for raw in segments(lex(command, legacy=True)):
-        enqueue(raw, set())
+        enqueue(raw, inherited if inherited else set())
     pending.reverse()  # pop the original segments in their historical order
     seen: dict[tuple, list[str]] = {}
     while pending:
@@ -2424,9 +2493,9 @@ def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
                 if program in SHELLS:
                     inline = shell_parts(words)[1]
                     if inline is not None:
-                        result.extend(prior_expand(inline, depth + 1))
+                        result.extend(prior_expand(inline, depth + 1, appended))
                 elif program == "eval" and len(words) > 1:
-                    result.extend(prior_expand(" ".join(words[1:]), depth + 1))
+                    result.extend(prior_expand(" ".join(words[1:]), depth + 1, appended))
             break
     return result
 
@@ -2469,7 +2538,7 @@ def prior_is_environment_dump(words: list[str]) -> bool:
 
 def prior_dumps_after_source(words: list[str]) -> bool:
     program = program_of(words)
-    if prior_is_environment_dump(words):
+    if program == "printenv" or prior_is_environment_dump(words):
         return True
     return program in {"declare", "typeset", "export", "readonly", "local"} and any(
         w.startswith("-") and not w.startswith("--") and set(w[1:]) & set("px") for w in words[1:])

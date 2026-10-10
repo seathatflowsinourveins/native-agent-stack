@@ -12,7 +12,8 @@ Without the key, Claude Code treats a hook exit code other than 0 and 2 as a
 non-blocking error and runs the tool call. The hooks reference says so under
 "Other exit codes" and adds that exit code 1, the conventional failure code,
 does not block either. The guard already turns its own exceptions into exit 2
-(`guard_error`, `scripts/hooks/secret_path_guard.py:5208-5213`). That handling
+(`guard_error`, `scripts/hooks/secret_path_guard.py:5208-5213` at commit
+`a30c2188e4423f05a7448e5f7a3bcfd858e0f5b8`). That handling
 cannot cover failures outside the script's own code: `python3` missing, an
 import-time error, the hook's 10 s timeout, or a killed process. In each of
 those cases the Bash command the guard should have read ran unread. With the
@@ -138,7 +139,8 @@ What the runs show:
 - The guard's own exit codes other than 0 and 2 now block too, on 2.1.295 and
   later. Exit 1 ran the call without the key and was blocked with it (M, N).
   The guard's `main()` returns 1 when the hook input is not readable JSON
-  (`scripts/hooks/secret_path_guard.py:5184-5188`), so that case is now blocked.
+  (`scripts/hooks/secret_path_guard.py:5184-5188` at commit
+  `a30c2188e4423f05a7448e5f7a3bcfd858e0f5b8`), so that case is now blocked.
 
 The guard took a median of 74 ms per call (largest 77 ms) on `git status` and
 87 ms (largest 92 ms) on an 8 KB pipeline, 15 calls each on this host. That is
