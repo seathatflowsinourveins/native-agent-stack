@@ -302,13 +302,17 @@ No setting, hook, permission, catalog or installed component changed in this pul
 and 9 cross-client sources (the Agent Skills specification and its skill-evaluation guide; the Codex skills, subagents,
 hooks, AGENTS.md, non-interactive and plugins documentation; OpenAI's harness-engineering post). For each source an Opus
 5.5 reader at xhigh extracted the practices it states and mapped each to a role slot and a client, and an Opus 5.5
-refuter at max re-read the page and refuted each practice by default. All 31 sources were readable. Of 248 practices
-the refuters kept 195 and refuted 53; of the 195, 56 agree with a default, 127 extend one, 3 contradict one and 9 are
-not covered by any default; 186 map to one of 24 role slots and 9 to none; 19 rest on a measurement the source
-reports, and 124 apply to both clients. Each source carries its fetch time and the sha256 of the bytes read
+refuter at max re-read the page and refuted each practice by default. The children could call the advisor tool, a Fable
+5.1 advisor: 63 calls, 29 answered (8 by readers, 21 by refuters, in 28 children) and 34 refused as too_many_requests.
+All 31 sources were readable. Of 248 practices the refuters kept 195 and refuted 53; of the 195, 56 agree with a
+default, 127 extend one, 3 contradict one and 9 are not covered by any default; 186 map to one of 24 role slots and 9 to
+none; 19 rest on a measurement the source reports, and 124 apply to both clients. Each source carries its fetch time and
+the sha256 of the bytes read
 ([primary-source-reading.json](../../evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json));
-the layer pages list each slot's sources. Before this run one post backed a default (planning-persistence); the
-others were only links inside community sources. Spend: $63.87 at API list price (usage record).
+the layer pages list each slot's sources. Before this run one post backed a default (planning-persistence); the others
+were only links inside community sources. Spend: $91.51 at API list price: $63.87 for the Opus 5.5 executors and $27.64
+for the answered Fable 5.1 advisor calls, which bill at the advisor's rates outside the executors' usage (usage record;
+rates read 2026-10-10 from the pricing page). An earlier figure, $63.87, counted the executors only.
 
 **One practice, native execution per client** (command center, 2026-10-09): procedure in a short AGENTS.md map and
 Agent Skills, which both clients load; execution in each client's own mechanism, with nothing ported; and, as the

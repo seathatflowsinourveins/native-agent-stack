@@ -6,6 +6,8 @@ docs/decisions/2026-10-09-claude-code-native-practice.md states, from
 evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json (the reading), probes-20261009.json (the
 probes) or the checked-in settings template. The reader and refuter settings the addendum names are compared with the
 models and efforts the run's children were measured at (usage.by_phase of the reading), not with the reading's own prose.
+The spend is recomputed from the recorded tokens of the executors and of the advisor they called, at the rate table the
+reading cites, so a figure that leaves out the advisor's separately billed calls cannot pass.
 Repository-text checks only: no page is fetched, so the sha256 values are compared with each other and never with the
 web, and the host's launcher and archive are read through the probe artifact.
 """
@@ -17,6 +19,7 @@ import copy
 import json
 import re
 import unittest
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -29,6 +32,15 @@ TEMPLATE = ROOT / "adoption/templates/claude.settings.template.json"
 RELATIONS = ("agrees", "extends", "contradicts", "not-covered")
 ANTHROPIC_HOSTS = ("claude.com", "www.anthropic.com")
 PHASES = {"reader": "Read", "refuter": "Refute"}
+PRICING_PAGE = "https://platform.claude.com/docs/en/about-claude/pricing"
+# The pricing page's model table as read on 2026-10-10 (USD per million tokens: base input, 5-minute and 1-hour cache writes,
+# cache hits, output). The reading records the same table; the tests hold the two to each other, so neither can drift alone.
+RATES_USD_PER_MTOK = {
+    "claude-opus-5-5": {"input": 4, "cache_write_5m": 5, "cache_write_1h": 8, "cache_read": 0.2, "output": 20},
+    "claude-fable-5-1": {"input": 10, "cache_write_5m": 12.5, "cache_write_1h": 20, "cache_read": 0.25, "output": 50},
+}
+TOKEN_CLASSES = (("input_tokens", "input"), ("output_tokens", "output"), ("cache_read_input_tokens", "cache_read"),
+                 ("cache_creation_5m_input_tokens", "cache_write_5m"), ("cache_creation_1h_input_tokens", "cache_write_1h"))
 
 
 def record_text() -> str:
@@ -47,6 +59,29 @@ def recorded_settings(usage: dict) -> list:
         (model,), (effort,) = usage["by_phase"][phase]["resolved_models"], usage["by_phase"][phase]["efforts"]
         settings.append((role, model_name(model), effort))
     return sorted(settings)
+
+
+def priced(tokens: dict, rates: dict) -> Decimal:
+    """USD for one model's tokens: each token class times its rate per million tokens."""
+    return sum(Decimal(tokens[field]) * Decimal(str(rates[rate])) for field, rate in TOKEN_CLASSES) / Decimal(1_000_000)
+
+
+def cents(amount: Decimal) -> Decimal:
+    return amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+def recomputed_spend(usage: dict) -> dict:
+    """The executors' spend, the advisor's spend and their total, from the recorded tokens and the recorded rates."""
+    rates = usage["pricing"]["rates_usd_per_mtok"]
+    executor = sum((priced(tokens, rates[model]) for model, tokens in usage["by_resolved_model"].items()), Decimal(0))
+    advisor = sum((priced(tokens, rates[model]) for model, tokens in usage["advisor_by_model"].items()), Decimal(0))
+    return {"executor": cents(executor), "advisor": cents(advisor), "total": cents(executor + advisor)}
+
+
+def published_spend(usage: dict) -> dict:
+    return {"executor": Decimal(str(usage["priced_usd_executor_api_list"])),
+            "advisor": Decimal(str(usage["priced_usd_advisor_api_list"])),
+            "total": Decimal(str(usage["priced_usd_api_list"]))}
 
 
 def stated_settings(text: str) -> list:
@@ -146,6 +181,75 @@ class ReadingCountsTests(unittest.TestCase):
         self.assertEqual({model for entry in usage["by_phase"].values() for model in entry["resolved_models"]},
                          set(usage["by_resolved_model"]))
         self.assertRegex(usage["measurement"]["record"]["sha256"], r"^[0-9a-f]{64}$")
+
+    def test_the_recorded_rates_are_the_cited_pricing_tables_rates(self):
+        usage = self.reading["usage"]
+        pricing = usage["pricing"]
+        self.assertEqual(pricing["source"], PRICING_PAGE)
+        self.assertEqual(pricing["rates_usd_per_mtok"], RATES_USD_PER_MTOK)
+        for key in ("page_sha256", "advisor_page_sha256"):
+            self.assertRegex(pricing[key], r"^[0-9a-f]{64}$")
+        self.assertEqual(sorted(pricing["rates_usd_per_mtok"]), sorted([*usage["by_resolved_model"], *usage["advisor_by_model"]]))
+
+    def test_the_published_spend_recomputes_from_the_recorded_tokens_and_rates(self):
+        # The advisor's calls bill at the advisor model's rates and are not in the executors' usage (the advisor tool's
+        # "Usage and billing"), so the spend is both: the executors' tokens and the advisor's, each at its own rates.
+        usage = self.reading["usage"]
+        spend = recomputed_spend(usage)
+        self.assertEqual(published_spend(usage), spend)
+        self.assertGreater(spend["advisor"], 0)
+        self.assertEqual(spend["executor"] + spend["advisor"], spend["total"])
+        for model, tokens in usage["by_resolved_model"].items():
+            with self.subTest(model=model):  # the 5-minute and 1-hour cache writes are priced apart and add up to the total
+                self.assertEqual(tokens["cache_creation_5m_input_tokens"] + tokens["cache_creation_1h_input_tokens"],
+                                 tokens["cache_creation_input_tokens"])
+        (executor_model,), (advisor_model,) = usage["by_resolved_model"], usage["advisor_by_model"]
+        self.assertIn(f"Spend: ${spend['total']} at API list price: ${spend['executor']} for the {model_name(executor_model)} "
+                      f"executors and ${spend['advisor']} for the answered {model_name(advisor_model)} advisor calls", record_text())
+
+    def test_a_spend_that_leaves_out_the_advisor_is_caught(self):
+        usage = self.reading["usage"]
+        published = published_spend(usage)
+        self.assertEqual(recomputed_spend(usage), published)
+        (advisor_model,) = usage["advisor_by_model"]
+        without_advisor = copy.deepcopy(usage)
+        without_advisor["advisor_by_model"] = {}
+        no_advisor_output = copy.deepcopy(usage)
+        no_advisor_output["advisor_by_model"][advisor_model]["output_tokens"] = 0
+        cheaper_advisor = copy.deepcopy(usage)
+        cheaper_advisor["pricing"]["rates_usd_per_mtok"][advisor_model]["output"] = 5
+        for label, mutated in (("the advisor's tokens removed", without_advisor),
+                               ("the advisor's output tokens removed", no_advisor_output),
+                               ("the advisor billed at a lower rate", cheaper_advisor)):
+            with self.subTest(change=label):
+                self.assertNotEqual(recomputed_spend(mutated), published)
+        # A total that equals the executors' spend, the first count of this reading, is not the spend.
+        self.assertNotEqual(recomputed_spend(usage), {**published, "total": published["executor"]})
+        self.assertNotEqual(published["total"], published["executor"])
+        text = record_text()
+        self.assertIn(f"Spend: ${published['total']} at API list price", text)
+        self.assertNotIn(f"Spend: ${published['executor']} at API list price", text)
+        (executor_model,) = usage["by_resolved_model"]
+        stated = (f"${published['total']} at API list price: ${published['executor']} for the {model_name(executor_model)} "
+                  f"executors and ${published['advisor']} for the answered {model_name(advisor_model)} advisor calls")
+        self.assertIn(stated, text)
+        self.assertNotIn(stated, text.replace(f"Spend: ${published['total']} at", f"Spend: ${published['executor']} at"))
+
+    def test_the_advisor_is_named_with_its_calls_in_the_run_description_and_the_addendum(self):
+        usage = self.reading["usage"]
+        calls = usage["advisor_calls"]
+        ((advisor_model, advisor),) = usage["advisor_by_model"].items()
+        self.assertEqual(calls["made"], calls["answered"] + calls["refused_too_many_requests"])
+        self.assertEqual(calls["answered"], advisor["calls"])
+        self.assertEqual(calls["children_with_an_answered_call"], advisor["children"])
+        self.assertEqual(sorted(calls["by_phase"]), sorted(PHASES.values()))
+        for key in ("made", "answered", "refused_too_many_requests"):
+            self.assertEqual(sum(entry[key] for entry in calls["by_phase"].values()), calls[key])
+        sentence = (f"{model_name(advisor_model)} advisor: {calls['made']} calls, {calls['answered']} answered "
+                    f"({calls['by_phase']['Read']['answered']} by readers, {calls['by_phase']['Refute']['answered']} by refuters, "
+                    f"in {advisor['children']} children) and {calls['refused_too_many_requests']} refused as too_many_requests")
+        self.assertIn(sentence, self.reading["run"])
+        self.assertIn(f"a {sentence}.", record_text())
 
     def test_the_addendum_and_the_run_text_state_the_recorded_reader_and_refuter(self):
         recorded = recorded_settings(self.reading["usage"])

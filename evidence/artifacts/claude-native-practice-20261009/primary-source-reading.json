@@ -1,6 +1,6 @@
 {
  "schema": "claude-native-practice-primary-reading/1",
- "run": "wf_bee0b670-035 (2026-10-09 13:48-14:12Z): per source an Opus 5.5 xhigh reader extracted the code and workflow quality practices it states and mapped each to a role slot and client; an Opus 5.5 max refuter re-read the page and refuted each practice by default; kept = not refuted",
+ "run": "wf_bee0b670-035 (2026-10-09 13:48-14:12Z): per source an Opus 5.5 xhigh reader extracted the code and workflow quality practices it states and mapped each to a role slot and client; an Opus 5.5 max refuter re-read the page and refuted each practice by default; kept = not refuted; the children could call the advisor tool, a Fable 5.1 advisor: 63 calls, 29 answered (8 by readers, 21 by refuters, in 28 children) and 34 refused as too_many_requests, all billed at the advisor's rates outside the executors' usage",
  "counts": {
   "sources": 31,
   "practices": 248,
@@ -14,8 +14,41 @@
     "input_tokens": 83749,
     "output_tokens": 1952979,
     "cache_read_input_tokens": 28763659,
-    "cache_creation_input_tokens": 3743896
+    "cache_creation_input_tokens": 3743896,
+    "cache_creation_5m_input_tokens": 3743896,
+    "cache_creation_1h_input_tokens": 0
    }
+  },
+  "advisor_by_model": {
+   "claude-fable-5-1": {
+    "calls": 29,
+    "children": 28,
+    "input_tokens": 1499557,
+    "output_tokens": 252949,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation_5m_input_tokens": 0,
+    "cache_creation_1h_input_tokens": 0
+   }
+  },
+  "advisor_calls": {
+   "made": 63,
+   "answered": 29,
+   "refused_too_many_requests": 34,
+   "children_with_an_answered_call": 28,
+   "by_phase": {
+    "Read": {
+     "made": 31,
+     "refused_too_many_requests": 23,
+     "answered": 8
+    },
+    "Refute": {
+     "made": 32,
+     "answered": 21,
+     "refused_too_many_requests": 11
+    }
+   },
+   "source": "the run's retained raw transcripts, not committed: the server_tool_use blocks named advisor, and their results, advisor_redacted_result (answered, billed) and advisor_tool_result_error with error_code too_many_requests (refused, no usage); the answered calls' tokens are the record's advisor_iterations"
   },
   "by_phase": {
    "Read": {
@@ -41,7 +74,33 @@
     ]
    }
   },
-  "priced_usd_api_list": 63.87,
+  "pricing": {
+   "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+   "read_utc": "2026-10-10T14:23Z",
+   "page_sha256": "67904e280b595d31f373c857844ed380072ae79d280d8f385640b5992d337ca9",
+   "advisor_billing_source": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool (Usage and billing: advisor calls are billed at the advisor model's rates; the top-level usage fields reflect executor tokens only and do not roll the advisor's tokens in)",
+   "advisor_page_sha256": "81a97b998b6d8043032a656214e34ffb474b3f4fa37d2724155df396ffefaf5a",
+   "rates_usd_per_mtok": {
+    "claude-fable-5-1": {
+     "input": 10,
+     "cache_write_5m": 12.5,
+     "cache_write_1h": 20,
+     "cache_read": 0.25,
+     "output": 50
+    },
+    "claude-opus-5-5": {
+     "input": 4,
+     "cache_write_5m": 5,
+     "cache_write_1h": 8,
+     "cache_read": 0.2,
+     "output": 20
+    }
+   },
+   "method": "tokens times the table's rate per million tokens, summed over the five token classes of each model and rounded to cents after summing; the executor's cache creation is all 5-minute (the record's per-message split)"
+  },
+  "priced_usd_executor_api_list": 63.87,
+  "priced_usd_advisor_api_list": 27.64,
+  "priced_usd_api_list": 91.51,
   "measurement": {
    "tool": "examples/claude-native/workflows/child-usage.mjs",
    "tool_commit": "3497f50ce66ff193fabec1196b39b3d83eed12fe",
@@ -55,7 +114,7 @@
     "file": "child-usage-wf_bee0b670-035.json",
     "sha256": "7b81e56efef8ca52ae778330f6882747f6f14fff5717cb3729b37d3258386d87",
     "committed": false,
-    "note": "the tool's JSON for the run's retained transcripts; by_resolved_model above and by_phase are copied from it"
+    "note": "the tool's JSON for the run's retained transcripts; by_resolved_model (with its 5-minute and 1-hour cache creation, from each message's split), advisor_by_model (each child's lanes.measurement.usage.advisor_iterations) and by_phase are copied from it, the call counts of advisor_calls come from the raw transcripts"
    }
   }
  },

@@ -18492,8 +18492,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
-      "sha256": "c3f4d84edfe86f0f934c1f0bb20ceb206f4060847f3737c34344a3242d7bdd76",
-      "bytes": 44124
+      "sha256": "fa5c90ae205f7581254aa11e37ca61cc9c0ac18c6db8e10be3daa48741ad9def",
+      "bytes": 44544
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -19952,8 +19952,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json",
-      "sha256": "f44ff6e88a662388c4f4c00ec2fb163fafa74ab47f5dd8fec8b151a8cda537d7",
-      "bytes": 443253
+      "sha256": "0d6807c6a7dd4e51a46fffd641123a0203749db613bba4d30b60cc6ac1c40eea",
+      "bytes": 445981
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/probes-20261009.json",
@@ -60622,8 +60622,8 @@
     },
     {
       "path": "tests/test_primary_source_reading_counts.py",
-      "sha256": "4f35b75bc6104c9d9c765531eeba2d6eb6e48a52a1c99056113c86ec531ebfa9",
-      "bytes": 13021
+      "sha256": "d5adf976f213cdff48d0c1ec245d58596203760d9f3ffb3253baedbfbc228b88",
+      "bytes": 20294
     },
     {
       "path": "tests/test_promotion_gate.py",
