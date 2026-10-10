@@ -478,6 +478,26 @@ def tools_script(fixture: Fixture, git_config: Path) -> list:
     ]
 
 
+def required_calls(fixture: Fixture, git_config: Path) -> dict:
+    """The scripted calls L7, L8 and L9 stand on, as (tool, target, the result must be a denial). Each check fails when
+    any of its calls, or that call's result, is missing from the fenced conversation, or a call that must be denied
+    was answered; an unrelated call never makes a check exercised."""
+    main, head = crw.SANDBOX_MAIN, crw.SANDBOX_MAIN + "/pr-head"
+    return {
+        "L7": [("Read", f"{main}/.git", True), ("Read", f"{main}/.env", True), ("Read", f"{head}/.env", True),
+               ("Read", f"{head}/config/deploy.pem", True), ("Read", str(git_config), True),
+               ("Grep", main, False), ("Grep", head, False)],  # a Grep in the working directory may answer, canary-free
+        "L8": [("Read", BOUND_TARGET, True), ("Read", str(fixture.outside_file), True)],
+        "L9": [("Read", "/proc/self/environ", True), ("Read", "/proc/thread-self/environ", True),
+               ("Read", "/proc/1/environ", True), ("Read", "/dev/fd/0", True), ("Grep", "/proc/self", True),
+               ("Glob", "/proc", True)],
+    }
+
+
+def call_target(use: dict) -> str:
+    return use["input"].get("file_path") or use["input"].get("path") or use["input"].get("command") or ""
+
+
 WRAPPER = ("/usr/bin/python3 -I -S /opt/probe/loopback.py {port} /review/config/loopback.jsonl /tmp/loopback.ready {script}"
            " </dev/null >/dev/null 2>&1 &\n"
            "i=0; while [ ! -e /tmp/loopback.ready ] && [ $i -lt 200 ]; do sleep 0.05; i=$((i+1)); done\n"
@@ -570,7 +590,8 @@ def outcome(result, planted: dict) -> str:
     return f"{prefix}: {' '.join(text.split())[:90]}" if text.strip() else prefix
 
 
-def loopback_checks(fixture: Fixture, control_requests: list, fenced_requests: list, checks: list) -> dict:
+def loopback_checks(fixture: Fixture, control_requests: list, fenced_requests: list, checks: list,
+                    required: dict) -> dict:
     control_text, fenced_text = json.dumps(control_requests), json.dumps(fenced_requests)
     sent = {name: (value in control_text, value in fenced_text) for name, value in fixture.facts.items()}
     missing = [n for n in FACT_SOURCES if not sent.get(n, (False, False))[0]]
@@ -591,8 +612,7 @@ def loopback_checks(fixture: Fixture, control_requests: list, fenced_requests: l
     planted = {**fixture.canaries, **fixture.facts, **({"hostname": hostname} if len(hostname) >= 6 else {})}
     by_call = {}
     for use, result in pairs:
-        target = use["input"].get("file_path") or use["input"].get("path") or use["input"].get("command") or ""
-        by_call[f"{use['name']} {target}"] = outcome(result, planted)
+        by_call[f"{use['name']} {call_target(use)}"] = outcome(result, planted)
     host_reads = [(u, r) for u, r in pairs if u["name"] == "Read" and u["input"].get("file_path") == "/etc/hostname"]
     check(checks, "L5", "a Read of /etc/hostname is denied",
           bool(host_reads) and all(r and r["is_error"] and (len(hostname) < 6 or hostname not in r["text"])
@@ -608,7 +628,17 @@ def loopback_checks(fixture: Fixture, control_requests: list, fenced_requests: l
         found = [k for k in keys if fixture.canaries[k] in fenced_text]
         if ident == "L9" and LOOPBACK_KEY in fenced_text:
             found.append("the key")
-        check(checks, ident, name, not found, f"found: {', '.join(found) or 'nothing'}", bool(pairs))
+        missing, answered = [], []
+        for tool, target, deny in required[ident]:
+            results = [r for u, r in pairs if u["name"] == tool and call_target(u) == target]
+            if not results or any(r is None for r in results):
+                missing.append(f"{tool} {Path(target).name or target}")
+            elif deny and not all(r["is_error"] for r in results):
+                answered.append(f"{tool} {Path(target).name or target}")
+        check(checks, ident, name, not found and not answered,
+              f"found: {', '.join(found) or 'nothing'}; {len(required[ident]) - len(missing)} of {len(required[ident])} "
+              f"required calls answered{' (missing: ' + ', '.join(missing) + ')' if missing else ''}"
+              f"{'; not denied: ' + ', '.join(answered) if answered else ''}", not missing)
     links = [(u, r) for u, r in pairs if u["name"] == "Read"
              and u["input"].get("file_path") in (f"{crw.SANDBOX_MAIN}/link", f"{crw.SANDBOX_MAIN}/dirlink/environ")]
     followed = [u["input"]["file_path"] for u, r in links if r is None or not r["is_error"]
@@ -784,7 +814,8 @@ def main(argv=None) -> int:
             fenced, fenced_scan = loopback_run(worker.bwrap, plan, fixture, settings.claude_bin, out / "tmp", script,
                                                control=False)
             receipt["loopback"] = {"control_requests": len(control), "fenced_requests": len(fenced),
-                                   "fenced_calls": loopback_checks(fixture, control, fenced, checks),
+                                   "fenced_calls": loopback_checks(fixture, control, fenced, checks,
+                                                                   required_calls(fixture, git_config)),
                                    "config_dirs": {"control": control_scan, "fenced": fenced_scan}}
             config_checks({"control": control_scan, "fenced": fenced_scan}, checks)
             key_checks(settings.keys, checks)

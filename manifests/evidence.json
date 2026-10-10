@@ -59832,8 +59832,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "699c7c9c9a5545c049a6546c986909f21bde0241558c30c967ff5d368b9d0ced",
-      "bytes": 97228
+      "sha256": "7e3844ec55500f2baac0225ca17e9e14a2ef27fb5456b79e1e199a64f1832439",
+      "bytes": 99222
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -60927,8 +60927,8 @@
     },
     {
       "path": "tools/claude-review-worker/probes.py",
-      "sha256": "f38f597fbdaa615825a67027608bdddd44b5dbb3e5b5c7945a18e8a3a1900635",
-      "bytes": 48867
+      "sha256": "5fa38e3f0bd8b9c09efef62df17208f5f9eefbc90d31f7781735755f170d5810",
+      "bytes": 50898
     },
     {
       "path": "tools/claude-review-worker/systemd/claude-review-worker.service",

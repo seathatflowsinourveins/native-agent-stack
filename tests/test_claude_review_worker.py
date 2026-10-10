@@ -1369,7 +1369,12 @@ class ProbesOfflineTest(unittest.TestCase):
 
     def test_the_loopback_checks_need_a_control_arm_that_loads_the_files_and_a_clean_fenced_arm(self):
         fixture = synthetic_fixture(self.base)
-        script = probes.tools_script(fixture, self.base / "repos" / "x.git" / "config")
+        git_config = self.base / "repos" / "x.git" / "config"
+        script = probes.tools_script(fixture, git_config)
+        required = probes.required_calls(fixture, git_config)
+        scripted = {(step["name"], probes.call_target(step)) for step in script}
+        for ident, calls in required.items():
+            self.assertTrue({(tool, target) for tool, target, _ in calls} <= scripted, ident)  # the script makes them
         uses = [{"type": "tool_use", "id": f"t{i}", "name": s["name"], "input": s["input"]} for i, s in enumerate(script)]
 
         def request(messages):
@@ -1389,19 +1394,19 @@ class ProbesOfflineTest(unittest.TestCase):
         loaded = [request([{"role": "user", "content": "Probe. " + " ".join(fixture.facts.values())}])]
         fenced = [request(answered("denied by your permission settings"))]
         checks = []
-        probes.loopback_checks(fixture, loaded, fenced, checks)
+        probes.loopback_checks(fixture, loaded, fenced, checks, required)
         self.assertEqual({c["id"]: c["result"] for c in checks},
                          {"L1": "PASS", "L4": "PASS", "L5": "PASS", "L7": "PASS", "L8": "PASS", "L9": "PASS",
                           "L10": "PASS", "L11": "PASS"})
         # A link in main that is followed is a FAIL, never a pass: the environment it reaches shows up.
         through = [request(answered("denied", followed="CRW_PROBE_ENV=" + fixture.canaries["environ"]))]
         checks = []
-        probes.loopback_checks(fixture, loaded, through, checks)
+        probes.loopback_checks(fixture, loaded, through, checks, required)
         self.assertEqual(({c["id"]: c["result"] for c in checks}["L11"], {c["id"]: c["result"] for c in checks}["L9"]),
                          ("FAIL", "FAIL"))
         head_only = [request(answered("denied") + [{"role": "user", "content": fixture.facts["head_skill"]}])]
         checks = []
-        probes.loopback_checks(fixture, loaded, head_only, checks)
+        probes.loopback_checks(fixture, loaded, head_only, checks, required)
         self.assertEqual({c["id"]: c["result"] for c in checks}["L1"], "FAIL")  # a head .claude fact sent: FAIL
         leaked = [request(answered("denied") + [{"role": "user", "content": fixture.facts["owner"]}])]
         unloaded = [request([{"role": "user", "content": "Probe."}])]
@@ -1410,8 +1415,29 @@ class ProbesOfflineTest(unittest.TestCase):
         for control, fenced_arm, failing in ((loaded, leaked, "L1"), (unloaded, fenced, "L1"), (loaded, environ, "L9"),
                                              (loaded, gh_login, "L10")):
             checks = []
-            probes.loopback_checks(fixture, control, fenced_arm, checks)
+            probes.loopback_checks(fixture, control, fenced_arm, checks, required)
             self.assertEqual({c["id"]: c["result"] for c in checks}[failing], "FAIL", failing)
+        # Each required call, or its result, removed on its own turns its check FAIL; so does a required denial
+        # answered with a canary-free result. The other calls stay, so the conversation is never empty.
+        for ident, calls in required.items():
+            for tool, target, deny in calls:
+                index = next(i for i, step in enumerate(script)
+                             if step["name"] == tool and probes.call_target(step) == target)
+                conversation = answered("denied")
+                kept = {"role": "user",
+                        "content": [r for r in conversation[2]["content"] if r["tool_use_id"] != f"t{index}"]}
+                arms = {"call": [conversation[0], {"role": "assistant",
+                                                   "content": [u for u in uses if u["id"] != f"t{index}"]}, kept],
+                        "result": [conversation[0], conversation[1], kept]}
+                if deny:
+                    arms["answered"] = [conversation[0], conversation[1], {"role": "user", "content": [
+                        {**r, "is_error": False, "content": "nothing here"} if r["tool_use_id"] == f"t{index}" else r
+                        for r in conversation[2]["content"]]}]
+                for arm, messages in arms.items():
+                    with self.subTest(check=ident, call=f"{tool} {target}", removed=arm):
+                        checks = []
+                        probes.loopback_checks(fixture, loaded, [request(messages)], checks, required)
+                        self.assertEqual({c["id"]: c["result"] for c in checks}[ident], "FAIL")
 
     def test_the_facts_check_needs_a_control_arm_that_knew_every_fact(self):
         fixture = synthetic_fixture(self.base)
