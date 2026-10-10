@@ -1937,6 +1937,54 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         normalized = " ".join(text.split())
         self.assertEqual(normalized.count(self.TRADING_CORRECTION), 1)
 
+    # docs/decisions/2026-10-10-layer15-nautilus-adjustment-claim.md: the Layer 1.5 candidate list said "NautilusTrader's
+    # data catalog and adjustment handling". The selected release, NautilusTrader 2.0.0rc5 (catalogs/us-equities/
+    # runtime-target.json:9), and rc6 declare no equity corporate-action or price-adjustment type in their public
+    # stubs, in crates/model/src/enums.rs at their tag commits, or in their documentation. The wheels were scanned.
+    LAYER_15_RECORD = "docs/decisions/2026-10-10-layer15-nautilus-adjustment-claim.md"
+    LAYER_15_NAUTILUS = (
+        "NautilusTrader's data catalog (storage and query: 2.0.0rc5, the selected release, and rc6 declare no equity "
+        "corporate-action or price-adjustment type; `" + LAYER_15_RECORD + "`)"
+    )
+    LAYER_15_OTHER_CANDIDATES = ("EdgarTools' CIK and ticker maps", "alpaca-py's corporate-actions endpoint",
+                                 "Lean's map and factor files", "an available vendor feed")
+    # wheel, bytes, sha256 (as PyPI publishes it), commit of the release tag in nautechsystems/nautilus_trader
+    LAYER_15_RELEASES = (
+        ("nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl", "69,963,442",
+         "eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebe", "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"),
+        ("nautilus_trader-2.0.0rc6-cp312-cp312-manylinux_2_34_x86_64.whl", "69,828,675",
+         "9b4002a7bf5e6399c51073039b740ccf3ca7a1e2584ff72c7d479f03eaa9658d", "7b766f8825b2539c5b2ac1375e9d97b41c509edb"),
+    )
+    # Every adjustment-named declaration the scan found in both releases, and the catalog class it also read.
+    LAYER_15_DECLARED = ("ContinuousFutureAdjustmentType", "PositionAdjustmentType", "PositionAdjusted",
+                         "AccountAdjustmentOutcome", "GreeksConvention", "PRICE_ADJUSTED", "IbHistoricalWhatToShow",
+                         "ADJUSTED_LAST", "IbTickType", "IB_DIVIDENDS", "ParquetDataCatalog")
+
+    def layer_15_paragraph(self):
+        text = (ROOT / "blueprints/us-equities/AGENTS.md").read_text(encoding="utf-8")
+        start = text.index('Desk data-integrity glue ("Layer 1.5")')
+        return " ".join(text[start:text.index("\n\n", start)].split())
+
+    def test_layer_15_candidates_do_not_claim_nautilus_adjustment_handling(self):
+        paragraph = self.layer_15_paragraph()
+        self.assertNotIn("adjustment handling", paragraph)
+        self.assertIn(self.LAYER_15_NAUTILUS, paragraph)
+        for candidate in self.LAYER_15_OTHER_CANDIDATES:
+            with self.subTest(candidate=candidate):
+                self.assertIn(candidate, paragraph)
+
+    def test_layer_15_record_pins_the_scanned_releases_and_the_declared_adjustment_types(self):
+        record = ROOT / self.LAYER_15_RECORD
+        self.assertTrue(record.is_file(), "the Layer 1.5 sentence points at this record")
+        text = " ".join(record.read_text(encoding="utf-8").split())
+        for release in self.LAYER_15_RELEASES:
+            for fact in release:
+                with self.subTest(release=release[0], fact=fact):
+                    self.assertIn(fact, text)
+        for name in self.LAYER_15_DECLARED:
+            with self.subTest(declaration=name):
+                self.assertIn(name, text)
+
     def test_root_review_rules_flag_unsourced_fixes_and_missing_regressions(self):
         text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("## Code Review Rules\n", text)

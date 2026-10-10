@@ -12807,8 +12807,8 @@
     },
     {
       "path": "blueprints/us-equities/AGENTS.md",
-      "sha256": "3ef75b070a712f194a9d92ad67092132fac10dc58343789995fcb8f88e36ae34",
-      "bytes": 5778
+      "sha256": "4a1d3f125f3e8c77484b736e592777fa887991d6dc1cd43d941b4cd621f68719",
+      "bytes": 5941
     },
     {
       "path": "blueprints/us-equities/CLAUDE.md",
@@ -18564,6 +18564,11 @@
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
       "sha256": "4158df8208e2beb10694778866f9f3e94dcbaed0df5df82842e53ec9f197a709",
       "bytes": 9146
+    },
+    {
+      "path": "docs/decisions/2026-10-10-layer15-nautilus-adjustment-claim.md",
+      "sha256": "c63ecc858de5c16dbf3186aa85b0fa1ce66828f4ebd02197359b200de646e774",
+      "bytes": 11740
     },
     {
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
@@ -60542,8 +60547,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "08574857b240aeb89b98aa1b573765442cc860dce7411a8e1d7f2602f68af301",
-      "bytes": 144020
+      "sha256": "662d2572c04c3aa863fe24d2bd73c4fe7782a2d75f655761d357ec23f1ec635a",
+      "bytes": 147293
     },
     {
       "path": "tests/test_install_skills.py",
