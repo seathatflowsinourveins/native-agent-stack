@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-10T08:49:10Z",
+  "checked_at": "2026-10-10T09:15:07Z",
   "base_commit": "4d345267866403d75edece400fde6cd35ec4d05c",
   "codex_lane_py_sha256": "6515b05e0a64b00a735d832e904dd2865b8a73d3df925fee7c0cdf540c258b1b",
   "status": "cc_authorized_proceed_with_not_attested_disclosure",
@@ -22,7 +22,30 @@
   "usage_transport_fields": ["provider", "provider_base_url", "pass_through"],
   "fail_before": {
     "fixture_class": "synthetic",
-    "main_provider_class": {"tests": 9, "exit_code": 1, "failures": 1, "errors": 14, "reason": "No provider flag or native provider provenance in unchanged core."},
+    "main_provider_class": {
+      "tests": 15,
+      "exit_code": 1,
+      "failures": 1,
+      "errors": 18,
+      "command": "python3 -m unittest tests.test_codex_lane.OmniRouteProviderTests -v",
+      "core_revision": "c8a29c3ee9b4337564165d9e588b3fe81e8ba817",
+      "core_sha256": "5b089c486a061d2aeb7fff75ac80e219a82929997f7961e8b00fef1cd88345f9",
+      "fixture_revision": "c83cea134fb6749f8e504b2759afca954492918b",
+      "sealer_revision": "c83cea134fb6749f8e504b2759afca954492918b",
+      "replay_scope": "Unchanged main codex_lane.py with the c83 provider fixture and feature sealer retained; the core is byte-identical at original main 4d345267866403d75edece400fde6cd35ec4d05c.",
+      "reason": "No provider flag or native provider provenance in unchanged core."
+    },
+    "full_baseline_provider_class": {
+      "tests": 15,
+      "exit_code": 1,
+      "failures": 3,
+      "errors": 18,
+      "command": "python3 -m unittest tests.test_codex_lane.OmniRouteProviderTests -v",
+      "baseline_revision": "c8a29c3ee9b4337564165d9e588b3fe81e8ba817",
+      "fixture_revision": "c83cea134fb6749f8e504b2759afca954492918b",
+      "replay_scope": "Full unchanged main archive with only tests/test_codex_lane.py overlaid from c83.",
+      "reason": "The unchanged main sealer adds two failures by rejecting native and OmniRoute provider provenance."
+    },
     "endpoint_normalization": {"exit_code": 1, "observed": "HTTP://LOCALHOST:021128/v1", "expected": "http://localhost:21128/v1"},
     "malformed_endpoint_json": {"exit_code": 1, "endpoint": 1, "observed": "AttributeError from urllib.parse.urlsplit", "expected": "Graceful loopback endpoint refusal"},
     "model_route_identity": {"exit_code": 1, "observed": "cx/gpt-6.1-sol", "expected": "gpt-6.1-sol"},
@@ -34,7 +57,7 @@
     "tests": 111,
     "failures": 0,
     "errors": 0,
-    "elapsed_seconds": 6.253,
+    "elapsed_seconds": 6.730,
     "class": "local_integration",
     "covers": ["native default", "loopback refusal", "credential/query/fragment/port refusal", "extra environment exclusion", "unchanged blind environment audit", "fresh keyless homes", "provider/family receipts", "exact not_attested disclosure on every Omni packet/attempt", "model disclosure spoof overwrite", "native/Claude disclosure refusal", "provider and endpoint resume invalidation", "canonical endpoint/model identity", "malformed metadata refusal", "legacy native sealer compatibility", "isolation args guard", "README block guard", "append-only code registries"]
   },

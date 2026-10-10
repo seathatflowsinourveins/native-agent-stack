@@ -61422,8 +61422,8 @@
     },
     {
       "path": "tools/sota-convergence/evidence/codex-lane-omniroute-20261010.json",
-      "sha256": "40819d19b2bff6260428f2bd6f52208dffad497776a074bec8096ebf68d41ad5",
-      "bytes": 5904
+      "sha256": "dd677c036dab4e34cf31e05b7c359db33fb5dac06bfad4950e77983019092f4c",
+      "bytes": 7103
     },
     {
       "path": "tools/sota-convergence/export_isolation_check.py",
