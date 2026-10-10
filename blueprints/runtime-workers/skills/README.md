@@ -2,7 +2,7 @@
 
 The [manifest](manifest.json) selects **134 skills from 13 pinned sources** for
 a broad worker trial: 77 OpenHands registry skills, 14 of the 15 superpowers
-lifecycle skills, 25 of the adoption manifest's 28 skills reused by `reuse_ref`,
+lifecycle skills, 25 of the adoption manifest's 29 skills reused by `reuse_ref`,
 and targeted additions for evaluation, research, browser testing and framework
 review. `security-audit` and `skill-creator` joined the reused set on 2026-09-30, when
 main promoted the first and pinned the second
@@ -77,6 +77,8 @@ worker catalog at 134 skills from 13 sources, with 25 central skills reused;
 worker coverage, roles, scenarios and deployment stay as recorded. A dated
 worker assignment can overturn an exclusion through the manifest's existing
 `adoption_ref` contract.
+
+The first-party skill `claude-native-practice` is excluded in the same way ([dated decision](../../../docs/decisions/2026-10-10-skills-claude-native-practice-row.md)): it configures Claude Code for the command center and native lanes, not a worker role. The selected worker catalog stays at 134 skills from 13 sources, with 25 central skills reused.
 
 - **Codex.** A reused entry carries no `codex_enabled` or `claude_listing` of its
   own. `install_skills.py` resolves each `reuse_ref` when it reads the manifest,

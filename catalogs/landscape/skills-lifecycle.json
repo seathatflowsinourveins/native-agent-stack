@@ -4,6 +4,7 @@
   "checked_at": "2026-09-30",
   "scope": "The lifecycle tasks the landscape sweep's skills modality sweeps (tools/sota-convergence/landscape-sweep/README.md, Skills modality), the installed skills of adoption/skills/manifest.json that serve each task, and the skill sources it searches. Each task is one skills-* layer. Inclusion does not install, accept or authorize a skill; adoption/skills/manifest.json stays the only place a skill is pinned.",
   "notes": [
+    "2026-10-10 amendment (docs/decisions/2026-10-10-skills-claude-native-practice-row.md): this repository's own claude-native-practice skill serves agent-docs once, from the first-party source at the manifest row's pin; the task field named installed follows the central manifest's selected pins, and this metadata addition performs no client installation. The original catalog checked_at date is retained.",
     "2026-10-08 amendment (docs/decisions/2026-10-08-skills-cc-lanes-picks.md): the three verified vendor pins serve existing tasks once each: hcom-agent-messaging and loki serve debugging, and promptfoo-evals serves skill-lifecycle evaluation. The task field named installed follows the central manifest's selected pins; this metadata addition performs no client installation. Host installation follows the PR's landing, as the decision records. The original catalog checked_at date is retained.",
     "Each GitHub source's pin is its default-branch HEAD commit, read on 2026-09-30 with gh api repos/<owner>/<repo>/commits/<default branch> (read-only). None of the sources was archived.",
     "Each task's source_ids come from the SKILL.md folder names at those pins (gh api repos/<owner>/<repo>/git/trees/<pin>?recursive=1), matched by task keyword and reviewed: product-scoped matches (Azure, Notion, Figma, trading) were dropped, and the registry and the curated list serve every task.",
@@ -42,7 +43,8 @@
     {"source_id": "vercel-labs-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/skills", "pin": "3694740352eeef5cdd689af694c485f1ff62eec3"},
     {"source_id": "aannoo-hcom", "kind": "github-skills-repo", "url": "https://github.com/aannoo/hcom", "pin": "b2a7c192003e7fd67ed93265289e4ac36276f965"},
     {"source_id": "promptfoo-promptfoo", "kind": "github-skills-repo", "url": "https://github.com/promptfoo/promptfoo", "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8"},
-    {"source_id": "grafana-skills", "kind": "github-skills-repo", "url": "https://github.com/grafana/skills", "pin": "1ccacf29049fde66637fe01ab93a83a772da323b"}
+    {"source_id": "grafana-skills", "kind": "github-skills-repo", "url": "https://github.com/grafana/skills", "pin": "1ccacf29049fde66637fe01ab93a83a772da323b"},
+    {"source_id": "seathatflowsinourveins-native-agent-stack", "kind": "github-skills-repo", "url": "https://github.com/seathatflowsinourveins/native-agent-stack", "pin": "7a6bfbcf0a4f7201c64e5410c2ccbed1b224b511"}
   ],
   "tasks": [
     {
@@ -161,8 +163,8 @@
       "layer_id": "skills-agent-docs",
       "lifecycle_task": "agent-docs",
       "requirement": "Maintain the agent instruction files (AGENTS.md, CLAUDE.md), which load into every Claude and Codex session and every worker that keeps project instructions: context load, a single source of truth and pruning of dated chronology. Skill authoring stays with skill-creator (skills-skill-lifecycle).",
-      "installed": ["writing-for-agents"],
-      "source_ids": ["mattpocock-skills", "getsentry-skills", "anthropics-claude-code", "addyosmani-agent-skills", "microsoft-skills", "affaan-m-ecc", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": ["writing-for-agents", "claude-native-practice"],
+      "source_ids": ["mattpocock-skills", "getsentry-skills", "anthropics-claude-code", "addyosmani-agent-skills", "microsoft-skills", "affaan-m-ecc", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills", "seathatflowsinourveins-native-agent-stack"],
       "open_gaps": [
         "writing-for-agents' description also triggers on skill edits, a trial confound; only AGENTS.md and CLAUDE.md uses count toward its gap (the manifest's writing-for-agents row)."
       ],

@@ -418,7 +418,8 @@
     "skill-creator": "on",
     "hcom-agent-messaging": "on",
     "promptfoo-evals": "on",
-    "loki": "on"
+    "loki": "on",
+    "claude-native-practice": "on"
   },
   "skillListingBudgetFraction": 0.05
 }
