@@ -18212,7 +18212,7 @@
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
-      "sha256": "54adce07e1970736e12bcf50fa036515356e4694a4c0fad62ad351bd98654de5",
+      "sha256": "212feea39edde28f9a40b3d6387364a7a47d6a2fbc9eff2e6f0e753d49a9fd0f",
       "bytes": 16799
     },
     {
@@ -61037,8 +61037,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "8d330d1446c4a06e6b77df60b28063882af54a0b1ae498fce3706495d532c2ce",
-      "bytes": 265105
+      "sha256": "727f79e54a0cca5b75e964dcca662959926066e14bdeabd98fb67bcaaf4fd5b7",
+      "bytes": 268313
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -61492,8 +61492,8 @@
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "ca647358c22a1b7709c1ec0a9d300bf3009b048411f1f929c7c897daa925ba17",
-      "bytes": 152377
+      "sha256": "f571ad6ab69b7909b24c66b8ac5ef31cfb4def75cbda1ee424e7a5a0af46de15",
+      "bytes": 152982
     },
     {
       "path": "tools/sota-convergence/README.md",

@@ -231,11 +231,28 @@ class RunSkillDoctor(unittest.TestCase):
                 self.assertEqual(S.skill_doctor_argv(paths), S.SKILL_DOCTOR_ARGV)
         self.assertEqual(S.skill_doctor_argv(()), S.SKILL_DOCTOR_ARGV)
 
+    @unittest.skipIf(os.name == "nt", "the Windows path is absolute on Windows; the planted name is a relative filename on POSIX")
+    def test_a_relative_file_named_like_a_managed_path_is_not_a_managed_config(self):
+        # The Windows path is a relative filename on POSIX, so a file of that literal name in the working directory made
+        # skill_doctor_argv drop --strict-mcp-config while the client saw no managed config and would load user and
+        # project MCP servers (command center micro of #925 at 46cc5dd1, reproduced there). Only an absolute, normalised
+        # path counts.
+        folder = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        (folder / "C:\\Program Files\\ClaudeCode\\managed-mcp.json").write_text("{}", encoding="utf-8")
+        (folder / "managed-mcp.json").write_text("{}", encoding="utf-8")
+        self.enterContext(contextlib.chdir(folder))
+        with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", REAL_MANAGED_MCP_CONFIG_PATHS):
+            self.assertEqual(S.skill_doctor_argv(), S.SKILL_DOCTOR_ARGV)
+        self.assertEqual(S.skill_doctor_argv(["managed-mcp.json"]), S.SKILL_DOCTOR_ARGV)
+        self.assertEqual(S.skill_doctor_argv([Path("managed-mcp.json")]), S.SKILL_DOCTOR_ARGV)
+        # The same files at their absolute paths are managed configs.
+        self.assertNotIn("--strict-mcp-config", S.skill_doctor_argv([folder / "managed-mcp.json"]))
+
     def test_the_default_paths_are_the_documented_system_paths(self):
         # https://code.claude.com/docs/en/managed-mcp, configuration summary (read 2026-10-10): /Library/Application
         # Support/ClaudeCode/ on macOS, /etc/claude-code/ on Linux (WSL included), C:\Program Files\ClaudeCode\ on Windows.
-        # All three are checked on every system (another system's path cannot exist on this one), so the module has no
-        # platform branch for the macOS drift guard (tests.test_workflow_hardening.MacosPatternsTests) to flag.
+        # All three are checked on every system and only an absolute path counts, so the module has no platform branch
+        # for the macOS drift guard (tests.test_workflow_hardening.MacosPatternsTests) to flag.
         self.assertEqual(REAL_MANAGED_MCP_CONFIG_PATHS, (
             "/Library/Application Support/ClaudeCode/managed-mcp.json",
             "/etc/claude-code/managed-mcp.json",
@@ -262,6 +279,8 @@ class RunSkillDoctor(unittest.TestCase):
         self.assertIn("24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de", comment)
         self.assertIn("present and loads without a read, JSON or schema error", comment)
         self.assertIn("drops the flag on presence alone", comment)
+        self.assertIn("relative filename", comment)  # only an absolute path counts
+        self.assertNotIn("cannot exist on this one", comment)  # the claim the planted-file test disproved
         readme = (ROOT / "tools/skill-usage/README.md").read_text(encoding="utf-8")
         flat_readme = " ".join(readme.split())
         self.assertIn(refusal, flat_readme)
@@ -414,6 +433,19 @@ class ManagedMcpDefaultLocations(unittest.TestCase):
     CONTENT = {"parsed": '{"mcpServers": {}}\n', "unparsable": "{not json"}
     EXPECTED = {None: FENCED, "parsed": MANAGED, "unparsable": MANAGED, "unreadable": FENCED, "directory": FENCED}
 
+    @staticmethod
+    def counts_here(location):
+        """A documented string is a system location only where it is an absolute, normalised path under the host's own
+        path rules: the Windows path is a relative filename on POSIX, and a file of that name in the working directory is
+        not a managed config (test_a_relative_file_named_like_a_managed_path_is_not_a_managed_config)."""
+        return os.path.isabs(location) and os.path.abspath(location) == location
+
+    def expected(self, location, state):
+        return self.EXPECTED[state] if self.counts_here(location) else self.FENCED
+
+    def live_locations(self):
+        return {name: location for name, location in self.LOCATIONS.items() if self.counts_here(location)}
+
     @contextlib.contextmanager
     def host(self, location, state):
         """The documented strings answer as a host with `state` at `location` (None, 'parsed', 'unparsable',
@@ -442,29 +474,40 @@ class ManagedMcpDefaultLocations(unittest.TestCase):
         with mock.patch.object(os.path, "isfile", isfile), mock.patch.object(os, "access", access):
             yield
 
+    def test_a_documented_string_counts_only_where_it_is_an_absolute_path(self):
+        counts = {name: self.counts_here(location) for name, location in self.LOCATIONS.items()}
+        if os.name == "nt":
+            self.assertEqual(counts, {"macOS": False, "Linux": False, "Windows": True})
+        else:
+            self.assertEqual(counts, {"macOS": True, "Linux": True, "Windows": False})
+
     def test_each_documented_location_decides_the_form_alone(self):
+        # On a host where a documented string is not an absolute path (the Windows one on POSIX, the two POSIX ones on
+        # Windows) every state keeps every fence: the string is no location there, whatever the fake host reports.
         for name, location in self.LOCATIONS.items():
-            for state, expected in self.EXPECTED.items():
+            for state in self.EXPECTED:
                 with self.subTest(location=name, state=state), self.host(location, state):
-                    self.assertEqual(S.skill_doctor_argv(), expected)
+                    self.assertEqual(S.skill_doctor_argv(), self.expected(location, state))
 
     def test_dropping_a_locations_detection_fails_its_cases(self):
-        # The matrix is sensitive to each location: with one documented path removed from the module's tuple, that
-        # location's present states keep the strict flag (so the matrix above fails on that location alone), the
-        # other locations still decide the form, and with all three removed no present state is seen.
-        for name, location in self.LOCATIONS.items():
+        # The matrix is sensitive to each location this host counts: with one documented path removed from the module's
+        # tuple, that location's present states keep the strict flag (so the matrix above fails on that location alone),
+        # the other counted locations still decide the form, and with all three removed no present state is seen. Dropping
+        # a string this host does not count (the Windows one on POSIX) changes nothing, so it has no case to fail.
+        live = self.live_locations()
+        for name, location in live.items():
             kept = tuple(path for path in REAL_MANAGED_MCP_CONFIG_PATHS if path != location)
             self.assertEqual(len(kept), len(REAL_MANAGED_MCP_CONFIG_PATHS) - 1, location)
             with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", kept):
                 for state in ("parsed", "unparsable"):
                     with self.subTest(dropped=name, state=state), self.host(location, state):
                         self.assertEqual(S.skill_doctor_argv(), self.FENCED)
-                for other_name, other in self.LOCATIONS.items():
+                for other_name, other in live.items():
                     if other != location:
                         with self.subTest(dropped=name, still_seen=other_name), self.host(other, "parsed"):
                             self.assertEqual(S.skill_doctor_argv(), self.MANAGED)
         with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", ()):
-            for name, location in self.LOCATIONS.items():
+            for name, location in live.items():
                 with self.subTest(dropped="all", location=name), self.host(location, "parsed"):
                     self.assertEqual(S.skill_doctor_argv(), self.FENCED)
 
@@ -475,8 +518,9 @@ class ManagedMcpDefaultLocations(unittest.TestCase):
             captured["argv"] = argv
             return subprocess.CompletedProcess(argv, 0, "[]", "")
 
+        location = next(iter(self.live_locations().values()))  # the host's own documented path
         for state, expected in ((None, self.FENCED), ("parsed", self.MANAGED)):
-            with self.subTest(state=state), self.host(self.LOCATIONS["Linux"], state):
+            with self.subTest(state=state), self.host(location, state):
                 S.run_skill_doctor(runner=fake_runner)
                 self.assertEqual(captured["argv"], expected)
 
