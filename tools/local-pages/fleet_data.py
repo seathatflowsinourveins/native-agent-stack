@@ -546,8 +546,9 @@ TRACKING_WINDOW_SECONDS = 300
 TRACKING_MAX_AGE_SECONDS = 120
 TRACKING_TIMEOUT_SECONDS = 2.0
 _TRACKING_ENDPOINT = "http://127.0.0.1:21090"
+_TRACKING_LOKI_ENDPOINT = "http://127.0.0.1:21300"
 _GRAFANA_ENDPOINT = "http://127.0.0.1:21301"
-_HEALTH_ROUTES = {"http://127.0.0.1:28231/health", "http://127.0.0.1:8888/health", "http://127.0.0.1:29374/healthz"}
+_HEALTH_ROUTES = {"http://127.0.0.1:28231/v1/models", "http://127.0.0.1:8888/health", "http://127.0.0.1:29374/healthz"}
 _CODEX_RATE_QUALIFICATION = "Lower bound until deployed start-timestamp ingestion and a newly born single-turn reconciliation pass."
 _TRACKING_RATE_FAMILIES = (
     ("api_requests", "API requests", "codex_api_request_total", "Native API attempts, including retries; these are not completed user turns."),
@@ -556,6 +557,20 @@ _TRACKING_RATE_FAMILIES = (
     ("skill_invocations", "Skill invocations", None, "Skill activation coverage requires a qualified native producer; skill reads are not substituted."),
     ("agent_invocations", "Agent invocations", None, "Agent invocation coverage requires a qualified native producer; delegation and completion records are not substituted."),
 )
+_CLAUDE_RECORD_QUERIES = {
+    family: 'sum by (ecosystem_lane) (rate({service_name="claude-code"} '
+            f'| event_name="{event}" | ecosystem_lane!="" | instance!="unscoped" [5m]))'
+    for family, event in (("api_requests", "api_request"), ("tool_results", "tool_result"))
+}
+_CLAUDE_RECORD_QUERY_ALLOWLIST = frozenset(_CLAUDE_RECORD_QUERIES.values())
+_TRACKING_PROM_QUERIES = frozenset(
+    query
+    for counter, grouping in [("codex_turn_token_usage_sum", "ecosystem_lane,token_type"),
+                              ("claude_code_token_usage_tokens_total", "ecosystem_lane,type")]
+                             + [(counter, "ecosystem_lane") for _, _, counter, _ in _TRACKING_RATE_FAMILIES if counter]
+    for selector in [counter + '{ecosystem_lane!="",instance!="unscoped"}']
+    for query in (f"sum by ({grouping}) (rate({selector}[5m]))", f"max by ({grouping}) (timestamp({selector}))")
+) | {"up{job=\"workstation-vllm\"}", "timestamp(up{job=\"workstation-vllm\"})"}
 
 
 def _workstation_module():
@@ -566,8 +581,20 @@ def _workstation_module():
 
 
 def _tracking_fetch(query, *, timeout):
-    # Reuse the native loopback/no-proxy/no-redirect bounded Prometheus client.
-    return _workstation_module()._fetch(query, timeout=timeout)
+    # Fixed numeric queries only; Loki streams and the old distro's port 13100
+    # are never requested. Native origin: grand-dashboard/README.md:68-80.
+    if query in _TRACKING_PROM_QUERIES:
+        return _workstation_module()._fetch(query, timeout=timeout)
+    if query not in _CLAUDE_RECORD_QUERY_ALLOWLIST:
+        raise ValueError("unreviewed tracking numeric query")
+    from urllib.request import ProxyHandler, build_opener
+    module = _workstation_module()
+    url = _TRACKING_LOKI_ENDPOINT + "/loki/api/v1/query?" + urlencode({"query": query})
+    with build_opener(ProxyHandler({}), module._NoRedirect()).open(url, timeout=timeout) as response:
+        raw = response.read(module.MAX_RESPONSE_BYTES + 1)
+    if len(raw) > module.MAX_RESPONSE_BYTES:
+        raise ValueError("Loki numeric response exceeds limit")
+    return json.loads(raw)
 
 
 def _tracking_probe(url, *, timeout):
@@ -672,30 +699,33 @@ def _tracking_manager(run, now):
             for name in VLLM_STATE_PROPERTIES]
 
 
-def _tracking_series(fetch, query, keys):
+def _tracking_series(fetch, query, keys, source=_TRACKING_ENDPOINT):
+    backend = "Loki" if source == _TRACKING_LOKI_ENDPOINT else "Prometheus"
     try:
         payload = fetch(query, timeout=TRACKING_TIMEOUT_SECONDS)
         data = payload.get("data") if isinstance(payload, dict) else None
         if (payload.get("status") != "success" or payload.get("warnings") or not isinstance(data, dict)
                 or data.get("resultType") != "vector" or not isinstance(data.get("result"), list) or len(data["result"]) > 2000):
-            raise ValueError("Prometheus result is not a bounded successful vector")
+            raise ValueError(backend + " result is not a bounded successful vector")
         result = {}
         for row in data["result"]:
             if not isinstance(row, dict) or not isinstance(row.get("metric"), dict):
-                raise ValueError("Prometheus series shape is malformed")
+                raise ValueError(backend + " series shape is malformed")
+            if source == _TRACKING_LOKI_ENDPOINT and (not row["metric"].get("ecosystem_lane") or row["metric"].get("instance") == "unscoped"):
+                continue
             identity = tuple(row["metric"].get(key) for key in keys)
             if not all(_identifier(value) for value in identity):
-                raise ValueError("Prometheus series labels are missing or unsafe")
+                raise ValueError(backend + " series labels are missing or unsafe")
             pair = row.get("value")
             pair = pair if isinstance(pair, list) and len(pair) == 2 else [None, None]
             value, evaluated = _tracking_numeric(pair[1]), _tracking_numeric(pair[0])
-            reason = None if value is not None and _tracking_stamp(evaluated) else "Prometheus observation is nonfinite or malformed"
+            reason = None if value is not None and _tracking_stamp(evaluated) else backend + " observation is nonfinite or malformed"
             if identity in result:
-                value, reason = None, "Prometheus grouped observation is duplicated"
+                value, reason = None, backend + " grouped observation is duplicated"
             result[identity] = {"value": value, "evaluated": evaluated, "reason": reason}
         return result, None
     except (OSError, HTTPException, ValueError, TypeError, KeyError, AttributeError, OverflowError, RecursionError) as error:
-        return {}, "Prometheus observation is UNKNOWN (" + type(error).__name__ + ")."
+        return {}, backend + " observation is UNKNOWN (" + type(error).__name__ + ")."
 
 
 def _tracking_measurement(row, source, *, query, fresh_query, unit, now, scope, window=None, error=None, fresh_error=None, lower_bound=False):
@@ -722,18 +752,60 @@ def _tracking_measurement(row, source, *, query, fresh_query, unit, now, scope, 
             "source": _TRACKING_ENDPOINT, "max_source_age_seconds": TRACKING_MAX_AGE_SECONDS}
 
 
+def _tracking_record_rate(row, *, family, query, now, error=None):
+    """A numeric LogQL record rate has an evaluation window, not event freshness."""
+    row = row or {}
+    evaluated = row.get("evaluated")
+    stamp = _tracking_stamp(evaluated)
+    reason = error or row.get("reason")
+    if not reason:
+        if row.get("value") is None:
+            reason = "Exported record rate is absent; no zero was inferred."
+        elif stamp is None:
+            reason = "Record-rate evaluation timestamp is absent or invalid."
+        elif evaluated > now or now - evaluated > TRACKING_MAX_AGE_SECONDS:
+            reason = "Record-rate evaluation timestamp is future or stale."
+        elif row["value"] == 0:
+            reason = "A zero exported record rate has no qualified full-window coverage; no measured zero is published."
+    api = family == "api_requests"
+    scope = ("Exported native Claude api_request records per second; not all API attempts or completed turns." if api else
+             "Exported native Claude tool_result records per second, including failed results and outer tool rows; not tool attempts or MCP calls.")
+    scope += " Query-window bounds come from evaluation time; raw-event freshness and complete export coverage are unreported."
+    return {"value": None if reason else row["value"], "unit": "records/s", "status": "UNKNOWN" if reason else "reported", "reason": reason,
+            "family": family, "label": "API request records" if api else "Tool result records", "scope": scope,
+            "source": _TRACKING_LOKI_ENDPOINT, "datasource": {"uid": "ns2604-loki", "type": "loki"}, "query": query,
+            "source_sample_utc": None, "freshness_query": None, "evaluated_utc": stamp,
+            "window_seconds": TRACKING_WINDOW_SECONDS, "window_start_utc": _tracking_stamp(evaluated - TRACKING_WINDOW_SECONDS) if stamp else None,
+            "window_end_utc": stamp, "max_evaluation_age_seconds": TRACKING_MAX_AGE_SECONDS}
+
+
 def _tracking_explore(lane, by_client, now):
     # Grafana v13.2.3 Explore's documented panes schema; no dashboard variable
     # or organization ID is inferred. Datasource UID: ns2604_dashboards.py:7-8.
-    expressions = dict.fromkeys(row["query"] for client in by_client.values()
-                                for row in client["tokens"] + client["rates"] if row.get("query"))
-    queries = [{"refId": chr(65 + index), "datasource": {"uid": "ns2604-prometheus", "type": "prometheus"},
-                "expr": expression.replace('ecosystem_lane!=""', "ecosystem_lane=" + json.dumps(lane)), "range": True}
-               for index, expression in enumerate(expressions)]
-    pane = {"datasource": "ns2604-prometheus", "queries": queries,
-            "range": {"from": str(int((now - TRACKING_WINDOW_SECONDS) * 1000)), "to": str(int(now * 1000))}}
-    return {"title": lane + " · Explore rates", "lane": lane, "uid": "ns2604-prometheus",
-            "url": _GRAFANA_ENDPOINT + "/explore?" + urlencode({"panes": json.dumps({"fleet": pane}, separators=(",", ":")), "schemaVersion": "1"})}
+    by_source = {}
+    for client in by_client.values():
+        for row in client["tokens"] + client["rates"]:
+            if not row.get("query"):
+                continue
+            datasource = row.get("datasource") or {"uid": "ns2604-prometheus", "type": "prometheus"}
+            start, end = now - TRACKING_WINDOW_SECONDS, now
+            if datasource["type"] == "loki":
+                stamps = [_stamp(row.get(field)) for field in ("window_start_utc", "window_end_utc")]
+                if all(stamps):
+                    start, end = [datetime.fromisoformat(stamp.replace("Z", "+00:00")).timestamp() for stamp in stamps]
+            bounds = (str(int(start * 1000)), str(int(end * 1000)))
+            by_source.setdefault((datasource["uid"], datasource["type"], *bounds), {})[row["query"]] = None
+    links = []
+    for (uid, kind, start, end), expressions in by_source.items():
+        queries = [{"refId": chr(65 + index), "datasource": {"uid": uid, "type": kind},
+                    "expr": expression.replace('ecosystem_lane!=""', "ecosystem_lane=" + json.dumps(lane)),
+                    **({"queryType": "range"} if kind == "loki" else {"range": True})}
+                   for index, expression in enumerate(expressions)]
+        pane = {"datasource": uid, "queries": queries,
+                "range": {"from": start, "to": end}}
+        links.append({"title": lane + " · Explore " + kind + " rates", "lane": lane, "uid": uid,
+                      "url": _GRAFANA_ENDPOINT + "/explore?" + urlencode({"panes": json.dumps({"fleet": pane}, separators=(",", ":")), "schemaVersion": "1"})})
+    return links
 
 
 def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
@@ -751,11 +823,11 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
     run, fetch, probe = run or subprocess.run, fetch or _tracking_fetch, probe or _tracking_probe
     hcom = _tracking_hcom(run, read_time)
     clients, query_observations = {}, []
-    def observed_query(query, keys, client, measurement):
-        rows, reason = _tracking_series(fetch, query, keys)
+    def observed_query(query, keys, client, measurement, source=_TRACKING_ENDPOINT):
+        rows, reason = _tracking_series(fetch, query, keys, source)
         query_observations.append({"client": client, "measurement": measurement, "status": "UNKNOWN" if reason else "reported",
                                    "reason": reason or ("No matching series in this returned result; no zero or absence of writers is inferred." if not rows else None),
-                                   "query": query, "source": _TRACKING_ENDPOINT, "read_utc": _utc(read_time()), "series_count": None if reason else len(rows)})
+                                   "query": query, "source": source, "read_utc": _utc(read_time()), "series_count": None if reason else len(rows)})
         return rows, reason
     for client, counter, label in (("codex", "codex_turn_token_usage_sum", "token_type"),
                                    ("claude", "claude_code_token_usage_tokens_total", "type")):
@@ -786,6 +858,12 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
         codex_rates[family] = (values, freshness, query, fresh_query, error, fresh_error)
         for lane, in sorted(set(values) | set(freshness)):
             clients.setdefault(lane, {}).setdefault("codex", {"client": "codex", "tokens": [], "source_refs": ["observability/lanes_dashboard.py"]})
+    claude_rates = {}
+    for family, query in _CLAUDE_RECORD_QUERIES.items():
+        values, error = observed_query(query, ("ecosystem_lane",), "claude", family + " exported record rates", _TRACKING_LOKI_ENDPOINT)
+        claude_rates[family] = (values, query, error)
+        for lane, in values:
+            clients.setdefault(lane, {}).setdefault("claude", {"client": "claude", "tokens": [], "source_refs": ["observability/lanes_dashboard.py"]})
     for lane, by_client in clients.items():
         for client, row in by_client.items():
             row["rates"] = []
@@ -795,10 +873,15 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
                     rate = _tracking_measurement(values.get((lane,)), freshness.get((lane,)), query=query, fresh_query=fresh_query,
                                                  unit="calls/s", now=read_time(), window=TRACKING_WINDOW_SECONDS, error=error, fresh_error=fresh_error,
                                                  scope=scope + " " + _CODEX_RATE_QUALIFICATION, lower_bound=True)
+                elif client == "claude" and family in {"api_requests", "tool_calls"}:
+                    family = "api_requests" if family == "api_requests" else "tool_results"
+                    values, query, error = claude_rates[family]
+                    rate = _tracking_record_rate(values.get((lane,)), family=family, query=query, now=read_time(), error=error)
+                    label = rate["label"]
                 else:
                     reason = f"A native {client.title()} {label.lower()} rate producer and full-window coverage are not qualified."
                     if client == "claude":
-                        reason += " Native Loki event contracts exist; a numeric rate transport and source-freshness contract are not qualified for this collector."
+                        reason += " API request and tool result records are not substituted for this invocation family."
                     rate = _tracking_measurement(None, None, query=None, fresh_query=None, unit="calls/s", now=read_time(),
                                                  window=TRACKING_WINDOW_SECONDS, scope=scope, error=reason)
                     rate["source"] = None
@@ -819,7 +902,7 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
     services[0]["observations"].extend(_tracking_manager(run, read_time))
     for identity, title, url, scope, source in (
         # CC's 2026-10-09 host measurement corrects the old distro's 8231 route.
-        ("vllm-embed", "vLLM embedding service", "http://127.0.0.1:28231/health", "Host port 28231 measured by the command center; HTTP health remains independent of the separate Prometheus scrape job.", "docs/hf-memory-model-qualification.md"),
+        ("vllm-embed", "vLLM embedding service", "http://127.0.0.1:28231/v1/models", "Documented model-list route on host port 28231; HTTP availability is independent of scrape state and does not establish embedding quality.", "docs/hf-memory-model-qualification.md"),
         ("hindsight", "Hindsight", "http://127.0.0.1:8888/health", "Database reachability only; no LLM or model readiness is established.", "recipes/hindsight-research-memory.md"),
         ("ai-memory", "ai-memory", "http://127.0.0.1:29374/healthz", "Unauthenticated process liveness only; no store, provider, or auth state is read.", "observability/ns2604_dashboards.py"),
     ):
@@ -847,7 +930,7 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
                     ("Lane monitoring", "cc-lanes", "/d/cc-lanes/lanes"),
                     ("Native agent ecosystem", "ecosystem-native", "/d/ecosystem-native/native-agent-ecosystem"),
                     ("Foundation services", "native-foundation-data", "/d/native-foundation-data/253abf9"),
-                )] + [_tracking_explore(lane, by_client, now) for lane, by_client in sorted(clients.items())],
+                )] + [link for lane, by_client in sorted(clients.items()) for link in _tracking_explore(lane, by_client, now)],
                 "source_refs": ["observability/ns2604_dashboards.py", "observability/lanes_dashboard.py"]},
             "limitations": ["Live hcom rows and historical telemetry labels are separate observations; no name join is inferred.",
                             "Token categories retain native inclusion semantics and must not be added together.",
@@ -855,7 +938,7 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
                             "Source freshness is the latest underlying scrape among grouped writers; it is not last invocation time or coverage of every writer.",
                             _CODEX_RATE_QUALIFICATION,
                             "Unscoped writers are excluded; remaining writer coverage is not qualified for measured rate zeros.",
-                            "Claude API requests, tool, MCP, skill and agent rates remain UNKNOWN until numeric event-rate transport and source freshness are qualified.",
+                            "Claude exported API request and tool result record rates retain their query windows; raw-event freshness is unreported. MCP, skill and agent rates remain UNKNOWN.",
                             "Missing, stale or unqualified zero rates remain UNKNOWN; reported service zeros remain zero."]}
 
 

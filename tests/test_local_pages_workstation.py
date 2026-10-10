@@ -3,6 +3,7 @@
 import importlib.util
 import threading
 import unittest
+from http.client import BadStatusLine, HTTPException, IncompleteRead, LineTooLong
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -130,6 +131,24 @@ class WorkstationTests(unittest.TestCase):
         self.assertEqual(kwargs["timeout"], 2.0)
         response.read.assert_called_once_with(workstation.MAX_RESPONSE_BYTES + 1)
         self.assertEqual(opener.call_args.args[0].proxies, {})
+
+    def test_http_protocol_errors_preserve_cc_values_dates_and_safe_error_categories(self):
+        failures = (HTTPException("UNPUBLISHED-TRANSPORT-DETAIL"),
+                    BadStatusLine("UNPUBLISHED-TRANSPORT-DETAIL"),
+                    IncompleteRead(b"UNPUBLISHED-TRANSPORT-DETAIL", 4),
+                    LineTooLong("UNPUBLISHED-TRANSPORT-DETAIL"))
+        for failure in failures:
+            with self.subTest(error=type(failure).__name__):
+                def fetch(query, *, timeout):
+                    raise failure
+                with patch.object(workstation.time, "time", return_value=NOW):
+                    actual = workstation.collect(FALLBACK, fetch)
+                for field in FALLBACK.keys() - {"read_utc"}:
+                    self.assert_fallback(actual, field)
+                    self.assertEqual(actual[field]["fallback_reason"], "API read failed")
+                self.assertEqual(actual["API_errors"], [{"endpoint": workstation.ENDPOINT,
+                    "read_utc": workstation._utc(NOW), "type": type(failure).__name__}])
+                self.assertNotIn("UNPUBLISHED-TRANSPORT-DETAIL", repr(actual))
 
     def test_redirects_are_refused_without_a_second_request(self):
         requests = []
