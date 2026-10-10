@@ -2,6 +2,21 @@
  "schema_version": 1,
  "kind": "new-wsl-layer-consensus",
  "date_utc": "2026-10-02",
+ "current_owner_pin_amendments": [
+  {
+   "slot_id": "trajectory-analysis",
+   "date_utc": "2026-10-09",
+   "by": "the coordinator's 2026-10-09 currency amendment under the owner's standing direction to keep tools current",
+   "decision": "docs/decisions/2026-10-09-harbor-0240-profile.md supersedes only the Harbor companion pin; the 2026-10-04 owner decision selected Harbor 0.23.0",
+   "package": "harbor",
+   "previous_pin": "0.23.0",
+   "current_pin": "0.24.0",
+   "source": {
+    "path": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
+    "sha256": "bdf43454a627229df2de864ba4e56556d6748af97baaef98f341899ec3668981"
+   }
+  }
+ ],
  "meaning": "rows added to, and amendments recorded on, the definitive manifest of the new WSL distribution by a recorded direct consensus of the two model families; selection and comparison decisions only",
  "method": "Leads came from the research runtime on the live web (GPT Researcher 3.7.0 on a local model; reports are leads, not facts). The Claude lane re-read every fact it used from GitHub by script and wrote proposals for seven layers and for the skills rows. The Codex lane decided each one independently from its own reading of the primary sources (its consequential decisions on its stronger model at maximum effort) and corrected two statements of the proposals. The acknowledgements are public comments on pull request 608, and each one listed under records says what its comment covers.",
  "authorization": {

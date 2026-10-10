@@ -1400,9 +1400,11 @@ class NewWslHandbookTests(unittest.TestCase):
         self.assertEqual(len(added), 14)
         for slot_id, row in added.items():
             with self.subTest(owner_row=slot_id):
+                current = next(record for record in manifest["slots"] if record["slot_id"] == slot_id)
+                self.assertEqual(current.get("prior_owner_decision", current), row)
                 cells = lines[slot_id]
                 self.assertEqual((cells[1], cells[4], cells[6], cells[7]),
-                                 (row["state"], "installed", "added_by_owner_decision", row["label"]))
+                                 (current["state"], "installed", "added_by_owner_decision", current["label"]))
                 self.assertIn(f"{row['catalog']} / {row['layer_id']} / owner_decision", cells[9])
         overturned = [row for row in manifest["slots"] if row.get("overturned")]
         self.assertEqual(sorted(row["slot_id"] for row in overturned),
@@ -1668,6 +1670,49 @@ class NewWslHandbookTests(unittest.TestCase):
                             ("handbook JSON", self.committed(handbook.OUTPUTS[1])),
                             ("bootstrap page", self.committed("adoption/bootstrap.md"))):
             self.assertNotIn("current at install time", " ".join(text.split()), label)
+
+    def test_current_harbor_companion_installations_match_the_profile_pin(self):
+        profile = json.loads(self.committed(handbook.PROFILE))
+        harbor, = [entry for entry in profile["entries"] if entry["name"] == "Harbor"]
+        manifest = json.loads(self.committed(DEFAULTS_SOURCE))
+        projected = json.loads(self.committed(handbook.OUTPUTS[1]))
+        owner_records = [slot for slot in manifest["slots"]
+                         if slot.get("row_kind") == "owner_decision"]
+        owner_records += [slot["record"] for layer in projected["layers"]
+                          for slot in layer["default_slots"]
+                          if slot["record"].get("row_kind") == "owner_decision"]
+        companions = []
+        for record in owner_records:
+            resolution = record.get("resolution", {})
+            for field in ("pin", "install"):
+                for pin in re.findall(r"(?<![\w-])harbor==([\w.+-]+)", resolution.get(field, "")):
+                    companions.append((record["slot_id"], field, pin))
+        self.assertTrue(companions, "the operative Harbor companion install must be checked")
+        for slot_id, field, pin in companions:
+            with self.subTest(slot=slot_id, field=field):
+                self.assertEqual(pin, harbor["pin"],
+                                 "operative owner installs must use the current Harbor profile pin")
+
+        plan_root = "evidence/artifacts/new-wsl-install-plan-20261002/"
+        plan = json.loads(self.committed(plan_root + "install-plan.json"))
+        direct, = [row for row in plan["owners"]
+                   if row["slot"] == "harbor-containerized-agent-e2e-runner"]
+        with self.subTest(carrier="direct Harbor owner"):
+            self.assertEqual(direct["release"], "v" + harbor["pin"])
+            self.assertEqual(direct["source_checkout"]["tag"], "v" + harbor["pin"])
+        executable = "\n".join(direct["commands"])
+        executable += "\n" + "\n".join(stage["command"]
+                                       for stage in direct["acceptance"].values())
+        for filename in ("install.sh", "accept.sh", "config/harbor-worker-telemetry-accept.sh"):
+            executable += "\n" + self.committed(plan_root + filename)
+        installed_pins = re.findall(r"harbor-(\d+\.\d+\.\d+)(?:-py3-none-any\.whl|[\"/])",
+                                    executable)
+        installed_pins += re.findall(r"harbor-v(\d+\.\d+\.\d+)", executable)
+        self.assertTrue(installed_pins, "the direct owner and its executable mirrors must be checked")
+        for pin in installed_pins:
+            with self.subTest(carrier="Harbor executable pin", pin=pin):
+                self.assertEqual(pin, harbor["pin"],
+                                 "the CLI producing ATIF must match the companion reading it")
 
     def test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them(self):
         result = subprocess.run([sys.executable, str(ROOT / "scripts/build_new_wsl_handbook.py"), "--check"],

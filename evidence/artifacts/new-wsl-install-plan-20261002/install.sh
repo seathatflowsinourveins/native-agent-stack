@@ -766,15 +766,15 @@ inspect-ai() {
 }
 
 harbor-containerized-agent-e2e-runner() {
-  # Harbor 0.23.0: published wheel hash, unchanged upstream tests and native recipe.
+  # Harbor 0.24.0: verified wheel hash, unchanged upstream tests and native recipe.
   copy_config 'harbor-worker-telemetry-accept.sh' || return "$?"
   copy_config 'harbor-worker-telemetry-contract.md' || return "$?"
-  # Source: https://pypi.org/pypi/harbor/0.23.0/json
-  run_command 'fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
-  # Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L22
-  run_command 'uv tool install --python 3.13 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
-  # Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L32
-  run_command 'checkout_tag https://github.com/harbor-framework/harbor.git v0.23.0 "$tool_root/harbor-v0.23.0"; [[ "$(git -C "$tool_root/harbor-v0.23.0" rev-parse HEAD)" == 1e5c5c6db929a10a140d05e606882c671ae20729 ]]' || return "$?"
+  # Source: https://pypi.org/pypi/harbor/0.24.0/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/9e/63/0e3d788e8d1ed116125507c6a01e3fb95cf82be71f2ea7040a1458709d21/harbor-0.24.0-py3-none-any.whl 23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c "$tool_root/downloads/harbor-0.24.0-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md#L22
+  run_command 'uv tool install --python 3.13 "$tool_root/downloads/harbor-0.24.0-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md
+  run_command 'checkout_tag https://github.com/harbor-framework/harbor.git v0.24.0 "$tool_root/harbor-v0.24.0"; [[ "$(git -C "$tool_root/harbor-v0.24.0" rev-parse HEAD)" == b53b8134e1241686dca7759af188f987ecc48e8b ]]' || return "$?"
 }
 
 promptfoo() {
@@ -1030,10 +1030,10 @@ trajectory-analysis() {
   run_command 'fetch_verified https://files.pythonhosted.org/packages/68/0c/474e38758bdf796d2f8c90ffb026790003b112b57405958cfdbe21b86a66/inspect_scout-0.5.3-py3-none-any.whl 097c1f1174bb3372bb15d72a69f979d6bf63e80752eac71062d4d9217136bd30 "$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl"' || return "$?"
   # Source: https://pypi.org/pypi/inspect-ai/0.3.273/json
   run_command 'fetch_verified https://files.pythonhosted.org/packages/91/88/4f60d412a9c37c9627619ab76574364c9cd33c2229e4f248fdd80e70b0a5/inspect_ai-0.3.273-py3-none-any.whl 8a8594237e3281bcb02b9be7638757f8693b78cbdef76eab348f6cdc6c6996f1 "$tool_root/downloads/inspect_ai-0.3.273-py3-none-any.whl"' || return "$?"
-  # Source: https://pypi.org/pypi/harbor/0.23.0/json
-  run_command 'fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
+  # Source: https://pypi.org/pypi/harbor/0.24.0/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/9e/63/0e3d788e8d1ed116125507c6a01e3fb95cf82be71f2ea7040a1458709d21/harbor-0.24.0-py3-none-any.whl 23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c "$tool_root/downloads/harbor-0.24.0-py3-none-any.whl"' || return "$?"
   # Source: https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/tools.md#L177
-  run_command 'scout_alias="$(uv tool dir --bin)/scout"; scout_tools="$(uv tool dir)"; if [[ -e "$scout_alias" || -L "$scout_alias" ]]; then scout_target="$(readlink -f -- "$scout_alias")"; if [[ ! -L "$scout_alias" ]] || { [[ "$scout_target" != "$scout_tools/inspect-ai/bin/scout" ]] && [[ "$scout_target" != "$scout_tools/inspect-scout/bin/scout" ]]; }; then printf '"'"'needs_owner: retained foreign Scout executable.\n'"'"' >&2; exit 3; fi; fi; uv tool install --force --no-build --reinstall --python 3.13 "$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl" --with "inspect-ai @ file://$tool_root/downloads/inspect_ai-0.3.273-py3-none-any.whl" --with "harbor @ file://$tool_root/downloads/harbor-0.23.0-py3-none-any.whl" --with litellm==1.92.0 --with "openai>=2.20.0,<3.0.0" --with pytest --with pytest-asyncio --with pytest-xdist' || return "$?"
+  run_command 'scout_alias="$(uv tool dir --bin)/scout"; scout_tools="$(uv tool dir)"; if [[ -e "$scout_alias" || -L "$scout_alias" ]]; then scout_target="$(readlink -f -- "$scout_alias")"; if [[ ! -L "$scout_alias" ]] || { [[ "$scout_target" != "$scout_tools/inspect-ai/bin/scout" ]] && [[ "$scout_target" != "$scout_tools/inspect-scout/bin/scout" ]]; }; then printf '"'"'needs_owner: retained foreign Scout executable.\n'"'"' >&2; exit 3; fi; fi; uv tool install --force --no-build --reinstall --python 3.13 "$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl" --with "inspect-ai @ file://$tool_root/downloads/inspect_ai-0.3.273-py3-none-any.whl" --with "harbor @ file://$tool_root/downloads/harbor-0.24.0-py3-none-any.whl" --with litellm==1.92.0 --with "openai>=2.20.0,<3.0.0" --with pytest --with pytest-asyncio --with pytest-xdist' || return "$?"
   # Source: https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/tools.md#L177
   run_command 'install -d -m 0700 -- "$config_root"; install -m 0600 -- "$plan_dir/config/scout-round2-delegation.py" "$config_root/scout-round2-delegation.py"' || return "$?"
   # Source: https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/tools.md#L177
@@ -1133,7 +1133,7 @@ if $list; then
   printf '%s\n' 'convergence-validators | Convergence practice and its validators | repository-recipe | planned'
   printf '%s\n' 'lm-program-optimization | DSPy 3.4.0 (dspy.GEPA and the other DSPy optimizers; GEPA 0.1.4 comes in as its pinned dependency) | uv-project | planned'
   printf '%s\n' 'skill-vetting | SkillSpector 2.12.0 CLI (on demand; advisory, never an allow decision; no MCP server and no install hook) | uv-tool | planned'
-  printf '%s\n' 'trajectory-analysis | Inspect Scout 0.5.3 (in the Inspect AI owner'"'"'s environment, with harbor 0.23.0 for ATIF import) | uv-tool | planned'
+  printf '%s\n' 'trajectory-analysis | Inspect Scout 0.5.3 (in the Inspect AI owner'"'"'s environment, with harbor 0.24.0 for ATIF import) | uv-tool | planned'
   printf '%s\n' 'mcp-protocol-conformance | MCP conformance suite (npm @modelcontextprotocol/conformance, on demand through npx; 0.2.0-alpha.11 until 0.2.0-alpha.12 clears the cooldown on 2026-10-08) | npx-on-demand | planned'
   exit 0
 fi

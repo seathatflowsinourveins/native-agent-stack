@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "source_repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+  "provenance": {
+    "kind": "pr-branch-pre-squash",
+    "pull_request": 927,
+    "commit": "b67a28264d84c9e9b51e0671ee1db046270ff833"
+  },
+  "purpose": "Historical negative-control bytes already captured on PR #927 before squash, retained as fixture provenance rather than a repository pin; current recommendations are read from the live checkout.",
+  "capture_status": "already-run-on-pr-branch-before-squash",
+  "capture_command": "git show <provenance.commit>:<source_path>",
+  "capture_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-show.adoc",
+  "reachability_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-merge-base.adoc",
+  "git_blob_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/user-manual.adoc#object-details",
+  "hash_object_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-hash-object.adoc",
+  "assertion_boundary_reference": "https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py#L253-L278",
+  "fixtures": [
+    {
+      "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "fixture": "README.md.fixture",
+      "git_blob": "6b80379b6be9c24041d3d29130d3f4e95b59e837",
+      "sha256": "48de7243aa72b2e30c5fb6805c5582ea9b3ad08cda8dcdb9aeab812f99bd98f0",
+      "bytes": 98175
+    },
+    {
+      "source_path": "docs/decisions/2026-10-09-harbor-0240-profile.md",
+      "fixture": "decision.md.fixture",
+      "git_blob": "ac9f55ed0500a6dca7218db0e8f04bef9cdc9eb3",
+      "sha256": "e500fb4b8424e54c0cf218fd5ba187cd8dd21952b0b2cb7aeb9f8155a6723d46",
+      "bytes": 7359
+    },
+    {
+      "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+      "fixture": "owners.json.fixture",
+      "git_blob": "ba8995ecd01728fa61d502d83a005183ced243e8",
+      "sha256": "c4ce11ac6ee48395fa0de4c639fbc59bc810aa143baa736301129daa380318f3",
+      "bytes": 35292
+    }
+  ]
+}

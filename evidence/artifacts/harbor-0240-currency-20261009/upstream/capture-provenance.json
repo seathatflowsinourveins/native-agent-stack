@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "kind": "public-upstream-capture",
+  "repository": "https://github.com/harbor-framework/harbor",
+  "pin": "b53b8134e1241686dca7759af188f987ecc48e8b",
+  "evidence_class": "public primary source custody; no runtime or host acceptance",
+  "capture_method": "GitHub API response bytes from gh api --cache 120s; public PyPI/raw-source response bytes from urllib.request; all host file writes used native apply_patch.",
+  "capture_format": "Internal UTF-8 content and line endings preserved. Native apply_patch added one final LF to the four GitHub API JSON responses that gh emitted without a final LF; PyPI and three raw source files were already LF-terminated and match fetched bytes exactly. Source-response and captured-file hashes are both recorded.",
+  "release": {
+    "tag_name": "v0.24.0",
+    "html_url": "https://github.com/harbor-framework/harbor/releases/tag/v0.24.0",
+    "id": 403380815,
+    "published_at": "2026-10-05T05:04:52Z",
+    "target_commitish": "main",
+    "draft": false,
+    "prerelease": false
+  },
+  "tag_resolution": {
+    "ref": "refs/tags/v0.24.0",
+    "ref_object_type": "tag",
+    "ref_object_sha": "bf8996ef6d97d014924dc1a5e4acc7e9b19b27a1",
+    "annotated": true,
+    "tag_object_sha": "bf8996ef6d97d014924dc1a5e4acc7e9b19b27a1",
+    "tag_object_target_type": "commit",
+    "peeled_commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+    "expected_commit_matches": true,
+    "tag_signature_verified": false,
+    "tag_signature_reason": "unsigned"
+  },
+  "commit": {
+    "sha": "b53b8134e1241686dca7759af188f987ecc48e8b",
+    "message": "v0.24.0",
+    "author_date": "2026-10-05T05:04:47Z",
+    "committer_date": "2026-10-05T05:04:47Z",
+    "tree_sha": "53f5cf4afcf87f9fd53e183e13b06bdfc8c63cb4",
+    "parents": [
+      "eacc03726b8c8d03761142c5db43aa657daade09"
+    ],
+    "signature_verified": false,
+    "signature_reason": "unsigned"
+  },
+  "sources": [
+    {
+      "path": "release.json",
+      "url": "https://api.github.com/repos/harbor-framework/harbor/releases/tags/v0.24.0",
+      "started_at_utc": "2026-10-09T11:16:41.300983+00:00",
+      "completed_at_utc": "2026-10-09T11:16:41.659252+00:00",
+      "source_response_bytes": 20713,
+      "source_response_sha256": "01f61dc75ea9ab6966ae51cf4571ace7dfbc67b0f999175d6cd57102fcad3544",
+      "source_response_trailing_lf": false,
+      "captured_bytes": 20714,
+      "captured_sha256": "17dd20187eef049e6d9aa943780e3863736e449257a068bdb299e92379d5421d",
+      "normalization": "one final LF added; no internal reformatting"
+    },
+    {
+      "path": "ref-v0.24.0.json",
+      "url": "https://api.github.com/repos/harbor-framework/harbor/git/ref/tags/v0.24.0",
+      "started_at_utc": "2026-10-09T11:16:41.301399+00:00",
+      "completed_at_utc": "2026-10-09T11:16:41.629075+00:00",
+      "source_response_bytes": 345,
+      "source_response_sha256": "a4c43fa3c82f361a0ddc98e6fe31731bfc049a5d6fd8676c0e7a6581ab13ef64",
+      "source_response_trailing_lf": false,
+      "captured_bytes": 346,
+      "captured_sha256": "baead2c103189c9248dd88ea788079f167c3c303d22e28c81abdae3bfb5323cb",
+      "normalization": "one final LF added; no internal reformatting"
+    },
+    {
+      "path": "commit.json",
+      "url": "https://api.github.com/repos/harbor-framework/harbor/commits/b53b8134e1241686dca7759af188f987ecc48e8b",
+      "started_at_utc": "2026-10-09T11:16:41.302133+00:00",
+      "completed_at_utc": "2026-10-09T11:16:41.696245+00:00",
+      "source_response_bytes": 9913,
+      "source_response_sha256": "909f6206adf6172dce9f77a1bea4492368cc75a45af3db477b8c91849d666873",
+      "source_response_trailing_lf": false,
+      "captured_bytes": 9914,
+      "captured_sha256": "20a6f31f5a0d590ce8865a9f9a0a89a0e6454812fb1ce4c54ff972b494f13432",
+      "normalization": "one final LF added; no internal reformatting"
+    },
+    {
+      "path": "pypi-0.24.0.json",
+      "url": "https://pypi.org/pypi/harbor/0.24.0/json",
+      "started_at_utc": "2026-10-09T11:16:41.302938+00:00",
+      "completed_at_utc": "2026-10-09T11:16:41.350596+00:00",
+      "source_response_bytes": 9594,
+      "source_response_sha256": "c56c5c7cab5961a324019395eef3ad01dbd82015dede7490f59998ebb8a2cb6f",
+      "source_response_trailing_lf": true,
+      "captured_bytes": 9594,
+      "captured_sha256": "c56c5c7cab5961a324019395eef3ad01dbd82015dede7490f59998ebb8a2cb6f",
+      "normalization": "none"
+    },
+    {
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/harbor-framework/harbor/b53b8134e1241686dca7759af188f987ecc48e8b/README.md",
+      "started_at_utc": "2026-10-09T11:16:41.350668+00:00",
+      "completed_at_utc": "2026-10-09T11:16:41.471290+00:00",
+      "source_response_bytes": 2984,
+      "source_response_sha256": "471eeac02b89640051dd25c0a4bb5a29a76d55862a6ae30da1dbb532f13bd633",
+      "source_response_trailing_lf": true,
+      "captured_bytes": 2984,
+      "captured_sha256": "471eeac02b89640051dd25c0a4bb5a29a76d55862a6ae30da1dbb532f13bd633",
+      "normalization": "none"
+    },
+    {
+      "path": "pyproject.toml",
+      "url": "https://raw.githubusercontent.com/harbor-framework/harbor/b53b8134e1241686dca7759af188f987ecc48e8b/pyproject.toml",
+      "started_at_utc": "2026-10-09T11:16:41.471345+00:00",
+      "completed_at_utc": "2026-10-09T11:16:41.566741+00:00",
+      "source_response_bytes": 6283,
+      "source_response_sha256": "d7d5398dfeff698ec1c008a9a122326be6e3e6b69af9dcf7caec8e79efabb43e",
+      "source_response_trailing_lf": true,
+      "captured_bytes": 6283,
+      "captured_sha256": "d7d5398dfeff698ec1c008a9a122326be6e3e6b69af9dcf7caec8e79efabb43e",
+      "normalization": "none"
+    },
+    {
+      "path": "pytest.yml",
+      "url": "https://raw.githubusercontent.com/harbor-framework/harbor/b53b8134e1241686dca7759af188f987ecc48e8b/.github/workflows/pytest.yml",
+      "started_at_utc": "2026-10-09T11:16:41.566790+00:00",
+      "completed_at_utc": "2026-10-09T11:16:41.678997+00:00",
+      "source_response_bytes": 3377,
+      "source_response_sha256": "a58bcad1137f9f0a862eb9308c1392fc29780794bc6b2ebfe850307f1336ecce",
+      "source_response_trailing_lf": true,
+      "captured_bytes": 3377,
+      "captured_sha256": "a58bcad1137f9f0a862eb9308c1392fc29780794bc6b2ebfe850307f1336ecce",
+      "normalization": "none"
+    },
+    {
+      "path": "tag-object.json",
+      "url": "https://api.github.com/repos/harbor-framework/harbor/git/tags/bf8996ef6d97d014924dc1a5e4acc7e9b19b27a1",
+      "started_at_utc": "2026-10-09T11:17:12.685594+00:00",
+      "completed_at_utc": "2026-10-09T11:17:13.017426+00:00",
+      "source_response_bytes": 669,
+      "source_response_sha256": "57ace4f3b795ede955d79244437604e83a2fc8e92204aa043d0614d354829ab6",
+      "source_response_trailing_lf": false,
+      "captured_bytes": 670,
+      "captured_sha256": "babb2265240ca677a2c74a4844553762966112a7737560c2faceae4082836165",
+      "normalization": "one final LF added; no internal reformatting"
+    }
+  ],
+  "held_wheel_independent_hash": {
+    "state_relative_path": "research/harbor-0240-currency-20261009/harbor-0.24.0-py3-none-any.whl",
+    "state_root": "native-agent-stack private state root",
+    "bytes": 2331740,
+    "sha256": "23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c",
+    "expected_bytes": 2331740,
+    "expected_sha256": "23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c",
+    "matches_expected": true,
+    "matches_pypi": true,
+    "public_url": "https://files.pythonhosted.org/packages/9e/63/0e3d788e8d1ed116125507c6a01e3fb95cf82be71f2ea7040a1458709d21/harbor-0.24.0-py3-none-any.whl",
+    "pypi_upload_time_iso_8601": "2026-10-05T05:04:42.088082Z",
+    "operation": "read and SHA256 only; no installation or import; wheel bytes are not committed"
+  },
+  "boundaries": {
+    "local_tests_run": false,
+    "installation_run": false,
+    "build_run": false,
+    "provider_calls_run": false,
+    "live_gateway_touched": false,
+    "credential_files_or_values_read": false
+  }
+}

@@ -1331,17 +1331,17 @@ harbor-containerized-agent-e2e-runner() {
   # Round-2 bounded configuration; destination execution remains owed.
   case "$stage" in
     post_install)
-      # Kind: upstream tests; Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/unit/test_trajectory_validator.py#L1
+      # Kind: upstream tests; Source: https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/tests/unit/test_trajectory_validator.py#L1
       check harbor-containerized-agent-e2e-runner 'upstream tests' 'export HARBOR_TELEMETRY=off
 harbor_env="$(uv tool dir)/harbor"
 [[ "$(readlink -f "$(command -v harbor)")" == "$(readlink -f "$harbor_env/bin/harbor")" ]]
-"$harbor_env/bin/python" -c '"'"'from importlib.metadata import version; assert version("harbor") == "0.23.0"'"'"'
+"$harbor_env/bin/python" -c '"'"'from importlib.metadata import version; assert version("harbor") == "0.24.0"'"'"'
 harbor --version
-cd "$tool_root/harbor-v0.23.0"
+cd "$tool_root/harbor-v0.24.0"
 uv run --frozen --group dev python -m pytest -q tests/unit/test_trajectory_validator.py'
       ;;
     service_health)
-      # Kind: smoke; Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/integration/test_hello_user_e2e.py#L25
+      # Kind: smoke; Source: https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/tests/integration/test_hello_user_e2e.py#L25
       check harbor-containerized-agent-e2e-runner smoke 'export HARBOR_TELEMETRY=off
 export DOCKER_HOST="unix://${XDG_RUNTIME_DIR:?Rootless Docker runtime directory is required}/docker.sock"
 umask 077
@@ -1349,7 +1349,7 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p "$state_root"
 run_dir="$(mktemp -d "$state_root/hello-user.XXXXXX")"
 for agent in oracle nop; do
-  harbor run -p "$tool_root/harbor-v0.23.0/examples/tasks/hello-user" -a "$agent" -e docker --force-build -n 1 -o "$run_dir" --job-name "$agent"
+  harbor run -p "$tool_root/harbor-v0.24.0/examples/tasks/hello-user" -a "$agent" -e docker --force-build -n 1 -o "$run_dir" --job-name "$agent"
 done
 python3 - "$run_dir" <<'"'"'PY'"'"'
 import json
@@ -1377,7 +1377,7 @@ else:
 PY'
       ;;
     after_sign_in)
-      # Kind: native worker telemetry qualification; Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/docs-mintlify/core-concepts/agents/atif.mdx#L121
+      # Kind: native worker telemetry qualification; Source: https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/docs-mintlify/core-concepts/agents/atif.mdx#L121
       check harbor-containerized-agent-e2e-runner 'native worker telemetry qualification' 'bash "$config_root/harbor-worker-telemetry-accept.sh"'
       ;;
     *) skipped harbor-containerized-agent-e2e-runner ;;
@@ -2723,7 +2723,7 @@ assert version("inspect-ai") == "0.3.273"
 assert Version("2.20.0") <= Version(version("openai")) < Version("3.0.0")
 assert version("litellm") == "1.92.0"
 assert version("inspect-scout") == "0.5.3"
-assert version("harbor") == "0.23.0"
+assert version("harbor") == "0.24.0"
 from harbor.models.trajectories import Trajectory  # Require ATIF coverage before importorskip tests.
 PY
 uv pip check --python "$tool_python"

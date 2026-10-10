@@ -88,7 +88,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "d5441b11b0641c3a1666851443db76e1703697962badb28f0fe48eac40f8171e"
+   "sha256": "3d35d64d44571ee4bc91b5ffb0329eefdbbc5017c11c57f16fbfea5a59e3b9c7"
   }
  },
  "counts": {
@@ -2900,11 +2900,11 @@
    "layer_id": "quality-evaluation",
    "slot_id": "trajectory-analysis",
    "row_kind": "owner_decision",
-   "default": "Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.23.0 for ATIF import)",
+   "default": "Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.24.0 for ATIF import)",
    "repository": "https://github.com/meridianlabs-ai/inspect_scout",
    "installs_nothing_extra": false,
    "definitive": false,
-   "label": "owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named this owner; not a blind result, a consensus or a measurement; its removal check reports to the owner",
+   "label": "owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named this owner; not a blind result, a consensus or a measurement; its removal check reports to the owner; current companion pin amended on 2026-10-09 (docs/decisions/2026-10-09-harbor-0240-profile.md supersedes only the Harbor companion pin; the 2026-10-04 owner decision selected Harbor 0.23.0); the original owner decision is retained under prior_owner_decision",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
@@ -2916,8 +2916,8 @@
     "by": "the owner's repository-quality rule of 2026-10-04",
     "batch": "wave5",
     "reason": "Decide round 2 applied the owner's repository-quality rule to the gap trajectory-analysis; its Opus verification named Inspect Scout against live upstream. Refuted. The verdict rests on one procedural step: \"recovering A and B is the single next check.\" Both deciders ended with deadline_exceeded and 0 chars (runs/p02-observability/status.json, out-A.jsonl, out-B.jsonl), so there is nothing to recover. The facts the critic itself checked are enough to settle the split under rule D.\n\n(1) Requirement gate: met under A(1), observability and evaluation of the two-client coding work and the Harbor A/B lane. The stack has repeatedly built its own transcript scanning (origin/main 3b8f9c8a1):\n- an ad hoc subagent_scan, a pattern scan over 308 Claude Code ",
-    "pin": "inspect-scout 0.5.3: GitHub release 2026-09-23T00:29:02Z; tag 0.5.3 is commit 0e8fc055a3cebba1a14c11bc35856767b6405173. PyPI wheel inspect_scout-0.5.3-py3-none-any.whl, uploaded 2026-09-23T00:30:00Z, carries a trusted-publishing provenance attestation (publisher meridianlabs-ai/inspect_scout, workflow publish.yaml, environment pypi). Companion: harbor==0.23.0, the stack's existing Harbor pin.",
-    "install": "Install in one Python >= 3.12 environment shared with the Inspect AI owner: python -m pip install \"inspect-scout==0.5.3\" \"harbor==0.23.0\". Upstream forms: `pip install inspect-scout` (docs/index.qmd:28 @0.5.3). For Harbor ATIF import, upstream says to install `pip install \"harbor>=0.6.0\"` in the same environment, Python >= 3.12 (docs/db_importing.qmd:285-288 @0.5.3). Prerequisite: inspect-scout 0.5.3 hard-depends on inspect-ai>=0.3.268 and inspect-swe>=0.2.56 (PyPI metadata). Either install it into the Inspect AI owner's environment, or move that owner's pin to released inspect-ai 0.3.276; never install a second inspect-ai beside the owner's. The owner pin, commit 0321960a dated 2026-10-01, postdates inspect-ai 0.3.268 (2026-09-22), but the version string of that editable install was not checked. Acceptance (not run): `scout scan` with a grep_scanner over claude_code() on one current ses",
+    "pin": "inspect-scout 0.5.3: GitHub release 2026-09-23T00:29:02Z; tag 0.5.3 is commit 0e8fc055a3cebba1a14c11bc35856767b6405173. PyPI wheel inspect_scout-0.5.3-py3-none-any.whl, uploaded 2026-09-23T00:30:00Z, carries a trusted-publishing provenance attestation (publisher meridianlabs-ai/inspect_scout, workflow publish.yaml, environment pypi). Companion: harbor==0.24.0, the stack's existing Harbor pin.",
+    "install": "Install in one Python >= 3.12 environment shared with the Inspect AI owner: python -m pip install \"inspect-scout==0.5.3\" \"harbor==0.24.0\". Upstream forms: `pip install inspect-scout` (docs/index.qmd:28 @0.5.3). For Harbor ATIF import, upstream says to install `pip install \"harbor>=0.6.0\"` in the same environment, Python >= 3.12 (docs/db_importing.qmd:285-288 @0.5.3). Prerequisite: inspect-scout 0.5.3 hard-depends on inspect-ai>=0.3.268 and inspect-swe>=0.2.56 (PyPI metadata). Either install it into the Inspect AI owner's environment, or move that owner's pin to released inspect-ai 0.3.276; never install a second inspect-ai beside the owner's. The owner pin, commit 0321960a dated 2026-10-01, postdates inspect-ai 0.3.268 (2026-09-22), but the version string of that editable install was not checked. Acceptance (not run): `scout scan` with a grep_scanner over claude_code() on one current ses",
     "overturn": "Scout against Monocle trace assertions on one frozen, human-labelled set of this stack's sessions and Harbor ATIF trials; Monocle replaces Scout if it detects more labelled failures at the same false-positive rate, with an interval excluding zero; it reports to the owner and removes nothing by itself",
     "open_acceptance_gates": [
      "scout --version reports 0.5.3 inside the Inspect AI environment, with one inspect-ai",
@@ -2928,6 +2928,53 @@
      "docs/decisions/2026-10-04-repository-quality-rule.md",
      "evidence/artifacts/final-architecture-round2-20261004/verdicts.json"
     ]
+   },
+   "prior_owner_decision": {
+    "catalog": "foundation",
+    "layer_id": "quality-evaluation",
+    "slot_id": "trajectory-analysis",
+    "row_kind": "owner_decision",
+    "default": "Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.23.0 for ATIF import)",
+    "repository": "https://github.com/meridianlabs-ai/inspect_scout",
+    "installs_nothing_extra": false,
+    "definitive": false,
+    "label": "owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named this owner; not a blind result, a consensus or a measurement; its removal check reports to the owner",
+    "state": "resolved",
+    "measurement": null,
+    "coincides_with_lane_record": null,
+    "claude": "Opus verification of decide round 2 (2026-10-04): settled the split under rule D (every gate passes; no candidate clearly stronger); never a second inspect-ai beside the owner's",
+    "gpt": "decide round 2 (2026-10-04): both blind deciders ended at their deadline with no output and the critic left the gap split; no GPT judgment of Inspect Scout is on record",
+    "job": "scanning agent transcripts and trajectories for behaviours and failures",
+    "resolution": {
+     "outcome": "added_by_owner_decision",
+     "by": "the owner's repository-quality rule of 2026-10-04",
+     "batch": "wave5",
+     "reason": "Decide round 2 applied the owner's repository-quality rule to the gap trajectory-analysis; its Opus verification named Inspect Scout against live upstream. Refuted. The verdict rests on one procedural step: \"recovering A and B is the single next check.\" Both deciders ended with deadline_exceeded and 0 chars (runs/p02-observability/status.json, out-A.jsonl, out-B.jsonl), so there is nothing to recover. The facts the critic itself checked are enough to settle the split under rule D.\n\n(1) Requirement gate: met under A(1), observability and evaluation of the two-client coding work and the Harbor A/B lane. The stack has repeatedly built its own transcript scanning (origin/main 3b8f9c8a1):\n- an ad hoc subagent_scan, a pattern scan over 308 Claude Code ",
+     "pin": "inspect-scout 0.5.3: GitHub release 2026-09-23T00:29:02Z; tag 0.5.3 is commit 0e8fc055a3cebba1a14c11bc35856767b6405173. PyPI wheel inspect_scout-0.5.3-py3-none-any.whl, uploaded 2026-09-23T00:30:00Z, carries a trusted-publishing provenance attestation (publisher meridianlabs-ai/inspect_scout, workflow publish.yaml, environment pypi). Companion: harbor==0.23.0, the stack's existing Harbor pin.",
+     "install": "Install in one Python >= 3.12 environment shared with the Inspect AI owner: python -m pip install \"inspect-scout==0.5.3\" \"harbor==0.23.0\". Upstream forms: `pip install inspect-scout` (docs/index.qmd:28 @0.5.3). For Harbor ATIF import, upstream says to install `pip install \"harbor>=0.6.0\"` in the same environment, Python >= 3.12 (docs/db_importing.qmd:285-288 @0.5.3). Prerequisite: inspect-scout 0.5.3 hard-depends on inspect-ai>=0.3.268 and inspect-swe>=0.2.56 (PyPI metadata). Either install it into the Inspect AI owner's environment, or move that owner's pin to released inspect-ai 0.3.276; never install a second inspect-ai beside the owner's. The owner pin, commit 0321960a dated 2026-10-01, postdates inspect-ai 0.3.268 (2026-09-22), but the version string of that editable install was not checked. Acceptance (not run): `scout scan` with a grep_scanner over claude_code() on one current ses",
+     "overturn": "Scout against Monocle trace assertions on one frozen, human-labelled set of this stack's sessions and Harbor ATIF trials; Monocle replaces Scout if it detects more labelled failures at the same false-positive rate, with an interval excluding zero; it reports to the owner and removes nothing by itself",
+     "open_acceptance_gates": [
+      "scout --version reports 0.5.3 inside the Inspect AI environment, with one inspect-ai",
+      "scout scan with a grep scanner over one Claude Code session returns a result row"
+     ],
+     "sources": [
+      "docs/decisions/2026-10-04-final-architecture-round2.md",
+      "docs/decisions/2026-10-04-repository-quality-rule.md",
+      "evidence/artifacts/final-architecture-round2-20261004/verdicts.json"
+     ]
+    }
+   },
+   "current_owner_pin_amendment": {
+    "date_utc": "2026-10-09",
+    "by": "the coordinator's 2026-10-09 currency amendment under the owner's standing direction to keep tools current",
+    "decision": "docs/decisions/2026-10-09-harbor-0240-profile.md supersedes only the Harbor companion pin; the 2026-10-04 owner decision selected Harbor 0.23.0",
+    "package": "harbor",
+    "previous_pin": "0.23.0",
+    "current_pin": "0.24.0",
+    "source": {
+     "path": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
+     "sha256": "bdf43454a627229df2de864ba4e56556d6748af97baaef98f341899ec3668981"
+    }
    }
   },
   {
