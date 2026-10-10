@@ -5216,8 +5216,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "36d8049cef393b9786c912975cbad5eddf676d1e357f2773ed47afee0dc7d342",
-      "bytes": 32556
+      "sha256": "5d27274ab0beee758ea4431e6847031bc72899cd0a8852c2a2478f7af0bc3056",
+      "bytes": 32997
     },
     {
       "path": ".gitleaksignore",
@@ -21629,6 +21629,11 @@
       "path": "evidence/artifacts/g5-start-closure-1-20261009/full-suite-comparison.json",
       "sha256": "623784ea49a51d2f3f57692539f2a516636a4ae6d7c77b6ffd50fb06962464af",
       "bytes": 18984
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/gitleaks-n1-fix.json",
+      "sha256": "eedd89b1f5c591dc043ac0b2efa3759f91b486f2b602fe9f75f0a6eabd7d9eb7",
+      "bytes": 10175
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json",
@@ -60327,8 +60332,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "af4fcd8fc06c207a0fed3ceafdfafff46092278e733c0ad29309c59da538ec2d",
-      "bytes": 61987
+      "sha256": "fb17e91c6d0ced490a7d8c90d209333d8b2aeeb276901d0d2ab38da49abcf9ca",
+      "bytes": 66184
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",

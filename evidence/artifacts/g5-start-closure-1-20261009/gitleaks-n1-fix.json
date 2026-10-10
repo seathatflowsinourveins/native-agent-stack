@@ -1,0 +1,169 @@
+{
+  "kind": "g5-pr878-gitleaks-n1-forward-fix",
+  "evidence_class": "local_integration_fixture",
+  "baseline_head": "f2451f711d1ad16bbcb734f9e3b6c4bc40606b62",
+  "finding": "N1; generic-api-key matches in two population receipts",
+  "verification": {
+    "credential_exposures_established": 0,
+    "false_positive_detections": 1656,
+    "per_field": [
+      {
+        "file": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-population-receipt.json",
+        "field": "before_population_key_sha256",
+        "format": "64 lowercase hexadecimal characters; SHA256 of canonical sorted public catalog keys",
+        "matched_count": 414,
+        "format_verified": 414,
+        "reproduced_from_public_native_keys": 414
+      },
+      {
+        "file": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-population-receipt.json",
+        "field": "after_population_key_sha256",
+        "format": "64 lowercase hexadecimal characters; SHA256 of canonical sorted public catalog keys",
+        "matched_count": 414,
+        "format_verified": 414,
+        "reproduced_from_public_native_keys": 414
+      },
+      {
+        "file": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
+        "field": "before_population_key_sha256",
+        "format": "64 lowercase hexadecimal characters; SHA256 of canonical sorted public catalog keys",
+        "matched_count": 414,
+        "format_verified": 414,
+        "reproduced_from_public_native_keys": 414
+      },
+      {
+        "file": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
+        "field": "after_population_key_sha256",
+        "format": "64 lowercase hexadecimal characters; SHA256 of canonical sorted public catalog keys",
+        "matched_count": 414,
+        "format_verified": 414,
+        "reproduced_from_public_native_keys": 414
+      }
+    ],
+    "classification": "FALSE POSITIVE as credential disclosure; the resulting CI failure is a real operational defect.",
+    "data_flow": "Native catalog identity+slot+qualification keys -> sorted per-stratum keys -> sealed_r3_generator.digest(canonical(keys).encode()) -> before/after population digest fields -> gitleaks generic-api-key keyword+entropy detector.",
+    "source_verification": "The unchanged native sampler/R3 functions reproduced all414 stratum population digests in memory. Every matched before/after field equals its recomputed public-data digest. No production packet, model, provider or broker operation ran.",
+    "matched_values_printed_or_retained_in_this_receipt": false
+  },
+  "upstream_sources": [
+    {
+      "repository": "gitleaks/gitleaks",
+      "release": "v8.30.1",
+      "pin": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "files": [
+        "config/gitleaks.toml:generic-api-key",
+        "config/allowlist.go",
+        "detect/detect.go",
+        "report/finding.go:Finding.Redact"
+      ],
+      "supported_format": "Rule-specific allowlists with condition AND, exact paths, regexTarget match and anchored regexes."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "f2451f711d1ad16bbcb734f9e3b6c4bc40606b62",
+      "files": [
+        "tools/sota-convergence/sealed_r3_generator.py:select",
+        "tools/sota-convergence/start_closure_sampler.py:rows_and_origins",
+        "tests/test_gitleaks_config.py"
+      ],
+      "source_scope": "Existing frozen native selectors and CPython unittest integration harness, unchanged population receipts and catalog data."
+    }
+  ],
+  "decision": {
+    "selected": "One generic-api-key allowlist requiring BOTH one of the two exact reviewed receipt paths AND an entire matched before/after_population_key_sha256 field containing exactly64 lowercase hex characters.",
+    "regex_target": "match",
+    "reason": "An additional forward receipt serialization change cannot remove matching lines in earlier commits of the required PR-range scan. The maintainer-supported match-scoped format fixes the historical false positives while preserving receipts and their bindings.",
+    "bounds": "No global allowlist, new ignored directory, other rule override, ignore fingerprint, scanner bypass or entire-line suppression. The inherited default rules and all other existing exceptions remain unchanged."
+  },
+  "regressions": {
+    "before": {
+      "command": "python3 -m unittest -v tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests.test_population_receipt_hash_fields_are_not_credentials",
+      "exit_code": 1,
+      "tests": 1,
+      "expected_failing_subtests": 4,
+      "scope": "New regression applied to the original config; both exact paths in compact and pretty JSON fail."
+    },
+    "after": {
+      "command": "python3 -m unittest -v tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests.test_population_receipt_hash_fields_are_not_credentials tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests.test_population_receipt_same_line_api_key_still_fires tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests.test_population_receipt_exception_is_path_field_shape_and_rule_scoped",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0
+    },
+    "controls": [
+      "Legitimate before/after digests in both exact paths are suppressed in compact and pretty JSON.",
+      "A credential-shaped api_key on the same physical line still fires in each exact receipt path, even when it has the same synthetic64-hex value as the digest.",
+      "An unapproved receipt path remains detected.",
+      "An uppercase/non-lowercase-hex value in a reviewed digest field remains detected.",
+      "A GitHub PAT-shaped value remains detected by its own rule in the reviewed receipt path.",
+      "Unbounded HEAD/--all and unrelated-range overrides are rejected before the real-history test can start."
+    ]
+  },
+  "redaction_and_scope": {
+    "all_native_test_scans": "--redact",
+    "real_repository_scan": "Actual merge-base..HEAD only. The historical test method name remains, but its current command no longer scans all HEAD ancestry.",
+    "range_guard": "GITLEAKS_TEST_RANGE, when specified, must exactly match git merge-base HEAD refs/remotes/origin/main followed by ..HEAD.",
+    "diagnostics": "Assertions use redacted match field names, detector IDs and locations instead of matched values. Full Line is removed because native redaction can leave adjacent values in that line.",
+    "synthetic_fixtures": "Existing isolated fixture scans and the single synthetic injected commit remain bounded; no production full-history scan ran."
+  },
+  "checks": {
+    "full_gitleaks_module": {
+      "command": "GITLEAKS_TESTS_REQUIRED=1 GITLEAKS_TEST_RANGE=15d82bcc8871206476dc8c4c7bf45d347e74b2b7..HEAD python3 -m unittest -v tests.test_gitleaks_config",
+      "exit_code": 0,
+      "tests": 42,
+      "skipped": 0,
+      "actual_summary": "Ran42 tests in25.378s; OK."
+    },
+    "before_pr_range": {
+      "command": "gitleaks git --redact --config .gitleaks.toml --log-opts=15d82bcc8871206476dc8c4c7bf45d347e74b2b7..HEAD --report-format json --report-path <PRIVATE_REPORT> --no-banner --log-level error",
+      "exit_code": 1,
+      "findings": 1656
+    },
+    "working_config_pr_range": {
+      "command": "gitleaks git --redact --config .gitleaks.toml --log-opts=15d82bcc8871206476dc8c4c7bf45d347e74b2b7..HEAD --report-format json --report-path <PRIVATE_REPORT> --no-banner --log-level error",
+      "exit_code": 0,
+      "findings": 0,
+      "scope": "Updated working-tree config over the unchanged baseline HEAD range. The final committed-head scan is reported separately after commit."
+    },
+    "whitespace": {
+      "exit_code": 0
+    },
+    "final_registered_full_validation": "Required after native registration, before the ONE forward commit; actual returned output is posted with the final head.",
+    "final_committed_pr_range": "Required after the forward commit; actual command and rc are posted with the final head."
+  },
+  "failed_attempts": [
+    {
+      "condition": "First full module after redaction conversion expected complete path names in two redacted matches.",
+      "observed": "40 tests, one assertion failure; the pinned native generic rule reports those two key basenames.",
+      "correction": "Use the observed basename metadata plus an exact two-finding count, preserving both detection assertions. Corrected full module passes42 tests.",
+      "source": "gitleaks/gitleaks@83d9cd684c87d95d656c1458ef04895a7f1cbd8e:config/gitleaks.toml generic-api-key identifier expression."
+    },
+    {
+      "condition": "The context-mode sandbox default Python lacked jsonschema for the optional native digest proof.",
+      "observed": "Module import failed before proof execution.",
+      "correction": "Use the installed native /usr/bin/python3 with its existing jsonschema dependency; all414 digests then reproduce.",
+      "scope": "No installation or environment mutation; failed sandbox attempt is not acceptance."
+    }
+  ],
+  "completeness_critic": {
+    "historical_inputs": "The exception covers original historical receipt lines in the PR range; reshaping only HEAD would not meet that gate.",
+    "credential_controls": "Same-path/same-line real-looking API key and other-rule controls remain live.",
+    "privacy": "Counts, field names, formats and equality results only; no matched values or raw finding lines in this receipt.",
+    "test_scope": "Whole native integration module passes, including existing context/fingerprint/scanner-error controls and five new tests.",
+    "remaining": "Final committed range check, required FULL validation and native hooks precede push. The CC reruns N2/N3 and performs designated micros/final landing."
+  },
+  "gates": {
+    "forward_commit_only": true,
+    "amend_or_rebase": "NOT_AUTHORIZED",
+    "flake_files": "UNCHANGED",
+    "landing_order": [
+      "923",
+      "706",
+      "943",
+      "878"
+    ],
+    "new_file_registration_rows": 1,
+    "grants_count": "Take the next available count only at the separately cued landing rebase; no grants-count edit in this fix.",
+    "g5": "NOT_MET",
+    "archive": "UNPUBLISHED"
+  }
+}
