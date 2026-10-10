@@ -1,5 +1,13 @@
 # Grand catalog handbook: foundation, runtimes and the north star
 
+Current trading selection and runtime corrections are maintained in the
+[US-equities catalog](../catalogs/us-equities/README.md) and its
+[October 9 scoped refresh](../catalogs/us-equities/catalog-refresh-20261009.md).
+This handbook preserves the September 22 snapshot below. The
+[generated new-host grand list](new-host-grand-list.md) projects the canonical
+ledgers and host evidence; it is not a second selection or a refreshed reading
+of every historical candidate.
+
 This is the handbook for the catalog as frozen on **September 22, 2026**. It covers
 two catalogs: the **foundation** that every native Claude and Codex session runs
 on (20 layers), and the **US-equities north star** that builds simulation, paper

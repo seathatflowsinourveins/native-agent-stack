@@ -2,6 +2,30 @@
   "schema_version": 1,
   "checked_at": "2026-09-19",
   "layer": "engines-strategies",
+  "current_refresh_record": "catalogs/us-equities/catalog-refresh-20261009.json",
+  "current_engine_refresh_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+  "conditional_products": [
+    {
+      "id": "vectorbt-pro",
+      "product_url": "https://vectorbt.pro/",
+      "decision": "conditional",
+      "adoption_status": "access_and_licence_fit_unestablished",
+      "public_advertised_version": "2026.10.5",
+      "private_source_pin": null,
+      "evidence_level": "source_review",
+      "role": "Private research product candidate, separately from public vectorbt",
+      "requirements": [
+        "Native membership/private repository access",
+        "Licence fit for intended use; public terms grant private/non-commercial scope and require separate written consent for additional commercial rights",
+        "Pinned private source and native task acceptance before adoption"
+      ],
+      "sources": [
+        "https://vectorbt.pro/",
+        "https://vectorbt.pro/terms/software-license/"
+      ],
+      "scope": "Public product/terms review on October 9; no private source, installed version, purchase, model run or performance acceptance. Product inclusion does not override the public edition's owner-routed disposition."
+    }
+  ],
   "snapshot_scope": "September 19 decisions are historical; later native evidence is individually linked. Use the current selection record for installation and the engine destination rather than historical default/alternative labels.",
   "current_selection_record": "catalogs/us-equities/runtime-target.json",
   "reconciliation_record": "docs/foundation-rd-readiness.md",
@@ -9,6 +33,8 @@
   "entries": [
     {
       "id": "lean",
+      "version_scope": "Historical September source-build/sample acceptance at 985ef30. The study route is the native source build at 80e7843f; Docker 18176 is an unproven candidate. The local 18149/source 33e3945f image record is separate; neither relabels this historical execution.",
+      "source_identity_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/6",
       "repository": "https://github.com/QuantConnect/Lean",
       "layers": [
         "backtesting",
@@ -64,8 +90,8 @@
         "execution"
       ],
       "role": "Official LEAN Alpaca brokerage implementation",
-      "decision": "default",
-      "rationale": "Chosen paper route after the research/data/risk gates; this is the official adapter rather than a claim that paper trading already works locally.",
+      "decision": "conditional",
+      "rationale": "2026-10-09: LEAN remains the historical backtest reference. Current Alpaca and IBKR plugins require QuantConnect product entitlement at startup; no local LEAN paper route is accepted.",
       "version_or_commit": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
       "release_date": null,
       "license": "Apache-2.0 (README and source-header declaration)",
@@ -86,7 +112,8 @@
       ],
       "requirements": [
         "Compatible pinned LEAN packages/.NET runtime and adapter dependency restore.",
-        "Later paper use requires a separately provisioned Alpaca paper account, private credentials, market-data entitlement, and explicit paper configuration."
+        "Later paper use requires a separately provisioned Alpaca paper account, private credentials, market-data entitlement, and explicit paper configuration.",
+        "QuantConnect paid-tier organization/login and brokerage product licence, separate from Apache source permission and broker credentials."
       ],
       "limitations": [
         "Native adapter builds were later accepted; account connection remains unexecuted; no Alpaca paper orders accepted yet.",
@@ -94,14 +121,24 @@
         "README deployment/account prose contains dated details; use current broker docs and pinned implementation for operational decisions.",
         "License is declared Apache-2.0 in README/source headers; GitHub license API is empty.",
         "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance.",
-        "Follow-up: pinned local dependency patches and source-integrated Alpaca compilation passed native runtime graph audits. This does not initialize the adapter; QuantConnect product347 entitlement and separately authorized paper access are still required."
+        "Follow-up: pinned local dependency patches and source-integrated Alpaca compilation passed native runtime graph audits. This does not initialize the adapter; QuantConnect product347 entitlement and separately authorized paper access are still required.",
+        "e69f39b0 AlpacaBrokerage.cs:179 calls ValidateSubscription(); invalid/expired product 347 licence leads to Environment.Exit(1):1544. Source reachability only, not an executed failure."
       ],
       "sources": [
         "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
         "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/commit/1973f6165bee212acf656ed2f9cb0af86d4f2a18",
         "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage/AlpacaBrokerageFactory.cs",
-        "https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/brokerages/supported-models/alpaca"
-      ]
+        "https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/brokerages/supported-models/alpaca",
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/e69f39b0d8869329cf084d08dfce7a3b5985b4d0/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs#L179",
+        "https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/alpaca"
+      ],
+      "current_adoption_status": "backtest_reference_only_no_local_paper",
+      "current_plugin_source": "e69f39b0d8869329cf084d08dfce7a3b5985b4d0",
+      "version_scope": "The 1973f616 compilation pin is historical. Current e69f39b0 startup validates QuantConnect product entitlement and exits on failure; no local paper acceptance is established.",
+      "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/0",
+      "historical_rationale": "Chosen paper route after the research/data/risk gates; this is the official adapter rather than a claim that paper trading already works locally.",
+      "current_reviewed_at": "2026-10-09",
+      "historical_decision": "default"
     },
     {
       "id": "alpaca-py",
@@ -209,42 +246,52 @@
         "broker-adapter"
       ],
       "role": "Python strategy lifecycle with built-in Alpaca broker",
-      "decision": "alternative",
-      "rationale": "Most direct Python-first alternative for the same backtest/paper strategy class; retain as an alternative rather than a second active engine.",
-      "version_or_commit": "4.5.91",
-      "release_date": "2026-09-06T21:16:02.051952Z",
-      "license": "GPL-3.0 license file; conflicting MIT package metadata (unresolved)",
+      "decision": "conditional",
+      "rationale": "2026-10-09: Owner-directed second-engine candidate at reviewed 4.6.11. Native historical simulation, data/fill semantics, recovery and broker acceptance remain required before adoption.",
+      "version_or_commit": "4.6.11; source 862504052407df2586122b752a645f88ce87afa1",
+      "release_date": "2026-10-09T16:35:59Z",
+      "license": "GPL-3.0",
       "us_equities_fit": "Deterministic equity strategies and historical-data backtesting are documented.",
       "alpaca_fit": "Shipped Alpaca broker constructs paper-aware REST/stream clients; paper mode uses PAPER=True.",
       "evidence_level": "source_review",
       "evidence_refs": [
-        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/README.md"
+        "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/README.md"
       ],
       "native_workflow": [
         "# Prospective and unexecuted. deterministic backtest only; downloads Yahoo data and never creates a broker.",
-        "python -m pip install lumibot==4.5.91",
+        "python -m pip install lumibot==4.6.11",
         "python - <<'PY'\nfrom datetime import datetime\nfrom lumibot.strategies import Strategy\nfrom lumibot.backtesting import YahooDataBacktesting\nclass Baseline(Strategy):\n    def on_trading_iteration(self):\n        if self.first_iteration:\n            self.submit_order(self.create_order('SPY',1,'buy'))\nBaseline.backtest(YahooDataBacktesting,datetime(2023,1,1),datetime(2024,1,1))\nPY"
       ],
       "requirements": [
         "Python >=3.10; use a separate environment for this package.",
         "Isolated Python environment and audited data provider.",
-        "Resolve license conflict before adoption or redistribution."
+        "GPLv3 licence fit and upstream-native acceptance required before adoption."
       ],
       "limitations": [
-        "Release LICENSE is GPL-3.0 while setup.py declares MIT; the conflict is unresolved, not silently treated as permissive.",
+        "At 4.6.11 LICENSE/setup.py both declare GPLv3. The 4.5.91 conflict is historical, not a current 4.6.11 blocker.",
         "Current agent examples can invoke paid LLMs and submit orders; those paths are outside this deterministic workflow.",
         "Yahoo example data and one backtest are not point-in-time universe or execution-quality validation.",
-        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance.",
+        "Latest GitHub release/PyPI4.6.11 agree; newer4.6.15 tag observed separately with version-specific PyPI404. No acceptance at that tag."
       ],
       "sources": [
-        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/README.md",
-        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/LICENSE",
-        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/pyproject.toml",
-        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/setup.py",
-        "https://pypi.org/project/lumibot/4.5.91/",
-        "https://github.com/Lumiwealth/lumibot/releases/tag/v4.5.91",
-        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/lumibot/brokers/alpaca.py"
-      ]
+        "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/README.md",
+        "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/LICENSE",
+        "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/pyproject.toml",
+        "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/setup.py",
+        "https://pypi.org/project/lumibot/4.6.11/",
+        "https://github.com/Lumiwealth/lumibot/releases/tag/v4.6.11",
+        "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/lumibot/brokers/alpaca.py"
+      ],
+      "historical_review": {
+        "version": "4.5.91",
+        "decision": "alternative",
+        "licence_finding": "GPL release LICENSE/MIT package metadata conflict at the historical pin; corrected4.6.11 metadata does not rewrite that review."
+      },
+      "adoption_status": "second_engine_candidate_unexecuted",
+      "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/2",
+      "historical_rationale": "Most direct Python-first alternative for the same backtest/paper strategy class; retain as an alternative rather than a second active engine.",
+      "current_reviewed_at": "2026-10-09"
     },
     {
       "id": "vectorbt",
@@ -254,20 +301,27 @@
         "backtesting"
       ],
       "role": "Fast signal/parameter sweeps and portfolio simulation",
-      "decision": "alternative",
-      "rationale": "Use for broad research only if its array semantics and license fit; recheck selected strategies in the chosen event-driven engine.",
-      "version_or_commit": "1.1.0",
-      "release_date": "2026-07-05T17:21:08.372312Z",
+      "decision": "excluded",
+      "decision_scope": "Current north-star trading adoption under the owner-routed licence disposition; no universal legal prohibition on internal research is inferred.",
+      "historical_decision": {
+        "decision": "alternative",
+        "scope": "Historical optional, unexecuted array-research recipe at 1.1.0; no engine adoption or licence acceptance.",
+        "source": "catalogs/us-equities/architecture/trading.json#/entries/3"
+      },
+      "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
+      "rationale": "2026-10-09: Excluded from current north-star adoption by the owner-routed licence rejection. The public source is Apache-2.0 with Commons Clause; the historical destination-engine rejection is separately scoped. Fresh 1.1.2 source supports multi-asset analysis and the public Rust extra, so those capabilities are not grounds for rejection.",
+      "version_or_commit": "1.1.2; source f0d2afba7af8a6e6c1b02afde27c9a16413e86ff",
+      "release_date": "2026-10-09T19:03:00Z",
       "license": "Apache-2.0 with Commons Clause License Condition v1.0",
       "us_equities_fit": "Works on supplied equity price arrays; no entitlement or corporate-action dataset included.",
       "alpaca_fit": "Research outputs must be translated and verified in the execution engine; no selected official Alpaca execution route.",
       "evidence_level": "source_review",
       "evidence_refs": [
-        "https://github.com/polakowo/vectorbt/blob/v1.1.0/README.md"
+        "https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/README.md"
       ],
       "native_workflow": [
-        "# Prospective and unexecuted. local-file holding baseline; sample fee assumption is not broker calibration.",
-        "python -m pip install vectorbt==1.1.0",
+        "# Prospective unexecuted 1.1.2 recipe; excluded from current north-star adoption. Historical 1.1.0 recipe is not new execution.",
+        "python -m pip install vectorbt==1.1.2",
         "python - <<'PY'\nimport pandas as pd, vectorbt as vbt\np=pd.read_csv('prices.csv',index_col=0,parse_dates=True)\nprint(vbt.Portfolio.from_holding(p,fees=0.001,freq='1D').stats())\nPY"
       ],
       "requirements": [
@@ -277,20 +331,22 @@
       ],
       "limitations": [
         "Apache-2.0 plus Commons Clause v1.0; do not describe as unrestricted Apache-only software.",
-        "PRO is a separate membership/commercial-license product (site advertises 2026.9.5); private code and member install API were not audited.",
+        "PRO is a separate private membership product; the 2026.9.5 advertisement belongs to the historical review. The current conditional_products card records public advertisement2026.10.5, private/non-commercial licence grant and required written consent for additional commercial rights. Private code/member installation remains unaccepted.",
         "Fast parameter search increases multiple-testing exposure; it does not establish edge.",
         "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
       ],
       "sources": [
-        "https://github.com/polakowo/vectorbt/blob/v1.1.0/README.md",
-        "https://github.com/polakowo/vectorbt/blob/v1.1.0/LICENSE.md",
-        "https://github.com/polakowo/vectorbt/blob/v1.1.0/pyproject.toml",
-        "https://github.com/polakowo/vectorbt/blob/v1.1.0/setup.py",
-        "https://pypi.org/project/vectorbt/1.1.0/",
-        "https://github.com/polakowo/vectorbt/releases/tag/v1.1.0",
+        "https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/README.md",
+        "https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/LICENSE.md",
+        "https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/pyproject.toml",
+        "https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/setup.py",
+        "https://pypi.org/project/vectorbt/1.1.2/",
+        "https://github.com/polakowo/vectorbt/releases/tag/v1.1.2",
         "https://vectorbt.pro/",
         "https://vectorbt.pro/terms/software-license/"
-      ]
+      ],
+      "historical_rationale": "Use for broad research only if its array semantics and license fit; recheck selected strategies in the chosen event-driven engine.",
+      "current_reviewed_at": "2026-10-09"
     },
     {
       "id": "backtrader",
@@ -300,8 +356,8 @@
         "legacy-engine"
       ],
       "role": "Mature Python event-driven research framework",
-      "decision": "alternative",
-      "rationale": "Reasonable for existing strategies and offline comparisons; old integrations and package age make it a weaker new Alpaca default.",
+      "decision": "watch",
+      "rationale": "2026-10-09: Owner-directed stale demotion for current north-star adoption. Preserve dated source/native evidence; unarchived metadata and default-branch dates do not prove abandonment.",
       "version_or_commit": "1.9.78.123",
       "release_date": "2023-04-19T14:13:18.842786Z",
       "license": "GPL-3.0-or-later",
@@ -324,14 +380,21 @@
       "limitations": [
         "Latest PyPI upload and repository HEAD are from 2023; do not infer compatibility with every modern dependency or broker API.",
         "Core examples reference dated Yahoo/IBPy integrations; source review is not current connectivity acceptance.",
-        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance.",
+        "October 9 currency is source review only; pushed_at/tag ordering is not code currency or native acceptance."
       ],
       "sources": [
         "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/README.rst",
         "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/LICENSE",
         "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/setup.py",
         "https://pypi.org/project/backtrader/1.9.78.123/"
-      ]
+      ],
+      "historical_decision": "alternative",
+      "adoption_status": "owner_directed_stale_demotion_not_selected",
+      "current_default_branch_commit": "b853d7c90b6721476eb5a5ea3135224e33db1f14",
+      "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/3",
+      "historical_rationale": "Reasonable for existing strategies and offline comparisons; old integrations and package age make it a weaker new Alpaca default.",
+      "current_reviewed_at": "2026-10-09"
     },
     {
       "id": "backtesting-py",
@@ -383,8 +446,8 @@
         "factor-research"
       ],
       "role": "Maintained Zipline research continuation",
-      "decision": "alternative",
-      "rationale": "Useful for existing Zipline/Pipeline research; avoid adopting a second event engine without a specific need.",
+      "decision": "watch",
+      "rationale": "2026-10-09: Owner-directed stale demotion for current north-star adoption. Preserve dated source/native evidence; unarchived metadata and default-branch dates do not prove abandonment.",
       "version_or_commit": "3.1.1",
       "release_date": "2025-07-19T13:52:06.873238Z",
       "license": "Apache-2.0",
@@ -407,7 +470,8 @@
       "limitations": [
         "README Nasdaq/Quandl tutorial data is historical; it is not a current universe or guaranteed free/live feed.",
         "Current PyPI requires Python >=3.10 although parts of README say >=3.9.",
-        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance.",
+        "October 9 currency is source review only; pushed_at/tag ordering is not code currency or native acceptance."
       ],
       "sources": [
         "https://github.com/stefan-jansen/zipline-reloaded/blob/3.1.1/README.md",
@@ -416,7 +480,13 @@
         "https://github.com/stefan-jansen/zipline-reloaded/blob/3.1.1/setup.py",
         "https://pypi.org/project/zipline-reloaded/3.1.1/",
         "https://github.com/stefan-jansen/zipline-reloaded/releases/tag/3.1.1"
-      ]
+      ],
+      "historical_decision": "alternative",
+      "adoption_status": "owner_directed_stale_demotion_not_selected",
+      "current_default_branch_commit": "943010b9da848e317fc520de87edade2b884d329",
+      "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/4",
+      "historical_rationale": "Useful for existing Zipline/Pipeline research; avoid adopting a second event engine without a specific need.",
+      "current_reviewed_at": "2026-10-09"
     },
     {
       "id": "bt",
@@ -724,6 +794,8 @@
     },
     {
       "id": "skfolio",
+      "version_scope": "Frozen chronological splitter/control study at 1.2.9; current published NativeStack2604 runtime separately selects 1.7.0. The latter's offline smoke does not establish portfolio/risk acceptance.",
+      "current_runtime_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/1",
       "repository": "https://github.com/skfolio/skfolio",
       "layers": [
         "portfolio-optimization",
@@ -1326,7 +1398,7 @@
       ],
       "role": "Older Alpaca/Backtrader connector",
       "decision": "excluded",
-      "rationale": "Do not make the 2022 connector the new execution foundation; keep for legacy migration/reference.",
+      "rationale": "2026-10-09: Owner-directed stale demotion for current north-star adoption. Preserve dated source/native evidence; unarchived metadata and default-branch dates do not prove abandonment.",
       "version_or_commit": "0.15.0",
       "release_date": "2022-01-02T21:34:24.007397Z",
       "license": "Apache-2.0",
@@ -1348,7 +1420,8 @@
       "limitations": [
         "Latest release and HEAD are 2022; it depends on the older alpaca-trade-api family.",
         "Never assume paper-by-default; historical samples and feed entitlements require re-audit.",
-        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance.",
+        "October 9 currency is source review only; pushed_at/tag ordering is not code currency or native acceptance."
       ],
       "sources": [
         "https://github.com/alpacahq/alpaca-backtrader-api/blob/v0.15.0/README.md",
@@ -1356,7 +1429,13 @@
         "https://github.com/alpacahq/alpaca-backtrader-api/blob/v0.15.0/setup.py",
         "https://pypi.org/project/alpaca-backtrader-api/0.15.0/",
         "https://github.com/alpacahq/alpaca-backtrader-api/releases/tag/v0.15.0"
-      ]
+      ],
+      "historical_decision": "excluded",
+      "adoption_status": "owner_directed_stale_demotion_not_selected",
+      "current_default_branch_commit": "475bb54b8b16506092eb97df5a7cb1d05f0b86be",
+      "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/5",
+      "historical_rationale": "Do not make the 2022 connector the new execution foundation; keep for legacy migration/reference.",
+      "current_reviewed_at": "2026-10-09"
     },
     {
       "id": "ib-async",

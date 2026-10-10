@@ -5,6 +5,20 @@ workers, skills, memory, retrieval, efficiency and operations are maintained in
 the separate [foundation catalog](../foundation/README.md). Trading work reuses
 that foundation and adds data, strategy, risk and broker-specific requirements.
 
+The [October 9 scoped catalog refresh](catalog-refresh-20261009.md) reconciles
+current runtime versus isolated-recipe pins, the final-lock acceptance,
+held/excluded adoption decisions, both TradingView repositories and the distinct
+LEAN source/build records. Its [registered decision supplement](catalog-refresh-20261009.json)
+is source review with explicit historical receipt references. The frozen
+September 22 GRAND handbook and generated new-host report are dated/derived
+views of the canonical records, rather than competing current selections.
+
+The [engine-source follow-up](catalog-engine-refresh-20261009.json) adds the
+LEAN brokerage product-entitlement boundary, Lumibot 4.6.11 as a second-engine
+candidate, public vectorbt 1.1.2 versus conditional private PRO access, and the
+owner-directed stale demotions. All are current source/adoption records; they
+do not relabel historical runs or create a new paired layer verdict.
+
 The [current four-layer comparisons](../landscape/us-equities.json) explain the
 selected roles and meaningful alternatives using later retained evidence. The
 offline comparison view (`docs/ecosystem/index.html#landscape`, generated
@@ -70,7 +84,7 @@ per-repository token-saving value.
 
 **Dated decision catalog: September 20, 2026.** The north star is native research → reproducible backtesting → independently accepted IBKR and Alpaca paper workflows. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **513 repository identities**, including all 342 public stars and 171 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,067 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+The dated baseline has **152 repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. After the October 9 supplement registration, the [typed decision union](decision-index.json) validates **878 repository identities**, including the recorded **357 public-star identities** and **521 beyond that snapshot**, with **2,099 source pointers**. It combines baseline cards, component/candidate records and explicitly registered supplements while preserving their different evidence depths. The [older repository index](repository-index.md) and historical 453-row index remain dated reference material; these counts do not claim a new live star census.
 
 The newest [security-identity review](security-identity-review.md) examines Alpaca,
 Zipline, Qlib, NautilusTrader, LEAN and WRDS. It separates engine identity/lifetime

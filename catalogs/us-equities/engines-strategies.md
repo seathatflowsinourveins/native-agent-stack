@@ -58,25 +58,58 @@ current runtime target above for the selected engine.
 | Catalog ID | Selected version or source | Decision | Reason and boundary |
 | --- | --- | --- | --- |
 | `lean` | `985ef30` | Default | Frozen historical comparator (oracle), not the runtime; SPY/LEAN parity gate G-a is planned/blocked. |
-| `lean-alpaca` | `1973f61` | Default | Official broker adapter; source/build recipe, no accepted paper session. |
+| `lean-alpaca` | Historical build 1973f61; current e69f39b0 | Conditional; no local LEAN paper | Startup QC product entitlement is separate from Apache source permission. |
 | `alpaca-py` | 0.44.0 | Default | Official SDK for read-only broker-state observation and market-data interfaces. |
 | `nautilustrader` | `2.0.0rc5` (tag `v2.0.0rc5`; source `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`) | Default | Selected destination runtime (runtime-target.json). Prerelease; SPY/LEAN parity gate G-a completed BLOCKED (four failed checks on the two unsupported mappings; not parity acceptance; per-check verdict retained under `blueprints/us-equities/engine-nautilus/spy-parity/`). Historical `1.231.0` source review below is superseded. |
 | `nautilus-ibkr-adapter` | same pin as `nautilustrader` | Default | Native IBKR socket adapter; `local_broker_acceptance` `not_established` (runtime-target.json). |
 | `adaptive-paper-alpaca-adapter` | `7e7eefe28315f3de3aa4dc75cc8b6524f70829cb` (`blueprints/us-equities/adaptive-paper`) | Default | Custom deterministic Alpaca adapter for the adaptive-paper lane; source_review with the synthetic capacity fixture cited (180 fills / 90 round trips in 60.4282s, zero broker connections); no live broker fills claimed. |
-| `lumibot` | 4.5.91 | Alternative | Direct Python strategy lifecycle and Alpaca broker; unresolved GPL/MIT license metadata conflict. |
-| `vectorbt` | 1.1.0 | Alternative | Array-based research sweeps; recheck selected hypotheses in the event engine. |
-| `backtrader` | 1.9.78.123 | Alternative | Useful for existing research; package and broker integration age require care. |
+| `lumibot` | 4.6.11 at 86250405 | Conditional second-engine candidate | GPLv3 metadata agrees; native historical/broker qualification remains required. |
+| `vectorbt` | 1.1.2 at f0d2afba | Excluded from current north-star adoption | Owner-routed licence disposition; historical 1.1.0 review remains dated. |
+| `vectorbt-pro` | Public product advertises 2026.10.5; private pin unknown | Conditional on access and licence fit | Separate private product; no purchase, installation or native acceptance. |
+| `backtrader` | 1.9.78.123 | Watch; owner stale demotion | Dated code/integrations; historical reference only for current adoption. |
 | `backtesting-py` | 0.6.6 | Alternative | Small single-instrument prototypes; not the multi-asset broker-state authority. |
-| `zipline-reloaded` | 3.1.1 | Alternative | Maintained Zipline/Pipeline research, with explicit data-bundle ingestion. |
+| `zipline-reloaded` | 3.1.1 | Watch; owner stale demotion | Historical Pipeline research remains; no abandonment claim. |
 | `bt` | 1.2.3 | Alternative | Convenient allocation/rebalance comparisons; no broker execution in this workflow. |
 | `ib-async` | 2.1.0 | Alternative | Community IBKR client only if the broker choice later changes. |
 | `alpaca-backtrader-legacy` | 0.15.0 | Excluded | Old SDK/data assumptions; README's default is live, not paper. |
 
 The paragraph below is the historical `1.231.0` source review, retained for context; the current selected destination and its IBKR/Alpaca broker cards are the `2.0.0rc5` rows above. Nautilus's stable `1.231.0` source included Interactive Brokers and Databento adapters, but no Alpaca adapter. Its v2 Rust/PyO3 development documentation must not be mixed into a 1.231.0 implementation. The catalog's AAPL example requires separately supplied Databento files; it is not an account-free data promise. [Stable adapter tree](https://github.com/nautechsystems/nautilus_trader/tree/v1.231.0/nautilus_trader/adapters), [example](https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/examples/backtest/databento_ema_cross_long_only_aapl_bars.py).
 
-Lumibot is the most direct reviewed Python-first alternative for reusing a strategy class between historical simulation and Alpaca paper trading. However, its release [LICENSE](https://github.com/Lumiwealth/lumibot/blob/v4.5.91/LICENSE) and [setup metadata](https://github.com/Lumiwealth/lumibot/blob/v4.5.91/setup.py) disagree. Resolve that before adoption. Some current agent examples also invoke model services and enable trading; the catalog deliberately supplies only a deterministic backtest example.
+Lumibot **4.6.11** is the owner-directed **second-engine candidate**, with native
+qualification still pending. Its [LICENSE](https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/LICENSE)
+and [setup metadata](https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/setup.py#L62)
+agree on GPLv3; the old 4.5.91 GPL/MIT mismatch remains historical. Newer 4.6.15
+tags were observed separately from GitHub's latest 4.6.11 release and its
+version-specific PyPI response. No installation or strategy/broker acceptance
+was performed. Some agent examples invoke model services and trading; the
+catalog's prospective example remains a deterministic backtest only.
 
-Vectorbt's public edition is Apache-2.0 **with Commons Clause**, not unrestricted Apache-only software. VectorBT PRO is a separate private commercial product, not another audited open repository; the site advertised 2026.9.5 when checked, but its private implementation was not reviewed. [Public license](https://github.com/polakowo/vectorbt/blob/v1.1.0/LICENSE.md), [PRO terms](https://vectorbt.pro/terms/software-license/).
+LEAN's current Alpaca and IBKR plugins call `ValidateSubscription()` during
+startup and exit on invalid/expired QuantConnect product entitlement. Apache
+source permission does not grant that entitlement. LEAN stays the historical
+backtest reference with **no accepted local paper route**; historical plugin
+compilation is preserved. See the [pinned engine/entitlement source record](catalog-engine-refresh-20261009.json).
+
+The owner also demotes Backtrader, Zipline Reloaded, alpaca-backtrader-api and
+hftbacktest as stale for current adoption. All four repositories were unarchived
+when checked. The record keeps their default-branch dates separate from
+`pushed_at`, release dates and any historical execution, without claiming abandonment.
+
+Vectorbt's public edition is Apache-2.0 **with Commons Clause**. The current
+north-star adoption disposition follows the owner-routed licence rejection;
+it is not a legal conclusion about every internal research use. The historical
+optional-sweep review remains dated. Fresh v1.1.2 source supports multi-asset
+analysis and the public `vectorbt[rust]` extra, so single-asset/PRO-only Rust
+arguments must not justify its rejection. VectorBT PRO is a separate private
+commercial product whose implementation was not reviewed. See the
+[current scope and primary sources](catalog-refresh-20261009.md),
+[public licence at v1.1.2](https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/LICENSE.md)
+and [PRO terms](https://vectorbt.pro/terms/software-license/).
+
+VectorBT PRO is conditional on private access and licence fit for the intended
+use. Its public terms grant private/non-commercial scope and require separate
+written consent for additional commercial rights. The public page's advertised
+2026.10.5 version does not supply a private source pin or installed-host result.
 
 ## Portfolio construction and statistical evaluation
 
@@ -87,7 +120,7 @@ Start with a transparent benchmark and unambiguous accounting. Add an optimizer 
 | `quantstats` | 0.0.81 | Default | Return-series report with explicit frequency, benchmark and net-cost accounting. |
 | `pyportfolioopt` | 1.6.0 | Alternative | Covariance/shrinkage and conventional constrained portfolio weights. |
 | `riskfolio-lib` | 7.3.0 | Alternative | Broader risk measures and allocation formulations when required. |
-| `skfolio` | 1.2.9 accepted splitter; 1.2.8 earlier review | Conditional beyond accepted scope | Native chronological splitter/control study is accepted; portfolio optimization and broader validation remain separate. |
+| `skfolio` | 1.2.9 frozen splitter; 1.7.0 selected runtime | Conditional beyond accepted scope | Historical chronological study and current offline runtime smoke are separate; portfolio/risk acceptance remains open. |
 | `cvxportfolio` | 1.5.1 | Conditional | Cost-aware, multi-period allocation research. |
 | `empyrical-reloaded` | 0.5.12 | Conditional | Reusable metrics where a report is insufficient. |
 | `ffn` | 1.2.2 | Alternative | Lightweight price/return analytics, especially alongside `bt`. |
@@ -176,4 +209,4 @@ Do not concatenate the entries into one installer. Respect the selected package'
 
 `version_or_commit` identifies the selected package release, reviewed release tag or source commit. `release_date` is the selected package's registry upload timestamp when applicable, otherwise the GitHub publication timestamp; source-only pins use `null`. Source URLs expose when API/license review used a source snapshot rather than the registry artifact. This is not a universal latest-HEAD audit. Notable version-family mismatches are explicit: LEAN's old GitHub release marker versus its current source pin; FinRL/FinGPT source versus old wheels; current `darts` versus legacy `u8darts`; and package releases that differ from GitHub's latest-release marker.
 
-The source and license declarations are recorded for selection, not a legal compatibility certification. Resolve Lumibot's conflicting metadata and Dexter's missing standalone license file before redistribution. Keep data/model terms separate from code licenses. At the September 19 review, open gaps included point-in-time US data acceptance, QuantConnect adapter entitlement, Alpaca paper integration, deterministic risk/reconciliation implementation and any demonstrated strategy edge. The later bounded runner and paper smoke close only their recorded scopes; use the current R&D readiness decision for remaining gates.
+The source and license declarations are recorded for selection, not a legal compatibility certification. The historical Lumibot 4.5.91 metadata conflict is resolved at 4.6.11; verify GPLv3 licence fit and Dexter's missing standalone license file before redistribution. Keep data/model terms separate from code licenses. At the September 19 review, open gaps included point-in-time US data acceptance, QuantConnect adapter entitlement, Alpaca paper integration, deterministic risk/reconciliation implementation and any demonstrated strategy edge. The later bounded runner and paper smoke close only their recorded scopes; use the current R&D readiness decision for remaining gates.

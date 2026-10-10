@@ -22,10 +22,16 @@ and scope. The separate
 [NativeStack2604 rerun receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
 records historical installation PASS and 25/25 offline acceptance at 5.60.0 on
 lock `4c98672d14147a1b` (before the 2026-10-05 DVC removal), at `d02c0827` on
-2026-10-05, 01:00:17Z–01:01:07Z. Independent review remains pending. The current
-lock `1fb9f8ca6fef9c47` is not yet qualified on NativeStack2604. The 2604 co-op
-will re-run installation and `accept-trading-2604.sh` for the current 24 checks
-and write a separate receipt.
+2026-10-05, 01:00:17Z–01:01:07Z. Independent review of that historical run remains
+separate. The published NativeStack2604 runtime now has EdgarTools **5.61.1**
+on lock `f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989`.
+Its [separate final-lock receipt](../../../evidence/receipts/runtime-final-native-24-acceptance-20261008.json)
+records **24/24 PASS, rc 0**, at **2026-10-08 17:48:39Z–17:49:09Z**, with
+actual lock hashes before and after in the same stdout stream. This is offline
+`local_integration` evidence. The isolated SEC recipe here remains **5.60.0**;
+the runtime smoke does not repeat SEC acquisition or historical-data qualification.
+The earlier `1fb9f8ca…` run keeps its own receipt and scope. See the
+[October 9 scope reconciliation](../../../catalogs/us-equities/catalog-refresh-20261009.md).
 
 ## Initial wave
 

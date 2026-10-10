@@ -12732,8 +12732,8 @@
     },
     {
       "path": "blueprints/us-equities/README.md",
-      "sha256": "c96eac4c51466043a7091d464262afa96f6cda1dffda754b22d1545f13cb7314",
-      "bytes": 9946
+      "sha256": "67a33e4fc6407d054d1615aef0bdfac881bcf25521e73623c9cf8341437baef5",
+      "bytes": 10195
     },
     {
       "path": "blueprints/us-equities/acceptance-wave/README.md",
@@ -14332,8 +14332,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/README.md",
-      "sha256": "9c49080c900c5c8101f6c0208cc923d499959099664a914741b58be97a29968e",
-      "bytes": 9582
+      "sha256": "426577f7fd7598db23663c50b9a4ad74bcf599081e8329061a82498056b56cb6",
+      "bytes": 10141
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
@@ -16832,8 +16832,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "b849394c1855754c7dbcc1106e5b21c196a4dd2113d1f3862c9a07107c1b9715",
-      "bytes": 3355
+      "sha256": "96c42268ffb3dca2226b6f5d1b33e18aa210bb3088cd0fab7226faeee3fb99e2",
+      "bytes": 3940
     },
     {
       "path": "catalogs/convergence-practice/architecture-wave/README.md",
@@ -16972,7 +16972,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "e35a8d2c2a4199a14799f65f1a25ed572bfcc0f974315a864cd7d768a6fcba1c",
+      "sha256": "d1ed06b8db2a6de06b4e3e3ff9e7455ffd9a10cafee3cbb0ed0196a6da8c8c9c",
       "bytes": 326276
     },
     {
@@ -17097,8 +17097,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618",
-      "bytes": 445299
+      "sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
+      "bytes": 457364
     },
     {
       "path": "catalogs/saturation/README.md",
@@ -17152,8 +17152,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "2bd80b8c4b9fe96f1cf42356f3bad3e169f38926c85462330475335c255ea215",
-      "bytes": 24730
+      "sha256": "d38458ce7790ef58cff1984aa1677ebaead5b59e1d78b484bf8b4affe4274710",
+      "bytes": 25779
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -17219,6 +17219,21 @@
       "path": "catalogs/us-equities/authenticated-data-review.md",
       "sha256": "ebe7bdcdbd2173ce25a355f74621aa690398fd641d02ffa69971d991ca62006b",
       "bytes": 9134
+    },
+    {
+      "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+      "sha256": "be3c6a7716007d395ab53473432163d1994ae87a3412ae1e55b9a2e5ae36bd24",
+      "bytes": 9792
+    },
+    {
+      "path": "catalogs/us-equities/catalog-refresh-20261009.json",
+      "sha256": "6ecb9e52f048f6da912cec8ab70d1257865f72167e1b7de0598b2dce9d0be4d0",
+      "bytes": 17454
+    },
+    {
+      "path": "catalogs/us-equities/catalog-refresh-20261009.md",
+      "sha256": "347379264704906340cc893860a471719f94faf78ae7c532a0b9adbe845ad174",
+      "bytes": 16554
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.json",
@@ -17297,28 +17312,28 @@
     },
     {
       "path": "catalogs/us-equities/data-research.json",
-      "sha256": "e3342e010f4e380c05897268592d85fbf9263c973053fcab7b283c336b459242",
-      "bytes": 98443
+      "sha256": "8daa7ea2ff5f29036351468bb12bb464546c0ae63440d694f2088a6103194845",
+      "bytes": 99719
     },
     {
       "path": "catalogs/us-equities/data-research.md",
-      "sha256": "59af2f6f3ae7fb5969174116d71464ce8408bf80be695afe3c21a43ce16557ac",
-      "bytes": 25330
+      "sha256": "7ed1ef66a3286220569cf9135d1f508abb0a803d276bc23dd5688616181f798d",
+      "bytes": 26383
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "2063cdc6fc8d1911c329794224946b998d2d109387bba7be596d72a16d40c688",
-      "bytes": 773696
+      "sha256": "c203bd694384f31dca4f75333ef6f3e1ac4bfa0f04972290581d5c9f6b259459",
+      "bytes": 778605
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
-      "sha256": "cc4dfdb8087419ccbea22d6af9a1d6bbf0359ba9821aa0f58a5754a350350136",
-      "bytes": 105732
+      "sha256": "048967637d3bd0e7f429d564ad1b9da0d070b49d0ca81e2404a9a4584b66f118",
+      "bytes": 113507
     },
     {
       "path": "catalogs/us-equities/engines-strategies.md",
-      "sha256": "74d4c7f385b6de7ff9f9011647b87eed6c7c3a2a24334732875dc0d4a227277b",
-      "bytes": 25459
+      "sha256": "024e6e0ce86e72e4f9225665af2d5a867c31eb48006e2809e9a8e433a1be9f4e",
+      "bytes": 27457
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
@@ -17427,8 +17442,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "2f2033acc4c730102f1f7b4b90d181d5d2ca2db3d5a3c91ef933711f727480c5",
-      "bytes": 27707
+      "sha256": "bd318252b220d2e611fa9baa21031359f0fbb8d07e1a7bb6a65f67c9cb02eb41",
+      "bytes": 29756
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -17462,8 +17477,8 @@
     },
     {
       "path": "catalogs/us-equities/star-audit.json",
-      "sha256": "4b8fc0ce3d29be3351e0fcd4a14d951ff14f59a94db821fcb97c71ea04c61dba",
-      "bytes": 642865
+      "sha256": "79c2dbb6370292ffc22ecbdff31cf5285b279efa28484c9772cdb4b391a5fe88",
+      "bytes": 643988
     },
     {
       "path": "catalogs/us-equities/star-audit.md",
@@ -18557,8 +18572,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "975c81017bfd910bf8c6d5eb50612c9eb5e7246dea707d7eee5294b6704bf51f",
-      "bytes": 426093
+      "sha256": "2864483aec7bf0b029824f96b6b8942bfb9a31902f7b98e2bbd380c57cbdd092",
+      "bytes": 426562
     },
     {
       "path": "docs/harness-defaults.md",
@@ -18702,12 +18717,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "08586eeb653b3a0f24d70907b3e29636d798b3e7d14c4c2ddf4c9ce9db405baa",
+      "sha256": "96d182f3554119c4dc85deb2e97910e4bff84133e8fcf179fbee4bcc726b0479",
       "bytes": 693491
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "39acb57d7bc9cae04739ec7c4f540881a32c1ae80f767582f1dff88507ea9abb",
+      "sha256": "1d23732ee73842b85cb799a220492715418be74be329daf7f4f8e8e815fed19c",
       "bytes": 369468
     },
     {
@@ -41632,8 +41647,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "a29497f5d13b3c31fd3e566a7e0d07186a8e9d0c1bafcb354f3537ed6ded57c1",
-      "bytes": 59929
+      "sha256": "3300e5c3eca756825a0cd33b23b21dc31c688cdf68e352419b1463906f906db0",
+      "bytes": 63050
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -53906,6 +53921,11 @@
       "bytes": 1302
     },
     {
+      "path": "evidence/artifacts/t19-catalog-refresh-20261009/review-receipt.json",
+      "sha256": "dfaf625a3eabb9c14b84ca18c2e624a0e1091e8ca8d4a9ea91cbf520db8d68b8",
+      "bytes": 21856
+    },
+    {
       "path": "evidence/artifacts/tavily-research-qualification-20260926/run.log",
       "sha256": "fdb738a4c9c28d554a79c8f07aba649b927aa3ffba1cf663cbc1f2f76c63a027",
       "bytes": 735
@@ -59767,8 +59787,8 @@
     },
     {
       "path": "tests/test_catalog_decisions.py",
-      "sha256": "e24efa328daf0a3536ee8416bcf5c1ac406e207202f559c3ad5ca11155e4110e",
-      "bytes": 9953
+      "sha256": "62e255a6a8e26b595dd700cce7aed2964828658508f188e98e3032c0e26ec1de",
+      "bytes": 11823
     },
     {
       "path": "tests/test_catalog_freshness_pins.py",
@@ -60179,6 +60199,11 @@
       "path": "tests/test_local_inference_latest_20260926.py",
       "sha256": "de493d86ef8944dbf5f31c5792a2f112752c02a505c22f89332322e72dabfce6",
       "bytes": 74274
+    },
+    {
+      "path": "tests/test_local_pages_fleet_regressions.py",
+      "sha256": "72d7e709ab952664b798b9afa84de3558108066ed5c8eec55ac56ffa205132df",
+      "bytes": 20631
     },
     {
       "path": "tests/test_managed_block.py",

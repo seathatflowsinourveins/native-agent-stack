@@ -2,6 +2,7 @@
   "schema_version": 1,
   "checked_at": "2026-09-19",
   "layer": "data-research",
+  "current_refresh_record": "catalogs/us-equities/catalog-refresh-20261009.json",
   "entries": [
     {
       "id": "data-alpaca-py",
@@ -145,6 +146,8 @@
     },
     {
       "id": "data-edgartools",
+      "version_scope": "Accepted isolated SEC/catalyst recipe at 5.60.0. Current published NativeStack2604 runtime separately selects 5.61.1; its offline smoke does not repeat the SEC acquisition acceptance.",
+      "current_runtime_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/0",
       "repository": "https://github.com/dgunning/edgartools",
       "layers": [
         "sec",
@@ -700,8 +703,15 @@
         "reproducibility"
       ],
       "role": "Git-linked hashes, data dependencies and experiment pipelines",
-      "decision": "default",
-      "rationale": "Use lightweight dataset manifests and private content-addressed artifacts before adding a lake service.",
+      "decision": "conditional",
+      "adoption_status": "held_not_in_selected_runtime",
+      "historical_decision": {
+        "decision": "default",
+        "scope": "September source-reviewed provisional dataset-versioning recommendation; not an install or historical equity-data acceptance.",
+        "source": "catalogs/sota-convergence/layer-verdicts-20260922.json"
+      },
+      "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/2",
+      "rationale": "2026-10-09: Use retained dataset manifests/private content-addressed artifacts. DVC remains a source-reviewed implementation candidate, with installation held after the October 5 dependency-security removal. The historical September 23 dvc checkout fixture remains local integration; no safe-use or full historical equity-dataset qualification is established.",
       "version_or_commit": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
       "release_date": "2026-03-31",
       "license": "Apache-2.0",
@@ -741,7 +751,9 @@
         "https://pypi.org/pypi/dvc/3.67.1/json",
         "https://osv.dev/vulnerability/PYSEC-2026-2447",
         "https://github.com/advisories/GHSA-w8v5-vhqr-4h9v"
-      ]
+      ],
+      "historical_rationale": "Use lightweight dataset manifests and private content-addressed artifacts before adding a lake service.",
+      "current_reviewed_at": "2026-10-09"
     },
     {
       "id": "data-lakefs",

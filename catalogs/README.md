@@ -5,6 +5,15 @@ explains the September 22, 2026 layer verdicts: 20 foundation and 12 trading
 layers, each with its winners, named alternatives, evidence class and the
 comparison that would overturn it, plus how to rerun them.
 
+For current trading selections and scoped corrections, start at the
+[US-equities catalog](us-equities/README.md) and its
+[October 9 refresh](us-equities/catalog-refresh-20261009.md). The September 22
+handbook/snapshot and the generated new-host grand list have different purposes:
+the former preserves dated decisions; the latter projects canonical ledgers,
+pins, profiles and evidence for host setup. Neither is a second independent
+selection authority. Layer dates remain their actual review dates; a scoped
+refresh does not imply that every candidate was re-reviewed on October 9.
+
 For the full rows, use the [landscape ledger](landscape/README.md), its frozen
 snapshot [layer-verdicts-20260922.json](sota-convergence/layer-verdicts-20260922.json)
 or the offline comparison view (`docs/ecosystem/index.html#landscape`,

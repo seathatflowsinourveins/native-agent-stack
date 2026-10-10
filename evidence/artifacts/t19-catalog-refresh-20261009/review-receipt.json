@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "id": "t19-catalog-refresh-source-review-20261009",
+  "recorded_at_utc": "2026-10-09T19:58:34Z",
+  "updated_at_utc": "2026-10-09T20:16:03Z",
+  "engine_followup_observed_at_utc": "2026-10-09T21:58:05Z",
+  "ci_repair_local_modules": {
+    "observed_at_utc": "2026-10-09T21:59:03Z",
+    "evidence_class": "local_integration",
+    "command_pattern": "timeout 600 nice -n 10 ionice -c2 -n7 /usr/bin/python3 -m unittest discover -s tests -p MODULE.py -v",
+    "modules": [
+      {
+        "module": "test_ecosystem_manifest.py",
+        "tests": 82,
+        "exit_code": 0,
+        "returned_summary": "Ran82tests in38.322s; OK",
+        "stderr_sha256": "76c336390d309b3d0daffd695bb5c9acf3beb3cc8a996e4e20d296154f542361"
+      },
+      {
+        "module": "test_new_wsl_handbook.py",
+        "tests": 87,
+        "exit_code": 0,
+        "returned_summary": "Ran87tests in44.451s; OK",
+        "stderr_sha256": "83321d6171890b885d58e5058ab5863e21eaab97df88a0b140ca2dd84e888084"
+      },
+      {
+        "module": "test_new_wsl_profile.py",
+        "tests": 18,
+        "exit_code": 0,
+        "returned_summary": "Ran18tests in6.677s; OK",
+        "stderr_sha256": "b4d48ff5773e439f4bba7ec9418980e3f3976d7699adb9a6d24faf87ca6a0c77"
+      },
+      {
+        "module": "test_verdict_review_gate.py",
+        "tests": 167,
+        "exit_code": 0,
+        "returned_summary": "Ran167tests in19.075s; OK",
+        "stderr_sha256": "f7fa259db31465a9114934d84a367726b6414010c3969c823e3e136eab3737a5"
+      },
+      {
+        "module": "test_catalog_freshness_propose.py",
+        "tests": 86,
+        "exit_code": 0,
+        "returned_summary": "Ran86tests in81.193s; OK",
+        "stderr_sha256": "d6661d3a8ce81d334f8150aa043a640cc7d78d4f30d42348ad4acf8b917f340a"
+      }
+    ],
+    "total_tests": 440,
+    "scope": "Whole repository integration-test modules for actual937CI failure paths. No new upstream suite, provider/model or host acceptance. Exact stdout/stderr retained; FULL validation and final-head CI remain separate.",
+    "failed_registration_attempt_retained": {
+      "module": "test_catalog_freshness_propose.py",
+      "tests": 86,
+      "exit_code": 1,
+      "failures": 1,
+      "stderr_sha256": "fbe856eedf4a40ceb8803d638d28d92c674e7441a087a928382de8ec76c1db59",
+      "condition": "Changed registered source/generated files had stale evidence hashes",
+      "correction": "Register every owned changed/new source path, then rerun the entire module; final86-test run passed"
+    },
+    "command_scope": "Historical pre-rebase module runs under the then-applicable resource policy; MODULE.py names each listed whole module. New runs follow the corrected normal-execution rule."
+  },
+  "engine_source_supplement": {
+    "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+    "bytes": 9516,
+    "sha256": "66354261042b50afbe3751a2362eae85b79a39103264245fd6c3f98ede9457f9",
+    "registered_entries": 7,
+    "decision_union": {
+      "repositories": 875,
+      "references": 2087
+    },
+    "evidence_class": "source_review",
+    "scope": "LEAN brokerage entitlement, Lumibot4.6.11 candidate/current GPLv3 metadata, public vectorbt1.1.2/private PRO scope, and owner stale demotions. No installation, provider/broker/model request or strategy acceptance."
+  },
+  "ci_repair_analysis": {
+    "run": "37984266312",
+    "failed_head": "7524a3b438633617358eba471794428ff3cb44c7",
+    "merge_base": "3a4cc28840ba7e8a1a9474a989102a669955f243",
+    "complete_failed_job_logs_read": [
+      114002183614,
+      114002183631,
+      114002183648,
+      114002183728,
+      114002183745
+    ],
+    "introduced_conditions": [
+      "unsupported landscape disposition caused Explorer/downstream generator and validator failures",
+      "direct frozen-paired-field edits failed the verdict integrity gate",
+      "historical star-audit decision change invalidated retained aggregate counts",
+      "generated WSL handbook bytes were stale after source pointers changed"
+    ],
+    "corrections": [
+      "preserve frozen paired fields and register current adoption records separately",
+      "use native out_of_scope for current generic candidate scope",
+      "retain historical star-audit decision/count binding with explicit current Terms decision",
+      "native handbook --write and current receipt mirror refresh, preserving every historical observation"
+    ],
+    "reported_extra_failures_refuted": {
+      "test_new_wsl_client_config": "230 passed in the recorded run",
+      "test_research_dispatch_exact_queries": "25 passed; 2 explicit DDGS availability/runtime skips; no failed test"
+    },
+    "scope": "Native GitHub Actions logs and exact source/validator evidence; current local checks are separate from that earlier run and final-head CI."
+  },
+  "bounded_engine_completeness": {
+    "result": "No remaining material source/pin/licence/currency inconsistency in the bounded local review",
+    "corrections": [
+      "date PRO2026.9.5 advertisement to history and point to current2026.10.5 conditional product/access/licence card",
+      "date Lumibot4.5.91 licence conflict to history; metadata agreement at4.6.11 is current"
+    ],
+    "limits": "Read-only local source check against prior measured primary observations; no new runtime, tests or network reads in this critic pass."
+  },
+  "base_commit": "3a4cc28840ba7e8a1a9474a989102a669955f243",
+  "evidence_class": "source_review",
+  "scope": "Catalog projection, source identity and owner-routed adoption reconciliation. Native catalog checks establish consistency; retained runtime/fixture evidence keeps its original execution date and class. No new installation, installed-host acceptance, market/SEC acquisition, model request, strategy, broker or paper gate change.",
+  "artifacts": [
+    {
+      "path": "catalogs/us-equities/catalog-refresh-20261009.json",
+      "bytes": 17454,
+      "sha256": "6ecb9e52f048f6da912cec8ab70d1257865f72167e1b7de0598b2dce9d0be4d0"
+    },
+    {
+      "path": "catalogs/us-equities/catalog-refresh-20261009.md",
+      "bytes": 16554,
+      "sha256": "347379264704906340cc893860a471719f94faf78ae7c532a0b9adbe845ad174"
+    }
+  ],
+  "historical_prepublication_commands": [
+    {
+      "command": "/usr/bin/python3 scripts/catalog_decisions.py --write --supplement catalogs/us-equities/catalog-refresh-20261009.json#/entries",
+      "exit_code": 0,
+      "returned_counts": {
+        "repositories": 875,
+        "public_star_repositories": 357,
+        "beyond_public_stars": 518,
+        "references": 2080
+      },
+      "stdout_sha256": "bb9679cdbdf04696e6d318f41020032321a3824b6c9c0570d18c82070a6ff054",
+      "scope": "Supported offline registration; exact output retained. No upstream source or native runtime execution was rerun."
+    },
+    {
+      "command": "/usr/bin/python3 scripts/component_matrix.py --write",
+      "exit_code": 0,
+      "returned_stdout": "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}\n",
+      "stdout_sha256": "4cd2e50526b588cf998c7136436856094ee43628f56bf7db7f397105a40df225"
+    },
+    {
+      "command": "/usr/bin/python3 scripts/new_host_grand_list.py --write",
+      "exit_code": 0,
+      "returned_stdout": "{\"status\": \"written\", \"layers\": 32, \"winners\": 65}\n",
+      "stdout_sha256": "41e2c1752d77b2596cf8f27ca11349437ec5ffcfeefd315d41e62d6f60c2aaa7",
+      "scope": "Initial local derived run before the direct frozen-layer edits were withdrawn. This 65-pair output is historical preparation, not the final ledger projection or a new paired verdict."
+    },
+    {
+      "commands": [
+        "/usr/bin/python3 scripts/catalog_decisions.py --check",
+        "/usr/bin/python3 scripts/component_matrix.py --check",
+        "/usr/bin/python3 scripts/new_host_grand_list.py --check",
+        "git diff --check"
+      ],
+      "observed_at_utc": "2026-10-09T19:57:20Z",
+      "exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "catalog_result": "875 identities / 2080 typed pointers",
+      "matrix_returned_stdout": "{\"rows\": 32, \"status\": \"checked\"}\n",
+      "grand_returned_stdout": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 65}\n",
+      "stderr_bytes": 0
+    }
+  ],
+  "final_contract_checks": {
+    "observed_at_utc": "2026-10-09T20:16:03Z",
+    "landscape_command": "/usr/bin/python3 scripts/landscape.py",
+    "landscape_exit_code": 0,
+    "landscape_scope": "32 layers, native disposition schema and reference integrity; no runtime/ranking acceptance",
+    "frozen_wave_command": "/usr/bin/python3 tools/sota-convergence/build_verdicts.py --check",
+    "frozen_wave_exit_code": 0,
+    "frozen_wave": "20260922; original paired verdict fields and wave bytes retained",
+    "gate_command": "timeout 600 nice -n 10 ionice -c2 -n7 /usr/bin/python3 scripts/verdict_review_gate.py --base 3a4cc28840ba7e8a1a9474a989102a669955f243",
+    "gate_exit_code": 0,
+    "gate_returned_stdout": "1 verdict path(s) changed; the repository validators ran\nverdict-review-gate: passed (0 changed row(s), 0 violation(s))\n",
+    "gate_stdout_sha256": "ff3e42acebf0c0ccccb63cb16a5a9b3f3e6d7e79fe82a68f14cfe2998e1c0c10",
+    "gate_stderr_bytes": 0,
+    "grand_write_exit_code": 0,
+    "grand_returned_stdout": "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}\n",
+    "grand_stdout_sha256": "f161f06c41a6dffe6e66c88c61f6e8de9ac981c52fc179231fb0df66ccb30b5a",
+    "scope": "Current adoption conditions are held/excluded in the registered source supplement and catalog cards. The 66-pair projection retains the dated paired layer verdicts and does not lift DVC's hold. No new native wave or family return is claimed."
+  },
+  "failed_conditions_retained": [
+    {
+      "condition": "Initial draft changed two frozen September v2 rows and used an unsupported landscape disposition",
+      "native_gate_exit_code": 1,
+      "native_gate_stdout_sha256": "244e24adf974d99985bb22d80f0661b6917a8b8dfefaf1fe56f387168a09adbf",
+      "observed_errors": [
+        "alternative.disposition is unknown",
+        "rows name wave 20260922 but differ from its frozen entries",
+        "a recorded verdict needs at least one winner"
+      ],
+      "correction": "Direct frozen-field edits withdrawn; current source/adoption decisions remain registered separately. Current vectorbt candidate scope uses native out_of_scope; landscape/build/gate now pass. A future paired-verdict change requires genuine sealed returns and a new wave.",
+      "usage": "Local catalog checks only; no model/provider usage. Failed commands and their returned logs remain retained privately; the initial draft commit preserves the attempted source state."
+    },
+    {
+      "condition": "A guessed scripts/landscape.py --check invocation returned argparse exit2",
+      "correction": "Use the supported no-flag scripts/landscape.py entrypoint; actual corrected invocation returned0"
+    },
+    {
+      "kind": "exact-head dispatched CI additional citation failures",
+      "run": 38000961680,
+      "head": "1544df77fc3ae68cc8f2335fa6bd28211fe38a67",
+      "failed_subtests": 5,
+      "cause": "Trading field insertion shifted authored foundation architecture pin_source spans; native expected_ranges computed the new spans.",
+      "log_sha256": "06dce3a98b108650ea84f26c7ae66a9d8dcbef3302f692961bfa4ab574f2390d",
+      "scope": "All other seven shards, verdict gate and both secret scans passed; this is not all-green CI."
+    }
+  ],
+  "prepublication_full_validation": {
+    "command": "timeout 600 nice -n 10 ionice -c2 -n7 /usr/bin/python3 scripts/validate.py",
+    "mode": "FULL; never --failed",
+    "started_at_utc": "2026-10-09T19:53:03Z",
+    "completion_observed_at_utc": "2026-10-09T19:54:21Z",
+    "exit_code": 0,
+    "returned_stdout": "{\"components\": 70, \"hashed_files\": 11279, \"profiles\": 4, \"receipts\": 239, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+    "stdout_bytes": 162,
+    "stdout_sha256": "05179c49963ac0f8870cce074bd0390ec9b7b0deb12a73c58c860ede0fd3a8a2",
+    "stderr_bytes": 0,
+    "scope": "Actual check of then-current registered content, before subsequent locator/snapshot notes and this receipt. Final FULL validation after receipt registration is required before commit and retained in the PR/lane handoff."
+  },
+  "independent_completeness_critic": {
+    "role": "Separate read-only critic",
+    "method_limit": "The critic reviewed source/identity/semantic scope and did not run the native verdict/schema validators. Subsequent coordinator checks found and corrected the formal recording defects recorded above; source facts remain unchanged.",
+    "verdict": "No unresolved material blockers or additional missed candidate class/modality within the bounded T19 scope",
+    "findings": [
+      {
+        "finding": "Shortened atila screener source URL returned HTTP 404",
+        "disposition": "Corrected to src/tradingview_mcp/core/services/screener_service.py at the same full b04513ec pin; independently re-fetched and parent gh contents returned rc0, 53664 bytes, Git blob db669c913343f3ad392a6007ce96d66829359b0f",
+        "verified_claim": "The pinned source imports tradingview_screener.Query"
+      },
+      {
+        "finding": "Generated new-host Edgar pin/latest5.58 and skfolio latest1.3 are inherited dated inputs",
+        "disposition": "Explicit dated-field/host-receipt caveat added in supplement grand_views.derived_snapshot_limits and Markdown GRAND views; current runtime/recipe/latest source scopes stay separate",
+        "next_sweep": "Canonical pin/latest projection reconciliation through the maintained native producer; no frozen-verdict rewrite or new host acceptance inferred"
+      }
+    ],
+    "artifact_observation": "Actual full runtime/recipe lock, manifest and final acceptance receipt hashes match the supplement. Current lock has Edgar5.61.1/skfolio1.7 and no DVC/diskcache. Retained sanitized final24 stdout contains 24 unique PASS|0 results and matching actual f451 hashes before/after, exit0 and original October8 times; no new native acceptance was performed.",
+    "timed_primary_reads": {
+      "tool": "ctx_fetch_and_index",
+      "date_utc": "2026-10-09",
+      "request_window_started_utc": "2026-10-09T19:56:29.629Z",
+      "all_eight_tool_results": "success; isError=false",
+      "completion_times_utc": {
+        "vectorbt_LICENSE_f0d2afba": "19:56:31.393Z",
+        "vectorbt_pyproject_f0d2afba": "19:56:31.795Z",
+        "atila_pyproject_b04513ec": "19:56:32.237Z",
+        "atila_corrected_src_screener_b04513ec": "19:56:32.655Z",
+        "tradesdontlie_LICENSE_c05b8f57": "19:56:33.083Z",
+        "TradingView_official_Terms": "19:56:33.657Z",
+        "skfolio_v171_release": "19:56:34.707Z",
+        "skfolio_v180_release": "19:56:35.539Z"
+      },
+      "limit": "These bracket tool calls, not HTTP-header dates. The tool did not expose raw response hashes or HTTP success codes; none is inferred from tool success. Original first-reader response hashes are separately attributed in the source supplement."
+    },
+    "provenance_limits": "CC adoption authority and LEAN build/source mappings remain attributed declarations. The critic did not reproduce owner dispatch, source-to-image equivalence or engine parity."
+  },
+  "retained_runtime_acceptance": {
+    "receipt": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+    "receipt_sha256": "cc32a1462171763446809fb675bd946f3b45875c797bea5049d1a925d4809086",
+    "evidence_class": "local_integration",
+    "run": "2026-10-08T17:48:39Z-17:49:09Z; 24/24 PASS rc0 with actual same-stream lock before/after",
+    "scope": "Reuse of existing evidence, not a new T19 model/provider/runtime execution"
+  },
+  "next_sweep": [
+    "DVC safe dependency closure and full historical equity snapshot contract",
+    "Upstream skfolio risk/portfolio acceptance for the intended use, including newly published fixes",
+    "Canonical generated pin/latest projection scopes",
+    "LEAN source/image provenance and retained-oracle parity"
+  ],
+  "limitations": [
+    "No fresh installed-host acceptance, new upstream-suite pass, broker/paper execution or strategy qualification.",
+    "Prospective 28-case/dev runtime checks and exact migration remain separate.",
+    "Historical receipts, failed conditions and frozen September verdict bytes remain preserved.",
+    "CC reads and lands the draft after #926; this unit does not rebase or merge it."
+  ],
+  "cc_review_fix": {
+    "observed_at_utc": "2026-10-09T23:52:59Z",
+    "old_remote_head": "1544df77fc3ae68cc8f2335fa6bd28211fe38a67",
+    "rebased_base": "a88c9865b91b0fb55553f3ac65c7713090a94823",
+    "replayed_parent": "f4360ea49f8b7260bf175b3c5f1e2edbd2701991",
+    "conflicts": [
+      "catalogs/us-equities/decision-index.json",
+      "manifests/evidence.json"
+    ],
+    "resolution": "Regenerated with catalog_decisions.py and documented host_receipts.register_file from current-main records, without hand-merging generated arrays.",
+    "historical_candidate_rows_preserved": 20,
+    "historical_card_rationales_preserved": 7,
+    "indexed_current_decision_records": 13,
+    "watch_mapping": "watch in engine source records maps to out_of_scope in the generic landscape enum; current adoption scope is distinct from maintenance or abandonment.",
+    "lean_correction": "The study engine is the native source build at 80e7843f; Docker 18176 is an unproven container candidate.",
+    "native_union_counts": {
+      "repositories": 878,
+      "public_star_repositories": 357,
+      "beyond_public_stars": 521,
+      "references": 2099
+    },
+    "pointer_test": {
+      "command": "/usr/bin/python3 -m unittest -v tests.test_catalog_decisions",
+      "red_exit_code": 1,
+      "red_tests": 15,
+      "red_failures": 13,
+      "red_errors": 0,
+      "red_stderr_sha256": "cfa97096f520b3c7d45acf4ce309e4d27eaa49731f6659ee49abeb64c62a7213",
+      "green_exit_code": 0,
+      "green_tests": 15,
+      "green_stderr_sha256": "b3fce28f9d388c2304998c2571fcd45124e3b887bfb88aefc77b77432a3d3bb1",
+      "source": "Existing scripts.catalog_decisions.pointer/load/identity; no new parser implementation."
+    },
+    "architecture_citations": {
+      "fields_only": 5,
+      "winner_values_and_pins_changed": 0,
+      "native_expected_ranges": "tests.test_architecture_pin_source.expected_ranges",
+      "whole_module_tests": 4,
+      "exit_code": 0,
+      "stderr_sha256": "0932d2518d6ea70de3f75b7a022de4282f1f6fb9269e982f429fb638e90a0161"
+    },
+    "remaining_checks": "Final registered-content FULL validation, cached whitespace check and exact lease push; final-head CI/CC micro/scripted readiness and landing remain separate.",
+    "affected_whole_modules": [
+      {
+        "module": "test_catalogs",
+        "command": "/usr/bin/python3 -m unittest -v tests.test_catalogs",
+        "tests": 47,
+        "elapsed_seconds": 0.401,
+        "exit_code": 0,
+        "stderr_sha256": "b9f58799c3a9251ebd4d2fdc45714b16e7faaed00a78c0c8ce2c2de15563c9d0"
+      },
+      {
+        "module": "test_new_wsl_handbook",
+        "command": "/usr/bin/python3 -m unittest -v tests.test_new_wsl_handbook",
+        "tests": 87,
+        "elapsed_seconds": 60.167,
+        "exit_code": 0,
+        "stderr_sha256": "4b0b75ee7288cc5a85f2527e9bfe98d99854be72739957f697526213af0fa36c"
+      },
+      {
+        "module": "test_new_wsl_profile",
+        "command": "/usr/bin/python3 -m unittest -v tests.test_new_wsl_profile",
+        "tests": 18,
+        "elapsed_seconds": 11.675,
+        "exit_code": 0,
+        "stderr_sha256": "55662ef32910d25efc928f4e5d516b40556ad6626e7a46736383a75b1c9f5c13"
+      },
+      {
+        "module": "test_catalog_freshness_propose",
+        "command": "/usr/bin/python3 -m unittest -v tests.test_catalog_freshness_propose",
+        "tests": 86,
+        "elapsed_seconds": 114.14,
+        "exit_code": 0,
+        "stderr_sha256": "9ab76e72470adf3c148f9461697cddeda03266929aca06d833362e7f11d22653"
+      },
+      {
+        "module": "test_verdict_review_gate",
+        "command": "/usr/bin/python3 -m unittest -v tests.test_verdict_review_gate",
+        "tests": 167,
+        "elapsed_seconds": 29.828,
+        "exit_code": 0,
+        "stderr_sha256": "d750ebcfdf8107e90ca0a8313397e4c2d6547cee6d091bee13e1ccd3948daaa2"
+      },
+      {
+        "module": "test_ecosystem_manifest",
+        "command": "/usr/bin/python3 -m unittest -v tests.test_ecosystem_manifest",
+        "tests": 82,
+        "elapsed_seconds": 52.602,
+        "exit_code": 0,
+        "stderr_sha256": "5f6668ea4923cf88efa4c6862d5a959e27ad62b9d71907024c2da677a52a20b7"
+      }
+    ],
+    "affected_whole_module_tests": 487,
+    "total_local_tests_including_pointer_and_architecture": 506,
+    "verdict_gate": {
+      "command": "/usr/bin/python3 scripts/verdict_review_gate.py --base a88c9865b91b0fb55553f3ac65c7713090a94823",
+      "exit_code": 0,
+      "paired_rows_changed": 0
+    },
+    "full_validation": {
+      "command": "/usr/bin/python3 scripts/validate.py",
+      "mode": "FULL; never --failed",
+      "exit_code": 0,
+      "components": 70,
+      "hashed_files": 11299,
+      "profiles": 4,
+      "receipts": 239,
+      "stdout_sha256": "7d3c0ed7aaaf2c255fcd158bfd5432f66e5336da2c8fa1a5992eeada9bd9ceb8",
+      "stderr_bytes": 0,
+      "scope": "Current rebased implementation before recording this final check summary; the same FULL checker is repeated after final registration before commit."
+    },
+    "independent_completeness": {
+      "scope": "Immutable base/head versus current authored changes; no fresh tests or runtime acceptance from the critic",
+      "result": "Historical preservation,13exact entry targets,5citation-only changes and source/runtime boundaries confirmed. Residual LEAN phrase and new-prose spacing corrected; preexisting spacing left with original scope."
+    }
+  }
+}
