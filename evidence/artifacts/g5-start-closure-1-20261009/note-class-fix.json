@@ -908,15 +908,23 @@
     "publication": "HELD"
   },
   "j8_current_receipt": {
-    "bytes": 19305,
+    "bytes": 19651,
     "path": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json",
-    "sha256": "c9d0dffd999e29bb465b59d3e57a69782c14608739b607846b5a48a077217351"
+    "sha256": "894e5c190c6cb13745cc02555a83ab1b097068336961cdb056d5f354f165faf1",
+    "serialization_rebinding": {
+      "previous_binding": {
+        "bytes": 19305,
+        "sha256": "c9d0dffd999e29bb465b59d3e57a69782c14608739b607846b5a48a077217351"
+      },
+      "evidence": "evidence/artifacts/g5-start-closure-1-20261009/gitleaks-n1-fix.json",
+      "new_qualification_run": false
+    }
   },
   "kind": "g5-native-note-class-sync",
   "origin_map_sha256": "50a577cb25fc0650355c3ddf9b709b18d0fadb5a426415b6f497c1e78fe83e7a",
   "parent": "b5c215ac53ed1705a078d2832e4458627f481025",
   "population_receipt": {
-    "bytes": 317521,
+    "bytes": 317934,
     "counts": {
       "changed": 0,
       "matches_503c4701_population": 414,
@@ -927,7 +935,14 @@
     "new_redraw_seed": null,
     "path": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
     "redraw_required": false,
-    "sha256": "8598ca152de68c7d6aef20278afaf04bfc104c0e43573fe4b2fada996433b6fe"
+    "sha256": "7acab851481e4a750fc5844467acb3212f4e15bf4911e6f1ae5f7ea1dee46d44",
+    "serialization_rebinding": {
+      "previous_sha256": "8598ca152de68c7d6aef20278afaf04bfc104c0e43573fe4b2fada996433b6fe",
+      "previous_bytes": 317521,
+      "parsed_receipt_values_unchanged": true,
+      "native_stratum_safe_separators": true,
+      "evidence": "evidence/artifacts/g5-start-closure-1-20261009/gitleaks-n1-fix.json"
+    }
   },
   "profile": "start-closure/1",
   "qualification": {

@@ -18702,8 +18702,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "2d4d95d20879dd8ada8fc80732beb8a2506bc001561421b17361c52d5a7fd610",
-      "bytes": 253822
+      "sha256": "c13c3644af4aef652a34f878d50f2083fea59288ed9d1a36e8e85ddf37f9ab4e",
+      "bytes": 254941
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -21612,13 +21612,13 @@
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-fix.json",
-      "sha256": "4446cc7369c5154d715ff80b23552eaeb1792e48d5504efecde0ac17f9b3e4df",
-      "bytes": 11925
+      "sha256": "4c41684d908e24740eb204b10a3ef8b25fa79b9c46b1434027a4b8ffb4788ace",
+      "bytes": 12269
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-population-receipt.json",
-      "sha256": "90200fa69a2f23c8a73e01b7ceb2875df05216b93ab18dc2aabd37a83b1efbde",
-      "bytes": 249297
+      "sha256": "16ab3fe58f8b685c7d57ab1e14f8d97d322e301540017a6f3bba19591f6814d0",
+      "bytes": 250123
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-suite-comparison.json",
@@ -21632,13 +21632,13 @@
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/gitleaks-n1-fix.json",
-      "sha256": "eedd89b1f5c591dc043ac0b2efa3759f91b486f2b602fe9f75f0a6eabd7d9eb7",
-      "bytes": 10175
+      "sha256": "ebe6f74176839b1e27bfb243942a16cdb995ba7e312cee3741e8de10380121ad",
+      "bytes": 19397
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json",
-      "sha256": "c9d0dffd999e29bb465b59d3e57a69782c14608739b607846b5a48a077217351",
-      "bytes": 19305
+      "sha256": "894e5c190c6cb13745cc02555a83ab1b097068336961cdb056d5f354f165faf1",
+      "bytes": 19651
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/micro-fix-3ed3f6ff.json",
@@ -21652,13 +21652,13 @@
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/note-class-fix.json",
-      "sha256": "65d924884fd8d1ece499693bbfa28bf895ca01c937c1c726ec443ad31794fbad",
-      "bytes": 29462
+      "sha256": "4e93bf7da4f8e68a2c1335e628c886a28a84b7503fcb3c8223055a0b5e2bec6a",
+      "bytes": 30120
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
-      "sha256": "8598ca152de68c7d6aef20278afaf04bfc104c0e43573fe4b2fada996433b6fe",
-      "bytes": 317521
+      "sha256": "7acab851481e4a750fc5844467acb3212f4e15bf4911e6f1ae5f7ea1dee46d44",
+      "bytes": 317934
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/openhands-slot-regression/AGENTS-ba3f1651.txt",
@@ -60332,8 +60332,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "fb17e91c6d0ced490a7d8c90d209333d8b2aeeb276901d0d2ab38da49abcf9ca",
-      "bytes": 66184
+      "sha256": "2080d7409aedca224c03acf0f4ae544f194fc1cd6659be9fc837f14b9526e626",
+      "bytes": 71166
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",

@@ -324,6 +324,81 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                                                indent=None if compact else 2) + "\n")
                     self.assertEqual(self._scan(target), [], "reviewed population digests are not credentials")
 
+    def test_population_fragment_boundary_rejects_partial_matches_and_accepts_safe_separators(self):
+        # gitleaks v8.30.1 sources/file.go:21,166-246 and sources/common.go:58-129:
+        # a 100,000-byte read peeks up to 25,000 more bytes. Put the digest's
+        # last byte in the next fragment, matching the hosted findings.
+        # Retain the complete-digest allowlist and use the upstream reader's
+        # double-newline boundary instead of suppressing truncated values.
+        fragment_end = 125_001
+        for name in ("confirmed-four", "note-class"):
+            for field in ("before_population_key_sha256", "after_population_key_sha256"):
+                with self.subTest(receipt=name, field=field), tempfile.TemporaryDirectory() as tmp:
+                    target = Path(tmp)
+                    path = target / f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                    path.parent.mkdir(parents=True)
+                    prefix = '{"padding":"'
+                    middle = f'","{field}":"'
+                    padding = "x" * (fragment_end - len(prefix + middle + HEX64))
+                    content = prefix + padding + middle + HEX64 + '"}\n'
+                    path.write_text(content)
+                    self.assertIn("generic-api-key", {f["RuleID"] for f in self._scan(target)},
+                                  "an incomplete native match must not gain a broader digest exception")
+                    path.write_text(json.dumps(json.loads(content), indent=2,
+                                               separators=(",\n", ": ")) + "\n")
+                    self.assertEqual(self._scan(target), [],
+                                     "native safe separators preserve complete reviewed population digests")
+
+    def test_population_receipts_scan_clean_with_native_file_fragments(self):
+        # Byte-for-byte public receipt fixtures exercise the serialization
+        # that the hosted working-tree scanner actually sees. The PR-range
+        # history check alone missed this failure because its fragments differ.
+        for name in ("confirmed-four", "note-class"):
+            with self.subTest(receipt=name), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                relative = f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                path = target / relative
+                path.parent.mkdir(parents=True)
+                shutil.copyfile(ROOT / relative, path)
+                self.assertEqual(self._scan(target), [],
+                                 "the actual population receipt must scan clean in native file mode")
+
+    def test_population_fragment_boundary_keeps_other_contexts_detectable(self):
+        cases = [
+            ("unreviewed", "after_population_key_sha256", HEX64, "generic-api-key"),
+            ("note-class", "api_key", HEX64, "generic-api-key"),
+            ("note-class", "after_population_key_sha256", HEX64.upper(), "generic-api-key"),
+            ("note-class", "after_population_key_sha256", HEX64[:-1], "generic-api-key"),
+            ("note-class", "after_population_key_sha256", HEX64 + "a", "generic-api-key"),
+            ("note-class", "after_population_key_sha256", GH_PAT_SHAPED_VALUE, "github-pat"),
+        ]
+        for name, field, value, rule in cases:
+            with self.subTest(receipt=name, field=field, length=len(value), rule=rule), \
+                    tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                path = target / f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                path.parent.mkdir(parents=True)
+                prefix = '{"padding":"'
+                middle = f'","{field}":"'
+                # The PAT rule needs its terminating delimiter in the
+                # fragment; keep that delimiter at the same boundary.
+                end = 125_000 if rule == "github-pat" else 125_001
+                padding = "x" * (end - len(prefix + middle + value))
+                path.write_text(prefix + padding + middle + value + '"}\n')
+                self.assertIn(rule, {f["RuleID"] for f in self._scan(target)})
+
+    def test_population_fragment_boundary_same_line_api_key_still_fires(self):
+        for name in ("confirmed-four", "note-class"):
+            with self.subTest(receipt=name), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                path = target / f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                path.parent.mkdir(parents=True)
+                prefix = '{"padding":"'
+                middle = '","after_population_key_sha256":"'
+                padding = "x" * (125_001 - len(prefix + middle + HEX64))
+                path.write_text(prefix + padding + middle + HEX64 + '","api_key":"' + HEX64 + '"}\n')
+                self.assertIn("api_key", _finding_fields(self._scan(target)))
+
     def test_population_receipt_same_line_api_key_still_fires(self):
         for name in ("confirmed-four", "note-class"):
             with self.subTest(receipt=name), tempfile.TemporaryDirectory() as tmp:

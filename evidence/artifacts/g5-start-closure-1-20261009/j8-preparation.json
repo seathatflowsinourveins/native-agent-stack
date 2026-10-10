@@ -371,13 +371,20 @@
     "write_stdout_sha256": "03f52ece73e324e0e6e867653cfa798b9c69894691c12d76e9c78bd094dc58ad"
   },
   "population_receipt": {
-    "bytes": 317521,
+    "bytes": 317934,
     "changed": 0,
     "path": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
     "redraw_required": false,
-    "sha256": "8598ca152de68c7d6aef20278afaf04bfc104c0e43573fe4b2fada996433b6fe",
+    "sha256": "7acab851481e4a750fc5844467acb3212f4e15bf4911e6f1ae5f7ea1dee46d44",
     "strata": 414,
-    "unchanged": 414
+    "unchanged": 414,
+    "serialization_rebinding": {
+      "previous_sha256": "8598ca152de68c7d6aef20278afaf04bfc104c0e43573fe4b2fada996433b6fe",
+      "previous_bytes": 317521,
+      "parsed_receipt_values_unchanged": true,
+      "native_stratum_safe_separators": true,
+      "evidence": "evidence/artifacts/g5-start-closure-1-20261009/gitleaks-n1-fix.json"
+    }
   },
   "prepared_observed_utc": "2026-10-09T19:13:24.308345+00:00",
   "read_boundary": "Current native synthetic controls and archive qualification pass. They establish neither a new model verdict nor G5 MET, readiness, landing or publication. Historical records below retain their original inputs and commands.",

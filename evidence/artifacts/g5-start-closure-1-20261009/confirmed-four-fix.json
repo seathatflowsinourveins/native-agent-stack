@@ -59,7 +59,7 @@
   },
   "population_hash_table": {
     "receipt": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-population-receipt.json",
-    "sha256": "90200fa69a2f23c8a73e01b7ceb2875df05216b93ab18dc2aabd37a83b1efbde",
+    "sha256": "16ab3fe58f8b685c7d57ab1e14f8d97d322e301540017a6f3bba19591f6814d0",
     "strata": 414,
     "unchanged": 414,
     "changed": 0,
@@ -70,7 +70,14 @@
     "seed_replayed_only_for_key_comparison": 209912885797751507,
     "redraw_required": false,
     "new_redraw_seed": null,
-    "read_boundary": "CC population rule retains existing sampled draws/reads. Corrected row hashes and J8/code delta still require designated reads; measurement establishes no new zero-defect verdict."
+    "read_boundary": "CC population rule retains existing sampled draws/reads. Corrected row hashes and J8/code delta still require designated reads; measurement establishes no new zero-defect verdict.",
+    "serialization_rebinding": {
+      "previous_sha256": "90200fa69a2f23c8a73e01b7ceb2875df05216b93ab18dc2aabd37a83b1efbde",
+      "previous_bytes": null,
+      "parsed_receipt_values_unchanged": true,
+      "native_stratum_safe_separators": true,
+      "evidence": "evidence/artifacts/g5-start-closure-1-20261009/gitleaks-n1-fix.json"
+    }
   },
   "archive_member_integrity": {
     "receipt": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-archive-delta.json",

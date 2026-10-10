@@ -165,5 +165,165 @@
     "grants_count": "Take the next available count only at the separately cued landing rebase; no grants-count edit in this fix.",
     "g5": "NOT_MET",
     "archive": "UNPUBLISHED"
+  },
+  "fragment_boundary_followup": {
+    "observed_utc": "2026-10-10T05:29:32Z",
+    "kind": "g5-native-file-fragment-serialization-fix",
+    "evidence_class": "Local integration checks and synthetic fixtures against installed upstream gitleaks; independent JSON equality and hosted job observation",
+    "north_star_action": "Restore reproducible acceptance of G5 catalog evidence supporting US-equities research and historical simulation",
+    "historical_n1_record": "All earlier fields describe the original N1 fix and its observed inputs. This follow-up corrects its untested native file-fragment boundary; it does not promote the earlier PR-range scan into working-tree acceptance.",
+    "hosted_failure": {
+      "run_id": 38019766374,
+      "job_id": 114118283001,
+      "step": "Scan working tree for secrets",
+      "findings": 2,
+      "history_step": "SUCCESS",
+      "module_step": "SUCCESS",
+      "log_sanitization": "Only counts, rule IDs, files and step metadata were retained; no finding, secret, match or full finding line was printed or retained. The hosted log reports the count without per-finding locations.",
+      "reproduced_metadata": [
+        {
+          "file": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-population-receipt.json",
+          "rule_id": "generic-api-key",
+          "line": 1,
+          "field": "after_population_key_sha256"
+        },
+        {
+          "file": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
+          "rule_id": "generic-api-key",
+          "line": 2617,
+          "field": "after_population_key_sha256"
+        }
+      ]
+    },
+    "upstream": {
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "release": "v8.30.1",
+      "revision": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "installed_version": "8.30.1",
+      "primary_files": [
+        "sources/file.go:21,166-246",
+        "sources/common.go:58-129",
+        "config/allowlist.go:148-157",
+        "detect/detect.go"
+      ],
+      "settled_behavior": "The native file reader starts with 100,000 bytes and seeks a double-newline boundary while peeking up to 25,000 more. Without that boundary it can split a digest before its terminating JSON quote. The exact complete-digest allowlist must not suppress an incomplete match."
+    },
+    "decision": {
+      "action": "Use the pinned upstream reader's supported double-newline boundaries between stratum objects",
+      "config_changed": false,
+      "population_values_changed": false,
+      "new_sampler_or_model_run": false,
+      "redraw_required": false,
+      "qualification_reused_only_for_identical_parsed_inputs": true,
+      "registration_rows_added": 0,
+      "historical_micro_fix_bindings": "The earlier micro-fix receipt retains its original observed file hashes. Current population and J8 byte bindings are explicitly rebound, preserving previous bindings alongside them."
+    },
+    "serialization": [
+      {
+        "file": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-population-receipt.json",
+        "previous_bytes": 249297,
+        "current_bytes": 250123,
+        "previous_sha256": "90200fa69a2f23c8a73e01b7ceb2875df05216b93ab18dc2aabd37a83b1efbde",
+        "current_sha256": "16ab3fe58f8b685c7d57ab1e14f8d97d322e301540017a6f3bba19591f6814d0",
+        "safe_separators": 413,
+        "largest_region_between_separators_bytes": 1543,
+        "parsed_json_equal": true,
+        "strata": 414
+      },
+      {
+        "file": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
+        "previous_bytes": 317521,
+        "current_bytes": 317934,
+        "previous_sha256": "8598ca152de68c7d6aef20278afaf04bfc104c0e43573fe4b2fada996433b6fe",
+        "current_sha256": "7acab851481e4a750fc5844467acb3212f4e15bf4911e6f1ae5f7ea1dee46d44",
+        "safe_separators": 413,
+        "largest_region_between_separators_bytes": 2027,
+        "parsed_json_equal": true,
+        "strata": 414
+      }
+    ],
+    "checks": {
+      "actual_receipt_regression_before_fix": {
+        "command": "GITLEAKS_TESTS_REQUIRED=1 python3 -m unittest -v tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests.test_population_receipts_scan_clean_with_native_file_fragments tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests.test_population_fragment_boundary_rejects_partial_matches_and_accepts_safe_separators tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests.test_population_fragment_boundary_keeps_other_contexts_detectable tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests.test_population_fragment_boundary_same_line_api_key_still_fires",
+        "observed_in_four_test_regression_group": true,
+        "exit_code": 1,
+        "failures": 2,
+        "failing_paths": "Both actual population receipts"
+      },
+      "four_new_regressions_after_fix": {
+        "exit_code": 0,
+        "tests": 4,
+        "skipped": 0,
+        "actual_summary": "Ran 4 tests in 12.172s; OK."
+      },
+      "original_symptom_after_fix": {
+        "scope": "Temporary native fixtures containing only the two public population receipts",
+        "command": "gitleaks dir . --config <repository>/.gitleaks.toml --redact --no-banner --log-level error --report-format json --report-path -",
+        "exit_code": 0,
+        "findings": 0
+      },
+      "full_gitleaks_module": {
+        "command": "GITLEAKS_TESTS_REQUIRED=1 GITLEAKS_TEST_RANGE=15d82bcc8871206476dc8c4c7bf45d347e74b2b7..HEAD python3 -m unittest -v tests.test_gitleaks_config",
+        "exit_code": 0,
+        "tests": 46,
+        "skipped": 0,
+        "actual_summary": "Ran 46 tests in 47.092s; OK."
+      },
+      "real_history_scope": "Only the actual merge-base..HEAD PR range; no full-history or --all scan was run locally",
+      "final_registered_full_validation": "Required after current-byte registration, before the one forward commit; returned output is posted in the lane status/questions with the final head",
+      "final_committed_pr_range": "Required after the one forward commit; command and actual returned metadata are posted with the final head"
+    },
+    "failed_attempts": [
+      {
+        "attempt": "Direct job-log API fetch",
+        "exit_code": 1,
+        "correction": "Native gh run view with the exact job and --log returned 0; only sanitized metadata was exposed"
+      },
+      {
+        "attempt": "Initial synthetic boundary controls",
+        "exit_code": 1,
+        "failures": 5,
+        "correction": "Four failures reproduced the digest split. The PAT control also lacked the delimiter required by that upstream rule; its complete delimiter was placed inside the fragment before using it as a detection oracle"
+      },
+      {
+        "attempt": "Optional closing-quote allowlist candidate",
+        "exit_code": 1,
+        "tests": 45,
+        "failures": 5,
+        "correction": "Rejected: it still left the four 64-character boundary fixtures red and incorrectly suppressed the 65-character control. Restored .gitleaks.toml byte-for-byte before selecting safe receipt separators"
+      },
+      {
+        "attempt": "Corrected red regression group before receipt serialization",
+        "exit_code": 1,
+        "tests": 4,
+        "failures": 2,
+        "actual_summary": "Ran 4 tests in 11.177s; FAILED (failures=2). Both actual receipt paths failed; all synthetic boundary and detection controls passed"
+      },
+      {
+        "attempt": "First final FULL validation",
+        "command": "python3 scripts/validate.py",
+        "result": "Context-mode carrier timed out after 55,000 milliseconds before returning a result; no validation pass or validation failure was inferred",
+        "correction": "Rerun the same FULL command with a larger carrier timeout and short coordinator yields; never use --failed"
+      }
+    ],
+    "completeness_critic": {
+      "missed_modality": "The original N1 acceptance covered git-diff fragments and small file fixtures, leaving large native file-fragment boundaries untested",
+      "candidate_classes_checked": "Pinned maintainer-native allowlist configuration, native safe-boundary serialization, and existing hosted betterleaks result. A broader allowlist was rejected by a reproduced negative control; no new scanner or runtime was adopted",
+      "remaining_boundaries": "Hosted acceptance on the new head, co-op and CC micros, inherited shard-5 failure repair, separately cued landing and grants count remain pending",
+      "next_sweep_input": "Secret-scan changes need both bounded PR history and the native file-fragment fixture relevant to the changed public evidence; preserve negative controls at the same boundary",
+      "anti_pattern_log": "docs/harness-defaults.md#anti-pattern-log"
+    },
+    "usage": {
+      "new_evaluation_provider_calls": 0,
+      "new_evaluation_model_runs": 0,
+      "provider_tokens": null,
+      "coordinator_usage": "Unknown; no aggregate token or efficiency claim"
+    },
+    "gates": {
+      "g5": "NOT_MET",
+      "archive": "UNPUBLISHED",
+      "landing_owner": "CC",
+      "landing_position": "Last in the grants count order; no grants count or release transition in this fix"
+    }
   }
 }
