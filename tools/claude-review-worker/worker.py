@@ -2174,8 +2174,15 @@ class Worker:
                 self.log(f"{label}: {part} not posted ({error})")
             save()
 
+        if post.get("status") in self.UNSENT or post.get("comment") in self.UNSENT:
+            # Saved before any POST: until a head read after posting settles the outcome, the attempt has open work
+            # (publish_pending finds it even when both parts are posted and the head is no longer listed).
+            post["verify"] = "pending"
+            save()
         if post.get("status") in self.UNSENT:
             if not current("the status"):
+                post.pop("verify", None)
+                save()
                 return
             payload = read_json(report_dir / "status.json", None)
             send("status", lambda: self.status_on_github(repo, sha, payload),
@@ -2187,6 +2194,8 @@ class Worker:
                 self.log(f"{repo.name}#{pr}: no comment: the repository is not private by both config and API")
             else:
                 if not current("the comment"):
+                    post.pop("verify", None)
+                    save()
                     return
                 marker = comment_marker(repo, pr, sha, attempt["number"])
 
@@ -2200,8 +2209,11 @@ class Worker:
                     post["comment_id"] = reply.get("id") if isinstance(reply, dict) else None
 
                 send("comment", found, create)
-        if post.get("status") == "posted" and "superseded" not in post:
-            current("the end of posting")
+        if post.get("verify") == "pending" and "superseded" not in post:
+            settled = current("the end of posting")  # False records the supersession work itself
+            if settled is not None:
+                post.pop("verify", None)
+                save()
 
     def settle_superseded(self, repo: Repo, pr: int, sha: str, record: dict, attempt: dict) -> None:
         """The open work a head move left: a comment whose POST may have reached GitHub (sending, failed, or posted
@@ -2250,7 +2262,8 @@ class Worker:
             repo = repos[record["repo"]]
             for index, attempt in enumerate(record["attempts"]):
                 post = attempt.get("post") or {}
-                unsettled = (post.get("superseded") or {}).get("comment_marked") is False
+                unsettled = ((post.get("superseded") or {}).get("comment_marked") is False
+                             or post.get("verify") == "pending")
                 unsent = index == len(record["attempts"]) - 1 and (post.get("status") in self.UNSENT
                                                                     or post.get("comment") in self.UNSENT)
                 if unsettled or unsent:

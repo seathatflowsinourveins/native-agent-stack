@@ -501,7 +501,9 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
     looked up by its marker even though its head moved, and a comment that exists gets the superseded line, retried on
     later ticks until the PATCH is confirmed (`true`); `none` means GitHub holds no comment of that review. Each tick
     finds open posting work from the stored attempt markers, not from the listed heads, since a moved head is no
-    longer listed. A result stored with `CLAUDE_REVIEW_POST=0`, or whose post failed, is posted by a later tick under
+    longer listed. Before any POST the attempt is marked `verify: pending`, and only a head read after posting clears
+    it (an unchanged head, or the supersession work recorded); a failed final read or a stopped tick leaves it for a
+    later tick, which never posts a posted part again. A result stored with `CLAUDE_REVIEW_POST=0`, or whose post failed, is posted by a later tick under
     the same checks.
 15. The comment is sent only when the configuration and the API both say private.
     - Its only model text is the finding lines, shown inside one fenced code block. Every backtick in them becomes
@@ -552,7 +554,7 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 
 ## Evidence class
 
-- The 85 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
+- The 87 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
   drives the real `credential_run.py` and bubblewrap with a fake key in a temporary store. It skips where bubblewrap
   cannot create a user namespace or the host pipes crash dumps, which is the case on GitHub-hosted runners. A second,
   `RealBoundaryChainTest`, adds srt to that chain; it also skips unless `CRW_TEST_SRT` and `CRW_TEST_NODE` name an
@@ -590,8 +592,16 @@ The GPT read of #953 at d784fe0e asked for changes with four P2 findings, fixed 
   inside it (the chain under the network boundary; R1).
 - **The records correction had no regression test.** `RecordRuleTest` fails when a quotation of eight or more words,
   straight, curly or block-quoted, comes back into the sections that carry the owner's or the command center's
-  direction, using synthetic text. Put back in a scratch copy, the 4b8027b8 form of the section fails it (script
-  `readers/crw-mutants-20261010/prior_record_check.py`); the current form passes.
+  direction, using synthetic text. A quotation wrapped across lines counts (whitespace collapsed, consecutive `>`
+  lines joined), and a blank line ends a span. Its detector finds one 25-word span in the 4b8027b8 form of the
+  section and none in the current form. Put back into a scratch copy, that prior form fails the test on the
+  detector's assertion (script `readers/crw-mutants-20261010/prior_record_check.py`, run 2026-10-10 12:58Z). The
+  first version of the detector, at 3d0bead8, stopped at a line break, so it found no span in that wrapped quotation:
+  the prior form failed that version only on its other assertions (the command center's read at 3d0bead8 found
+  this).
+- **The final head read could be lost (the GPT read at 3d0bead8).** With both parts posted, a head move during
+  posting and a failed final read left the comment unmarked for good. The final verification is now open work
+  (`verify: pending`, decision 14), with regressions for the failed read and for a tick stopped before it.
 - **The ledger reference was not pinned.** It is now pinned by content, with line locators and a read-only copy, and
   the worker was run against it (run step 10). A close of another workload's debit is now refused as well.
 

@@ -119,6 +119,9 @@ if method == "GET" and m:
     state["reads"][f"{name}#{number}"] = seen + 1
     keep()
     head = sequence[min(seen, len(sequence) - 1)]
+    if head == "error":
+        sys.stderr.write("gh: HTTP 502\n")
+        sys.exit(1)
     emit([{"number": number, "state": "closed" if head == "closed" else "open",
            "head": {"sha": None if head == "closed" else head}}]); sys.exit(0)
 m = re.fullmatch(r"repos/([^/]+/[^/]+)/commits/([0-9a-f]{40})/statuses\?per_page=100", path or "")
@@ -737,6 +740,51 @@ class ReviewRunTest(unittest.TestCase):
         h.worker([repo], post=True).tick()
         self.assertEqual(len([c for c in h.gh_calls() if c["method"] == "PATCH"]), 2)  # settled: no more PATCH
 
+    def test_a_head_that_moves_while_posting_and_a_failed_final_read_still_mark_the_comment(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.fixtures["heads"] = {"o/priv#3": [sha, sha, "error"]}  # both POSTs land; the read after them fails
+        h.queue([run_of(REPORT)])
+        h.worker([repo], post=True).tick()
+        post = self.post_states(h, repo, sha)
+        self.assertEqual((post["status"], post["comment"], post["verify"]), ("posted", "posted", "pending"))
+        h.fixtures["heads"] = {"o/priv#3": [self.MOVED]}
+        h.pulls("o/priv", [])
+        h.worker([repo], post=True).tick()
+        post = self.post_states(h, repo, sha)
+        self.assertNotIn("verify", post)
+        self.assertIs(post["superseded"]["comment_marked"], True)
+        self.assertTrue(h.remote()["comments"]["o/priv#3"][0]["body"].startswith("**Superseded:**"))
+        self.assertEqual([p["path"] for p in h.posts()].count("repos/o/priv/issues/3/comments"), 1)
+
+    def test_a_tick_that_stops_before_the_final_head_read_is_verified_by_the_next(self):
+        class Stopped(BaseException):
+            pass
+
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.queue([run_of(REPORT)])
+        worker = h.worker([repo], post=True)
+        real, calls = worker.current_head, []
+
+        def stop_on_the_final_read(repo_, pr):
+            calls.append(pr)
+            if len(calls) == 3:
+                raise Stopped("the process ends after the comment was recorded, before the final head read")
+            return real(repo_, pr)
+
+        worker.current_head = stop_on_the_final_read
+        with self.assertRaises(Stopped):
+            worker.tick()
+        self.assertEqual(self.post_states(h, repo, sha)["verify"], "pending")
+        h.fixtures["heads"] = {"o/priv#3": [self.MOVED]}
+        h.pulls("o/priv", [])
+        h.worker([repo], post=True).tick()
+        post = self.post_states(h, repo, sha)
+        self.assertNotIn("verify", post)
+        self.assertIs(post["superseded"]["comment_marked"], True)
+        self.assertEqual(len(h.posts()), 2)  # one status, one comment: nothing posted twice
+
     def test_a_comment_that_never_reached_github_is_closed_when_its_head_moves(self):
         h = Harness(self)
         repo, sha = self.private(h)
@@ -1242,7 +1290,10 @@ RECORD = TOOL.parents[1] / "docs" / "decisions" / "2026-10-09-claude-review-work
 # The sections of the record that carry the owner's or the command center's direction. The records rule: that direction
 # is paraphrased, dated and attributed, never quoted. Upstream documentation may be quoted elsewhere in the record.
 DIRECTION_SECTIONS = ("## Upstream alignment in every trading review", "## Command center decisions on #953")
-QUOTED = re.compile(r'"([^"\n]+)"|\u201c([^\u201d\n]+)\u201d|^>\s*(.+)$', re.MULTILINE)
+# A quotation may be wrapped across lines, but not across a blank line (a paragraph break ends any span).
+SPAN = r'(?:[^{close}\n]|\n(?![ \t]*\n))+'
+QUOTED = re.compile('"(' + SPAN.format(close='"') + ')"|\u201c(' + SPAN.format(close='\u201d') + ')\u201d', re.S)
+BLOCK = re.compile(r"(?:^[ \t]*>[^\n]*(?:\n|$))+", re.M)  # consecutive > lines: one block quotation
 
 
 def record_section(text: str, heading: str) -> str:
@@ -1253,7 +1304,9 @@ def record_section(text: str, heading: str) -> str:
 
 def quoted_directions(section: str, words: int = 8) -> list:
     """Quoted or block-quoted spans of at least `words` words: a restored quotation, not a short term or API string."""
-    spans = [next(g for g in match.groups() if g) for match in QUOTED.finditer(section)]
+    spans = [" ".join(line.strip().lstrip(">") for line in block.group(0).splitlines()) for block in BLOCK.finditer(section)]
+    spans += [next(g for g in match.groups() if g) for match in QUOTED.finditer(BLOCK.sub("\n\n", section))]
+    spans = [" ".join(span.split()) for span in spans]  # whitespace, line breaks included, collapsed
     return [span for span in spans if len(span.split()) >= words]
 
 
@@ -1274,10 +1327,17 @@ class RecordRuleTest(unittest.TestCase):
         paraphrase = ("## Upstream alignment in every trading review\n\nOn 2026-01-01 at 00:00Z the lead asked "
                       "that claims cite sources; paraphrased here.\n")
         self.assertEqual(quoted_directions(paraphrase), [])
+        cut = direction.index(" ", 35)
+        first, second = direction[:cut], direction[cut + 1:]  # one quotation wrapped across two lines
         for restored in (f'row "Example row" (read on the host): "{direction}".',
-                         f"\u201c{direction}\u201d", f"> {direction}"):
-            with self.subTest(form=restored[:12]):
+                         f"\u201c{direction}\u201d", f"> {direction}",
+                         f'row "Example row" (read on the host): "{first}\n{second}".',
+                         f'row "Example row": "{first}\n  {second}"', f"\u201c{first}\n{second}\u201d",
+                         f"> {first}\n> {second}"):
+            with self.subTest(form=restored[:40]):
                 self.assertEqual(quoted_directions(paraphrase + restored + "\n"), [direction])
+        broken = f'"{first}\n\n{second}"'  # a paragraph break is not inside one quotation
+        self.assertEqual(quoted_directions(paraphrase + broken + "\n"), [])
         self.assertEqual(quoted_directions('the 400 "credit balance is too low" refusal'), [])  # an API string
 
 
