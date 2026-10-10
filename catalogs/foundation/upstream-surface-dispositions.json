@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "generated_utc": "2026-10-10T00:18:04Z",
+ "generated_utc": "2026-10-10T00:25:03Z",
  "baseline_versions": {
   "claude_code": "2.1.296",
   "codex": "rust-v0.162.1"
@@ -3666,7 +3666,7 @@
    },
    "scope": "startup-instructions",
    "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3680,7 +3680,7 @@
    },
    "scope": "startup-instructions",
    "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3771,14 +3771,14 @@
   },
   {
    "key": "claude:env:CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL",
-   "disposition": "defer-user",
-   "reason": "2.1.296: pins every workflow agent's model. Model choice is the owner's; unset here (CLAUDE_CODE_SUBAGENT_MODEL=opus names children); precedence undocumented.",
+   "disposition": "declined",
+   "reason": "2.1.296: pins workflow agents' model. Left unset: they inherit the session model and Claude stays on top-quality judgment (command center, 2026-10-09).",
    "source": "https://github.com/anthropics/claude-code/blob/2301018b1f61073c501a8e7a4813ef48c239163b/CHANGELOG.md#L7",
    "carrier": null,
    "value": null,
    "scope": "env var; unset",
-   "overturn": "A one-run probe shows the variable's precedence over CLAUDE_CODE_SUBAGENT_MODEL and the owner rules on a scoped workflow pin.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "overturn": "A frozen-packet quality-parity result for a cheaper workflow-agent model, and a command center ruling on it.",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3790,7 +3790,7 @@
    "value": null,
    "scope": "env var; unset",
    "overturn": "A lane shows 529 retry exhaustion under the default backoff.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3802,7 +3802,7 @@
    "value": null,
    "scope": "env var; unset",
    "overturn": "A lane shows 529 retry exhaustion under the default backoff.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3814,7 +3814,7 @@
    "value": null,
    "scope": "env var; unset",
    "overturn": "A decision to enable CLAUDE_CODE_RETRY_WATCHDOG for unattended lanes; then set a cap with it.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3826,7 +3826,7 @@
    "value": null,
    "scope": "env var; unset",
    "overturn": "A session hits the WebSearch limit, or a probe shows the refill rate and CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION interact.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3838,7 +3838,7 @@
    "value": null,
    "scope": "env var; unset",
    "overturn": "A non-interactive workflow needs mod reload (set 1) or reload misfires (set 0).",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3850,7 +3850,7 @@
    "value": null,
    "scope": "env var; unset",
    "overturn": "The stack adopts Claude in Chrome.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3862,7 +3862,7 @@
    "value": null,
    "scope": "env var; unset",
    "overturn": "An enabled mod draws images in a terminal that needs the override.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3874,7 +3874,7 @@
    "value": null,
    "scope": "env var; unset",
    "overturn": "The stack adds a Vertex or Agent Platform route.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
   },
   {
@@ -3886,7 +3886,7 @@
    "value": false,
    "scope": "native feature; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -3898,7 +3898,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -3910,7 +3910,7 @@
    "value": false,
    "scope": "native feature; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -3922,7 +3922,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -3934,7 +3934,7 @@
    "value": false,
    "scope": "native feature; no override",
    "overturn": "A measured Code Mode tool-discovery gap on a lane, then a qualified upstream scenario.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -3946,7 +3946,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "A measured Code Mode tool-discovery gap on a lane, then a qualified upstream scenario.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -3958,7 +3958,7 @@
    "value": false,
    "scope": "native feature; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -3970,7 +3970,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -3982,7 +3982,7 @@
    "value": false,
    "scope": "native feature; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -3994,7 +3994,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4006,7 +4006,7 @@
    "value": false,
    "scope": "native feature; no override",
    "overturn": "A lane loses a bundled tool after login-shell PATH reset, then qualify the upstream flag.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4018,7 +4018,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "A lane loses a bundled tool after login-shell PATH reset, then qualify the upstream flag.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4030,7 +4030,7 @@
    "value": false,
    "scope": "native feature; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4042,7 +4042,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4054,7 +4054,7 @@
    "value": false,
    "scope": "native feature; no override",
    "overturn": "multi_agent_v2 is adopted and a host need for dynamic tools is shown.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4066,7 +4066,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "multi_agent_v2 is adopted and a host need for dynamic tools is shown.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4078,7 +4078,7 @@
    "value": false,
    "scope": "native feature; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4090,7 +4090,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4102,7 +4102,7 @@
    "value": null,
    "scope": "native feature; no override",
    "overturn": "The stack runs Codex desktop apps for lanes.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4114,7 +4114,7 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "The stack runs Codex desktop apps for lanes.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4126,7 +4126,7 @@
    "value": null,
    "scope": "native feature; no override",
    "overturn": "The stack adopts Codex desktop Voice.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4138,19 +4138,19 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "The stack adopts Codex desktop Voice.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
    "key": "codex:feature:api_key_cyber_access_programs",
    "disposition": "defer-user",
-   "reason": "Stable, off: forwards explicit cyber access programs with builtin OpenAI API keys. Program enrollment is an account decision; nothing is set.",
+   "reason": "Stable, off: forwards explicit cyber access programs with builtin OpenAI API keys. Account program, owner information only; no stack change.",
    "source": "https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/features/src/lib.rs#L1370",
    "carrier": null,
    "value": null,
    "scope": "native feature; no override",
    "overturn": "The owner decides to enroll an account in a cyber access program.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4162,43 +4162,43 @@
    "value": null,
    "scope": "native config switch; no override",
    "overturn": "The owner decides to enroll an account in a cyber access program.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
    "key": "codex:feature:ultrafast_mode",
-   "disposition": "defer-user",
-   "reason": "Stable, on: enables Ultra Fast mode independently of Fast mode (0.162.0 #50472). Tier and spend stay the command center's call at lane launch.",
+   "disposition": "declined",
+   "reason": "Stable, on: Ultra Fast mode independent of Fast mode. Plan-gated, and the OmniRoute profile drops it client-side (measured 2026-10-09); no override.",
    "source": "https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/features/src/lib.rs#L1908",
    "carrier": null,
    "value": null,
    "scope": "native feature; no override",
-   "overturn": "The command center re-runs the fast-tier A/B and rules on Ultra Fast for lane launches.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "overturn": "A plan or profile change makes Ultra Fast reachable from lanes; then a same-work tier comparison.",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
    "key": "codex:config:features.ultrafast_mode",
-   "disposition": "defer-user",
+   "disposition": "declined",
    "reason": "Config switch of codex:feature:ultrafast_mode; same decision.",
    "source": "https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/features/src/lib.rs#L1908",
    "carrier": null,
    "value": null,
    "scope": "native config switch; no override",
-   "overturn": "The command center re-runs the fast-tier A/B and rules on Ultra Fast for lane launches.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "overturn": "A plan or profile change makes Ultra Fast reachable from lanes; then a same-work tier comparison.",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
    "key": "codex:config:daybreak",
    "disposition": "defer-user",
-   "reason": "Default Daybreak preference; true alone is insufficient (opt-in needs cli_daybreak, 0.161.0). Access-program choice is the owner's.",
+   "reason": "Default Daybreak preference; true alone is insufficient (needs cli_daybreak, 0.161.0). Account program, owner information only; no stack change.",
    "source": "https://github.com/openai/codex/releases/download/rust-v0.162.1/config-schema.json",
    "carrier": null,
    "value": null,
    "scope": "native config key; no override",
    "overturn": "The owner decides to use a Cyber access program from lanes.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4210,7 +4210,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4222,7 +4222,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4234,7 +4234,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "A supported upstream release and a concrete host need are qualified through unchanged upstream scenarios.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4246,7 +4246,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "multi_agent_v2 is adopted and a remote board is chosen over hcom.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4258,7 +4258,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "multi_agent_v2 remote board adopted; credentials stay in the secret loader.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4270,7 +4270,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "multi_agent_v2 remote board adopted.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4282,43 +4282,43 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "multi_agent_v2 remote board adopted.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
    "key": "codex:config:model_providers.*.capabilities",
-   "disposition": "defer-user",
-   "reason": "Provider override (capability overrides for a custom provider); alters the OmniRoute route. Provider settings are the command center's; defaults kept.",
+   "disposition": "declined",
+   "reason": "Provider capability override (any capability) changes Codex on the OmniRoute route; needs the effort-ladder proof first (currency-lane trial after #943).",
    "source": "https://github.com/openai/codex/releases/download/rust-v0.162.1/config-schema.json",
    "carrier": null,
    "value": null,
    "scope": "native config key; no override",
-   "overturn": "The command center rules on a provider capability change for the OmniRoute route.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "overturn": "The currency lane's trial after #943 passes the effort-ladder proof on the OmniRoute route.",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
    "key": "codex:config:model_providers.*.capabilities.external_web_access",
-   "disposition": "defer-user",
-   "reason": "Provider override (live-web access for hosted web search); alters the OmniRoute route. Provider settings are the command center's; defaults kept.",
+   "disposition": "declined",
+   "reason": "Provider capability override (live web access) changes Codex on the OmniRoute route; needs the effort-ladder proof first (currency-lane trial after #943).",
    "source": "https://github.com/openai/codex/releases/download/rust-v0.162.1/config-schema.json",
    "carrier": null,
    "value": null,
    "scope": "native config key; no override",
-   "overturn": "The command center rules on a provider capability change for the OmniRoute route.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "overturn": "The currency lane's trial after #943 passes the effort-ladder proof on the OmniRoute route.",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
    "key": "codex:config:model_providers.*.capabilities.remote_compaction",
-   "disposition": "defer-user",
-   "reason": "Provider override (remote context-compaction protocol); alters the OmniRoute route. Provider settings are the command center's; defaults kept.",
+   "disposition": "declined",
+   "reason": "Provider capability override (remote compaction) changes Codex on the OmniRoute route; needs the effort-ladder proof first (currency-lane trial after #943).",
    "source": "https://github.com/openai/codex/releases/download/rust-v0.162.1/config-schema.json",
    "carrier": null,
    "value": null,
    "scope": "native config key; no override",
-   "overturn": "The command center rules on a provider capability change for the OmniRoute route.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "overturn": "The currency lane's trial after #943 passes the effort-ladder proof on the OmniRoute route.",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4330,7 +4330,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "The stack standardizes a TUI preference across lanes.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4342,7 +4342,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "The stack standardizes a TUI preference across lanes.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4354,7 +4354,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "The stack standardizes a TUI preference across lanes.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4366,7 +4366,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "The stack standardizes a TUI preference across lanes.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   },
   {
@@ -4378,7 +4378,7 @@
    "value": null,
    "scope": "native config key; no override",
    "overturn": "The stack adopts Codex voice input.",
-   "reviewed_utc": "2026-10-10T00:18:04Z",
+   "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "rust-v0.162.1"
   }
  ]

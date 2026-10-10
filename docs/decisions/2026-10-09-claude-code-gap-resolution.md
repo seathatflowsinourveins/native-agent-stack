@@ -26,7 +26,7 @@ Codex rust-v0.160.0). It writes nothing.
 | 2026-10-09 23:39:44Z | 40 | 6 | 0 | 38 | `codex:feature` unobserved: `codex --version` timed out at 60 s under host load |
 | 2026-10-09 23:51:12Z | 55 | 6 | 2 | 51 | all kinds observed |
 | 2026-10-10 00:04:06Z, at the PR base | 55 | 6 | 2 | 51 | 49 names plus two reopened instruction documents |
-| 2026-10-10 00:19:23Z, after the rows and the new baseline | 0 | 0 | 0 | 0 | no document changed, all kinds observed |
+| 2026-10-10 00:25:49Z, after the rows and the new baseline | 0 | 0 | 0 | 0 | no document changed, all kinds observed |
 
 The 55 new names are one Claude setting, ten Claude environment variables, 29 Codex
 configuration keys and 15 Codex features. Six already had rows
@@ -45,28 +45,36 @@ description name this pass.
 
 | Surface | Rows | declined | default-on | not-applicable | defer-user |
 | --- | --- | --- | --- | --- | --- |
-| Claude environment variables | 9 | 3 | 2 | 3 | 1 |
-| Codex features (13) and config keys (29) | 42 | 25 | 0 | 9 | 8 |
+| Claude environment variables | 9 | 4 | 2 | 3 | 0 |
+| Codex features (13) and config keys (29) | 42 | 30 | 0 | 9 | 3 |
 
-- **Workflow-agent model.** `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (2.1.296) stays
-  unset and is `defer-user`: the model choice is the owner's,
-  `CLAUDE_CODE_SUBAGENT_MODEL=opus` already names children
-  ([anti-pattern log](../harness-defaults.md)), and the precedence between the two
-  is undocumented. A one-run probe comes before any pin.
+Four rows were ruled by the command center on 2026-10-09 and are marked below.
+
+- **Workflow-agent model** (command center ruling).
+  `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (2.1.296) is `declined` and stays unset, so
+  workflow agents inherit the session model. Claude stays on top-quality judgment,
+  and cost savings come from routing bulk work to GPT lanes, not from lowering
+  Claude subagent models. `CLAUDE_CODE_SUBAGENT_MODEL=opus` already names children
+  ([anti-pattern log](../harness-defaults.md)); the precedence between the two is
+  undocumented. Overturn needs a frozen-packet quality-parity result and a ruling.
 - **Retry tuning.** The 529 backoff variables and the 429/529 watchdog cap are
   declined: retry tuning is a safety net, not the fix, and the watchdog they refine
   is off. Overturn is a measured retry exhaustion in an unattended lane.
 - **WebSearch refill.** `CLAUDE_CODE_WEB_SEARCH_REFILLS_PER_HOUR` is `default-on`
   (100 an hour interactive, 0 non-interactive). The project's per-session cap
   stays the bound; the interaction of the two is unverified.
-- **Cyber access cluster** (`daybreak`, `cli_daybreak`,
-  `api_key_cyber_access_programs`): program enrollment is an account decision,
-  `defer-user` or declined as native-off.
-- **Ultra Fast** (`ultrafast_mode`, stable and on, "Enable Ultra Fast mode
-  independently of Fast mode"): `defer-user`. Tier and spend stay the command
-  center's call at lane launch, after a same-work tier comparison.
-- **Provider capabilities** (`model_providers.*.capabilities*`): `defer-user`,
-  because they change what the OmniRoute route does.
+- **Cyber access cluster** (command center ruling; `daybreak`,
+  `api_key_cyber_access_programs`): account programs, so `defer-user` as owner
+  information only, with no stack change. `cli_daybreak` is declined as native-off.
+- **Ultra Fast** (command center ruling; `ultrafast_mode`, stable and on, "Enable
+  Ultra Fast mode independently of Fast mode"): `declined`. It is plan-gated, and
+  the OmniRoute profile drops it client-side (measured 2026-10-09). Overturn is a
+  plan or profile change that makes it reachable from lanes, then a same-work tier
+  comparison.
+- **Provider capabilities** (command center ruling;
+  `model_providers.*.capabilities*`): `declined` for now. A capabilities
+  declaration changes what Codex enables on the OmniRoute route, so it needs the
+  effort-ladder proof first; the currency lane trials it after #943.
 - **Remote message board** (`features.multi_agent_v2.message_board_remote*`):
   declined with its parent `multi_agent_v2`; `bearer_token` is a credential field,
   so if the board is ever adopted the token comes from the secret loader through
@@ -130,7 +138,9 @@ release notes, which surface new pages without a standing unreviewed count.
   [lifecycle.md](../../adoption/lifecycle.md) renders `@REPOSITORY@` as
   `~/code/native-agent-stack-live`, a checkout that must track `origin/main`; the
   units read these catalogs from that root, so this change should land before the
-  first daily run (otherwise it reports the whole backlog again).
+  first daily run (otherwise it reports the whole backlog again). The command center
+  creates that checkout and installs both units after #943 lands, because that PR's
+  collector exits 2 once the committed model manifest is a day old.
 - **Settings drift** for the inventory (template, user and local settings
   disagree): `ultracode`, `model`, `advisorModel`, `cleanupPeriodDays`,
   `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` and two plugins present only live. In this
@@ -150,9 +160,12 @@ release notes, which surface new pages without a standing unreviewed count.
 - **Owner items:** the Max-plan API credits ($100 on Max 5x, $200 on Max 20x a
   month, claimed by linking a Console organization; they cover the API, Agent SDK,
   `claude -p` with an API key and Managed Agents, not interactive Claude Code)
-  touch credentials and spending. Sonnet 5.5 cache reads fell from $0.20 to $0.10
-  per million tokens on 2026-10-07; cost readings from third-party price data may
-  lag.
+  touch credentials and spending. The Codex cyber access programs (`daybreak`,
+  `api_key_cyber_access_programs`) are information only. Sonnet 5.5 cache reads fell
+  from $0.20 to $0.10 per million tokens on 2026-10-07; cost readings from
+  third-party price data may lag.
+- **Currency lane:** the `model_providers.*.capabilities*` trial after #943, with
+  the effort-ladder proof first.
 - **Agent teams** stay as decided: experimental, narrow use, `TeammateIdle` pending
   a first real team run; `TaskCreated` and `TaskCompleted` are already
   `not-applicable`.
