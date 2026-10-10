@@ -18391,6 +18391,11 @@
       "bytes": 8327
     },
     {
+      "path": "docs/decisions/2026-10-09-claude-review-worker.md",
+      "sha256": "c0c54d6480779171253f5f38530ea48f26baa487709cf000831f0f1e875e2aba",
+      "bytes": 31660
+    },
+    {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
       "sha256": "337ec932d1e70994adc7b6e90458114e604d70ec065c49fc7d7ff8c2191e11fc",
       "bytes": 9003
@@ -18537,8 +18542,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "28a97e3dea87e15a141bb297e4654fc235bc7445ba54941a23e19de90eaf75c8",
-      "bytes": 103924
+      "sha256": "dcc9f9919bdaf7b65d7ecd4c9b78a55ed798b2fb6a195ef7dc1b57be65a188b1",
+      "bytes": 105390
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -59826,6 +59831,11 @@
       "bytes": 11326
     },
     {
+      "path": "tests/test_claude_review_worker.py",
+      "sha256": "249de6433f4e625a79bf242efc41371a0f2e2433077518dc18bf95c4b8a0f494",
+      "bytes": 73124
+    },
+    {
       "path": "tests/test_claude_spend_scan.py",
       "sha256": "bd4994e38cdadfa5b4099351261c6908875540d5be54139aa9e4f8dae4691e4b",
       "bytes": 2669
@@ -60904,6 +60914,36 @@
       "path": "tools/capability-gate/run_gate.py",
       "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7",
       "bytes": 22476
+    },
+    {
+      "path": "tools/claude-review-worker/README.md",
+      "sha256": "1f49d308413217933e2baafbf069db00d19e9656fc9e4ab08fe5cc0c55e65928",
+      "bytes": 9552
+    },
+    {
+      "path": "tools/claude-review-worker/essential-paths.json",
+      "sha256": "7beb97c903f0e0cffb558d5cfbf22d534fed893a71f8e372f3347a58568eaae7",
+      "bytes": 3314
+    },
+    {
+      "path": "tools/claude-review-worker/probes.py",
+      "sha256": "999d9be49d681054fde9ba3c5feb7c96a0efcd54e3a0ee502a4856d0465430b8",
+      "bytes": 43352
+    },
+    {
+      "path": "tools/claude-review-worker/systemd/claude-review-worker.service",
+      "sha256": "70d45c2f997485834f5f079209c0ceeffdf2a2c8d733a3b7362359086d405c18",
+      "bytes": 2295
+    },
+    {
+      "path": "tools/claude-review-worker/systemd/claude-review-worker.timer",
+      "sha256": "b2a31d4cdadecf261f1a38a6ead9f170898a59013c900be4d9d86f4f7cf78503",
+      "bytes": 648
+    },
+    {
+      "path": "tools/claude-review-worker/worker.py",
+      "sha256": "bf23dc0decb5b3ba7c79e818350b2e3e64d848b939a12532ab74c97d1a058149",
+      "bytes": 87484
     },
     {
       "path": "tools/credentials/canary_lane_consumer.sh",

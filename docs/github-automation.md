@@ -101,6 +101,19 @@ The Actions allow-list and harness description below were checked against live s
   $22 client budget and a time limit scaled by the diff's size; a model-free step copies both reports to the job
   summary and nothing is posted to the pull request ([decision](decisions/2026-10-09-claude-actions-pr-toolkit-review.md)).
   Its output is an input before the command center's cue, never a designated read. No hosted run has been made.
+- **Local review of essential heads** ([`tools/claude-review-worker/`](../tools/claude-review-worker/README.md), added
+  2026-10-09): a command-center-owned systemd user timer reviews, every 15 minutes, this repository's same-repository
+  heads that touch `blueprints/us-equities/`, `.github/`, `scripts/validate*.py`, `tools/credentials/`,
+  `adoption/hooks/` or `tools/local-pages/`, and every head of the private trading repository. Claude Code headless runs
+  on a stored API key inside a bubblewrap sandbox with no home directory (no gh login, no key store), the key passed by
+  `tools/credentials/credential_run.py` through the environment only; Read, Glob and Grep only, no CLAUDE.md memory
+  (`CLAUDE_CODE_DISABLE_CLAUDE_MDS=1`), a $10 client budget, an 11 USD bound per run and a 55 USD daily ceiling in the
+  api-actions ledger. A trading head's prompt also carries the owner's upstream-alignment rule: each claim about
+  external behaviour must cite an upstream pin or a vendor URL. A model-free step posts the commit
+  status `claude-review/local` (here the status only, its description built from parsed fields; on the private
+  repository also one sanitized comment), which the command center's landing scripts can require on essential pull
+  requests; the ruleset does not. Posting stays off until the command center installs it and sets
+  `CLAUDE_REVIEW_POST=1`, and no real review has run ([decision](decisions/2026-10-09-claude-review-worker.md)).
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
   family made for these layers. The clean-room definitive round announced there decides one pick per slot.
   - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
