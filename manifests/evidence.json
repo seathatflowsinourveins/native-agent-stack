@@ -11256,6 +11256,11 @@
       "bytes": 3568
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/shard-discovery-protection-20261010.json",
+      "sha256": "5f2af969a762616e9f2b082d2fe290e693aebdd8add8192833c921b5b0e52b82",
+      "bytes": 4895
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/stage2-fail-first.txt",
       "sha256": "214fabb2476d41f6ba6aeae0937ade9d4438e60de31109fe740b0d890aed1e78",
       "bytes": 48843
@@ -11367,8 +11372,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "5a53cc382b88ec64f41aaf29808603436e9eba80630afaa95f46f5bba3a9b694",
-      "bytes": 75186
+      "sha256": "a39e0eaea70801a198c6cb5d9fac4cd8731c33a25003dc43a90c5a3d770379aa",
+      "bytes": 75793
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -18519,6 +18524,11 @@
       "path": "docs/decisions/2026-10-09-validate-macos-portability.md",
       "sha256": "9bb4b115138f4abf6d74c0893e8ea1da50fef295598cfcf8a2ffe85e62089042",
       "bytes": 11363
+    },
+    {
+      "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
+      "sha256": "634ea007962339fed50e933bdc7d407da28041b0cb21c610215f47a4455138e6",
+      "bytes": 2956
     },
     {
       "path": "docs/direct-results.md",
@@ -60657,8 +60667,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "1c2c46523eacb9245afa5dfdcf1c79a00a6304203fe1a08c12fd94a68965979f",
-      "bytes": 158428
+      "sha256": "2f15a21eb88102db5b5f9bc9d44c000133627ff4c10faf2511616af690fd13f3",
+      "bytes": 162179
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",

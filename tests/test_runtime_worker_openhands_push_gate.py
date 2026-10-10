@@ -671,6 +671,30 @@ class WorkflowReaderTests(unittest.TestCase):
         self.assertEqual(runs, [(".", "test*.py"), (".", "test*.py"), ("tools/t", "test_d.py"),
                                 ("tools/t", "test_e.py"), (".", "test*.py")])
 
+    def test_validate_shards_discovery_keeps_memory_trees_git_free(self):
+        script = (ROOT / "scripts/validate_shards.py").read_bytes()
+        commands = (
+            ("python3 scripts/validate_shards.py run -v \\\n  --shard 0 --shards 8 --report report.json", "ci_discovered"),
+            ("python3.12 ./scripts/validate_shards.py run", "ci_discovered"),
+            ("python3 scripts/validate_shards.py aggregate", None),
+            ("python3 scripts/validate_shards.py runner", None),
+            ("python3 scripts/validate_shards.py run-again", None),
+        )
+        for command, expected in commands:
+            with self.subTest(command=command):
+                tree = self.g.patch_policy.MemoryTree({
+                    ".github/workflows/fixture.yml": "on: pull_request\njobs:\n  check:\n    steps:\n"
+                        "      - run: |\n" + "\n".join("          " + line for line in command.splitlines()),
+                    "scripts/validate_shards.py": script,
+                    "tests/__init__.py": "", "tests/test_new.py": "", "test_root.py": "",
+                })
+                with mock.patch.object(self.g.subprocess, "run", side_effect=AssertionError(
+                        "in-memory discovery started a subprocess")):
+                    derived = self.g.derive_ci_protected(tree)
+                    protected = self.g.Protected([derived], set())
+                self.assertEqual((protected.rule("tests/test_new.py"), protected.rule("test_root.py")),
+                                 (expected, expected))
+
 
 class GateReadsTests(unittest.TestCase):
     """gate_reads and the derivation's data reads (rule ci_read) on in-memory trees, without git."""
@@ -1152,9 +1176,9 @@ class RepositoryWorkflowTests(unittest.TestCase):
         self.assertEqual(derived.interpolations, [])
         expected = {"scripts/validate.py": "ci_named", ".gitleaks.toml": "ci_named",
                     "tests/test_workflow_hardening.py": "workflow_policy_test",
-                    # The merged workflow set names tests/: both b8eb9352b and the new reader
-                    # give the stronger ci_named rule in place of ci_discovered on this tree.
-                    "tests/test_brand_new_module.py": "ci_named", ".github/workflows/validate.yml": "github",
+                    # validate_shards.py run delegates root test*.py discovery, so the
+                    # package keeps protection independently of workflow-named tests/.
+                    "tests/test_brand_new_module.py": "ci_discovered", ".github/workflows/validate.yml": "github",
                     "CODEOWNERS": "codeowners", f"{RESOLVER}/push_gate.py": "gate_code",
                     f"{RESOLVER}/gate_reads.py": "gate_code",
                     "blueprints/runtime-workers/openhands/resolver.py": "gate_code",
@@ -1183,6 +1207,37 @@ class RepositoryWorkflowTests(unittest.TestCase):
         self.assertNotIn(".github/workflows/practice-references-freshness.yml", derived.workflows)
         self.assertIn(".github/workflows/validate.yml", derived.workflows)
 
+    def test_validate_shards_alone_protects_a_new_test_module(self):
+        # Keep the real repository tree and the real suite step, but remove every
+        # other workflow runner/name that could accidentally supply tests/ protection.
+        source, _ = self.derived()
+        workflow = ".github/workflows/validate.yml"
+        facts = self.g.scan_workflow(source.read(workflow).decode("utf-8"))
+        runs = [text for text in facts.runs if "python3 scripts/validate_shards.py run" in text]
+        self.assertEqual(len(runs), 1)
+        step = "\n".join("          " + line for line in runs[0].splitlines())
+        module = "tests/test_brand_new_module.py"
+        replacements = {
+            workflow: ("on: pull_request\njobs:\n  check:\n    steps:\n"
+                       "      - run: |\n" + step + "\n").encode("utf-8"),
+            module: b"import unittest\nclass Added(unittest.TestCase):\n    def test_added(self): pass\n",
+        }
+        entries = {path: entry for path, entry in source.entries().items()
+                   if not path.startswith(".github/workflows/")}
+        entries.update({path: ("100644", "blob", "0" * 40) for path in replacements})
+
+        class ShardOnlyTree:
+            def entries(self):
+                return entries
+
+            def read(self, path):
+                return replacements[path] if path in replacements else source.read(path)
+
+        derived = self.g.derive_ci_protected(ShardOnlyTree())
+        protected = self.g.Protected([derived], set())
+        self.assertEqual((derived.files.get(module), protected.rule(module)),
+                         ("ci_discovered", "ci_discovered"))
+
     def test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository(self):
         # The monitoring baseline is stable under line-only changes. It is neither a
         # complete read inventory nor an enforcement/enablement requirement.
@@ -1197,10 +1252,17 @@ class RepositoryWorkflowTests(unittest.TestCase):
         def shapes_by_script(shapes):
             return Counter((location.rsplit(":", 1)[0], tuple(values)) for location, values in shapes.items())
 
-        self.assertEqual(scripts(advisory.unclassified), scripts(baseline["unclassified"]))
+        # The historical receipt traced test_catalogs as a gate script before root
+        # shard discovery identified it as a test module. derive_ci_protected omits
+        # test modules from gate-script import tracing; retain the receipt and assert
+        # this exact eight-location correction, with every other expectation intact.
+        baseline_scripts = scripts(baseline["unclassified"])
+        self.assertEqual(baseline_scripts.pop("tests/test_catalogs.py"), 8)
+        self.assertEqual(derived.files.get("tests/test_catalogs.py"), "ci_discovered")
+        self.assertEqual(scripts(advisory.unclassified), baseline_scripts)
         self.assertEqual(shapes_by_script(advisory.unclassified_shapes),
                          shapes_by_script(baseline["unclassified_shapes"]))
-        self.assertEqual(len(advisory.unclassified), baseline["count"])
+        self.assertEqual(len(advisory.unclassified), baseline["count"] - 8)
         self.assertNotIn("", derived.prefixes)
         self.assertTrue(all(self.g.gate_reads.static_dir(pattern) for pattern in derived.globs), derived.globs)
         protected = self.g.Protected([derived], self.g.policy_tests(tree))

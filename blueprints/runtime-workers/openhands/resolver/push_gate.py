@@ -143,6 +143,8 @@ SHELL_BREAK = {"|", "||", "&&", ";", ">", ">>", "2>&1", "&>", "2>", "<"}
 QUIET_FLAGS = {"-v", "-q", "-b", "-f", "-c", "--verbose", "--quiet", "--buffer", "--failfast", "--catch",
                "--locals"}
 UNITTEST = re.compile(r"\bpython(?:3(?:\.[0-9]+)?)? -m unittest\b([^\n]*)")
+VALIDATE_SHARDS_RUN = re.compile(
+    r"\bpython(?:3(?:\.[0-9]+)?)? (?:\./)?scripts/validate_shards\.py run(?=$|[\s;&|)])")
 CD = re.compile(r"(?:^|[\s;&|(])cd[ \t]+([^\s;&|)]+)")
 
 
@@ -412,8 +414,9 @@ def _unittest_runs(text):
     tests/test_workflow_hardening.py:803-825: no module or pattern arguments, or `discover`;
     `-s`, `-p` and `-t` may also be positional, in that order (unittest command-line help).
     """
+    text = text.replace("\\\n", " ")
     runs = []
-    for found in UNITTEST.finditer(text.replace("\\\n", " ")):
+    for found in UNITTEST.finditer(text):
         args = []
         for token in found.group(1).split():
             if token in SHELL_BREAK or token.startswith((">", "2>", "|", ";", "&", ")")):
@@ -440,6 +443,11 @@ def _unittest_runs(text):
         start = options.get("s") or (positional[0] if positional else ".")
         pattern = options.get("p") or (positional[1] if len(positional) > 1 else "test*.py")
         runs.append((start, pattern))
+    # scripts/validate_shards.py:94-96 at a30c2188e4423f05a7448e5f7a3bcfd858e0f5b8
+    # delegates to TestLoader.discover(root, pattern="test*.py", top_level_dir=root).
+    # python/cpython@v3.12.3 Lib/unittest/loader.py:229-233,344-374,419-444 supplies
+    # the root/pattern/package semantics; run_shard uses the working directory as root.
+    runs.extend((".", "test*.py") for _ in VALIDATE_SHARDS_RUN.finditer(text))
     return runs
 
 
@@ -662,7 +670,8 @@ def derive_ci_protected(tree):
     (patch_policy.executable_lines): the names patch_policy.names_in_text finds from the
     repository root, from each working directory and from each `cd` target, leaving out the
     words of lists used only as `case` patterns (pattern_lists); unittest
-    discovery (its start directory and the packages it enters); and the import closure
+    discovery (including scripts/validate_shards.py run, its start directory and the
+    packages it enters); and the import closure
     (patch_policy.python_references) of each Python file named that is not a test module.
     Raises WorkflowSyntaxError when a reachable file cannot be read.
     """
