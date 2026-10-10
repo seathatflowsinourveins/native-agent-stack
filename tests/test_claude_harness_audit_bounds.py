@@ -260,7 +260,7 @@ class HarnessAuditStepTests(unittest.TestCase):
         code, console, summary, usage = run_step(NUMBERS, execution())
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
-        self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "result_subtype", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
+        self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "error_class", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "result_subtype", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
         self.assertEqual(record["result_subtype"], "success")
         self.assertEqual(record["tools"], ["Read", "Glob", "Grep"])
         self.assertEqual(sorted(record["models"][0]), ["cache_creation_input_tokens", "cache_read_input_tokens",

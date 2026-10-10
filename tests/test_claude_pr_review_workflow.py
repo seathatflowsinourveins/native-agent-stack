@@ -568,7 +568,7 @@ class PullRequestReviewStepTests(unittest.TestCase):
         code, console, summary, usage, _ = run_step(NUMBERS, execution_file=execution())
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
-        self.assertEqual(sorted(record), ["assistant_turns", "budget_stop", "claude_code_version", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
+        self.assertEqual(sorted(record), ["assistant_turns", "budget_stop", "claude_code_version", "error_class", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
         self.assertIs(record["budget_stop"], False)
         self.assertNotIn("Budget stop", summary)
         self.assertNotIn("Over the cost bound", summary)

@@ -11,8 +11,12 @@ name: claude-pr-review
 # review is advisory; no check is required.
 #
 # Authentication is Anthropic workload identity federation (no Anthropic key in this repository). A dispatch or a
-# schedule run on main presents the subject the federation rule accepts, as harness-audit.yml does. A pull_request
-# run would not (its subject is `repo:OWNER/REPO:pull_request`) and would run the pull request's own copy of this
+# schedule run on main presents the immutable subject
+# `repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`.
+# Acceptance still depends on the Console rule matching that subject. A pull_request run's derived form is
+# `repo:OWNER@OWNER-ID/REPO@REPO-ID:pull_request`: native REST sub_claim_prefix plus the separately documented
+# pull_request suffix (retained OIDC snapshot:332-336, revision 35d79cb1, decision 2026-10-10).
+# It would run the pull request's own copy of this
 # file, and workflow_run is a trigger this repository's zizmor gate and policy refuse, so the schedule is how every
 # pull request is reached. The resolve job, which holds no token, picks the heads and checks each through the API;
 # the review job checks again with its own read before any token is requested. Both run only while the repository
@@ -444,8 +448,10 @@ jobs:
             (map(select(.type == "system" and .subtype == "init")) | first) as $init |
             (map(select(.type == "result")) | last) as $result |
             if $result == null then error("no result") else . end |
+            (if $result.is_error == true and $result.total_cost_usd == 0 and $result.modelUsage == {}
+             then "zero_cost_error_without_model_usage" else null end) as $error_class |
             if ($result.total_cost_usd | type == "number" and . >= 0) and ($result.num_turns | count) and
-               ($result.modelUsage | type == "object" and length > 0)
+               (($result.modelUsage | type == "object" and length > 0) or $error_class != null)
             then . else error("usage unavailable") end |
             ($init.tools // []) as $listed |
             ($listed | map(select(type == "string"))) as $tools |
@@ -457,6 +463,7 @@ jobs:
              elif $result.subtype == "error_max_budget_usd" then $written else "" end) as $text |
             ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
             {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
+             error_class: $error_class,
              result_chars: ($text | length),
              tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
              successful_result: ($result.subtype == "success" and $result.is_error == false),
@@ -484,6 +491,9 @@ jobs:
                    "| assistant turns | messages | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
                    "| ---: | ---: | ---: | --- | --- | --- | ---: |",
                    "| \(.assistant_turns) | \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+                   (if .error_class != null
+                    then "", "Error class: \(.error_class). The result reports zero client cost and no model usage; this does not establish the cause."
+                    else empty end),
                    (if .budget_stop
                     then "", "Budget stop: the client stopped the run at its \($budget) USD budget (error_max_budget_usd), before a final report."
                     else empty end),
@@ -495,6 +505,7 @@ jobs:
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
           failed="$(jq -r --argjson budget "$budget" --argjson bound "$cost_bound" '[
+            (if .error_class != null then "error class: \(.error_class)" else empty end),
             (if .successful_result != true and .budget_stop != true
              then "the run did not end in success or in a budget stop" else empty end),
             (if .session_started != true then "no session start record" else empty end),

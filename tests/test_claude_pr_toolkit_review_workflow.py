@@ -704,7 +704,7 @@ class PullRequestToolkitStepTests(unittest.TestCase):
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
         self.assertEqual(sorted(record), ["agents_called", "assistant_turns", "claude_code_version", "complete",
-                                          "forbidden_tools", "handbacks", "lower_bound_models", "mcp_servers",
+                                          "error_class", "forbidden_tools", "handbacks", "lower_bound_models", "mcp_servers",
                                           "models", "num_turns", "report_sections", "report_source", "result_chars",
                                           "result_subtypes", "session_started", "successful_result", "tools",
                                           "tools_listed", "total_cost_usd"])

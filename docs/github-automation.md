@@ -91,7 +91,14 @@ The Actions allow-list and harness description below were checked against live s
   `ANTHROPIC_WORKSPACE_ID`. `main` is at the workspace root and the pull request head is data under `pr-head/`; Claude has Read, Glob
   and Grep only, a $5 client budget and at most 30 assistant turns; the job grants `contents: read`, `pull-requests: read` and
   `id-token: write`. A model-free step copies the review to the job summary; nothing is posted to the pull request
-  ([decision](decisions/2026-10-08-claude-actions-pr-review.md)). No hosted run has been made.
+  ([decision](decisions/2026-10-08-claude-actions-pr-review.md)).
+  [Scheduled run 37988961127](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37988961127)
+  completed with failure on 2026-10-09; this is execution evidence, not accepted federation or model usage.
+  The immutable main subject is
+  `repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`.
+  All three federation workflows retain `zero_cost_error_without_model_usage` when an error result has zero cost
+  and empty model usage, and still fail their bounds check. Raw provider messages are excluded. The class does not
+  identify a Console deny reason; see the [P1 diagnosis and acceptance procedure](decisions/2026-10-10-claude-federation-diagnostics.md).
 - **Pre-cue toolkit read** (`claude-pr-toolkit-review.yml`, added 2026-10-09): Anthropic's pr-review-toolkit agents
   `pr-test-analyzer` and `silent-failure-hunter`, from `anthropics/claude-code` at
   `602df92bf481ed904533e95c09f740f40aab5aed` (checked out with its three files' SHA-256 verified, loaded with

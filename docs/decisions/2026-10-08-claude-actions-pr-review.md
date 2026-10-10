@@ -553,8 +553,12 @@ pull requests give that comparison its vendor arm, and the command center reads 
 non-draft head.
 
 **Trigger: a 15-minute schedule, beside the dispatch.** Two other designs were checked and rejected:
-- **A `pull_request` trigger** presents the OIDC subject `repo:OWNER/REPO:pull_request` (GitHub's OpenID Connect
-  reference, "Filtering for pull_request events"), which the federation rule does not accept. It would also run the
+- **A `pull_request` trigger** has the derived immutable form `repo:OWNER@OWNER-ID/REPO@REPO-ID:pull_request`.
+  The native repository OIDC REST metadata supplies `sub_claim_prefix`, and the event suffix comes from
+  GitHub's "Filtering for pull_request events", [retained OIDC snapshot:332](../../evidence/artifacts/claude-federation-docs-20261010/docs.github.com_actions_reference_security_oidc.txt#L332)
+  (revision `sha256:35d79cb17e94732a467c63e59c3a01d18029b47f4b5f9cbf15d92037164b03cd`, retrieved 2026-10-10, 37248 bytes;
+  immutable syntax separately at 352–359). Combining that prefix and documented suffix is a derivation, not an example
+  quoted from the immutable-subject section. A main-only federation rule does not accept it. It would also run the
   pull request's own copy of the workflow file with the token.
 - **`workflow_run`** runs main's copy with main's subject (GitHub's "Events that trigger workflows": GITHUB_REF is
   the default branch). claude-code-action supports it as an automation event at the pin

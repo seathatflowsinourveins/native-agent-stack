@@ -320,10 +320,13 @@ jobs:
             if type != "array" then error("unsupported execution shape") else . end |
             (map(select(.type == "system" and .subtype == "init")) | first) as $init |
             map(select(.type == "result")) as $results |
+            (if any($results[]; .is_error == true and .total_cost_usd == 0 and .modelUsage == {})
+             then "zero_cost_error_without_model_usage" else null end) as $error_class |
             (($results | length) > 0 and all($results[]; usable)) as $complete |
             ([.[] | select(.type == "assistant") | .message | select(type == "object" and (.usage | type) == "object")]
               | group_by(.id) | map(first)) as $messages |
-            if $complete or ($messages | length) > 0 then . else error("usage unavailable") end |
+            if $complete or ($messages | length) > 0 or $error_class != null
+            then . else error("usage unavailable") end |
             ($init.tools // []) as $listed |
             ($listed | map(select(type == "string"))) as $tools |
             ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
@@ -345,6 +348,7 @@ jobs:
             ([.[] | select(.type == "assistant" and (.parent_tool_use_id == null)) | .message.id?
               | select(type == "string")] | unique | length) as $turns |
             {complete: $complete,
+             error_class: $error_class,
              total_cost_usd: (if $complete then ([$results[].total_cost_usd] | max) else null end),
              num_turns: (if $complete then ([$results[].num_turns] | max) else null end),
              assistant_turns: $turns,
@@ -390,6 +394,9 @@ jobs:
                    "| ---: | ---: | ---: | --- | ---: | --- | --- | ---: |",
                    "| \(.assistant_turns) | \(.num_turns // "none") | \(.total_cost_usd // "none") | \(.successful_result) | \(.report_sections | length) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
                    "", "Result records: \(.result_subtypes | listed). Agents called: \(.agents_called | listed). Handbacks: \(.handbacks) of 2.",
+                   (if .error_class != null
+                    then "", "Error class: \(.error_class). A result reports zero client cost and no model usage; this does not establish the cause."
+                    else empty end),
                    (if any(.result_subtypes[]; . == "error_max_budget_usd")
                     then "", "Budget stop: the client stopped the run at its \($budget) USD budget (error_max_budget_usd), with \(.handbacks) of 2 handbacks."
                     else empty end),
@@ -403,6 +410,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           failed="$(jq -r --argjson budget "$budget" --argjson bound "$cost_bound" '
             def listed: if length > 0 then join(" ") else "none" end; [
+            (if .error_class != null then "error class: \(.error_class)" else empty end),
             (if .complete != true then "no result record, or one without usable usage: the token counts kept are a lower bound from the assistant messages, without a cost"
              else empty end),
             (if .successful_result != true then "the run did not end in success, or in a budget stop after both agents handed back (result records: \(.result_subtypes | listed); handbacks: \(.handbacks) of 2)"

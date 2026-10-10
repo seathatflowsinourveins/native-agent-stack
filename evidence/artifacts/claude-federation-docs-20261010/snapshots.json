@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "claude-federation-vendor-docs-20261010",
+  "evidence_class": "source_review",
+  "retrieval_date_precision": "date",
+  "source_packet_staged_at": "2026-10-10T07:03:18Z",
+  "source_packet": "upstream-src-961-22d1cada/SOURCES.md",
+  "provenance_note": "Source packet records successful HTTP 200 captures and its staging timestamp. Individual request timestamps are not available; retrieved_on preserves the recorded date without inventing finer precision. SHA-256 revisions identify these retained bytes, not vendor publication versions.",
+  "snapshots": [
+    {
+      "id": "github-oidc",
+      "url": "https://docs.github.com/en/actions/reference/security/oidc",
+      "path": "evidence/artifacts/claude-federation-docs-20261010/docs.github.com_actions_reference_security_oidc.txt",
+      "format": "visible-text reduction of upstream HTML",
+      "revision": "sha256:35d79cb17e94732a467c63e59c3a01d18029b47f4b5f9cbf15d92037164b03cd",
+      "retrieved_on": "2026-10-10",
+      "sha256": "35d79cb17e94732a467c63e59c3a01d18029b47f4b5f9cbf15d92037164b03cd",
+      "bytes": 37248,
+      "upstream_html_sha256_recorded_in_source_packet": "5a88f1469d4a089770722ec216dca785396c432762b9be98c0843273c6d80325",
+      "locators": [
+        {
+          "line": 332,
+          "contains": "Filtering for pull_request events"
+        },
+        {
+          "line": 335,
+          "contains": "repo:ORG-NAME/REPO-NAME:pull_request"
+        },
+        {
+          "line": 355,
+          "contains": "repo:OWNER@OWNER-ID/REPO@REPO-ID:ref:refs/heads/BRANCH"
+        },
+        {
+          "line": 359,
+          "contains": "opt in to immutable subject claims"
+        }
+      ]
+    },
+    {
+      "id": "claude-wif-github",
+      "url": "https://platform.claude.com/docs/en/manage-claude/wif-providers/github-actions",
+      "path": "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_wif-providers_github-actions.md",
+      "format": "upstream Markdown endpoint capture",
+      "revision": "sha256:edc97bf1872a1292911b08600aadfc494295009cc6db1da232279dae46c0429b",
+      "retrieved_on": "2026-10-10",
+      "sha256": "edc97bf1872a1292911b08600aadfc494295009cc6db1da232279dae46c0429b",
+      "bytes": 14693,
+      "locators": [
+        {
+          "line": 316,
+          "contains": "A denied exchange returns an opaque `401`"
+        },
+        {
+          "line": 316,
+          "contains": "match_subject_prefix"
+        }
+      ]
+    },
+    {
+      "id": "claude-wif-concepts",
+      "url": "https://platform.claude.com/docs/en/manage-claude/workload-identity-federation",
+      "path": "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_workload-identity-federation.md",
+      "format": "upstream Markdown endpoint capture",
+      "revision": "sha256:d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7",
+      "retrieved_on": "2026-10-10",
+      "sha256": "d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7",
+      "bytes": 25749,
+      "locators": [
+        {
+          "line": 42,
+          "contains": "all configured matchers must pass for the JWT to be accepted"
+        }
+      ]
+    }
+  ]
+}
