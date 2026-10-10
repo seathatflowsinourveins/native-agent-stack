@@ -41,7 +41,7 @@ paraphrases those directions and quotes no message.
 | Claude family | A blind Opus 5.5 selection per slot group that did not open the GPT returns; Opus judges verifying every default under the version, scope and integrity lenses; blind adjudication of each disagreement with a second adjudicator refuting each judgment | 83 lens verdicts: 19 stand, 64 stand with corrections, none refuted (417 decision claims, 39 corrected); 11 disagreements adjudicated; 10 judgments upheld by their refuter, and one refuted for a misstated citation with the default unchanged ([verification.json](../../evidence/artifacts/claude-native-practice-20261009/verification.json)) |
 | Third selection | The owner's session's landscape sweep, `research/api-surfaces-20261008/FINAL.md` on the producing host (corrected bytes, sha256 `17b1489725f0cb403b8f8d838fe20b0cc79375c926288c20daa3320b7a00ed12`) | Converged per slot where it overlaps |
 | Audit | A third, independent audit of the five Claude workflow heads with the trailofbits agentic-actions-auditor skill, plus a measured symlink probe on 2.1.295 | 0 P0, 0 P1, 1 P2 mitigated by measurement, 5 P3 to the owning lane |
-| Handoff proof | skill-creator `run_eval.py` trigger evaluation, 10 queries times 3 runs, on both descriptions; six fresh `claude -p` sessions in a checkout of this branch, none told to use the skill | 30 of 30 correct on each description; the skill was the first tool call in 5 of 6 sessions and its page was read in 4 of 6 (per-run excerpts: launch command, request, Skill arguments, the read) |
+| Handoff proof | skill-creator `run_eval.py` trigger evaluation, 10 queries times 3 runs, on both descriptions; six fresh `claude -p` sessions in a checkout of this branch, none told to use the skill | 30 of 30 correct on each description; the skill was the first tool call in 5 of 6 sessions, 4 of 6 then read its slots page whole and a fifth grepped it (per-run excerpts: launch command, request, Skill arguments, every read from the skill directory) |
 
 Claude-family spend, priced at API list price from each run's own usage record (`usage_record.py`): inventory $2.57,
 blind selection $30.66, verification $62.46, adjudication at least $38.44, the actions audit $5.34, fresh-session
@@ -248,11 +248,13 @@ documentation). Measured on 2026-10-09:
   and 30 of 30 for the shipped one; no unrelated query fired in either run
   ([trigger-eval.json](../../evidence/artifacts/claude-native-practice-20261009/trigger-eval.json));
 - fresh `claude -p` sessions in a checkout of this branch, three practice questions on each of Sonnet 5.5 and Opus 5.5,
-  none of which names the skill: the skill was the session's first tool call in 5 of 6 and its reference page was read
-  in 4 of 6 (Sonnet 2 and 2 of 3, Opus 3 and 2 of 3). For example, asked which model, effort and permission flags a
+  none of which names the skill: the skill was the session's first tool call in 5 of 6; 4 of 6 then read
+  `reference/slots.md` whole, two by Read and two by `cat` in a shell command (Sonnet 2 of 3, Opus 2 of 3), and a fifth
+  (Opus) grepped it before reading the MCP page. For example, asked which model, effort and permission flags a
   headless reviewer should use, Sonnet 5.5 called `Skill` with `claude-native-practice` first and then read
   `.claude/skills/claude-native-practice/reference/slots.md`. Each run's launch command, exact request, first Skill
-  invocation with its arguments and first reference read are in `activation_excerpts`; the transcripts stay private. The
+  invocation with its arguments and every tool call that read from the skill directory (position, tool, exact path or
+  command) are in `activation_excerpts`, so the rates recompute; the transcripts stay private. The
   misses cluster on the hooks question, where this host's auto memory and the 2026-10-08 guard record already hold
   the answer. The first description fired in 0 of 1 Sonnet runs; stating that the page is newer than repository notes
   or memory, and telling the session to start by reading it, produced the measured rate

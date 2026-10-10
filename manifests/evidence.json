@@ -18487,8 +18487,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
-      "sha256": "d1bb3266804fa09629bc33f0a8cf7bdb69dfd28601e777ee6c2757e2437735b0",
-      "bytes": 36772
+      "sha256": "8a2b71a1fa2c169676fb4cfe95815393feb0b881f8a2a5e6563dae509adf4752",
+      "bytes": 37026
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -19927,8 +19927,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/fresh-session.json",
-      "sha256": "8ae2332534c590bdb35688ee6ac74cbd1d869f461c9de5dedfbf032626a6bebc",
-      "bytes": 19255
+      "sha256": "5db3955c7b24d3202d9a43c6f002a194e6091b007d3d68435bde982d485e8363",
+      "bytes": 30132
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/g5-candidate-rows.json",
