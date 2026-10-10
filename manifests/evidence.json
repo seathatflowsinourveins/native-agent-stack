@@ -5206,8 +5206,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "c12a0bea0aa8ec4265aa91cd2984a77650a5a536c6d416f7cb66e40c795d6305",
-      "bytes": 39199
+      "sha256": "1c8a817bff26722134d9707dc47a7d9a5092342b95e1899e9977d9b1d3c1ece0",
+      "bytes": 39299
     },
     {
       "path": ".gitignore",
@@ -18577,8 +18577,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-secret-scan-large-targets.md",
-      "sha256": "41e7ce7f213af96121e2bf2d0c1b0f4fd86b7769b61a3c0c113154188144ac76",
-      "bytes": 9635
+      "sha256": "0996a9cb5686a8a0735d56ae2d25bf8401632dcec7bae9cfdf53b708dc5ba9e2",
+      "bytes": 11810
     },
     {
       "path": "docs/direct-results.md",
@@ -60692,7 +60692,7 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "7ea348554ca4d467b71b18833167858f77715ee962832e1f503ed4682c983585",
+      "sha256": "6ee5152d9bb4827c8a27e4dec46d53c04c0b8bdb39d2c697f1760c6a2507be4a",
       "bytes": 19309
     },
     {
@@ -61067,8 +61067,8 @@
     },
     {
       "path": "tests/test_secret_scan_size.py",
-      "sha256": "b95e7df3214fb47715d20116c48f37797bc7cba5e2a7f4264312faafe988a585",
-      "bytes": 13496
+      "sha256": "12cd68819dad9adc9c15072eea535edb6cbacca81a60b82642b5b81440f0ef66",
+      "bytes": 13809
     },
     {
       "path": "tests/test_security_identity.py",
@@ -61517,8 +61517,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "3e65408d5fab88cb3ab7a3167b738ba207d053f37bbe25c5e4890ac6e3ed82b9",
-      "bytes": 755702
+      "sha256": "c836a29f76bbd62182fcdda3394d452a18a618982a253fc84b37f71a6a467f71",
+      "bytes": 755784
     },
     {
       "path": "tools/omniroute/gateway_record.py",

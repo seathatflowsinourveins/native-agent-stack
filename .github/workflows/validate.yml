@@ -377,7 +377,7 @@ jobs:
           GITLEAKS_TESTS_REQUIRED: '1'
         run: |
           export PATH="$RUNNER_TEMP/gitleaks:$PATH"
-          python3 -m unittest tests.test_gitleaks_config tests.test_secret_scan_size.GitleaksLargeFileTests -v
+          python3 -m unittest tests.test_gitleaks_config tests.test_secret_scan_size.GitleaksLargeFileTests tests.test_secret_scan_size.ScannerTimerTests -v
       - name: Scan git history for secrets
         if: always()
         run: |
@@ -435,11 +435,12 @@ jobs:
     # evidence/artifacts/betterleaks-parity-20260927/. The job is report-only, like security-scan.yml's
     # zizmor online audits: findings and parity-fixture assertion failures go to the step summary as
     # counts and do not fail it. The large-target detection regressions must pass. The job is red when
-    # verification, scanning or a test run errors, or a required large-target regression fails. Its
+    # verification, scanning or a test run errors, a required large-target regression fails, or the
+    # resource-receipt writer fails after a successful scan. Its
     # green therefore does not say that a change adds no secret: secret-scan stays the gate.
     runs-on: ubuntu-24.04
-    # On the recording workstation the full-history scan took 55 s wall, 1,546 CPU-seconds and a 7.9 GiB
-    # peak resident set (gitleaks: 74 s, 3.3 GiB); the hosted-runner figures are pending its first run.
+    # Native hosted full git scan at run38053675250:19.01 s/1,074,456 KiB peak; the complete job
+    # took64 s of1,200 s, including verification/regressions/post steps. The decision retains scope.
     timeout-minutes: 20
     permissions:
       contents: read

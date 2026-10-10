@@ -194,6 +194,11 @@ class ScannerTimerTests(unittest.TestCase):
 
 
 class TimedWorkflowArgumentsTests(unittest.TestCase):
+    def test_verified_gitleaks_job_runs_timer_portability_regressions(self):
+        native_job = jobs(WORKFLOW.read_text())["secret-scan"]
+        self.assertIn("tests.test_secret_scan_size.ScannerTimerTests", native_job,
+                      "Timer portability controls must run with CI's verified gitleaks")
+
     def test_timing_prefix_keeps_all_four_production_scanner_options(self):
         source = WORKFLOW.read_text()
         timed = re.sub(r'(?m)^(\s*)("\$RUNNER_TEMP/(?:gitleaks/gitleaks|betterleaks/betterleaks)" (?:git|dir) \.)',

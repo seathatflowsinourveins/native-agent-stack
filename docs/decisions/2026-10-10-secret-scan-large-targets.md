@@ -11,7 +11,7 @@ incomplete-coverage boundary; neighboring and prefixed paths remain covered.
 - [gitleaks/gitleaks v8.30.1@83d9cd684c87d95d656c1458ef04895a7f1cbd8e:cmd/root.go:84](https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/cmd/root.go#L84) sets the default cap0. [cmd/directory.go:62](https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/cmd/directory.go#L62) multiplies by decimal1,000,000; [sources/files.go:93](https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/sources/files.go#L93) skips files strictly larger than that limit. [detect/detect.go:431](https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/detect/detect.go#L431) compares the integer-MB fragment length, so cap2 skips at3,000,000 bytes in git mode.
 - [betterleaks/betterleaks v1.8.1@5eab48332cc48565864514e3bc6de89df091a7c4:cmd/root.go:92](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/cmd/root.go#L92) also defaults to0. [cmd/directory.go:66](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/cmd/directory.go#L66) supplies the decimal limit to [sources/files.go:85](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/sources/files.go#L85). Its git source has no corresponding size option; the obsolete flag is removed there as well.
 - Gitleaks applies the explicit path pattern through [config/allowlist.go:136, PathAllowed](https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/config/allowlist.go#L136); line135 is its comment.
-- Betterleaks v1.8.1 translates configured path patterns into its prefilter at [config/translate_filters.go:96](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/config/translate_filters.go#L96). The expression checks `attributes["path"]` at96–108. [detect/detect.go:436, SkipFunc](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/detect/detect.go#L436) evaluates that prefilter and supplies the source callback. [sources/common.go:55](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/sources/common.go#L55) applies it to file paths; [sources/files.go:117](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/sources/files.go#L117) and:124 skip those files. The Git source's `ShouldSkip` callback is applied to commit attributes at [sources/git.go:436](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/sources/git.go#L436) and propagated into diff scanning at:460. Its `PathAllowed` helper has no non-test caller at this pin; the earlier shared-helper citation did not name its production mechanism.
+- Betterleaks v1.8.1 translates configured path patterns into its prefilter at [config/translate_filters.go:96](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/config/translate_filters.go#L96). The expression checks `attributes["path"]` at 96–108. [detect/detect.go:436, SkipFunc](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/detect/detect.go#L436) evaluates that prefilter and supplies the source callback. [sources/common.go:55](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/sources/common.go#L55) applies it to file paths; [sources/files.go:117](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/sources/files.go#L117) and :124 skip those files. The Git source sets the changed path at :423 and applies `ShouldSkip` to its commit attributes at [sources/git.go:436](https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/sources/git.go#L436). The callback at :460 is propagated into the archive-blob `File` branch at :449–461; it is not the text-diff path. Its `PathAllowed` helper has no non-test caller at this pin; the earlier shared-helper citation did not name its production mechanism.
 
 The exact exclusion is tested with both native binaries, and adjacent/prefixed
 paths still yield findings. Focused source-claim controls require the pinned
@@ -76,7 +76,9 @@ availability and the timer's successful GNU `--version` response. Darwin and an
 existing non-GNU timer execute the scanner directly with an accurate platform
 and an explicit unmeasured label. Simulated BSD-option rejection reproduces the
 old detection failure; Darwin/non-GNU fallback and native Linux GNU measurement
-controls pass. This is not a native macOS execution claim.
+controls pass. `ScannerTimerTests` runs in the hosted job with the installed,
+verified gitleaks binary, alongside the large-target controls. This is not a
+native macOS execution claim.
 
 GNU time's supported `%e`, `%M` and `%x` formats measure elapsed seconds, peak RSS
 in KiB and the command exit status. The native Linux workflow verifies GNU time
@@ -103,6 +105,34 @@ verification, regressions, scans and post steps. Compare it with the unchanged
 margin. The six local fixture figures above remain a separate measurement;
 they do not establish full-repository timeout or memory acceptance. No local
 unbounded-history measurement is performed.
+
+Native Ubuntu full production measurements were retained from
+[run38053675250](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38053675250),
+attempt 1, `pull_request`, `refs/pull/964/merge`, exact checkout
+`f2f10412c68a859800b2bcad034c8ab639fd6f2e`. The workflow/config hashes in the
+resource artifacts bind those figures to the source used for that run. This
+checkout revision records evidence provenance; it is not a fixture/dependency
+pin and does not substitute for fresh CI at the landing head.
+
+| Actual uncapped production scan | Seconds | Peak RSS KiB | Exit status | Findings |
+| --- | ---: | ---: | ---: | ---: |
+| gitleaks 8.30.1 git, HEAD ancestry | 37.42 | 745128 | 0 | 0 |
+| gitleaks 8.30.1 dir | 14.52 | 126772 | 0 | native gating status; no JSON report |
+| betterleaks 1.8.1 git, HEAD ancestry | 19.01 | 1074456 | 0 | 1687, report-only |
+| betterleaks 1.8.1 dir | 4.16 | 147360 | 0 | 1685, report-only |
+
+The complete native jobs include checkout, installation, verification,
+regressions, both scans, uploads and post steps. Gitleaks
+[job114217705392](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38053675250/job/114217705392)
+completed SUCCESS in 116 seconds of its 600-second limit, leaving 484 seconds.
+Betterleaks [job114217705237](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38053675250/job/114217705237)
+completed SUCCESS in 64 seconds of its 1,200-second limit, leaving 1,136 seconds.
+Artifacts are `secret-scan-metrics-gitleaks-38053675250-1` (11670637536) and
+`secret-scan-metrics-betterleaks-38053675250-1` (11670032999), downloaded and
+retained with native receipt hashes by the lane. Both scanner jobs passed;
+that full run's separate inventory-grant failure was corrected by adding the
+exact repository grant and a manually measured count of 93. Betterleaks' finding
+counts remain report-only, distinct from gitleaks' gating result.
 
 Mechanism sources: [GNU time manual](https://www.gnu.org/software/time/manual/time.html),
 version1.9 (installed package1.9-0.4; native `--help`/`--version` and shipped info
