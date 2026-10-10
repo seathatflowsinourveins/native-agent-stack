@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "subject": "PR875 P3 extraction-host/citation follow-up; restored scope",
+  "checked_at": "2026-10-08T19:13:56Z",
+  "base": "a484989a43f70ff2575b6fb054cf00c9834e7679",
+  "upstream": {
+    "repository": "https://github.com/deedy5/ddgs",
+    "tag": "v9.16.0",
+    "commit": "70a5635510fb8d5b15d5ba6ceced6a67e212149b",
+    "files": [
+      "ddgs/ddgs.py:135-272",
+      "ddgs/engines/duckduckgo.py:15-42",
+      "ddgs/http_client.py"
+    ]
+  },
+  "source_hashes": {
+    "tools/research/exact_queries.py": "94175be78f81aeb60fcb76dd6cf0f6ab0c7089ff192fba2b7846aff5a4a5be5f",
+    "tests/test_research_dispatch_exact_queries.py": "6b54cddf5e3fb9ab75600c3f9f4be7e60a6465bcc0d66ee66cd408e32d110da9",
+    "tools/research/dispatch": "8a72a88c90405f3b8bccb5b695480a59020cc253b93ac7031ddfff0a1fc6da12"
+  },
+  "native_designated_review": {
+    "evidence_class": "native_proven",
+    "source": "coordination/cc-reads-20261005/pr875/GPT-VERDICT-14281e370.full.md",
+    "sha256": "cf8f8c4c7dd7213d8718d125101554f7b5fa4d606170ca157f134dec6288e889",
+    "scope": "genuine pinned DDGS/primp extraction canonicalization behind syscall guard; attempted loopback connection refused",
+    "not_this_followup_run": true
+  },
+  "fixtures": {
+    "evidence_class": "synthetic",
+    "forms": [
+      "http://127。0.0.1/",
+      "http://１２７.０.０.１/",
+      "http://%31%32%37.0.0.1/",
+      "http://127%2e0.0.1/"
+    ],
+    "before": {
+      "tests": 4,
+      "failures": 4,
+      "reason": "extraction invoked for refused host"
+    },
+    "after": {
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "command": "nice -n 10 ionice -c2 -n7 env PYTHONDONTWRITEBYTECODE=1 <native GPTR Python> -B -m unittest discover -s tests -p test_research_dispatch_exact_queries.py",
+      "duration_seconds": 0.953
+    },
+    "preserves": [
+      "original vendor URL",
+      "native hit/rank",
+      "failure record",
+      "all existing input/witness/partial/interruption contracts"
+    ]
+  },
+  "source_critic": "COMPLETE_RESTORED_DELTA",
+  "independent_reader": "Prior P3 ACK retained; restored source critic COMPLETE and unchanged main-test comparison passed 27/27; no new provider read claimed",
+  "boundaries": [
+    "No live network or model call, installer or active configuration change by these checks.",
+    "No DNS, redirect, arbitrary-URL or broad IDNA qualification.",
+    "This small P3 follow-up is separate from the G5 diagnostic/subset/backend feature.",
+    "Known initial HOLD, failed fixtures and native review evidence remain retained.",
+    "Backend parameter, backend witness, registration and measurement records removed from this PR; original dispatcher/capture contracts preserved.",
+    "Backslash refusal is conservative; no native backslash sink measurement is claimed."
+  ],
+  "inverse": "Repository rollback only; no host apply or dependency install.",
+  "scope_restore": {
+    "trigger": "2026-10-08 scope ruling",
+    "removed_commits": [
+      "152acc2193da056b1848f0a652f37067fa24a6ae",
+      "2d284a63709bcc071bc9c4b3bf52e032c04f4a65"
+    ],
+    "restored_content": "cae36093 plus conservative backslash refusal/test and non-vacuous retained-record assertion",
+    "main_test_against_fresh_merge": {
+      "base": "be7273a43c35f25002be8b481683c475482d661c",
+      "tested_head": "d3c0c019eff51d50c35bc1ea8617a5de62dd7a85",
+      "merge_index_tree": "d202935697ae2c710a0c9a277e87e4011b1e3f01",
+      "source_file": "tests/test_research_dispatch_exact_queries.py",
+      "source_sha256": "14459ef71db5b6118dacbb93acd68112a3faa99dc5685a1aa58cc4fdcdece59d",
+      "bytes": 37274,
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "seconds": 0.838,
+      "method": "Unchanged main bytefile temporarily used only in a disposable detached merge copy; same bytes verified after run, PR test restored."
+    },
+    "historical_failure": "Expanded backend added mandatory witness fields and failed3of27 unchanged main tests; rejected feature history retained.",
+    "PR_tests_against_same_merge": {
+      "source_sha256": "6b54cddf5e3fb9ab75600c3f9f4be7e60a6465bcc0d66ee66cd408e32d110da9",
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "seconds": 0.863
+    }
+  }
+}

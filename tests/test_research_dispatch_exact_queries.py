@@ -237,6 +237,35 @@ class MechanicalRetentionTests(ExactQueryFixtures):
         self.assertEqual([source["url"] for source in records[0]["sources"]], urls)
         self.assertEqual([source["status"] for source in records[0]["sources"]], ["refused_nonpublic_url_form"] * 5)
 
+    def assert_host_spelling_is_retained_without_extraction(self, url):
+        results = [{"href": url, "title": "Original vendor title", "body": "Original vendor snippet"}]
+        client = mock.Mock()
+        client.text.return_value = results
+        _, manifest, records, _ = self.capture(client, top_k=1)
+        client.extract.assert_not_called()
+        self.assertEqual(manifest["fetch_calls"], 0)
+        self.assertTrue(records)
+        for record in records:
+            self.assertEqual(record["raw_vendor_results"], results)
+            self.assertEqual(record["sources"], [{"vendor_result_rank": 1, "url": url,
+                                                 "status": "refused_nonpublic_url_form"}])
+
+    def test_ideographic_dot_loopback_host_is_retained_without_extraction(self):
+        self.assert_host_spelling_is_retained_without_extraction("http://127。0.0.1/")
+
+    def test_fullwidth_digit_loopback_host_is_retained_without_extraction(self):
+        self.assert_host_spelling_is_retained_without_extraction("http://１２７.０.０.１/")
+
+    def test_percent_encoded_digit_loopback_host_is_retained_without_extraction(self):
+        self.assert_host_spelling_is_retained_without_extraction("http://%31%32%37.0.0.1/")
+
+    def test_percent_encoded_dot_loopback_host_is_retained_without_extraction(self):
+        self.assert_host_spelling_is_retained_without_extraction("http://127%2e0.0.1/")
+
+    def test_backslash_host_is_retained_without_extraction(self):
+        # Conservative delimiter refusal; this fixture is not a native sink probe.
+        self.assert_host_spelling_is_retained_without_extraction(r"http://127.0.0.1\.evil.com/")
+
 
 class ExactDispatchWiringTests(ExactQueryFixtures):
     def setUp(self):
