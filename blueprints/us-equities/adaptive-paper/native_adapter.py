@@ -35,7 +35,8 @@ from typing import Protocol, Callable
 _HERE = str(Path(__file__).resolve().parent)
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
-from sessions import DEFAULT_SESSION_POLICY, order_extended_hours_flag, reconciliation_receipt
+from sessions import (DEFAULT_SESSION_POLICY, SessionKind, order_extended_hours_flag,
+                      reconciliation_receipt, session_at)
 
 from nautilus_trader.common import Environment, FileWriterConfig, LogLevel
 from nautilus_trader.config import DataClientConfig, ExecutionClientConfig, LiveNodeConfig
@@ -761,9 +762,27 @@ class AlpacaExecutionClient(ExecutionClient):
         if cid in self.orders:
             self.session.fail("duplicate_native_submit")
             return
-        self.orders[cid] = order
         tags = list(order.tags or [])
         now = datetime.fromtimestamp(self.clock.timestamp_ns() / 1e9, tz=timezone.utc)
+        if self.session.session_policy.get("extended_hours", False):
+            # A native owner tick and this async dispatch may straddle 20:00.
+            # Deny before submission: LIMIT/DAY with extended_hours=False
+            # would otherwise queue the order for the next session at Alpaca.
+            prefix = "exit" if order.side == OrderSide.SELL else "entry"
+            try:
+                dispatch_session = session_at(now).kind
+            except ValueError:
+                refusal = prefix + "_dispatch_session_classification_failed"
+            else:
+                refusal = (None if dispatch_session in (SessionKind.RTH, SessionKind.PRE, SessionKind.POST)
+                           else prefix + "_dispatch_session_unavailable")
+            if refusal is not None:
+                self.generate_order_denied(order, refusal)
+                # Retain the held residual in reconciliation and surface an
+                # operator-visible fault rather than a successful overnight hold.
+                self.session.fail(refusal + ":" + cid)
+                return
+        self.orders[cid] = order
         extended_hours = order_extended_hours_flag(now, self.session.session_policy)
         payload = {"client_order_id": cid, "symbol": str(order.instrument_id.symbol),
             "side": str(order.side).lower(), "qty": str(order.quantity), "limit_price": str(order.price),

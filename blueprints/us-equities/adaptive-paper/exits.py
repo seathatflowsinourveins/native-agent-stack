@@ -34,7 +34,8 @@ either of those.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from decimal import InvalidOperation
 
 
 @dataclass(frozen=True)
@@ -55,6 +56,12 @@ class ExitContext:
     force_exit: bool
     force_exit_reason: str
     volatility_bps: float | None = None
+    # Explicit session input: default RTH preserves the historical rule chain.
+    # The owning runtime supplies its classification; this module reads no clock.
+    session: str = "RTH"
+    bid: str | float | None = None
+    ask: str | float | None = None
+    exit_side: str = "sell"
 
 
 @dataclass(frozen=True)
@@ -62,6 +69,9 @@ class ExitDecision:
     reason: str
     fraction: float = 1.0
     price_rule: str = "market"
+    limit_price: str | None = None
+    submit: bool = True
+    flag_position: bool = False
 
 
 # Reason -> the price_rule a resting sell order for that reason should use.
@@ -172,10 +182,43 @@ class ExitPlan:
     rules: tuple = DEFAULT_RULES
 
     def evaluate(self, ctx: ExitContext, config) -> ExitDecision | None:
+        """Return an exit or an explicit flagged hold, never submit an order.
+
+        Outside RTH the freshness guard precedes *all* rules, including forced
+        liquidation. Fresh extended exits use the existing marketable-limit
+        helper. Consumers must preserve submit/flag_position; a flagged hold is
+        not an actionable exit or a portfolio-rotation signal.
+        """
+        extended_price = None
+        if ctx.session != "RTH":
+            if ctx.session == "CLASSIFICATION_FAILED":
+                return ExitDecision("session_classification_failed", 0.0, "hold",
+                                    submit=False, flag_position=True)
+            if not ctx.quote_fresh:
+                return ExitDecision("quote_stale", 0.0, "hold",
+                                    submit=False, flag_position=True)
+            # OVERNIGHT remains a measured candidate. Its native classifier,
+            # adapter and owned paper acceptance have not been established.
+            if ctx.session == "OVERNIGHT":
+                return ExitDecision("overnight_unqualified", 0.0, "hold",
+                                    submit=False, flag_position=True)
+            if ctx.session not in ("PRE", "POST"):
+                return ExitDecision("session_unavailable", 0.0, "hold",
+                                    submit=False, flag_position=True)
+            # Local import reuses the native numeric/side-price primitive after
+            # module loading; strategies_v1 imports this plan during startup.
+            from strategies_v1 import limit_price
+            try:
+                extended_price = limit_price(ctx.bid, ctx.ask, ctx.exit_side)
+            except (InvalidOperation, TypeError, ValueError):
+                return ExitDecision("quote_invalid", 0.0, "hold",
+                                    submit=False, flag_position=True)
         stop_bps, trailing_bps = effective_thresholds(ctx, config)
         for rule in self.rules:
             decision = rule(ctx, config, stop_bps, trailing_bps)
             if decision is not None:
+                if extended_price is not None:
+                    return replace(decision, price_rule="limit", limit_price=extended_price)
                 return decision
         return None
 

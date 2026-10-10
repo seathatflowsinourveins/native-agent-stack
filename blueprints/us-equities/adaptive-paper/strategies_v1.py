@@ -287,6 +287,10 @@ class AdaptivePolicy:
         # order; not part of Decision itself so the golden fixture (which
         # only ever serializes Decision) is unaffected by this field.
         self.last_exit_fractions: dict[str, float] = {}
+        # Rich exit dispositions stay outside Decision's golden serialization.
+        # A session-aware native caller supplies the session before decide().
+        self.exit_session = "RTH"
+        self.last_exit_decisions = {}
 
     def observe(self, symbol: str, bid: float, ask: float, timestamp: float) -> bool:
         if symbol not in self.history:
@@ -409,9 +413,13 @@ class AdaptivePolicy:
         features, complete, risk_off, regime, signals = self._regime_and_signals(now)
         targets, exits = {}, {}
         self.last_exit_fractions = {}
+        self.last_exit_decisions = {}
         for symbol, holding in self.holdings.items():
             latest = self.latest.get(symbol)
             quote_fresh = bool(latest and now - latest.timestamp <= c.quote_age_seconds)
+            if self.exit_session != "RTH":
+                quote_fresh = bool(quote_fresh and
+                                   now >= latest.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS)
             if quote_fresh:
                 holding.high_bid = max(holding.high_bid, latest.bid)
                 pnl_bps = (latest.bid / holding.average_price - 1) * 10000
@@ -421,11 +429,20 @@ class AdaptivePolicy:
             ctx = ExitContext(now=now, entered_at=holding.entered_at, pnl_bps=pnl_bps,
                               trail_bps=trail_bps, quote_fresh=quote_fresh, risk_off=risk_off,
                               force_exit=force_exit, force_exit_reason=force_exit_reason,
-                              volatility_bps=(features.get(symbol) or {}).get("vol"))
+                              volatility_bps=(features.get(symbol) or {}).get("vol"),
+                              session=self.exit_session,
+                              bid=latest.bid if latest else None,
+                              ask=latest.ask if latest else None)
             decision = DEFAULT_PLAN.evaluate(ctx, c)
             if decision is not None:
-                exits[symbol] = decision.reason
-                self.last_exit_fractions[symbol] = decision.fraction
+                self.last_exit_decisions[symbol] = decision
+                if decision.submit:
+                    exits[symbol] = decision.reason
+                    self.last_exit_fractions[symbol] = decision.fraction
+                else:
+                    # Preserve the position, including when entries are allowed:
+                    # otherwise the post-loop portfolio_rotation fallback sells it.
+                    targets[symbol] = holding.quantity
             elif not allow_entries or not complete or now - holding.entered_at < c.min_hold_seconds:
                 targets[symbol] = holding.quantity
         # Leverage is an exposure ceiling, not permission to multiply an order.

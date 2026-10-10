@@ -1535,12 +1535,17 @@ def _final_corporate_action_guard_summary(strategy, held_symbols, now):
     mutates the strategy (a pure read), unlike the per-tick method."""
     guard = strategy.corporate_action_guard
     ever_flagged = set(strategy._ca_ever_flagged)
+    pending_exit_attention = (set(getattr(strategy, "_exit_pending_attention", {}))
+                              & set(held_symbols))
     if guard is None:
         return {"enabled": False, "ever_flagged_symbols": sorted(ever_flagged),
-                "pending_must_flatten": [], "pending_needs_attention_held": []}
+                "pending_must_flatten": [],
+                "pending_exit_attention_held": sorted(pending_exit_attention),
+                "pending_needs_attention_held": sorted(pending_exit_attention)}
     if not held_symbols:
         return {"enabled": True, "ever_flagged_symbols": sorted(ever_flagged),
-                "pending_must_flatten": [], "pending_needs_attention_held": []}
+                "pending_must_flatten": [], "pending_exit_attention_held": [],
+                "pending_needs_attention_held": []}
     try:
         info = session_at(datetime.fromtimestamp(now, timezone.utc))
         next_session_date = next_trading_day(info.session_date)
@@ -1550,7 +1555,9 @@ def _final_corporate_action_guard_summary(strategy, held_symbols, now):
         # positively verified clear, but none is force-flattened purely
         # because the calendar itself failed to classify this instant.
         return {"enabled": True, "ever_flagged_symbols": sorted(ever_flagged | set(held_symbols)),
-                "pending_must_flatten": [], "pending_needs_attention_held": sorted(held_symbols)}
+                "pending_must_flatten": [],
+                "pending_exit_attention_held": sorted(pending_exit_attention),
+                "pending_needs_attention_held": sorted(held_symbols)}
     decisions = guard.evaluate(today=info.session_date, next_session_date=next_session_date,
                                held_symbols=set(held_symbols), candidate_symbols=set(), now=now)
     pending_must_flatten = {symbol for symbol, decision in decisions.items() if decision.must_flatten}
@@ -1562,10 +1569,12 @@ def _final_corporate_action_guard_summary(strategy, held_symbols, now):
     # _corporate_action_guard_symbols's own equivalent defensive union)
     # counts as NOT verified, never silently "clear".
     pending_needs_attention_held |= set(held_symbols) - set(decisions)
+    pending_needs_attention_held |= pending_exit_attention
     ever_flagged |= {symbol for symbol, decision in decisions.items()
                     if decision.block_entry or decision.must_flatten or decision.needs_attention}
     return {"enabled": True, "ever_flagged_symbols": sorted(ever_flagged),
             "pending_must_flatten": sorted(pending_must_flatten),
+            "pending_exit_attention_held": sorted(pending_exit_attention),
             "pending_needs_attention_held": sorted(pending_needs_attention_held)}
 
 
@@ -1598,6 +1607,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     session_policy = validate_session_policy(config)
     strategy = AdaptiveStrategy(policy, controller.ledger, trial_id,
                                 event_sink=controller.events.append, transport=controller.port,
+                                session_policy=session_policy,
                                 account_multiplier=config.get("_account_multiplier"),
                                 halted=controller.is_halted,
                                 corporate_action_guard=_corporate_action_guard_for_strategy(
@@ -1776,7 +1786,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                         await _schedule_corporate_action_refresh(
                             strategy.corporate_action_guard, ca_watch, ca_start, ca_end, now, ca_refresh_state)
                 strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=force_exit)
-                strategy.rebalance(now, force_exit=force_exit)
+                tick_decision = strategy.rebalance(now, force_exit=force_exit)
                 if leverage_policy is not None:
                     acct_now = controller.ledger.accounting()
                     # EH-1: filled_gross_exposure_usd excludes every
@@ -1806,20 +1816,16 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                         ceiling=current_ceiling if current_ceiling is not None else Decimal("0"),
                         next_lower_ceiling=next_lower_ceiling)
                     last_achievement_tick = now
-                    if current_ceiling != last_recorded_ceiling:
-                        # G-e receipt (S6): regime is read back from this
-                        # tick's own decision event (controller.events),
-                        # rather than re-deriving it, so a throttled tick
-                        # (no fresh decision -> no event appended) simply
-                        # keeps the last known ceiling change unlogged for
-                        # regime rather than guessing.
-                        last_event = controller.events[-1] if controller.events else {}
+                    if tick_decision is not None and current_ceiling != last_recorded_ceiling:
+                        # The returned same-tick decision owns this regime.
+                        # Later order/attention events contain no regime, and
+                        # a throttled tick cannot authorize a new receipt.
                         try:
                             observed_session = session_at(datetime.fromtimestamp(now, timezone.utc)).kind.value
                         except ValueError:
                             observed_session = None
                         ceiling_changes.append({
-                            "t": now, "session": observed_session, "regime": last_event.get("regime"),
+                            "t": now, "session": observed_session, "regime": tick_decision.regime,
                             "drawdown_fraction": str(acct_now.drawdown_usd / controller.ledger.limits.max_drawdown_usd),
                             "ceiling": str(current_ceiling)})
                         last_recorded_ceiling = current_ceiling

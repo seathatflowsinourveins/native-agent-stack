@@ -9,7 +9,7 @@ from nautilus_trader.trading import Strategy
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model import (ClientOrderId, InstrumentId, OrderSide, Price,
                                   Quantity, StrategyId, TimeInForce)
-from exits import REASON_PRICE_RULE
+from exits import DEFAULT_PLAN, ExitContext, ExitDecision, REASON_PRICE_RULE
 from leverage import LeverageInputs
 from native_adapter import guarded_callback
 from safety import DEFAULT_STOP, SafetyError, evaluate_gap_risk
@@ -23,14 +23,21 @@ class AdaptiveStrategy(Strategy):
                                 order_id_tag="A", log_events=False, log_commands=False, manage_stop=False))
 
     def __init__(self, policy: AdaptivePolicy, ledger, trial_id: str, *, event_sink=None,
-                 transport=None, stop_file=None, clock=time.time, account_multiplier=None, halted=None,
-                 corporate_action_guard=None):
+                  transport=None, stop_file=None, clock=time.time, account_multiplier=None, halted=None,
+                  corporate_action_guard=None, exit_session_at=None, session_policy=None):
         self.policy = policy
         self.ledger = ledger
         self.trial_id = trial_id
         self.event_sink = event_sink or (lambda event: None)
         self.transport = transport
         self.stop_file = stop_file
+        # The runner's validated policy governs every transport, including
+        # SimulatedPort. Default RTH runs never start consulting a calendar.
+        if exit_session_at is None and (session_policy or {}).get("extended_hours", False):
+            exit_session_at = lambda now: session_at(datetime.fromtimestamp(now, timezone.utc)).kind
+        self._exit_session_at = exit_session_at
+        self._exit_pending_attention = {}
+        self._exit_attention_next = None
         # E4: a symbol halted, paused or quotation-only per the status stream or an
         # unexpired startup seed (runner.Controller.is_halted) gets no new order, entry or
         # exit, and its resting exit is not re-priced until it resumes. The quote's own
@@ -830,13 +837,82 @@ class AdaptiveStrategy(Strategy):
         return LeverageInputs(session, acct.drawdown_usd / self.ledger.limits.max_drawdown_usd, kill,
                               self.account_multiplier, acct.pending_buy_notional_usd)
 
+    def _exit_session(self, now):
+        classify = getattr(self, "_exit_session_at", None)
+        if classify is None:
+            return "RTH"
+        try:
+            result = classify(now)
+        except ValueError:
+            # A missing/invalid calendar classification is a held position,
+            # never permission to fall back to an RTH replacement.
+            return "CLASSIFICATION_FAILED"
+        kind = getattr(result, "kind", result)
+        return getattr(kind, "value", kind)
+
+    def _session_exit_decision(self, symbol, now, reason):
+        """Fresh acknowledgement/dispatch-time disposition for an owned exit."""
+        if getattr(self, "_exit_session_at", None) is None:
+            return None
+        quote = self.policy.latest.get(symbol)
+        fresh = bool(quote and
+                     now - quote.timestamp <= self.policy.config.quote_age_seconds and
+                     now >= quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS)
+        return DEFAULT_PLAN.evaluate(ExitContext(
+            now=now, entered_at=now, pnl_bps=0.0, trail_bps=0.0,
+            quote_fresh=fresh, risk_off=False, force_exit=True,
+            force_exit_reason=reason, session=self._exit_session(now),
+            bid=quote.bid if quote else None, ask=quote.ask if quote else None,
+        ), self.policy.config)
+
+    def _flag_exit_position(self, symbol, decision):
+        if self._exit_attention_next is not None:
+            self._exit_attention_next[symbol] = decision.reason
+            return
+        self._publish_exit_attention({**self._exit_pending_attention, symbol: decision.reason})
+
+    def _publish_exit_attention(self, attention):
+        previous = self._exit_pending_attention
+        self._exit_pending_attention = attention
+        for symbol, reason in attention.items():
+            if previous.get(symbol) != reason:
+                self.event_sink({"type": "exit_attention", "symbol": symbol, "reason": reason})
+
+    def _resolve_exit_attention(self, symbol):
+        # A clear quote/order disposition cannot clear a still-applicable
+        # corporate-action refusal. Its final summary is rechecked by the runner.
+        if symbol in self._ca_last_needs_attention_held:
+            return
+        attention = (self._exit_attention_next if self._exit_attention_next is not None
+                     else self._exit_pending_attention)
+        attention.pop(symbol, None)
+
     def rebalance(self, now=None, *, force_exit=False):
+        """Publish one attention transition after the entire owner tick."""
+        completed = False
+        try:
+            decision = self._rebalance(now, force_exit=force_exit)
+            completed = True
+            return decision
+        finally:
+            attention = self._exit_attention_next
+            self._exit_attention_next = None
+            if attention is not None:
+                if not completed:
+                    # A partial/failed tick may add refusals but cannot prove
+                    # an earlier held problem resolved.
+                    attention = {**self._exit_pending_attention, **attention}
+                self._publish_exit_attention(attention)
+
+    def _rebalance(self, now=None, *, force_exit=False):
         """Called on the native owner loop, never a socket thread. A strategy whose
         order callback raised (``faulted``) submits nothing more; recovery cleans up."""
         if self.faulted:
             return None
         now = self._clock() if now is None else now
         self.policy.sync_positions(self.positions(), now)
+        if hasattr(self.policy, "exit_session"):
+            self.policy.exit_session = self._exit_session(now)
         for client_id in list(self.pending):
             self._finish_if_terminal(client_id)
         operational = self._operational_status(now) if self.policy.selector is not None else None
@@ -852,6 +928,14 @@ class AdaptiveStrategy(Strategy):
                                        **decide_kwargs)
         if decision is None or not self.started:
             return None
+        flagged_exits = {symbol: value for symbol, value in
+                         getattr(self.policy, "last_exit_decisions", {}).items()
+                         if value.flag_position}
+        # Keep previous active reasons until all runtime guards have decided.
+        # Throttled/not-started ticks return above without starting a collector.
+        held = {s: Decimal(p["qty"]) for s, p in self.positions().items()}
+        self._exit_attention_next = {s: reason for s, reason in self._exit_pending_attention.items()
+                                     if held.get(s, 0) > 0}
         # If this tick's selector decision liquidates (FLATTEN_BEFORE_SWITCH),
         # policy.decide() already force-exited every holding above; propagate
         # that into this method's own force_exit so (a) no fresh entry is
@@ -866,7 +950,6 @@ class AdaptiveStrategy(Strategy):
             # cancel resting sells too. Use an unreachable timeout so only
             # the all_entries clause (buy-side entries) applies here.
             self.cancel_expired(now, float("inf"), all_entries=True)
-        held = {s: Decimal(p["qty"]) for s, p in self.positions().items()}
         busy = {i.symbol for i in self.ledger.unresolved()}
         busy.update(item["symbol"] for item in self.pending.values())
         # D4 (round 4): _gap_risk_stop_symbols is now called before the
@@ -915,7 +998,11 @@ class AdaptiveStrategy(Strategy):
             decision_event["corporate_action_must_flatten"] = sorted(ca_must_flatten)
         if getattr(self.policy, "leverage_policy", None) is not None:
             decision_event["leverage_ceiling"] = self.policy.last_leverage_ceiling
+        if flagged_exits:
+            decision_event["exit_flags"] = {s: d.reason for s, d in flagged_exits.items()}
         self.event_sink(decision_event)
+        for symbol, flagged in flagged_exits.items():
+            self._flag_exit_position(symbol, flagged)
         # Exits consume capacity before fresh entries; one outstanding order per
         # symbol also prevents sell-before-entry-terminal and oversell races.
         # A D5 gap-risk stop forces a full exit even if the ordinary decision
@@ -969,16 +1056,28 @@ class AdaptiveStrategy(Strategy):
                         for s, qty in decision.targets.items()
                         if qty > held.get(s, 0) and s not in ca_block_entry]
         for symbol, side, quantity, reason in actions:
+            if symbol in flagged_exits:
+                continue
             if self._halted(symbol):
                 # E4: halted, paused or quotation-only (status stream or unexpired seed):
                 # no entry and no new exit, and a resting exit is neither replaced nor
                 # joined by a new one (a limit sell cannot fill in a halt); the next tick
                 # after the resume, or the seed's expiry, acts again. A gap_risk_stop
                 # stays armed (fire-once is only marked on submit).
+                if side == "sell":
+                    self._flag_exit_position(symbol, ExitDecision(
+                        "exit_halted", 0.0, "hold", submit=False, flag_position=True))
                 continue
             quote = self.policy.latest.get(symbol)
+            session_exit = self._session_exit_decision(symbol, now, reason) if side == "sell" else None
+            if session_exit is not None and not session_exit.submit:
+                self._flag_exit_position(symbol, session_exit)
+                continue
             if not quote or now - quote.timestamp > self.policy.config.quote_age_seconds \
                     or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS:
+                if side == "sell":
+                    self._flag_exit_position(symbol, ExitDecision(
+                        "quote_stale", 0.0, "hold", submit=False, flag_position=True))
                 # D2 (round 3): a gap_risk_stop action that fails this same
                 # freshness check must NOT be marked fire-once applied --
                 # the stop stays armed and is re-evaluated (against a
@@ -1017,7 +1116,9 @@ class AdaptiveStrategy(Strategy):
                 continue
             self.sequence += 1
             client_id = f"adp-{self.trial_id}-{self.sequence:07d}"
-            price_str = limit_price(quote.bid, quote.ask, side)
+            price_str = (session_exit.limit_price if session_exit is not None
+                         and session_exit.price_rule == "limit" else
+                         limit_price(quote.bid, quote.ask, side))
             order = self.order_factory.limit(
                 InstrumentId.from_str(symbol + ".ALPACA"),
                 OrderSide.BUY if side == "buy" else OrderSide.SELL,
@@ -1036,9 +1137,13 @@ class AdaptiveStrategy(Strategy):
                 # just the price_rule label, which stays "trailing" for
                 # every tick of a trailing-stop ratchet -- see
                 # replace_exit's docstring).
-                self.pending[client_id]["price_rule"] = REASON_PRICE_RULE.get(reason, "market")
+                self.pending[client_id]["price_rule"] = (session_exit.price_rule
+                    if session_exit is not None and session_exit.price_rule == "limit"
+                    else REASON_PRICE_RULE.get(reason, "market"))
                 self.pending[client_id]["price"] = price_str
             busy.add(symbol)
+            if side == "sell":
+                self._resolve_exit_attention(symbol)
             self.submit_order(order)
             # D2 (round 3): mark fire-once applied only now that the order
             # has actually been submitted, not preemptively when the stop
@@ -1146,6 +1251,10 @@ class AdaptiveStrategy(Strategy):
         """
         if symbol in self._exit_replace_busy or quantity <= 0:
             return "refused"
+        session_exit = self._session_exit_decision(symbol, now, reason)
+        if session_exit is not None and not session_exit.submit:
+            self._flag_exit_position(symbol, session_exit)
+            return "refused"
         attempts = self._exit_attempts.get(symbol, 0)
         if attempts >= self.policy.config.exit_replace_max_attempts:
             return "refused"
@@ -1164,12 +1273,16 @@ class AdaptiveStrategy(Strategy):
         if min_interval > 0 and last_replace_at is not None and now - last_replace_at < min_interval:
             return "refused"
         resting = self.pending[client_id]
-        price_rule = REASON_PRICE_RULE.get(reason, "market")
+        price_rule = (session_exit.price_rule if session_exit is not None
+                      and session_exit.price_rule == "limit" else
+                      REASON_PRICE_RULE.get(reason, "market"))
         old_price_rule = resting.get("price_rule", "market")
         quote = self.policy.latest.get(symbol)
         price_changed = False
         if quote is not None:
-            new_price = Decimal(limit_price(quote.bid, quote.ask, "sell"))
+            new_price = Decimal(session_exit.limit_price if session_exit is not None
+                                and session_exit.price_rule == "limit" else
+                                limit_price(quote.bid, quote.ask, "sell"))
             old_price = resting.get("price")
             if old_price is None:
                 price_changed = True  # no recorded baseline -- treat as changed
@@ -1225,9 +1338,21 @@ class AdaptiveStrategy(Strategy):
         symbol = replacement["symbol"]
         self._exit_replace_busy.discard(symbol)
         quote = self.policy.latest.get(symbol)
+        session_exit = self._session_exit_decision(symbol, now, replacement["reason"])
+        if session_exit is not None and not session_exit.submit:
+            self._flag_exit_position(symbol, session_exit)
+            self._clear_gap_stop_for_dropped_replacement(replacement)
+            return
         if (self.faulted or self._halted(symbol) or not quote
                 or now - quote.timestamp > self.policy.config.quote_age_seconds
                 or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
+            if self._halted(symbol):
+                self._flag_exit_position(symbol, ExitDecision(
+                    "exit_halted", 0.0, "hold", submit=False, flag_position=True))
+            elif (not quote or now - quote.timestamp > self.policy.config.quote_age_seconds
+                    or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
+                self._flag_exit_position(symbol, ExitDecision(
+                    "quote_stale", 0.0, "hold", submit=False, flag_position=True))
             # E3/E4: a faulted strategy submits nothing; a symbol that halted while its
             # cancel was in flight is not re-priced (the ordinary path acts after it
             # resumes), exactly as for a stale quote below.
@@ -1245,15 +1370,22 @@ class AdaptiveStrategy(Strategy):
         client_id = f"adp-{self.trial_id}-{self.sequence:07d}"
         reason = replacement["reason"]
         quantity = replacement["quantity"]
-        price_str = limit_price(quote.bid, quote.ask, "sell")
+        price_str = (session_exit.limit_price if session_exit is not None
+                     and session_exit.price_rule == "limit" else
+                     limit_price(quote.bid, quote.ask, "sell"))
+        price_rule = (session_exit.price_rule if session_exit is not None
+                      and session_exit.price_rule == "limit" else
+                      REASON_PRICE_RULE.get(reason, "market") if session_exit is not None
+                      else replacement["price_rule"])
         order = self.order_factory.limit(
             InstrumentId.from_str(symbol + ".ALPACA"), OrderSide.SELL,
             Quantity.from_str(str(min(quantity, self.policy.config.max_shares))),
             Price.from_str(price_str),
             time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(client_id),
-            tags=[f"strategy={reason}", f"reason={reason}", f"price_rule={replacement['price_rule']}"])
+            tags=[f"strategy={reason}", f"reason={reason}", f"price_rule={price_rule}"])
         self.pending[client_id] = {"symbol": symbol, "side": "sell", "created": now,
-                                   "price_rule": replacement["price_rule"], "price": price_str, "reason": reason}
+                                   "price_rule": price_rule, "price": price_str, "reason": reason}
+        self._resolve_exit_attention(symbol)
         self.submit_order(order)
         # D1 (round 4): fire-once is marked here -- once the replacement
         # order has actually been submitted -- not on replace_exit's
