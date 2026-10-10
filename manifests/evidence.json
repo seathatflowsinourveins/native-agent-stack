@@ -18342,8 +18342,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-corrections-rule.md",
-      "sha256": "76793e0c31d94a55c0e588195e7b630f2db172cb3fa40a8880aa74a917dac4df",
-      "bytes": 7784
+      "sha256": "f12ce8d83ee913e33e5ab8ecae593b87a6271a75e99ce05ae8e877de2889574b",
+      "bytes": 8899
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
@@ -59797,8 +59797,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "a3b4451ae9751d5430061a7057dba5b196225ae1a17ef24699bf48b213bd7e15",
-      "bytes": 193146
+      "sha256": "0ac5ad272e3a2ea3746c05ed8c67640da2f4afde1be7e5eef6674386b5646206",
+      "bytes": 193282
     },
     {
       "path": "tests/test_codex_worker_skill.py",
