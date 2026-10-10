@@ -22,7 +22,7 @@ against it.
 | `tavily` | Tavily API key. Until 2026-09-29 it lived only in the kernel keyring; its first file write comes from that copy through the create-only chain in [Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29) | optional | `<store>/tavily.env` | `TAVILY_API_KEY` |
 | `anthropic-api` | Anthropic Claude Console API key for local tools without an identity provider | optional | `<store>/anthropic-api.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-2` | Anthropic Claude API key, second key (additional credit; fast-mode trial) | optional | `<store>/anthropic-api-2.env` | `ANTHROPIC_API_KEY` |
-| `anthropic-api-3` | Anthropic Claude API key, third key (CI Claude review) | optional | `<store>/anthropic-api-3.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-3` | Anthropic Claude API key, third key (CI Claude review first, then local quality work) | optional | `<store>/anthropic-api-3.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-4` | Anthropic Claude API key, fourth key (additional credit; direct use only) | optional | `<store>/anthropic-api-4.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-5` | Anthropic Claude API key, fifth key (additional credit; direct use only) | optional | `<store>/anthropic-api-5.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-6` | Anthropic Claude API key, sixth key (additional credit; direct use only) | optional | `<store>/anthropic-api-6.env` | `ANTHROPIC_API_KEY` |
@@ -108,9 +108,9 @@ records the evidence and the alternatives.
 
 | Slot | Organization id prefix | Purpose |
 | --- | --- | --- |
-| `anthropic-api-3` | `cd36eeda` | CI Claude review (the main-only `claude-review` environment secret) |
+| `anthropic-api-3` | `cd36eeda` | CI Claude review first, then local quality work (its key is the main-only `claude-review` environment secret) |
 | `anthropic-api-4` | `72e62741` | Quality-critical work and the north star's multi-model QA; the default when work uses a single key |
-| `anthropic-api-5` | `e02c4dee` | Additional credit; next in line after `anthropic-api-4` |
+| `anthropic-api-5` | `e02c4dee` | Additional credit; next in line after `anthropic-api-3` |
 | `anthropic-api`, `anthropic-api-2` | `9b5bb5b0`, `e0da7458` | Spares |
 | `anthropic-api-6` to `anthropic-api-10` | none stored | The next keys, filled in slot order |
 
@@ -187,10 +187,13 @@ and credit balances are not recorded here.
     center). Keys are not pooled; each spends its own account's credit.
     Quality work uses one key until Anthropic reports that key's credit
     exhausted, or answers 401 for a revoked key, and then moves to the next
-    in a fixed order: `anthropic-api-4`, `anthropic-api-5`, `anthropic-api`,
-    `anthropic-api-2`, then `anthropic-api-6` to `anthropic-api-10` as they
-    are stored. `anthropic-api-3` stays dedicated to CI and is never in that
-    order. Never round-robin. Anthropic's
+    in a fixed order: `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-5`,
+    `anthropic-api`, `anthropic-api-2`, then `anthropic-api-6` to
+    `anthropic-api-10` as they are stored. `anthropic-api-3` serves the CI
+    review first and local quality work second. The owner set this order at
+    about 15:12Z on 2026-10-10 (relayed by the command center), moving
+    `anthropic-api-3` into it; the command center's 14:15Z record had kept
+    that slot for CI alone. Never round-robin. Anthropic's
     [prompt-caching page](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
     ("Cache storage and sharing", read 2026-10-10) states "Caches are
     isolated between organizations. Different organizations never share

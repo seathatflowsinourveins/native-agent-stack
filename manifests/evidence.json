@@ -5361,8 +5361,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "42da1baf02da9dabce370c7340bc8f875e2c02ec46ef83bad2dd484da4d8ba26",
-      "bytes": 39757
+      "sha256": "a0cf9a37556f4c6c93d047da28d3ec13698b0b3c351621eda4ee4009c946ebf1",
+      "bytes": 39862
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -17082,7 +17082,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "b11e980f6ade7966426e9b9dfecc4005dc423a76abcd9ffb21e3ce536aa29978",
+      "sha256": "c78016a2ff0918fcb7557919a732094adf9e45dfc58748bce52f4cf05a710b5c",
       "bytes": 160022
     },
     {
@@ -18557,8 +18557,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-anthropic-key-slots-and-practice.md",
-      "sha256": "90d3e709bfef6700aec3e0f72d666c07b4ce6686e4ec0c86b2e4f6e4f6761def",
-      "bytes": 11240
+      "sha256": "04e53899245bcdb9d58d8352d423719ec6c2916ff640b24b00d71537d6bebc47",
+      "bytes": 12116
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
@@ -18902,8 +18902,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "ae9cbbef44cbfdfa7499835d9a8b7e07e36f179209a5edc4f85ed5d67f2b1925",
-      "bytes": 203138
+      "sha256": "1167732b4b7fa22835816b248e4bbacf7c970b898fda4a6738fe6ad8b1e360e0",
+      "bytes": 203440
     },
     {
       "path": "docs/stack.md",

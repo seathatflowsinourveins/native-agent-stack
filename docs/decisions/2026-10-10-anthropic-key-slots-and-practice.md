@@ -17,9 +17,16 @@ practice, in [Key practice (2026-10-10)](../secret-storage.md#key-practice-2026-
 one purpose per slot, hidden-prompt storage, per-command injection,
 main-only environment secrets for CI, a no-token health check, tracking,
 rotation, spend control and fill-first failover. Record `anthropic-api-3`'s
-purpose as CI Claude review (the main-only `claude-review` environment
-secret). Mark the inventory sentence "no Anthropic key is stored in GitHub"
-as superseded in `anthropic-api-3` and `anthropic-api-4`: under the owner's
+purpose as CI Claude review first, then local quality work; its key is the
+main-only `claude-review` environment secret. The fill-first order is
+`anthropic-api-4`, `anthropic-api-3`, `anthropic-api-5`, `anthropic-api`,
+`anthropic-api-2`, then `anthropic-api-6` to `anthropic-api-10` as stored.
+That is the owner's revision of about 15:12Z on 2026-10-10 (relayed by the
+command center). It moved `anthropic-api-3` into the order, which the
+command center's 14:15Z record had kept for CI alone.
+
+Mark the inventory sentence "no Anthropic key is stored in GitHub" as
+superseded in `anthropic-api-3` and `anthropic-api-4`: under the owner's
 ruling of 2026-10-10 (PR #968), the CI key from `anthropic-api-3` is an
 environment secret of the main-only `claude-review` environment.
 
@@ -92,10 +99,13 @@ Command-center inputs, used as leads and not re-measured here: the
 practice record `key-practice-20261010.md` (finalized 2026-10-10T14:15Z,
 `sha256:69dd4a8e1cad1cb63218358c5febfe47259435a909bfebfab05fa4a4e75f3eee`) and
 `cc-tools/anthropic_key_health.sh`
-(`sha256:713453037a589118f575f7500783291968ecc1ab497838a5017b6b82a8d922d1`). Both
-live in the command center's private state directory. They supplied the slot purposes, the organization id prefixes read
-at 14:14Z, the individual-account finding, the CI cap and the failover
-order. The repository copy omits account names and credit balances.
+(`sha256:713453037a589118f575f7500783291968ecc1ab497838a5017b6b82a8d922d1`).
+Both live in the command center's private state directory. They supplied
+the slot purposes, the organization id prefixes read at 14:14Z, the
+individual-account finding, the CI cap and the first failover order. The
+coordinator relayed the owner's revised order and `anthropic-api-3`'s
+revised purpose after 15:12Z. The repository copy omits account names and
+credit balances.
 
 ## Alternatives
 
@@ -104,6 +114,9 @@ order. The repository copy omits account names and credit balances.
   one workload over the five accounts would make each one write and hold its
   own copy of a cached prefix. Pooling would also blur which account spent
   which credit.
+- **Keeping `anthropic-api-3` for CI alone.** The command center's 14:15Z
+  record did so. The owner's revision of about 15:12Z puts it second in the
+  order, so its credit also serves local quality work after the CI review.
 - **Admin API keys for usage, cost and limits.** Unavailable: both Anthropic
   pages state that the Admin API is unavailable for individual accounts.
   Converting an account to an organization would enable it; that is the
@@ -131,6 +144,8 @@ order. The repository copy omits account names and credit balances.
   `anthropic-organization-id` leaves the documented response headers. The
   health check then reports `?` for the organization, and its source needs
   a new primary reference.
+- Local quality work on `anthropic-api-3` draws down the credit the CI
+  review needs. Revisit that slot's place in the order.
 - The owner changes the CI ruling, a slot's purpose, or the failover order.
 
 ## Acceptance and boundaries
@@ -170,7 +185,7 @@ actions.
 - [Claude API overview, Response headers](https://platform.claude.com/docs/en/api/overview)
   (read 2026-10-10, markdown
   `sha256:56b2a39bfcafe6f10efa7b5b3c81e4ba129d124998d67b278dbce8daaac607bf`).
-- [python/cpython@v3.13.16 Lib/urllib/request.py](https://github.com/python/cpython/blob/v3.13.16/Lib/urllib/request.py#L623-L655):
+- [python/cpython@v3.13.16 Lib/urllib/request.py](https://github.com/python/cpython/blob/v3.13.16/Lib/urllib/request.py#L623-L656):
   `HTTPRedirectHandler.redirect_request` copies every request header except
   content length and type to the redirect target. The installed 3.13.16 copy
   is byte-identical, which is why the probe follows no redirect.
