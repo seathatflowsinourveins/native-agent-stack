@@ -1693,18 +1693,117 @@ class TrustPathDerivationTests(unittest.TestCase):
         self.assertEqual(sorted(seen - set(gate.TRUST_PATHS)), [])
 
     def test_workflow_wrappers_match_the_workflow_trust_paths(self):
-        from tests.test_workflow_policy import load_workflow, workflow_files
+        from tests.test_workflow_policy import UnsupportedYAML, load_workflow, local_callee, workflow_files
 
-        wrappers = set()
+        workflows = {}
         for path in workflow_files(self.ROOT / ".github/workflows"):
-            jobs = load_workflow(path.read_text(encoding="utf-8"))["jobs"]
+            relative = path.relative_to(self.ROOT).as_posix()
+            try:
+                workflows[relative] = load_workflow(path.read_text(encoding="utf-8"))["jobs"]
+            except (OSError, UnsupportedYAML) as error:
+                self.fail(f"{relative}: unreadable or unparsable workflow ({type(error).__name__})")
+
+        wrappers, callers = set(), {}
+        for relative, jobs in workflows.items():
             invokes_gate = any("scripts/verdict_review_gate.py" in step.get("run", "")
                                for job in jobs.values() for step in job.get("steps", []))
             if "verdict-review-gate" in jobs or invokes_gate:
-                wrappers.add(path.relative_to(self.ROOT).as_posix())
+                wrappers.add(relative)
+            for job in jobs.values():
+                callee = local_callee(job.get("uses"))
+                if callee is not None:
+                    target = (Path(".github/workflows") / callee).as_posix()
+                    self.assertIn(target, workflows, f"{relative}: missing local reusable workflow {target}")
+                    callers.setdefault(target, set()).add(relative)
+
+        pending = list(wrappers)
+        while pending:
+            reached = callers.get(pending.pop(), set()) - wrappers
+            wrappers.update(reached)
+            pending.extend(reached)
         self.assertTrue(wrappers, "no workflow defines or invokes the verdict-review gate")
         trusted = {path for path in gate.TRUST_PATHS if path.startswith(".github/workflows/")}
         self.assertEqual(wrappers, trusted)
+
+    def workflow_fixture(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        directory = root / ".github/workflows"
+        directory.mkdir(parents=True)
+        (directory / "gate.yml").write_text(
+            "on: workflow_call\njobs:\n  verdict-review-gate:\n    runs-on: ubuntu-24.04\n"
+            "    steps:\n      - run: python3 scripts/verdict_review_gate.py\n", encoding="utf-8")
+        return root
+
+    @staticmethod
+    def write_workflow_caller(root, name, callee):
+        (root / ".github/workflows" / name).write_text(
+            f"on: workflow_call\njobs:\n  review:\n    uses: {callee}\n", encoding="utf-8")
+
+    def workflow_guard_result(self, root, trusted):
+        case = type(self)("test_workflow_wrappers_match_the_workflow_trust_paths")
+        case.ROOT = root
+        result = unittest.TestResult()
+        with mock.patch.object(gate, "TRUST_PATHS", trusted):
+            case.run(result)
+        return result
+
+    def test_reusable_workflow_callers_are_trust_paths_for_both_local_forms(self):
+        from tests.test_workflow_policy import LOCAL_WORKFLOW_PREFIXES
+
+        for prefix in LOCAL_WORKFLOW_PREFIXES:
+            with self.subTest(prefix=prefix):
+                root = self.workflow_fixture()
+                self.write_workflow_caller(root, "caller.yml", prefix + "gate.yml")
+                omitted = self.workflow_guard_result(root, (".github/workflows/gate.yml",))
+                self.assertEqual(omitted.errors, [], omitted.errors)
+                self.assertTrue(omitted.failures, "the gate caller was omitted from TRUST_PATHS")
+                registered = self.workflow_guard_result(
+                    root, (".github/workflows/gate.yml", ".github/workflows/caller.yml"))
+                self.assertTrue(registered.wasSuccessful(), registered.failures + registered.errors)
+
+    def test_transitive_reusable_workflow_callers_are_trust_paths(self):
+        from tests.test_workflow_policy import LOCAL_WORKFLOW_PREFIXES
+
+        for prefix in LOCAL_WORKFLOW_PREFIXES:
+            with self.subTest(prefix=prefix):
+                root = self.workflow_fixture()
+                self.write_workflow_caller(root, "middle.yml", prefix + "gate.yml")
+                self.write_workflow_caller(root, "outer.yml", prefix + "middle.yml")
+                trusted = (".github/workflows/gate.yml", ".github/workflows/middle.yml",
+                           ".github/workflows/outer.yml")
+                for caller in trusted[1:]:
+                    with self.subTest(omitted=caller):
+                        omitted = self.workflow_guard_result(root, tuple(path for path in trusted if path != caller))
+                        self.assertEqual(omitted.errors, [], omitted.errors)
+                        self.assertTrue(omitted.failures, "a transitive gate caller was omitted from TRUST_PATHS")
+                registered = self.workflow_guard_result(root, trusted)
+                self.assertTrue(registered.wasSuccessful(), registered.failures + registered.errors)
+
+    def test_missing_reusable_workflow_callees_fail_closed(self):
+        from tests.test_workflow_policy import LOCAL_WORKFLOW_PREFIXES
+
+        for prefix in LOCAL_WORKFLOW_PREFIXES:
+            with self.subTest(prefix=prefix):
+                root = self.workflow_fixture()
+                self.write_workflow_caller(root, "caller.yml", prefix + "missing.yml")
+                result = self.workflow_guard_result(root, (".github/workflows/gate.yml",))
+                self.assertEqual(result.errors, [], result.errors)
+                self.assertTrue(result.failures, "a missing local callee was silently omitted")
+
+    def test_unparsable_reusable_workflow_callees_fail_closed(self):
+        from tests.test_workflow_policy import LOCAL_WORKFLOW_PREFIXES
+
+        for prefix in LOCAL_WORKFLOW_PREFIXES:
+            with self.subTest(prefix=prefix):
+                root = self.workflow_fixture()
+                self.write_workflow_caller(root, "caller.yml", prefix + "broken.yml")
+                (root / ".github/workflows/broken.yml").write_text(
+                    "on: workflow_call\njobs: [broken]\n", encoding="utf-8")
+                result = self.workflow_guard_result(root, (".github/workflows/gate.yml",))
+                self.assertEqual(result.errors, [], result.errors)
+                self.assertTrue(result.failures, "an unparsable local callee was silently omitted")
 
     # Runs in a subprocess: an audit hook cannot be removed once added. It records every file opened
     # for reading under the data root and every module imported from the repository.

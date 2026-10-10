@@ -1382,9 +1382,11 @@ A rule input held inside a data file
 counts too: `adoption/manifest.json#/platform_profiles` (which host
 os/architecture a receipt's platform binds) changed together with verdict
 data fails the same way (`RULE_INPUT_FIELDS`). The tests derive the list
-rather than restate it: one parses workflow jobs and steps and requires the
-gate wrapper paths to exactly match the workflow entries in `TRUST_PATHS`,
-one walks the modules' imports with `ast`, and one
+rather than restate it: one parses workflow jobs and steps, follows job-level
+local reusable-workflow calls in both supported path forms, and requires every
+direct gate wrapper and transitive caller to exactly match the workflow entries
+in `TRUST_PATHS`. Missing or unparsable local callees fail this check.
+Another walks the modules' imports with `ast`, and another
 records every file opened (a `sys.addaudithook`, in a subprocess) while the
 gate judges a fixture that reaches every row path and while the validators
 check this checkout. Every head-side file the gate reads must be a

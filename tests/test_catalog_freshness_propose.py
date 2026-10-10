@@ -815,8 +815,9 @@ class RebuildExplorerSubprocessTests(unittest.TestCase):
         artifact_dir = _make_artifact(self.scratch, "artifact-validate")
         result = _run_propose_cli(self.scratch, artifact_dir, checked_at="2026-09-23T02:00:00Z")
         self.assertEqual(result.returncode, 0, result.stderr[-3000:])
+        # Leave time for fixture setup and the other tests within the 600-second module budget.
         checked = subprocess.run(
-            ["python3", "scripts/validate.py"], cwd=self.scratch, capture_output=True, text=True, timeout=60,
+            ["python3", "scripts/validate.py"], cwd=self.scratch, capture_output=True, text=True, timeout=300,
         )
         self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
 
