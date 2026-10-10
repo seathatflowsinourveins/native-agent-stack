@@ -69,6 +69,7 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "claude-pr-toolkit-review.yml",
             # Its offline zizmor pass/fail assertions live in tests/test_sota_sources_gate.py.
             "sota-sources-gate.yml",
+            "pr-metadata.yml",
         }
         self.assertEqual(
             actual, expected,

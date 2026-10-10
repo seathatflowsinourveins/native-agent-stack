@@ -1,12 +1,12 @@
-"""The reusable sota-sources gate and the check it shares with validate.yml.
+"""The reusable sota-sources gate and the check it shares with pr-metadata.yml.
 
-.github/workflows/sota-sources-gate.yml is validate.yml's required sota-sources job made callable (`on:
+.github/workflows/sota-sources-gate.yml is pr-metadata.yml's required sota-sources job made callable (`on:
 workflow_call`), so a repository scaffolded by tools/adoption/scaffold_repo.py enforces the same pull-request rule by
 calling it at a pinned commit. These tests keep the two copies one check:
 
-- from the job's `if:` line to its end the gate's job is validate.yml's byte for byte (only the leading comment may
+- from the job's `if:` line to its end the gate's job is pr-metadata.yml's byte for byte (only the leading comment may
   differ), and a one-character drift is caught;
-- the gate is only a reusable workflow, with a read-only token, and validate.yml keeps the job the main ruleset
+- the gate is only a reusable workflow, with a read-only token, and pr-metadata.yml keeps the job the main ruleset
   requires;
 - run the way actions/github-script runs a script (an AsyncFunction over the named arguments,
   src/async-function.ts at the pinned v9.0.0 commit 3a2844b7), both copies pass and fail the same descriptions, and
@@ -29,7 +29,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github/workflows"
-VALIDATE = WORKFLOWS / "validate.yml"
+VALIDATE = WORKFLOWS / "pr-metadata.yml"
 GATE = WORKFLOWS / "sota-sources-gate.yml"
 RULESET = ROOT / ".github/main-ruleset.json"
 SCAFFOLD = ROOT / "adoption/scaffold"
@@ -77,8 +77,8 @@ def sota_job(path: Path) -> str:
 
 
 # actions/github-script v9.0.0 (3a2844b7e9c422d3c10d287c895573f7108da1b3) src/async-function.ts: the script is the
-# body of `new AsyncFunction(...Object.keys(args), source)`, called with the argument values. This script reads only
-# `context` and `core`, so the harness passes those two.
+# body of `new AsyncFunction(...Object.keys(args), source)`, called with the argument values. The fixture supplies
+# `context`, `core` and the REST client, and main.ts's handleError turns a rejected script into core.setFailed.
 HARNESS = r"""
 const fs = require('fs');
 const AsyncFunction = Object.getPrototypeOf(async () => null).constructor;
@@ -86,10 +86,21 @@ const {script, payloads} = JSON.parse(fs.readFileSync(0, 'utf8'));
 (async () => {
   const results = [];
   for (const payload of payloads) {
-    const outcome = {failed: null, info: null};
+    const outcome = {failed: null, info: null, requests: []};
     const core = {setFailed: (message) => { outcome.failed = String(message); },
                   info: (message) => { outcome.info = String(message); }};
-    await new AsyncFunction('context', 'core', script)({payload}, core);
+    const context = {payload, repo: {owner: 'fixture-owner', repo: 'fixture-repo'},
+                     issue: {number: payload.pull_request?.number || 17}};
+    const github = {rest: {pulls: {get: async (parameters) => {
+      outcome.requests.push(parameters);
+      if (payload.retrieval_error) throw new Error(payload.retrieval_error);
+      return {data: payload.current_pull_request ?? payload.pull_request ?? {}};
+    }}}};
+    try {
+      await new AsyncFunction('context', 'core', 'github', script)(context, core, github);
+    } catch (error) {
+      core.setFailed(`Unhandled error: ${error}`);
+    }
     results.push(outcome);
   }
   process.stdout.write(JSON.stringify(results));
@@ -133,13 +144,13 @@ class GateIdentityTests(unittest.TestCase):
         self.assertEqual(re.findall(r"(?m)^on:.*$", text), ["on:"])
         self.assertEqual(re.findall(r"(?m)^  [a-z_]+:", text.split("\non:\n", 1)[1].split("\n\n", 1)[0]),
                          ["  workflow_call:"])
-        # No token scope and no cache access (docs/decisions/2026-10-04-ci-least-privilege.md); the job adds none.
+        # No default token scope or cache access; the job grants only the current-PR retrieval scope.
         self.assertIn("\npermissions: {}\ncache-mode: none\n\n", text)
-        self.assertNotRegex(text, r"(?m)^    permissions:")
+        self.assertRegex(text, r"(?m)^    permissions:\n      pull-requests: read\n    steps:")
         self.assertNotRegex(text, r"(?m)^[ \t]*[\w-]+:[ \t]*write(?:-all)?[ \t]*(?:#.*)?$")
         self.assertEqual(list(jobs(text)), [JOB_ID])
 
-    def test_the_gate_runs_validate_ymls_check_byte_for_byte(self):
+    def test_the_gate_runs_pr_metadata_ymls_check_byte_for_byte(self):
         self.assertEqual(check_body(sota_job(GATE)), check_body(sota_job(VALIDATE)))
         self.assertEqual(inline_script(sota_job(GATE)), inline_script(sota_job(VALIDATE)))
         self.assertIn("core.setFailed(", inline_script(sota_job(GATE)))
@@ -154,7 +165,7 @@ class GateIdentityTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             check_body(original.replace("    if: ", "    name: x\n    if: ", 1))
 
-    def test_validate_yml_keeps_the_job_the_main_ruleset_requires(self):
+    def test_pr_metadata_yml_keeps_the_job_the_main_ruleset_requires(self):
         contexts = [check["context"] for rule in json.loads(RULESET.read_text(encoding="utf-8"))["rules"]
                     if rule.get("type") == "required_status_checks"
                     for check in rule["parameters"]["required_status_checks"]]
@@ -167,8 +178,8 @@ class GateBehaviourTests(unittest.TestCase):
     def test_both_copies_pass_and_fail_the_same_descriptions(self):
         payloads = [payload for _, payload, _ in CASES]
         outcomes = {name: run_check(inline_script(sota_job(path)), payloads)
-                    for name, path in (("validate.yml", VALIDATE), ("sota-sources-gate.yml", GATE))}
-        self.assertEqual(outcomes["validate.yml"], outcomes["sota-sources-gate.yml"])
+                    for name, path in (("pr-metadata.yml", VALIDATE), ("sota-sources-gate.yml", GATE))}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
         for (case, _, passes), outcome in zip(CASES, outcomes["sota-sources-gate.yml"]):
             with self.subTest(case=case):
                 self.assertIs(outcome["failed"] is None, passes, outcome)
@@ -176,6 +187,31 @@ class GateBehaviourTests(unittest.TestCase):
                     self.assertRegex(outcome["info"], r"^SOTA sources section present \(\d+ characters\)\.$")
                 else:
                     self.assertIn('non-empty "SOTA sources" section', outcome["failed"])
+
+    def test_both_copies_judge_the_current_body_instead_of_the_event_body(self):
+        valid = "### SOTA sources\n- https://github.com/o/r at v1.2.3, src/x.py\n"
+        for path in (VALIDATE, GATE):
+            with self.subTest(workflow=path.name):
+                script = inline_script(sota_job(path))
+                removed, restored = run_check(script, [
+                    {**body(valid), "current_pull_request": {"body": "## Summary\nNo sources\n"}},
+                    {**body(""), "current_pull_request": {"body": valid}},
+                ])
+                self.assertIsNotNone(removed["failed"])
+                self.assertIsNone(restored["failed"], restored)
+                for outcome in (removed, restored):
+                    self.assertEqual(outcome["requests"], [{"owner": "fixture-owner", "repo": "fixture-repo",
+                                                          "pull_number": 17}])
+
+    def test_a_rejected_pulls_get_fails_both_copies_even_with_a_valid_event_body(self):
+        payload = {**body("### SOTA sources\n- https://example.org/paper\n"), "retrieval_error": "request denied"}
+        for path in (VALIDATE, GATE):
+            with self.subTest(workflow=path.name):
+                (outcome,) = run_check(inline_script(sota_job(path)), [payload])
+                self.assertIn("Unhandled error:", outcome["failed"])
+                self.assertIn("request denied", outcome["failed"])
+                self.assertIsNone(outcome["info"])
+                self.assertEqual(len(outcome["requests"]), 1)
 
     def test_both_pull_request_templates_fail_until_the_section_is_filled_in(self):
         script = inline_script(sota_job(GATE))
@@ -209,10 +245,11 @@ def zizmor(path: Path, directory: Path) -> tuple:
 
 @unittest.skipUnless(ZIZMOR, "native zizmor unavailable; CI installs the pinned analyzer")
 class GateZizmorTests(unittest.TestCase):
-    def test_the_gate_has_no_offline_findings(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            status, idents = zizmor(GATE, Path(temporary))
-        self.assertEqual((status, idents), (0, set()))
+    def test_both_metadata_workflows_have_no_offline_findings(self):
+        for path in (GATE, VALIDATE):
+            with self.subTest(workflow=path.name), tempfile.TemporaryDirectory() as temporary:
+                status, idents = zizmor(path, Path(temporary))
+                self.assertEqual((status, idents), (0, set()))
 
 
 class ScaffoldCallerTests(unittest.TestCase):
@@ -220,6 +257,7 @@ class ScaffoldCallerTests(unittest.TestCase):
         text = CALLER_TEMPLATE.read_text(encoding="utf-8")
         self.assertEqual(re.findall(r"(?m)^    uses: (\S+)$", text), [f"{GATE_REFERENCE}@<sha>"])
         self.assertIn("\npermissions:\n  contents: read\n", text)
+        self.assertIn("\n  pull-requests: read\n", text)
         self.assertRegex(text, r"(?m)^  pull_request:\n    # [^\n]*\n    types: \[opened, synchronize, reopened, edited\]$")
 
     def test_no_scaffold_file_is_collected_as_a_workflow(self):

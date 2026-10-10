@@ -2139,7 +2139,7 @@ class PullRequestLoopTests(unittest.TestCase):
                                  sleep=clock.sleep, **options)
 
     def test_sota_check_is_a_port_of_the_ci_job(self):
-        workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+        workflow = (ROOT / ".github/workflows/pr-metadata.yml").read_text(encoding="utf-8")
         self.assertIn(r"/^#{2,3}[ \t]+SOTA sources[ \t]*$([\s\S]*?)(?=^#{2,3}[ \t]|(?![\s\S]))/m", workflow)
         self.assertIn(r".replace(/<!--[\s\S]*?-->/g, '').trim()", workflow)
         content = self.r.sota_section_content

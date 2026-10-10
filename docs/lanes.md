@@ -172,8 +172,9 @@ gh pr merge <N> --squash --match-head-commit <SHA>
   and [`aggregate.go` L72-88](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/checks/aggregate.go#L72-L88)
   at gh v2.101.0: `CANCELLED` is bucket `cancel`, counted as neither failed nor
   pending), and with `--json` it exits 0 whatever the state. A description edit
-  starts a new `validate.yml` run on the same head (its `pull_request` types
-  include `edited`), so run it after the last edit. `gh` sends `<SHA>` as
+  starts a `pr-metadata.yml` run on the same head to read the current PR;
+  `validate.yml` does not subscribe to `edited`, so run the check read after
+  the last edit and wait for the metadata gates too. `gh` sends `<SHA>` as
   GitHub's `expectedHeadOid` ([gh pr merge](https://cli.github.com/manual/gh_pr_merge):
   "Commit SHA that the pull request head must match to allow merge"), and GitHub
   refuses the merge if the head has moved since; the mechanics are in the

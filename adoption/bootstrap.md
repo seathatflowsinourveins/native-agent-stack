@@ -841,11 +841,12 @@ python3 tools/adoption/scaffold_repo.py --target <repo>             # writes it;
 | `.github/workflows/sota-sources.yml` | `sota-sources.yml.template` with `<sha>` filled in: it calls this repository's reusable `sota-sources-gate.yml` at that main commit |
 | `.codex/config.toml` | `adoption/templates/project.codex.config.template.toml`, rendered for this host |
 
-The gate is `validate.yml`'s required `sota-sources` job made reusable (`on: workflow_call`), the same
+The gate is `pr-metadata.yml`'s required `sota-sources` job made reusable (`on: workflow_call`), the same
 check byte for byte (`tests/test_sota_sources_gate.py`); a called workflow runs in its caller's
-context, so it reads the new repository's pull request
+context, so it reads the new repository's current pull request through the REST API
 ([reusing workflow configurations](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations),
-"`github` context"). `<sha>` is `--main-sha`, else what `git ls-remote origin refs/heads/main` reports;
+"`github` context"). The scaffold caller grants `pull-requests: read`; existing callers must add that
+grant when they update their gate pin. `<sha>` is `--main-sha`, else what `git ls-remote origin refs/heads/main` reports;
 when that commit is in this checkout it must carry `.github/workflows/sota-sources-gate.yml`, or nothing
 is written (exit 2), and a commit this checkout lacks is used as given and reported unchecked. GitHub
 resolves the reusable workflow when the check runs, so the new repository's check works only once that

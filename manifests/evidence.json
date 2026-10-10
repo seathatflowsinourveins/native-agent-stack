@@ -5150,6 +5150,11 @@
       "bytes": 3254
     },
     {
+      "path": ".github/workflows/pr-metadata.yml",
+      "sha256": "3f0d77d6d28e2c1a15905a277cff15326a75c4960e37f634e2a2c12e2e7bffe6",
+      "bytes": 9927
+    },
+    {
       "path": ".github/workflows/practice-references-freshness.yml",
       "sha256": "edf35611020d9338f3f28db9d247039d25cb1d31e4c001306e395dab2862a7e1",
       "bytes": 3456
@@ -5186,8 +5191,8 @@
     },
     {
       "path": ".github/workflows/sota-sources-gate.yml",
-      "sha256": "25029eba404feb5bf9fe79c3c8d97c53cc290c6876e72be73c268a7e13d7883b",
-      "bytes": 2699
+      "sha256": "468a1d1b8b765823dc5175f546c236cdf026669de2581e8149c1ef68177274e7",
+      "bytes": 3020
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -5201,8 +5206,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "339626f86df3cf5954f23e1365e87eaf3635ff55488b65f0715ed7dbdbd3cacb",
-      "bytes": 43019
+      "sha256": "61a9ed511b422382bcf4433167aa6627e51eb390b6a6a4efd9aa5cc377e99a66",
+      "bytes": 35456
     },
     {
       "path": ".gitignore",
@@ -5351,8 +5356,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "ca7f66cde7af2396a8e9c728ca1e4067394d9c92dfe5ced3def886ca18d9ff3e",
-      "bytes": 74554
+      "sha256": "0a448d9813a9c74f84ba23f935431eba558c55e8febe42061d4658f6ab8bf9da",
+      "bytes": 74706
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5593,6 +5598,11 @@
       "path": "adoption/research.md",
       "sha256": "10e83b515760e86ffd1a9b6540aaeea769f94af5d569c001954f0031548ca75b",
       "bytes": 2735
+    },
+    {
+      "path": "adoption/scaffold/.github/workflows/sota-sources.yml.template",
+      "sha256": "9d6f5dbd746e9c0589ad26aa103ced6f2b1f1290a39a6beee7711efc3495db3c",
+      "bytes": 1107
     },
     {
       "path": "adoption/scaffold/AGENTS.md",
@@ -11342,8 +11352,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
-      "sha256": "b72dc929e54da878eac6a6ee34cd1e076ac8016f0015153725aadd96861b1a15",
-      "bytes": 103642
+      "sha256": "9ca877e1fce797196a0b24980def08a812fade5366fbcedaa4f01caa7571610f",
+      "bytes": 103645
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gate_reads.py",
@@ -17722,8 +17732,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "5cd35591a82a8502d17da26adca21019edefeda076c3462fd98cf29dd53c6b66",
-      "bytes": 159318
+      "sha256": "572f707148b14e996441cbe00ec3dc76d5e0f86eb3a247bc0bf3ee9e9fa36a74",
+      "bytes": 161476
     },
     {
       "path": "docs/decisions/2026-09-23-max-effort-default.md",
@@ -18127,8 +18137,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "69f7fcd2c2f91412dc478f8d10503820a186efba9788f09f723d3212695cf3d0",
-      "bytes": 43157
+      "sha256": "b4a735ec0834156c89adf66ab7dc3b32c540c638475554621a99b1b702c3252b",
+      "bytes": 43474
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18452,8 +18462,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
-      "sha256": "f4b4f1d9952db662d8c0c9f1f9aec24da40c4666e4655e105c0617a689e6826c",
-      "bytes": 10028
+      "sha256": "b8134a6c28b1f6575d72945bf141ff36de9bc7e268afad23a53c752da4634666",
+      "bytes": 10082
     },
     {
       "path": "docs/decisions/2026-10-08-qmd-shared-mcp.md",
@@ -18647,8 +18657,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "28a97e3dea87e15a141bb297e4654fc235bc7445ba54941a23e19de90eaf75c8",
-      "bytes": 103924
+      "sha256": "b5e80791e416eec587e8202253c764aac9454290d5afc6561187a045eee1747b",
+      "bytes": 105989
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -18707,8 +18717,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "bc464ce7d95542b7a33229de29f50efe2bf52b341bf037772bf91e556468cb8f",
-      "bytes": 13335
+      "sha256": "36a2c7a6bb52252e04fd836ecd0684fc50a412f0b9226ff179c74e46fe4e31b8",
+      "bytes": 13410
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
@@ -59461,6 +59471,11 @@
       "bytes": 21933
     },
     {
+      "path": "scripts/verdict_review_gate.py",
+      "sha256": "daa20fe48f09e64ef3db7814dee3a2860d058031f56cc5be2c21236c16c77fbb",
+      "bytes": 100220
+    },
+    {
       "path": "scripts/verify_nautilus_ci.py",
       "sha256": "e14e3372815747eefa800f3538f30eabfb4fab7025ccc507bb0b946e67d2292f",
       "bytes": 8608
@@ -59917,8 +59932,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "b941755e00c05e08751e64c55eac8ab7f5827a71b4bb8903e6ce229be9c29611",
-      "bytes": 63830
+      "sha256": "6aa868be73a47e3f2347c0728ec4489e59c52ecfb84f115aed051698effc4e6d",
+      "bytes": 64694
     },
     {
       "path": "tests/test_catalog_freshness_runtime.py",
@@ -60242,8 +60257,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "268aee4e0eff1cf8404068ea3f67d622b962713bb1b0bd874d8ccb07f73f35ba",
-      "bytes": 144017
+      "sha256": "08574857b240aeb89b98aa1b573765442cc860dce7411a8e1d7f2602f68af301",
+      "bytes": 144020
     },
     {
       "path": "tests/test_install_skills.py",
@@ -60324,6 +60339,11 @@
       "path": "tests/test_local_pages_fleet_regressions.py",
       "sha256": "4601bbba4a6c1cf04352a484670b1601b468e9aa879c8ac5f55eee6c3fd5dd94",
       "bytes": 20940
+    },
+    {
+      "path": "tests/test_local_pages_policy_grants.py",
+      "sha256": "7ea348554ca4d467b71b18833167858f77715ee962832e1f503ed4682c983585",
+      "bytes": 19309
     },
     {
       "path": "tests/test_managed_block.py",
@@ -60662,8 +60682,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "b6ce5cf835a00e68494513a79df41238d059abf794e8d8062c2286812cee66b6",
-      "bytes": 276707
+      "sha256": "852f6115d6295c2ea54a3c9aede259a380d45c9c712963f1fcc3363bddaa766c",
+      "bytes": 276710
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
@@ -60752,8 +60772,8 @@
     },
     {
       "path": "tests/test_sota_sources_gate.py",
-      "sha256": "35b1e34003658cddd9e9ede37c71bdf8fee7ede6cda5105924792670e3e30d12",
-      "bytes": 13871
+      "sha256": "869038ea7c6261e335e942934b335789e9f3e883ee172835a1c0828ea4afa870",
+      "bytes": 16230
     },
     {
       "path": "tests/test_spy_parity.py",
@@ -60861,6 +60881,11 @@
       "bytes": 12669
     },
     {
+      "path": "tests/test_verdict_review_gate.py",
+      "sha256": "0b829e33823d3d9f3e94295836f63b97342c8cedc7b92ed0d08e3c40553b894b",
+      "bytes": 116272
+    },
+    {
       "path": "tests/test_windows_terminal_defaults.py",
       "sha256": "f4b2c8ebe16f54782204f32fd674debc4b8f3a01f5ca1d0b00b788c175ed0502",
       "bytes": 51736
@@ -60872,8 +60897,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "7f16b2ad9aa5ef3886a24bf2a576f3304c1b9fda354520d89824b8dd7178ec18",
-      "bytes": 166541
+      "sha256": "932313de8026909dad900fcca7da06df65304416cd501da31285e5441050e604",
+      "bytes": 173584
     },
     {
       "path": "tests/test_workflow_policy.py",
@@ -60887,8 +60912,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "804fb4ab24d29bf05becb43facd4d0cf68158ef24ad13101d2eb0d57c69b8ec9",
-      "bytes": 13367
+      "sha256": "4e11c6592c56636c1e557eb93ffb745a2703a4ee87565259568418e51d7bde29",
+      "bytes": 13398
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -61124,6 +61149,11 @@
       "path": "tools/invocation-monitoring/test_codex_counter.py",
       "sha256": "1c88c483bf50c4b12658aa43fec806060c557dda1215178c3e2dff1feb75a86e",
       "bytes": 5161
+    },
+    {
+      "path": "tools/local-pages/source_policy.json",
+      "sha256": "3e65408d5fab88cb3ab7a3167b738ba207d053f37bbe25c5e4890ac6e3ed82b9",
+      "bytes": 755702
     },
     {
       "path": "tools/omniroute/gateway_record.py",

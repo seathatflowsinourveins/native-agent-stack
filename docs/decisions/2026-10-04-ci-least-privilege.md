@@ -178,16 +178,17 @@ inventories.
 | `native-service-reboot.yml` | `{}` | `contents: read` on both jobs | | added | |
 | `native-token-e2e.yml` | `{}` | `contents: read` | `none` | added | |
 | `practice-references-freshness.yml` | `{}` | `contents: read` | | added | |
+| `pr-metadata.yml` (added 2026-10-09, PR #706) | `{}` | `verdict-review-gate`: `contents: read`, `pull-requests: read`; `sota-sources`: `pull-requests: read` | `none` | added, `queue: max` | current PR body and base read through REST |
 | `publish-catalog.yml` | `{}` | (already job-scoped) | `none` | added, never cancels | |
 | `receipt-staleness.yml` | `{}` | (already `contents: read`) | `none` | kept | |
 | `runtime-worker-skills-freshness.yml` | `{}` | `contents: read` | | added | |
 | `saturation-tracking.yml` | `{}` | (already job-scoped) | | kept | |
 | `scorecard.yml` | `{}` | (already job-scoped) | | kept | |
 | `security-scan.yml` | `{}` | (already job-scoped) | `none` | kept | |
-| `sota-sources-gate.yml` | `{}` | none (payload only) | `none` | none (reusable) | |
+| `sota-sources-gate.yml` | `{}` | `sota-sources`: `pull-requests: read` (PR #706) | `none` | none (reusable) | current PR body read through REST |
 | `supply-chain.yml` | `{}` | `contents: read` | `none` | kept | |
 | `token-report.yml` | `{}` | `contents: read` | `none` | kept | |
-| `validate.yml` | `{}` | `validate`, `secret-scan`: `contents: read`; `sota-sources`: none | `none` | kept | |
+| `validate.yml` | `{}` | `contents: read` on all 4 jobs | `none` | kept | metadata gates move to `pr-metadata.yml` in PR #706 |
 
 Tests changed to follow the new layout, without loosening any assertion: `tests/test_workflow_hardening.py` (top-level
 `{}` instead of `contents: read` in five classes, and `{}` accepted as the one inline permissions form),
@@ -204,7 +205,7 @@ Job 004's residual risks, and what this change does about them:
    (#489) is the control. This layer catches regressions on `main` and in human pull requests, and the required checks
    still gate merging.
 2. **Network-enabled test code can read the checkout and whatever credentials a job holds.** Narrowed: no pull request
-   job holds a secret or a write scope; tokens are `contents: read` or none and never persisted to disk. Egress
+   job holds a secret or a write scope; tokens grant read scopes or none and are never persisted to disk. Egress
    stays audit-only (harden-runner); confidentiality of public-repository source is not at stake.
 3. **Caches.** Closed for pull request jobs (`cache-mode: none`, or restore-only with the save step guarded off pull
    requests), and the attested release restores nothing. A job-level `cache-mode` override on a pull request job fails

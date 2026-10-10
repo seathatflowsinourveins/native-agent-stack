@@ -1219,12 +1219,14 @@ way this catalog gains evidence; read that chapter for the full flow.
 
 The repository has one maintainer and the main ruleset requires 0 approvals,
 so a PR that changes a layer verdict could merge with no review at all.
-`validate.yml`'s `verdict-review-gate` job is the control instead. It runs
+`pr-metadata.yml`'s `verdict-review-gate` job is the control instead. It runs
 [`scripts/verdict_review_gate.py`](../scripts/verdict_review_gate.py) on every
 pull request (no path filter, so it can be required) and on each push to
-`main`. The job has `contents: read`, starts with harden-runner in audit mode,
-and checks out full history without persisted credentials. The event values
-reach the script only through `env`. On a pull request the job first asserts
+`main`. The job has `contents: read` and `pull-requests: read`, starts with
+harden-runner in audit mode, and checks out full history without persisted
+credentials. On a pull request it first reads the current base branch through
+the API and requires its ref to match the event's base ref. The shell step
+receives event values only through `env`. It then asserts
 that the checked-out HEAD is the PR merge commit: it has exactly two parents
 and the second is the payload's `pull_request.head.sha`, or the job fails
 (otherwise `HEAD^1` could be the PR's own previous commit and the gate would
@@ -1375,11 +1377,16 @@ the gate script, every repository module the gate and its validators import
 (transitively, which brings in `scripts/validate.py` through
 `scripts/host_receipts.py`), the rule inputs they read (the lane-provenance
 registry `tools/sota-convergence/lane-provenance.json`, the host-receipt and
-lane-return schemas) and `validate.yml`. A rule input held inside a data file
+lane-return schemas) and the gate wrapper `.github/workflows/pr-metadata.yml`.
+A rule input held inside a data file
 counts too: `adoption/manifest.json#/platform_profiles` (which host
 os/architecture a receipt's platform binds) changed together with verdict
 data fails the same way (`RULE_INPUT_FIELDS`). The tests derive the list
-rather than restate it: one walks the modules' imports with `ast`, and one
+rather than restate it: one parses workflow jobs and steps, follows job-level
+local reusable-workflow calls in both supported path forms, and requires every
+direct gate wrapper and transitive caller to exactly match the workflow entries
+in `TRUST_PATHS`. Missing or unparsable local callees fail this check.
+Another walks the modules' imports with `ast`, and another
 records every file opened (a `sys.addaudithook`, in a subprocess) while the
 gate judges a fixture that reaches every row path and while the validators
 check this checkout. Every head-side file the gate reads must be a
@@ -1398,14 +1405,37 @@ and `build_verdicts.py --check`. Run it locally with:
 python3 scripts/verdict_review_gate.py --base origin/main
 ```
 
-The workflow's `pull_request` trigger adds the `edited` type to the default
-three, so a PR whose base branch changes runs again, and the job fails closed
-on any `pull_request` event whose base branch (`GITHUB_BASE_REF`, passed
-through the step's environment) is not `main`. A PR first judged against
-another branch and then retargeted to `main` therefore cannot merge on its
-earlier green run. The merge commit's first parent, which the gate compares
-with, must also be a commit on `origin/main`, so a merge commit still built on
-a branch that merely contains `main`'s tip fails closed.
+`pr-metadata.yml` owns `sota-sources` and `verdict-review-gate`, keeping their
+required check names. It subscribes to `pull_request` types `opened`,
+`synchronize`, `reopened` and `edited`, push to `main` and manual dispatch.
+`validate.yml` drops `edited`, so a description edit or retarget starts the
+metadata gates without starting or cancelling the full validation suite.
+The metadata workflow queues per PR with `queue: max` and no
+`cancel-in-progress`. GitHub permits up to 100 pending runs, cancels
+additional runs at that limit and does not guarantee dispatch order; the
+gates therefore read current metadata rather than depend on queue order
+([GitHub concurrency source at `336b7f546d94`](https://github.com/github/docs/blob/336b7f546d94/data/reusables/actions/actions-group-concurrency.md)).
+
+Both gates use `github.rest.pulls.get` through
+[`actions/github-script` v9.0.0, `3a2844b7`](https://github.com/actions/github-script/tree/3a2844b7e9c422d3c10d287c895573f7108da1b3),
+with job-local `pull-requests: read`; a retrieval error fails the action.
+`sota-sources` checks the current body, keeping description text out of the
+shell. Its reusable `sota-sources-gate.yml` job stays byte-identical and the
+scaffold caller grants the read permission. Existing callers adopt the
+change only when they update their commit pin
+([Get a pull request](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request)).
+
+`verdict-review-gate` first requires the current base branch ref to match the
+event's base ref, failing closed when a queued run's event predates a retarget.
+Advancing the same base branch's tip does not fail this metadata check. The
+subsequent shell checks fail closed when the event's base branch
+(`GITHUB_BASE_REF`, passed through the step's environment) is not `main`.
+A PR first judged against another branch and then retargeted to `main`
+therefore cannot merge on its earlier green run. The merge commit still must
+have exactly two parents with the event's PR head as its second parent. Its
+first parent, which the gate compares with, must also be a commit on
+`origin/main`, so a merge commit still built on a branch that merely contains
+`main`'s tip fails closed.
 
 After a retarget, the `edited` run checks out the merge commit still built on
 the old base. This was measured on 2026-09-23 with throwaway PR #143, and the
@@ -1419,7 +1449,7 @@ base has none and this change adds `scripts/verdict_review_gate.py` (the
 bootstrap PR); a base without the gate otherwise fails closed.
 
 One residual is accepted. A pull request runs the job definition from its
-own `validate.yml`, so a PR that rewrites this job's step can disable the
+own `pr-metadata.yml`, so a PR that rewrites this job's step can disable the
 check for itself. The tests that pin the job's shape
 (`tests/test_workflow_hardening.py`) and the gate's rules
 (`tests/test_verdict_review_gate.py`) are the head's copies too, so such a PR

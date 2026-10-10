@@ -1046,7 +1046,7 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   - Relying on `validate` alone: `scripts/landscape.py` checks what a row claims against its own
     files. It does not compare the row with the base, and it does not recompute agreement or
     winners from the sealed returns.
-- **Decision.** The new `verdict-review-gate` job in `validate.yml` runs
+- **Decision (2026-09-23; wrapper amended 2026-10-09 below).** The new `verdict-review-gate` job in `validate.yml` runs
   `scripts/verdict_review_gate.py` on every pull request, with no path filter, and on each push
   to `main`. Any row that is added or changed outside the grandfathered 20260922 wave needs all
   of the following:
@@ -1073,6 +1073,18 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   runs, the verdict tools, `validate.yml`) fails. `.github/main-ruleset.json` adds the
   check. The coordinator applies the ruleset after merge, and until then the check reports but
   does not block.
+- **Wrapper amendment (2026-10-09, PR #706).** `verdict-review-gate` and `sota-sources` move to
+  `.github/workflows/pr-metadata.yml`, retaining their required context names and the `opened`,
+  `synchronize`, `reopened` and `edited` pull-request types, with no path filter. `validate.yml`
+  drops `edited`, so a description edit no longer starts its eight validation shards. The gate's
+  `TRUST_PATHS` now names `pr-metadata.yml` instead of `validate.yml`. The new wrapper uses
+  actions/github-script `v9.0.0` (`3a2844b7e9c422d3c10d287c895573f7108da1b3`) to call
+  [`GET /repos/{owner}/{repo}/pulls/{pull_number}`](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request):
+  `sota-sources` reads the current description, and `verdict-review-gate` fails when the current
+  base ref differs from the event's base ref before checking the merge commit. Both jobs grant
+  `pull-requests: read`; the verdict job also keeps `contents: read`. The workflow queues runs
+  with `queue: max`. These are the PR #706 implementation changes; the dated measurements and
+  accepted residuals below retain their historical scope.
 - **Review of the gate (2026-09-23).** An independent review found a decoy-ledger bypass (the
   manifest could point `scripts/landscape.py` at a copy while the published ledger changed), that
   the gate ran the PR's own code, that a winner's repository and recipe reference and the published
@@ -1500,6 +1512,11 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     runs the merged commit's job, so it does not catch a PR that disabled that job.
   - *Overturn.* The repository moves to an organization with required workflows, or GitHub offers
     base-defined required checks for personal repositories.
+- **Residual amendment (2026-10-09, PR #706).** The PR now supplies the job definition through
+  `.github/workflows/pr-metadata.yml`, and that file replaces `validate.yml` in the gate's trust
+  base. Moving the job preserves the accepted residual above: a PR can edit its own wrapper to
+  stop running the base gate. The current-base REST check in the wrapper amendment above does
+  not remove that residual.
 - **Overturn.** A merged PR whose changed verdict row is inconsistent with the sealed evidence
   its wave registers, while this check was required (the gate checks consistency; the
   self-attestation residual above bounds what that shows). The other trigger is a second maintainer joining, which would
@@ -1885,16 +1902,23 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   - #410 fails `sota-sources` and cannot merge until its sources are fixed.
   - #205 and #216 had no `sota-sources` run: their last runs predate the job. A
     new `pull_request` run can report it, and a rebase is not the only way to
-    start one: `validate.yml` also runs on `reopened` and `edited`
+    start one: at the time, `validate.yml` also ran on `reopened` and `edited`
     (`.github/workflows/validate.yml` L6-9), and `docs/lanes.md` ("Hot-file
     protocol") makes a pushed merge of `main` as valid as a rebase. GitHub starts
     no `pull_request` run while a pull request has a merge conflict
     ([events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request)).
-    Reporting the check is not passing it: the job reads only the pull request's
+    Reporting the check is not passing it: at the time, the job read only the pull request's
     description (`.github/workflows/validate.yml` L517-521). Measured
     2026-09-29T03:18:04Z (`gh pr view <N> --json mergeable,statusCheckRollup`):
     both are `CONFLICTING`, with no `sota-sources` run.
   - #415 and #417 pass it.
+
+  **Trigger and description amendment (2026-10-09, PR #706).** The `reopened` and `edited`
+  metadata runs now belong to `.github/workflows/pr-metadata.yml`; `validate.yml` retains
+  `reopened` but drops `edited`. Its `sota-sources` job retrieves the current PR description
+  through `github.rest.pulls.get`, also used by `.github/workflows/sota-sources-gate.yml`, rather
+  than the event's description. The required context remains `sota-sources`; the 2026-09-29
+  observations and workflow line references above describe the implementation measured then.
 
   **Merge-guard mechanics** (moved here from `docs/lanes.md`; each measured or read
   on 2026-09-29): `gh pr merge --match-head-commit` becomes the `expectedHeadOid` of
