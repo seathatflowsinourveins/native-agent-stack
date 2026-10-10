@@ -125,6 +125,9 @@ requests now. It reuses the repository's own fence: main at the working director
    - A stream line that does not parse, for any reason (a record nested past the parser's limit raises RecursionError,
      not ValueError), is counted as unparseable. If reading or analysing the stream still fails, the class is
      `unreadable_stream` and the debit is settled as unknown. Nothing in a stream can leave a debit open.
+   - A stream with lines but no readable record is also `unreadable_stream`: output that does not parse is no proof
+     that no request was sent, so the reservation is kept and the attempt counts. Only an empty or absent stream is
+     `no_stream`.
    - Every other failure is counted and not final; the second attempt is the next tick's.
 8. **Status:**
    - PASS with no P1 and no P2 is `success`;
@@ -139,12 +142,16 @@ requests now. It reuses the repository's own fence: main at the working director
 10. **Ledger:** rows are appended to `API_ACTIONS_LEDGER` under an exclusive `fcntl.flock` on `<ledger>.lock` around
     each read-check-append, with the ledger file itself also flocked during the write. That is the api-actions
     harness's own protocol (`_ledger_lock` and `_append` in its `common.py`, read on the host). A ref that already
-    exists is refused. The rows are:
+    exists is refused. A settle or void is appended only while the ref's latest row is its open debit, checked under
+    the same lock, as the harness's `_open_debit` does; the key and the unknown amount come from that debit. A second
+    close, or a close with no debit, is refused. The rows are:
     - a debit (`max_usd` 11.0) before the run;
     - then a settle with `total_cost_usd`;
-    - or a settle at 11.0 with `outcome: unknown`, for a timeout, no result, no usable cost, an unreadable stream, or a
-      stopped worker found by the next tick (which also deletes that run's leftover CLAUDE_CONFIG_DIR and archive);
-    - or a void at 0.0, for a refusal with no usage or a run that wrote no stream.
+    - or a settle at the debit's `max_usd` with `outcome: unknown`, for a timeout, no result, no usable cost, an
+      unreadable stream, or a stopped worker found by a later tick that passes preflight (which also deletes that run's
+      leftover CLAUDE_CONFIG_DIR and archive). Recovery rechecks each ref under the lock and leaves one that another
+      writer closed meanwhile;
+    - or a void at 0.0, for a refusal with no usage or a run whose stream is empty or absent.
 
 ## The instruction fence (command center, 2026-10-10 00:05Z)
 
@@ -163,10 +170,11 @@ or user sources alone, it knew none.
 
 ## Upstream alignment in every trading review (command center, 2026-10-10 00:15Z)
 
-The owner's rule: truth and fixes come from upstream sources. Source: `command-center/ROW-cc-20261010T0015Z-api-routing.md`,
-row "Upstream alignment in every trading review" (read by the coordinator on the host): "the review brief requires
-each claim and fix to cite the upstream source at a pin (local mirrors under ~/code/upstream, vendor docs), and flags
-deviations".
+The owner holds that truth and fixes come from upstream sources. On 2026-10-10 at 00:15Z the command center turned
+that into a routing rule for trading reviews: they asked that every claim and fix in a trading change be checked
+against an upstream source at a pin (a local mirror or vendor documentation) and that the review report each
+deviation. Source: `command-center/ROW-cc-20261010T0015Z-api-routing.md`, row "Upstream alignment in every trading
+review" (read by the coordinator on the host; paraphrased here).
 
 - **Scope.** Every `us-equities-trading` pull request, and every `native-agent-stack` pull request that changes a
   trading path. The worker classifies each reviewed head by repository (`trading_every_pr`) and by its changed paths
@@ -276,11 +284,12 @@ The client is Claude Code 2.1.296, native binary sha256
     request.
   - **The run's CLAUDE_CONFIG_DIR (O8):** after a loopback run it held `.claude.json`, a `.claude.json` backup and the
     planted user CLAUDE.md. None held the key or a `customApiKeyResponses` entry, in the control arm or the fenced one.
-    The worker deletes each run's directory when the run ends. A directory left by a killed tick is deleted at the next
-    tick's start.
+    The worker deletes each run's directory when the run ends. A directory left by a killed tick is deleted at the start
+    of the next tick that passes preflight (recovery runs after preflight).
 - **`probes.py offline`, run in the coordinator's probe state on 2026-10-10: all checks PASS** (receipt
   `readers/crw-probes/probes/20261010T013330Z`). The checks are O1 to O8, L1, L4, L5 and L7 to L11; O6 reported each
-  of the three keys `ok` and printed no value.
+  of the three keys `ok` and printed no value. Rerun after the hardening (`20261010T013843Z`, 18 of 18) and after the
+  stricter L7 to L9 grader (`20261010T052121Z`, 18 of 18, with 7, 2 and 6 required calls answered).
 
 ## Probes (operator-run before enabling)
 
@@ -303,7 +312,10 @@ The client is Claude Code 2.1.296, native binary sha256
 | O8 (offline only) | After a run, its CLAUDE_CONFIG_DIR holds neither the key nor a `customApiKeyResponses` entry. |
 | P11 | An uncited upstream claim in a trading diff yields an `[upstream]` finding. |
 
-A live check whose action the model never attempted is FAIL. L7 to L10 answer the permissions page's statement
+A live check whose action the model never attempted is FAIL. Offline, L7, L8 and L9 each name the scripted calls they
+stand on (`required_calls` in `probes.py`: 7, 2 and 6 calls) and whether each must be denied. A check fails when any
+of those calls or its result is missing, or a required denial was answered; an unrelated call never makes it
+exercised. A Grep in the working directory may answer, without a canary. L7 to L10 answer the permissions page's statement
 (<https://code.claude.com/docs/en/permissions>, fetched by the coordinator on 2026-10-10 at 00:45Z): "Claude makes a
 best-effort attempt to apply `Read` rules to all built-in tools that read files like Grep and Glob".
 
@@ -351,7 +363,10 @@ edge, and the other two keys were near theirs), against the api-actions ledger. 
   processes out of scope, and this worker does not change that.
 - **R2, shared network.** The sandbox shares the host's network namespace so the client can reach the API. Services on
   the host's loopback are therefore reachable from inside the sandbox. The client has no tool that makes a network call
-  (no Bash, WebFetch or WebSearch); its own requests go to the API.
+  (no Bash, WebFetch or WebSearch); its own requests go to the API. Open: the GPT read at 4b8027b8 (P2-3) holds that
+  the brief asks for an API-host-only boundary, which this is not. The coordinator is measuring the options on this
+  host (an isolated network namespace with a filtering proxy, as Claude Code's own sandbox runtime does, against the
+  alternatives) for the command center, who decides; this record changes with that decision.
 - **R3, host Claude Code policy.** All of `/etc` is bound read-only, so a host-managed Claude Code policy in
   `/etc/claude-code` would apply to the run. None exists on this host today, and adding one would change the fence.
 
@@ -385,18 +400,24 @@ edge, and the other two keys were near theirs), against the api-actions ledger. 
 7. A budget stop is final whatever it wrote, because a second run would meet the same budget, and it posts `error`.
 8. An `end_turn` run with no parseable VERDICT line is `no_verdict`: status `error`, counted, not final.
 9. A run that wrote no stream record (the runner refused, bwrap failed, the launch failed) is voided, not counted, and
-   stops the tick.
+   stops the tick. Its stream is empty or absent; a stream with lines that do not parse is not this case (class 7).
 10. A head with nothing to review (already in main, or an empty diff) is skipped without a status. A head over the
     export limit is refused like an oversized diff. A pull request whose base is not `main` is skipped.
 11. A file list at the API's 3,000-file cap counts as essential. A rename counts by its old path too. The decision is
     cached per head.
 12. One ledger ref per key try, `CRW:<UTC stamp>:<repository name>#<n>:<sha12>` (the name without its owner), so the
     per-key sums of the api-actions ledger tools stay right.
-13. Recovery at tick start: an open `CRW` debit is settled as unknown, a `started` attempt becomes `interrupted`, and
-    a stopped run's leftover scratch (its CLAUDE_CONFIG_DIR, an archive) is deleted.
-    Ticks and probes share one lock.
-14. Pending posts: a result stored with `CLAUDE_REVIEW_POST=0`, or whose post failed, is posted by a later tick while its
-    head is still current.
+13. Recovery at the start of a tick that passes preflight: an open `CRW` debit is settled as unknown (rechecked under
+    the ledger lock, so a ref another writer closed is left), a `started` attempt becomes `interrupted`, and a stopped
+    run's leftover scratch (its CLAUDE_CONFIG_DIR, an archive) is deleted. Ticks and probes share one lock.
+14. Posting. The pull request is read just before the status POST and again before the comment POST; when its head is
+    no longer the reviewed sha, or it is closed, what is unsent is marked `superseded` and never posted. If the head
+    moves after both were posted, the comment gets a superseded line (the status stays on the reviewed commit, which is
+    no longer the head). Each POST is saved as `sending` before it and `posted` after it. A retry of a `sending` or
+    `failed` POST first looks on GitHub: the commit's latest `claude-review/local` status, and this attempt's comment,
+    found by a hidden marker line (`<!-- claude-review/local <repo>#<n>@<sha> attempt <k> -->`), both by the same gh
+    login. A lost reply or a stopped tick therefore never posts twice. A result stored with `CLAUDE_REVIEW_POST=0`, or
+    whose post failed, is posted by a later tick under the same checks.
 15. The comment is sent only when the configuration and the API both say private.
     - Its only model text is the finding lines, shown inside one fenced code block. Every backtick in them becomes
       U+02CB (`ˋ`), so no run of backticks can close the fence. No image, link, raw HTML or `#N` reference in a finding
@@ -446,7 +467,7 @@ edge, and the other two keys were near theirs), against the api-actions ledger. 
 
 ## Evidence class
 
-- The 64 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
+- The 75 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
   drives the real `credential_run.py` and bubblewrap with a fake key in a temporary store. It skips where bubblewrap
   cannot create a user namespace or the host pipes crash dumps, which is the case on GitHub-hosted runners.
 - The sandbox, offline-client and loopback measurements above are native measurements of the pinned client on this
@@ -455,6 +476,22 @@ edge, and the other two keys were near theirs), against the api-actions ledger. 
 - The tool-call checks (L4, L5, L7 to L10) are native measurements of the client's permission layer with a scripted
   stand-in model; no model chose those calls (see "Live probes" below).
 - No real pull request review has run.
+- The fixes after the GPT read at 4b8027b8 (below) rest on unit tests and the offline probes only; no paid call was
+  made for them.
+
+## Fixes after the GPT read at 4b8027b8 (2026-10-10)
+
+The GPT read of #953 at 4b8027b8 asked for changes with seven P2 findings. Six are fixed in forward commits, each guard
+with a test that fails on a weakened copy (12 weakened copies, all failing their tests):
+
+- **P2-1, a head that moves during publication:** decision 14.
+- **P2-2, a retry that posts twice:** decision 14.
+- **P2-4, a stream with no readable record:** class 7 and decision 9.
+- **P2-5, a close with no open debit:** run step 10 and decision 13.
+- **P2-6, L7 to L9 passing with their calls removed:** the Probes section.
+- **P2-7, the routing row quoted verbatim:** replaced by an attributed paraphrase.
+
+P2-3 (the network boundary) is a design question for the command center; see R2.
 
 ## SOTA sources
 

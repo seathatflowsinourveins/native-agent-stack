@@ -18392,8 +18392,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
-      "sha256": "13f35d919daa20db635450d99568c2031f156a4350259f7cedba04f95962d381",
-      "bytes": 40069
+      "sha256": "580e6f1c9e3fa81e71878706476abb406296845fe6ce56610994cdd4066be662",
+      "bytes": 43685
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
