@@ -1,9 +1,18 @@
-"""Harbor source/maintenance contracts; no installation or provider execution."""
+"""Harbor source/maintenance contracts; no installation or provider execution.
+
+CPython v3.13.16 accepts any matching exception inside assertRaises:
+https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py#L253-L278
+Retrieve, hash-check and parse historical inputs before expecting content rejection.
+The source-bound fixtures also work after squash merging or in a Git-free archive.
+"""
+import hashlib
 import json
 from pathlib import Path
 import re
-import subprocess
+import shutil
+import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN = "evidence/artifacts/new-wsl-install-plan-20261002"
@@ -11,6 +20,8 @@ DECISION = "docs/decisions/2026-10-09-harbor-0240-profile.md"
 PROFILE = "adoption/new-wsl-profile.json"
 CONSENSUS = "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json"
 AUTHORITY = "the coordinator's 2026-10-09 currency amendment under the owner's standing direction to keep tools current"
+PREDECESSOR_REVISION = "b67a28264d84c9e9b51e0671ee1db046270ff833"
+PREDECESSOR_FIXTURES = Path(__file__).resolve().parent / "fixtures/harbor_currency_predecessors"
 
 
 class HarborCurrencyContracts(unittest.TestCase):
@@ -50,31 +61,41 @@ class HarborCurrencyContracts(unittest.TestCase):
         self.assertIn("current_release_source", owner["note"])
 
     def predecessor(self, path):
-        result = subprocess.run(["git", "show", "b67a28264d84c9e9b51e0671ee1db046270ff833:" + path],
-                                cwd=ROOT, capture_output=True, text=True)
-        self.assertEqual(result.returncode, 0, result.stderr)
-        return result.stdout
+        manifest = json.loads((PREDECESSOR_FIXTURES / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["schema_version"], 1)
+        self.assertEqual(manifest["source_revision"], PREDECESSOR_REVISION)
+        rows = [row for row in manifest["fixtures"] if row["source_path"] == path]
+        self.assertEqual(len(rows), 1, "predecessor fixture declaration missing or ambiguous: " + path)
+        row, = rows
+        raw = (PREDECESSOR_FIXTURES / row["fixture"]).read_bytes()
+        self.assertEqual(len(raw), row["bytes"], "predecessor fixture length mismatch: " + path)
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), row["sha256"],
+                         "predecessor fixture SHA-256 mismatch: " + path)
+        return raw.decode("utf-8")
 
     def test_current_readme_routes_harbor_to_its_receipt_and_qualifies_history(self):
         self.readme_contract((ROOT / PLAN / "README.md").read_text())
 
     def test_predecessor_readme_fails_the_source_routing_guard(self):
+        text = self.predecessor(PLAN + "/README.md")
         with self.assertRaises(AssertionError):
-            self.readme_contract(self.predecessor(PLAN + "/README.md"))
+            self.readme_contract(text)
 
     def test_inverse_names_every_operative_carrier(self):
         self.inverse_contract((ROOT / DECISION).read_text())
 
     def test_predecessor_profile_only_inverse_fails_the_inventory_guard(self):
+        text = self.predecessor(DECISION)
         with self.assertRaises(AssertionError):
-            self.inverse_contract(self.predecessor(DECISION))
+            self.inverse_contract(text)
 
     def test_current_owner_release_is_bound_and_retained_metadata_is_historical(self):
         self.owners_contract(json.loads((ROOT / PLAN / "owners.json").read_text()))
 
     def test_predecessor_empty_note_fails_the_snapshot_guard(self):
+        document = json.loads(self.predecessor(PLAN + "/owners.json"))
         with self.assertRaises(AssertionError):
-            self.owners_contract(json.loads(self.predecessor(PLAN + "/owners.json")))
+            self.owners_contract(document)
 
     def test_profile_markdown_contains_the_actual_harbor_source_contract(self):
         row = self.profile()
@@ -90,6 +111,60 @@ class HarborCurrencyContracts(unittest.TestCase):
         manifest = json.loads((ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json").read_text())
         row = next(row for row in manifest["slots"] if row["slot_id"] == "trajectory-analysis")
         self.assertEqual(row["current_owner_pin_amendment"]["by"], AUTHORITY)
+
+
+class HarborPredecessorEvidenceTests(unittest.TestCase):
+    CASES = (
+        ("test_predecessor_readme_fails_the_source_routing_guard", "readme_contract", PLAN + "/README.md"),
+        ("test_predecessor_profile_only_inverse_fails_the_inventory_guard", "inverse_contract", DECISION),
+        ("test_predecessor_empty_note_fails_the_snapshot_guard", "owners_contract", PLAN + "/owners.json"),
+    )
+
+    def test_retrieval_failure_cannot_satisfy_semantic_rejection(self):
+        for name, guard_name, _ in self.CASES:
+            with self.subTest(case=name):
+                case = HarborCurrencyContracts(name)
+                result = unittest.TestResult()
+                message = "predecessor input unavailable"
+                with mock.patch.object(case, "predecessor", side_effect=AssertionError(message)) as retrieve, \
+                        mock.patch.object(case, guard_name, side_effect=AssertionError("semantic rejection")) as guard:
+                    case.run(result)
+                retrieve.assert_called_once()
+                self.assertEqual(result.testsRun, 1)
+                self.assertFalse(result.wasSuccessful(), "retrieval failure was accepted as semantic evidence")
+                self.assertEqual(len(result.failures) + len(result.errors), 1)
+                self.assertIn(message, (result.failures + result.errors)[0][1])
+                guard.assert_not_called()
+
+    def test_missing_or_corrupt_fixture_cannot_satisfy_semantic_rejection(self):
+        for name, guard_name, source_path in self.CASES:
+            for mode in ("missing", "corrupt"):
+                with self.subTest(case=name, mode=mode), tempfile.TemporaryDirectory() as temporary:
+                    fixture_root = Path(temporary) / "predecessors"
+                    shutil.copytree(PREDECESSOR_FIXTURES, fixture_root)
+                    manifest = json.loads((fixture_root / "manifest.json").read_text())
+                    row, = [row for row in manifest["fixtures"] if row["source_path"] == source_path]
+                    fixture = fixture_root / row["fixture"]
+                    if mode == "missing":
+                        fixture.unlink()
+                        expected_failure = "FileNotFoundError"
+                    else:
+                        raw = fixture.read_bytes()
+                        corrupted = raw.replace(b" ", b"\t", 1)
+                        self.assertNotEqual(raw, corrupted)
+                        self.assertEqual(len(raw), len(corrupted))
+                        fixture.write_bytes(corrupted)
+                        expected_failure = "predecessor fixture SHA-256 mismatch"
+                    case = HarborCurrencyContracts(name)
+                    result = unittest.TestResult()
+                    with mock.patch(__name__ + ".PREDECESSOR_FIXTURES", fixture_root), \
+                            mock.patch.object(case, guard_name, side_effect=AssertionError("semantic rejection")) as guard:
+                        case.run(result)
+                    self.assertEqual(result.testsRun, 1)
+                    self.assertFalse(result.wasSuccessful(), "fixture failure was accepted as semantic evidence")
+                    self.assertEqual(len(result.failures) + len(result.errors), 1)
+                    self.assertIn(expected_failure, (result.failures + result.errors)[0][1])
+                    guard.assert_not_called()
 
 
 if __name__ == "__main__":

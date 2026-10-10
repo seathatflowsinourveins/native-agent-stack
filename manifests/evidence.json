@@ -59746,6 +59746,26 @@
       "bytes": 767
     },
     {
+      "path": "tests/fixtures/harbor_currency_predecessors/README.md.fixture",
+      "sha256": "48de7243aa72b2e30c5fb6805c5582ea9b3ad08cda8dcdb9aeab812f99bd98f0",
+      "bytes": 98175
+    },
+    {
+      "path": "tests/fixtures/harbor_currency_predecessors/decision.md.fixture",
+      "sha256": "e500fb4b8424e54c0cf218fd5ba187cd8dd21952b0b2cb7aeb9f8155a6723d46",
+      "bytes": 7359
+    },
+    {
+      "path": "tests/fixtures/harbor_currency_predecessors/manifest.json",
+      "sha256": "3aca2dfb486c48c0a8de9ecf1f481a8238c6933f9cd41dd0e212bfdc93aa4ae5",
+      "bytes": 1534
+    },
+    {
+      "path": "tests/fixtures/harbor_currency_predecessors/owners.json.fixture",
+      "sha256": "c4ce11ac6ee48395fa0de4c639fbc59bc810aa143baa736301129daa380318f3",
+      "bytes": 35292
+    },
+    {
       "path": "tests/fixtures/harness-context-moves/09-20261006.txt",
       "sha256": "df2a6b435b576fabd32ad3b519fbbfc48d6adedcf90656b1cb9b22471b8b2901",
       "bytes": 865
@@ -60417,8 +60437,8 @@
     },
     {
       "path": "tests/test_harbor_currency_contracts.py",
-      "sha256": "a40c276b0985d3f67b4d1fcd388c438170785eee9d43991436413951d3aecc63",
-      "bytes": 5321
+      "sha256": "8c5dd1d98be63e7af2c683f2a999edd72c957627cfe89415ac8f5d1fb4f1610e",
+      "bytes": 9829
     },
     {
       "path": "tests/test_hardware_profile.py",
