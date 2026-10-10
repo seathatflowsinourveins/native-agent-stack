@@ -344,14 +344,14 @@ class ResearchFeedSelection(unittest.TestCase):
     """The one configured feed reaches the snapshot request and every row."""
 
     def test_unqualified_feed_is_refused_with_a_bounded_reason(self):
-        for value in ("otc", "delayed_sip", "boats", "IEX", "iex ", "", None, 1, ["iex"]):
+        for value in ("otc", "delayed_sip", "overnight", "IEX", "iex ", "", None, 1, ["iex"]):
             with self.subTest(feed=value):
                 with self.assertRaises(m.ResearchError) as caught:
                     m.normalize_snapshot("SPY", snapshot(), m.iso(OBSERVED), feed=value)
                 self.assertEqual(str(caught.exception), "unqualified_data_feed")
 
     def test_snapshot_row_records_the_configured_feed(self):
-        self.assertEqual(m.DATA_FEEDS, ("iex", "sip"))
+        self.assertEqual(m.DATA_FEEDS, ("iex", "sip", "boats"))
         self.assertEqual(m.normalize_snapshot("SPY", snapshot(), m.iso(OBSERVED), feed="sip")["feed"], "sip")
         self.assertEqual(m.normalize_snapshot("SPY", snapshot(), m.iso(OBSERVED))["feed"], "iex")
 
@@ -362,7 +362,7 @@ class ResearchFeedSelection(unittest.TestCase):
         self.assertIs(transport.DATA_FEEDS, feeds.DATA_FEEDS)
         self.assertIs(m.is_qualified_feed, feeds.is_qualified_feed)
         self.assertIs(transport.is_qualified_feed, feeds.is_qualified_feed)
-        self.assertEqual(feeds.DATA_FEEDS, ("iex", "sip"))
+        self.assertEqual(feeds.DATA_FEEDS, ("iex", "sip", "boats"))
 
     @unittest.skipUnless(HAS_SDK, "requires reviewed isolated Alpaca runtime")
     def test_sdk_enum_members_are_refused_rather_than_recorded_as_a_feed(self):

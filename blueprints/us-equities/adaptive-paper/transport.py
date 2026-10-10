@@ -306,7 +306,12 @@ def data_feed(value):
 
 def data_stream_url(feed):
     """Derive the quote stream endpoint from the single configured feed."""
-    return "%s/%s" % (DATA_WS_BASE, data_feed(feed))
+    feed = data_feed(feed)
+    # Official Real-time Stock Data, updated 2026-05-18, fetched 2026-10-10:
+    # https://docs.alpaca.markets/us/docs/real-time-stock-pricing-data.md
+    if feed == "boats":
+        return "wss://stream.data.alpaca.markets/v1beta1/boats"
+    return "%s/%s" % (DATA_WS_BASE, feed)
 
 
 def halt_statuses_supported(feed):
@@ -600,6 +605,26 @@ STATUS_CODES = {**CTA_STATUS_CODES, **UTP_STATUS_CODES}
 CTA_TAPES, UTP_TAPES = frozenset({"A", "B"}), frozenset({"C", "O"})
 CTA_LULD_PAUSE_REASON = "M"                      # CTA reason: Limit Up-Limit Down (LULD) Trading Pause
 MARKET_WIDE_REASONS = frozenset({"1", "2", "3", "MWC0", "MWC1", "MWC2", "MWC3"})
+
+
+def normalize_overnight_status(asset, observed_at_ns):
+    """Carry broker asset eligibility/halt state separately from every quote.
+
+    alpaca-py 0.44.0 (cc4cb3b7), trading/models.py:70 exposes ``attributes``;
+    the official 24/5 FAQ (2026-07-07) names overnight_tradable/overnight_halted.
+    An absent/malformed attribute list is unknown, not an explicit resume.
+    ``observed_at_ns`` is the caller's receipt time for the supported asset read.
+    """
+    symbol = asset.get("symbol")
+    if (not isinstance(symbol, str) or not SYMBOL.fullmatch(symbol)
+            or type(observed_at_ns) is not int or observed_at_ns <= 0):
+        raise TransportError("invalid overnight status")
+    attributes = asset.get("attributes")
+    known = isinstance(attributes, list) and all(type(value) is str for value in attributes)
+    return {"symbol": symbol, "ts_ns": observed_at_ns, "source": "alpaca_assets",
+            "state": "overnight_asset_status", "halted": None,
+            "overnight_tradable": "overnight_tradable" in attributes if known else None,
+            "overnight_halted": "overnight_halted" in attributes if known else None}
 
 
 def normalize_trading_status(raw):
@@ -1005,11 +1030,12 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
         # explicitly incomplete and therefore cannot establish that condition.
         raw_orders = trading.get("/orders", {"status": "open", "limit": 500, "nested": False})
         orders = [normalize_order(raw) for raw in raw_orders]
-        assets = []
+        assets, asset_statuses = [], []
         for symbol in symbols:
             asset = trading.get_asset(symbol)
             assets.append({key: asset.get(key) for key in
-                           ("symbol", "status", "tradable", "fractionable", "marginable", "shortable")})
+                           ("symbol", "status", "tradable", "fractionable", "marginable", "shortable", "attributes")})
+            asset_statuses.append(normalize_overnight_status(asset, time.time_ns()))
         quotes = data.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=list(symbols), feed=DataFeed(feed)))
         normalized_quotes, quote_errors = [], {}
         for symbol in symbols:
@@ -1026,7 +1052,8 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
                 "timestamp_ns": timestamp_ns(clock["timestamp"]), "next_close_ns": timestamp_ns(clock["next_close"]),
                 "next_open_ns": timestamp_ns(clock["next_open"])},
                 "positions": positions, "orders": orders, "open_orders_complete": len(raw_orders) < 500,
-                "assets": assets, "quotes": normalized_quotes, "quote_errors": quote_errors}
+                "assets": assets, "asset_statuses": asset_statuses,
+                "quotes": normalized_quotes, "quote_errors": quote_errors}
     finally:
         trading._session.close()
         data._session.close()
@@ -1178,6 +1205,11 @@ class AlpacaPaperTransport:
         # keys byte-identical to before G-e.
         self.include_margin = bool(include_margin)
         self.feed = data_feed(feed)
+        if self.feed == "boats":
+            # alpaca-py 0.44.0 cc4cb3b7, data/live/stock.py:47 rejects BOATS.
+            # Its enum and the documented URL do not qualify a native stream.
+            # Refuse before opening a client; never substitute IEX/SIP or fork it.
+            raise UnsupportedDataFeed("boats_stream_unqualified_sdk")
         self.data_ws = data_stream_url(self.feed)
         self.halt_statuses = halt_statuses_supported(self.feed)
         self.symbols = _symbols(symbols)

@@ -2,14 +2,22 @@
 
 This module is deliberately pure: it never reads wall-clock time itself. Every
 query takes an explicit date or timezone-aware ``datetime`` and derives the
-NYSE session (PRE / RTH / POST / CLOSED), with ``zoneinfo`` for DST-correct
+market session (OVERNIGHT / PRE / RTH / POST / CLOSED), with ``zoneinfo`` for DST-correct
 America/New_York conversion.
 
 Normal session boundaries (Eastern local time; RTH follows XNYS's schedule):
     PRE     04:00 - 09:30
     RTH     09:30 - 16:00 (13:00 on a scheduled early-close day)
     POST    16:00 - 20:00 (13:00 - 20:00 on a scheduled early-close day)
-    CLOSED  outside the above, and all day on a weekend or full-closure holiday
+    OVERNIGHT 20:00 on the prior civil day - 04:00 on the XNYS trade date
+    CLOSED  outside the above (no Friday/Saturday evening overnight session)
+
+Alpaca's 24/5 FAQ (updated 2026-07-07, fetched 2026-10-10) and Blue Ocean
+Technologies' venue hours define 20:00-04:00 Eastern, Sunday evening through
+Friday morning. Holiday eligibility follows the upcoming XNYS trade date;
+an early-close trade date still has the full eight-hour overnight window.
+https://docs.alpaca.markets/us/docs/245-trading.md
+https://blueocean-tech.io/
 
 The source for trading dates, holidays and RTH opening/closing times is XNYS
 from required exchange-calendars 4.13.2, gerrymanoim/exchange_calendars commit
@@ -42,6 +50,7 @@ RTH_CLOSE = dtime(16, 0)
 POST_CLOSE = dtime(20, 0)
 
 class SessionKind(str, Enum):
+    OVERNIGHT = "OVERNIGHT"
     PRE = "PRE"
     RTH = "RTH"
     POST = "POST"
@@ -128,6 +137,19 @@ def session_at(ts: datetime) -> SessionInfo:
     is_trading_day, close_t = _exchange_calendars_day(d)
     is_early = is_trading_day and close_t < RTH_CLOSE
 
+    # Alpaca assigns 20:00+ activity to the next civil trade date, not the
+    # next available session. Skipping a closed trade date would create a
+    # phantom Friday/weekend/holiday overnight market.
+    overnight_date = d + timedelta(days=1) if ts_ny.time() >= POST_CLOSE else d
+    if ts_ny.time() >= POST_CLOSE or ts_ny.time() < PRE_OPEN:
+        overnight_day, overnight_close_t = _exchange_calendars_day(overnight_date)
+        if overnight_day:
+            overnight_open = datetime.combine(overnight_date - timedelta(days=1), POST_CLOSE, NY)
+            overnight_close = datetime.combine(overnight_date, PRE_OPEN, NY)
+            return SessionInfo(SessionKind.OVERNIGHT, overnight_date, overnight_open,
+                               overnight_close, overnight_close_t < RTH_CLOSE,
+                               overnight_open, (overnight_close - ts_ny).total_seconds())
+
     if is_trading_day:
         pre_open, rth_open, rth_close, post_close = _boundaries(d, close_t)
         if ts_ny < pre_open:
@@ -142,17 +164,19 @@ def session_at(ts: datetime) -> SessionInfo:
             return SessionInfo(SessionKind.POST, d, rth_close, post_close, is_early,
                                 rth_close, (post_close - ts_ny).total_seconds())
         nxt = _next_trading_day(d)
-        nxt_pre_open, *_ = _boundaries(nxt)
-        return SessionInfo(SessionKind.CLOSED, d, None, None, is_early, nxt_pre_open, None)
+        nxt_open = datetime.combine(nxt - timedelta(days=1), POST_CLOSE, NY)
+        return SessionInfo(SessionKind.CLOSED, d, None, None, is_early, nxt_open, None)
 
     nxt = _next_trading_day(d)
-    nxt_pre_open, *_ = _boundaries(nxt)
-    return SessionInfo(SessionKind.CLOSED, d, None, None, is_early, nxt_pre_open, None)
+    nxt_open = datetime.combine(nxt - timedelta(days=1), POST_CLOSE, NY)
+    return SessionInfo(SessionKind.CLOSED, d, None, None, is_early, nxt_open, None)
 
 
 def is_trading_session(ts: datetime) -> bool:
-    """True for PRE, RTH or POST; False (CLOSED) on weekends, holidays and
-    outside the 04:00-20:00 ET window."""
+    """Market availability including OVERNIGHT, independent of lane admission.
+
+    A known market session alone grants no order or paper-acceptance authority.
+    """
     return session_at(ts).kind != SessionKind.CLOSED
 
 
@@ -263,14 +287,14 @@ def validate_session_policy(config: dict) -> dict:
 def order_extended_hours_flag(ts: datetime, policy: dict) -> bool:
     """Whether a new order at ``ts`` should carry Alpaca's ``extended_hours``
     flag. Only meaningful (and only ever ``True``) when the session policy has
-    extended hours enabled and the order is being placed in PRE or POST; RTH
+    extended hours enabled and the order is being placed in OVERNIGHT, PRE or POST; RTH
     orders never need the flag, and CLOSED is never a valid submission time
     (that is refused separately by the existing preflight/session-window
     checks, not by this helper).
     """
     if not policy.get("extended_hours", False):
         return False
-    return session_at(ts).kind in (SessionKind.PRE, SessionKind.POST)
+    return session_at(ts).kind in (SessionKind.OVERNIGHT, SessionKind.PRE, SessionKind.POST)
 
 
 def extended_session_close(ts: datetime) -> datetime:

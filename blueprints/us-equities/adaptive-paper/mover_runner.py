@@ -592,7 +592,7 @@ def _controller_session(close, now, session_policy):
     if not session_policy["extended_hours"]:
         return close, True
     moment = datetime.fromtimestamp(now, timezone.utc)
-    market_open = session_at(moment).kind != SessionKind.CLOSED
+    market_open = session_at(moment).kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
     if market_open:
         close = extended_session_close(moment).astimezone(timezone.utc).timestamp()
     return close, market_open

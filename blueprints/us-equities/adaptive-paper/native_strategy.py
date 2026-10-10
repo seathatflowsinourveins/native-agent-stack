@@ -135,6 +135,7 @@ class AdaptiveStrategy(Strategy):
         self._prior_rth_close = {symbol: record["price"] for symbol, record in loaded.items()}
         self._prior_rth_close_session_date = {symbol: record["session_date"] for symbol, record in loaded.items()}
         self._last_session_kind = None
+        self._last_rth_session_date = None
         self._gap_risk_stop_price = {}
         self._gap_stop_applied = set()
         # D2 (round 4): symbols still waiting to be armed for the current
@@ -563,6 +564,8 @@ class AdaptiveStrategy(Strategy):
         except ValueError:
             return set()
         kind, today = info.kind, info.session_date
+        if kind == SessionKind.RTH:
+            self._last_rth_session_date = today
         # D4 (round 2): a fresh process whose *first* rebalance() tick lands
         # already inside RTH (e.g. a restart resuming an overnight hold)
         # never observes a CLOSED/PRE -> RTH transition -- _last_session_kind
@@ -693,15 +696,14 @@ class AdaptiveStrategy(Strategy):
         if crossed_out_of_rth:
             self._gap_risk_stop_price = {}
             # D2 (round 5): seed the capture retry set for this crossing;
-            # `today` here is the RTH session date that just ended (this
-            # tick's own session_at().session_date, still the same
-            # calendar day as the RTH session -- POST is the ordinary
-            # case), pinned in _prior_close_capture_session_date so a
+            # The observed RTH date is pinned separately: an OVERNIGHT
+            # tick belongs to the upcoming trade date. Keep the completed
+            # RTH date in _prior_close_capture_session_date so a
             # later retry tick (which may itself land on a different
             # calendar day, e.g. after midnight) still tags the eventual
             # capture with the correct originating session date.
             self._prior_close_capture_pending = {symbol for symbol, qty in held.items() if qty > 0}
-            self._prior_close_capture_session_date = today
+            self._prior_close_capture_session_date = self._last_rth_session_date
         if kind != SessionKind.RTH and self._prior_close_capture_pending:
             capture_date = self._prior_close_capture_session_date or today
             for symbol in list(self._prior_close_capture_pending):

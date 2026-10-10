@@ -7,7 +7,10 @@ capability to either caller.
 """
 from __future__ import annotations
 
-DATA_FEEDS = ("iex", "sip")
+# alpaca-py 0.44.0, cc4cb3b7ba50ae250e621983c2779047fb16bb28,
+# alpaca/data/enums.py:56-73: BOATS is the venue feed; OVERNIGHT is derived.
+# Naming a feed does not establish entitlement or streaming acceptance.
+DATA_FEEDS = ("iex", "sip", "boats")
 
 
 def is_qualified_feed(value):
