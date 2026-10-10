@@ -7,10 +7,9 @@ Read `examples/omniroute-codex-sdk/README.md` for invocation and lifecycle detai
 Use this project's `examples/omniroute-codex-sdk/worker.py` through Claude's native
 Bash tool. The primary route is `cx/gpt-6.1-sol-max`, with native Max effort.
 The coordinator retains its native Claude account and model route.
-Two shell startup failures occurred in the builder's nested Codex sandbox;
-the coordinator's separate non-nested read-only shell run succeeded with exit 0
-and output `13`. The builder's task also retained an MCP `Transport closed`
-failure; writing (`workspace-write`) dispatch is not yet qualified at 0.160.0.
+Writing (`workspace-write`) dispatch is not yet qualified at Codex 0.160.0; the
+decision records below retain the shell-startup and MCP `Transport closed`
+failures behind that limit.
 
 Give a writing worker its own worktree, bounded file ownership, an executable
 acceptance condition and the enhanced private Codex home described in
@@ -56,7 +55,7 @@ explicit permitted alternative or unrelated authorized task.
 Use explicit `--model cx/gpt-6-astra-max` for consequential architecture,
 conflicting primary evidence, or a failure unresolved after one bounded Sol
 repair. Record that trigger and the acceptance result. The separate Claude SDK
-bridge remains a trial after its gateway errors; it is not the primary worker.
+bridge is a trial, not the primary worker.
 
 Sources: [Claude native project skills](https://code.claude.com/docs/en/skills)
 and [official Codex SDK, rust-v0.160.0](https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python).

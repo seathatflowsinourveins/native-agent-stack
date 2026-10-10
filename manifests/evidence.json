@@ -4996,8 +4996,8 @@
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
-      "sha256": "feacd5b6324649e3fff16d4f7f469f994e2984dccbb462f84e6fa8bf8e93da48",
-      "bytes": 3840
+      "sha256": "335ca2ec3f19002073b6704e610d79e75a1408a6a1f4e67bb878546ae132e564",
+      "bytes": 3677
     },
     {
       "path": ".gitattributes",
