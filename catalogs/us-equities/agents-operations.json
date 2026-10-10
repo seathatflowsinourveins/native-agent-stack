@@ -955,7 +955,7 @@
       "native_workflow": [
         "# Portable upstream commands; configure owned loopback endpoints and storage first. Executed scope is limited to the linked receipts.",
         "grafana server --homepath \"$GRAFANA_HOME\" --config \"$GRAFANA_CONFIG\"",
-        "curl --fail --silent http://127.0.0.1:13000/api/health"
+        "curl --fail --silent --show-error --output \"$GRAFANA_HEALTH_FILE\" http://127.0.0.1:13000/api/health"
       ],
       "requirements": [
         "Verified Grafana OSS 13.2.2 distribution, explicit loopback binding and reviewed local authentication.",
