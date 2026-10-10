@@ -815,7 +815,15 @@ class RebuildExplorerSubprocessTests(unittest.TestCase):
         artifact_dir = _make_artifact(self.scratch, "artifact-validate")
         result = _run_propose_cli(self.scratch, artifact_dir, checked_at="2026-09-23T02:00:00Z")
         self.assertEqual(result.returncode, 0, result.stderr[-3000:])
-        # Leave time for fixture setup and the other tests within the 600-second module budget.
+        # CC measured nested-validator durations (2026-10-10):
+        # 44.8 s pass (#944): https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38016041243
+        # 52.2 s pass (#947): https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38016041799
+        # 57.2 s pass (#948): https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38016595551
+        # 60.4 s TimeoutExpired (#937, attempt 1): https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38016044731/attempts/1
+        # On timeout, run() kills/waits for the child and raises TimeoutExpired:
+        # https://docs.python.org/3.12/library/subprocess.html#subprocess.run
+        # We choose 300 s for measured margin within the 600-second module budget,
+        # leaving time for fixture setup and the other tests.
         checked = subprocess.run(
             ["python3", "scripts/validate.py"], cwd=self.scratch, capture_output=True, text=True, timeout=300,
         )

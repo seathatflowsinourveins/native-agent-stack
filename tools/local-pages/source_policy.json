@@ -1866,6 +1866,10 @@
     },
     {
       "root": "repo",
+      "path": ".github/workflows/pr-metadata.yml"
+    },
+    {
+      "root": "repo",
       "path": ".github/workflows/practice-references-freshness.yml"
     },
     {
