@@ -9,6 +9,7 @@ import io
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -20,6 +21,8 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "skill-usage"))
 import skill_usage as S  # noqa: E402
+
+REAL_MANAGED_MCP_CONFIG_PATHS = S.MANAGED_MCP_CONFIG_PATHS  # RunSkillDoctor.setUp hides it behind a patch
 
 FIXTURES = ROOT / "tests" / "fixtures" / "skill_usage"
 NOW = "2026-10-30T00:00:00Z"
@@ -190,6 +193,82 @@ class SkillDoctorParsing(unittest.TestCase):
 
 
 class RunSkillDoctor(unittest.TestCase):
+    def setUp(self):
+        # Hermetic: no test here may depend on a managed-mcp.json that happens to exist on the host running it.
+        self.enterContext(mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", ()))
+
+    def test_a_deployed_managed_mcp_config_drops_only_the_strict_flag(self):
+        # Claude Code 2.1.296 refuses --strict-mcp-config while managed-mcp.json is deployed ("You cannot use
+        # --strict-mcp-config when an enterprise MCP config is present"); the file already holds exclusive control, so
+        # only that flag goes and every other fence stays, in order (the Codex review thread on #925, P2).
+        managed = Path(self.enterContext(tempfile.TemporaryDirectory())) / "managed-mcp.json"
+        managed.write_text("{}", encoding="utf-8")
+        self.assertEqual(S.skill_doctor_argv([managed]),
+                         ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
+                          "--permission-prompts", "none", "--tools", "", "--max-turns", "1", "--max-budget-usd", "0.05"])
+        self.assertIn("--strict-mcp-config", S.SKILL_DOCTOR_ARGV)  # the documented command keeps it
+
+    def test_run_skill_doctor_runs_the_managed_form_on_a_managed_host(self):
+        managed = Path(self.enterContext(tempfile.TemporaryDirectory())) / "managed-mcp.json"
+        managed.write_text("{}", encoding="utf-8")
+        captured = {}
+
+        def fake_runner(argv, **kwargs):
+            captured["argv"] = argv
+            return subprocess.CompletedProcess(argv, 0, "[]", "")
+
+        S.run_skill_doctor(runner=fake_runner, managed_paths=[managed])
+        self.assertNotIn("--strict-mcp-config", captured["argv"])
+        self.assertEqual(captured["argv"][captured["argv"].index("--permission-mode"):][:4],
+                         ["--permission-mode", "dontAsk", "--permission-prompts", "none"])
+        self.assertIn("--max-budget-usd", captured["argv"])
+
+    def test_without_a_readable_managed_file_every_fence_stays(self):
+        folder = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        (folder / "a-directory-named-managed-mcp.json").mkdir()
+        for paths in ([], [folder / "absent.json"], [folder / "a-directory-named-managed-mcp.json"]):
+            with self.subTest(paths=[str(p) for p in paths]):
+                self.assertEqual(S.skill_doctor_argv(paths), S.SKILL_DOCTOR_ARGV)
+        self.assertEqual(S.skill_doctor_argv(()), S.SKILL_DOCTOR_ARGV)
+
+    def test_the_default_paths_are_the_documented_system_paths(self):
+        # https://code.claude.com/docs/en/managed-mcp, configuration summary (read 2026-10-10): /Library/Application
+        # Support/ClaudeCode/ on macOS, /etc/claude-code/ on Linux (WSL included), C:\Program Files\ClaudeCode\ on Windows.
+        # All three are checked on every system (another system's path cannot exist on this one), so the module has no
+        # platform branch for the macOS drift guard (tests.test_workflow_hardening.MacosPatternsTests) to flag.
+        self.assertEqual(REAL_MANAGED_MCP_CONFIG_PATHS, (
+            "/Library/Application Support/ClaudeCode/managed-mcp.json",
+            "/etc/claude-code/managed-mcp.json",
+            "C:\\Program Files\\ClaudeCode\\managed-mcp.json"))
+        # With no managed file on this host the unpatched default keeps every fence.
+        with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", REAL_MANAGED_MCP_CONFIG_PATHS):
+            if not any(os.path.isfile(path) for path in REAL_MANAGED_MCP_CONFIG_PATHS):
+                self.assertEqual(S.skill_doctor_argv(), S.SKILL_DOCTOR_ARGV)
+
+    def test_the_managed_mcp_comment_and_guide_cite_the_client_and_the_docs(self):
+        source = (ROOT / "tools/skill-usage/skill_usage.py").read_text(encoding="utf-8").split("\n")
+        start = next(i for i, line in enumerate(source) if line.startswith("MANAGED_MCP_CONFIG_PATHS = "))
+        comment = []
+        for line in reversed(source[:start]):
+            if not line.startswith("#"):
+                break
+            comment.insert(0, line[1:].strip())
+        comment = " ".join(comment)
+        refusal = "You cannot use --strict-mcp-config when an enterprise MCP config is present"
+        self.assertIn(refusal, comment)
+        self.assertIn("https://code.claude.com/docs/en/managed-mcp", comment)
+        # The client's own distinction, read from the pinned binary (co-op GPT read of #925 at 46cc5dd1): a refusal
+        # needs a present file that loads without error, while its launcher drops the flag on presence alone.
+        self.assertIn("24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de", comment)
+        self.assertIn("present and loads without a read, JSON or schema error", comment)
+        self.assertIn("drops the flag on presence alone", comment)
+        readme = (ROOT / "tools/skill-usage/README.md").read_text(encoding="utf-8")
+        flat_readme = " ".join(readme.split())
+        self.assertIn(refusal, flat_readme)
+        self.assertIn("drop `--strict-mcp-config`", readme)
+        self.assertIn("present and loads without a read, JSON or schema error", flat_readme)
+        self.assertIn("drops the flag on presence alone", flat_readme)
+
     def test_runs_exact_argv_with_devnull_stdin_and_timeout(self):
         captured = {}
 
@@ -199,11 +278,72 @@ class RunSkillDoctor(unittest.TestCase):
             return subprocess.CompletedProcess(argv, 0, "[]", "")
 
         S.run_skill_doctor(timeout=17, runner=fake_runner)
-        self.assertEqual(captured["argv"], ["claude", "-p", "/skill-doctor", "--output-format", "json"])
+        # An independent literal: the headless fences deny what is not pre-approved without prompting (rule PERM-03,
+        # docs/harness-rules-convergence-20260922.md), offer no tools and no MCP servers, allow one turn and cap the spend.
+        self.assertEqual(captured["argv"], ["claude", "-p", "/skill-doctor", "--output-format", "json",
+                                            "--permission-mode", "dontAsk", "--permission-prompts", "none",
+                                            "--tools", "", "--strict-mcp-config", "--max-turns", "1",
+                                            "--max-budget-usd", "0.05"])
         self.assertIs(captured["kwargs"]["stdin"], subprocess.DEVNULL)
         self.assertEqual(captured["kwargs"]["timeout"], 17)
         self.assertTrue(captured["kwargs"]["text"])
         self.assertTrue(captured["kwargs"]["capture_output"])
+
+    def test_every_documented_copy_of_the_command_matches_the_argv(self):
+        # The command is copied by hand into the module docstring, the --run-skill-doctor help and the operator
+        # docs; each copy must equal the argv that runs, so a fence change cannot leave a stale copy behind.
+        command = shlex.join(S.SKILL_DOCTOR_ARGV)
+
+        def flat(text):
+            return " ".join(text.replace("\\\n", " ").split())
+
+        copies = {"module docstring": S.__doc__}
+        for relative in ("tools/skill-usage/README.md", "adoption/update.md", "blueprints/native-skill-practice/README.md"):
+            copies[relative] = (ROOT / relative).read_text(encoding="utf-8")
+        for name, text in copies.items():
+            with self.subTest(copy=name):
+                self.assertIn(command, flat(text))
+
+    def test_each_cli_help_entry_names_the_exact_command(self):
+        # Checked per option, not over the whole --help output: a correct copy in one entry must not hide a stale copy
+        # in the other (co-op GPT read of #925 at 2c8fc61b, P2).
+        command = shlex.join(S.SKILL_DOCTOR_ARGV)
+        helps = {option: action.help for action in S.build_parser()._actions for option in action.option_strings}
+        for option in ("--claude-skill-doctor", "--run-skill-doctor"):
+            with self.subTest(option=option):
+                self.assertIn(command, helps[option])
+        # Negative control: the bare command of b2189ba0 in one entry fails even while the other entry is correct.
+        stale = "Parse a captured 'claude -p \"/skill-doctor\" --output-format json' result object"
+        self.assertNotIn(command, stale)
+
+    def test_the_fence_comment_names_its_sources(self):
+        # The comment above SKILL_DOCTOR_ARGV must cite where each fence is documented: the client's --help does not
+        # list --max-turns (hidden in 2.1.295 and 2.1.296), so the CLI reference is cited for it, and the
+        # no-prompting rule is PERM-03. An unlanded record is no source (co-op GPT reads of #925).
+        source = (ROOT / "tools/skill-usage/skill_usage.py").read_text(encoding="utf-8").split("\n")
+        start = next(i for i, line in enumerate(source) if line.startswith("SKILL_DOCTOR_ARGV = "))
+        comment = []
+        for line in reversed(source[:start]):
+            if not line.startswith("#"):
+                break
+            comment.insert(0, line)
+        comment = " ".join(comment)
+        self.assertIn("https://code.claude.com/docs/en/cli-reference", comment)
+        self.assertIn("--max-turns is accepted but hidden from --help", comment)
+        self.assertIn("PERM-03 (docs/harness-rules-convergence-20260922.md)", comment)
+        self.assertNotIn("practice record", comment)
+
+    def test_the_windows_decision_cites_the_ledger_refusal_lines(self):
+        # docs/decisions/2026-10-04-pwsh7-windows-guidance.md cites the lines that refuse a ledger path inside a git
+        # work tree. Lines are counted by "\n", as editors, grep -n and GitHub count them: str.splitlines() also
+        # breaks at U+2028 and U+2029, which this module holds in one line, and would shift the count.
+        decision = (ROOT / "docs/decisions/2026-10-04-pwsh7-windows-guidance.md").read_text(encoding="utf-8")
+        cited = re.findall(r"tools/skill-usage/skill_usage\.py:(\d+)-(\d+)", decision)
+        self.assertEqual(len(cited), 1, cited)
+        start, end = (int(n) for n in cited[0])
+        lines = (ROOT / "tools/skill-usage/skill_usage.py").read_text(encoding="utf-8").split("\n")[start - 1:end]
+        self.assertTrue(lines[0].startswith("def ledger_path_issue("), lines[0])
+        self.assertIn("refusing a path inside a git work tree", "\n".join(lines))
 
     def test_uses_the_sample_fixture_stdout(self):
         sample = (FIXTURES / "skill-doctor-sample.json").read_text()
@@ -247,6 +387,98 @@ class RunSkillDoctor(unittest.TestCase):
         result = S.run_skill_doctor(runner=raising_runner)
         self.assertIn("error", result)
         self.assertIn("TimeoutExpired", result["error"])
+
+
+class ManagedMcpDefaultLocations(unittest.TestCase):
+    """skill_doctor_argv() through its default route, with the host reporting one documented system location at a time
+    (co-op GPT read of #925 at 46cc5dd1, P2). RunSkillDoctor injects its own paths and hides the module's, so dropping
+    a location, or the default route itself, left it green. A fake filesystem answers for the documented strings only
+    (a real file backs each present state), so no test here depends on a managed-mcp.json that exists on the host
+    running it and none plants a file at a system path."""
+
+    # Independent literals: the documented command with and without the one flag Claude Code 2.1.296 refuses while a
+    # managed config is deployed; every other fence keeps its words and its order.
+    FENCED = ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
+              "--permission-prompts", "none", "--tools", "", "--strict-mcp-config", "--max-turns", "1",
+              "--max-budget-usd", "0.05"]
+    MANAGED = ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
+               "--permission-prompts", "none", "--tools", "", "--max-turns", "1", "--max-budget-usd", "0.05"]
+    # https://code.claude.com/docs/en/managed-mcp, configuration summary (read 2026-10-10), spelled apart from the module.
+    LOCATIONS = {"macOS": "/Library/Application Support/ClaudeCode/managed-mcp.json",
+                 "Linux": "/etc/claude-code/managed-mcp.json",
+                 "Windows": "C:\\Program Files\\ClaudeCode\\managed-mcp.json"}
+    # The file the host holds at the location. The 2.1.296 client refuses the flag only for a file that loads without
+    # a read, JSON or schema error, and its own `plugin eval init` launcher drops the flag on presence alone (the
+    # comment above MANAGED_MCP_CONFIG_PATHS cites both); this module drops it for any file it can read, and keeps it
+    # when the file is absent, unreadable or not a regular file, the cases in which the client does not refuse it.
+    CONTENT = {"parsed": '{"mcpServers": {}}\n', "unparsable": "{not json"}
+    EXPECTED = {None: FENCED, "parsed": MANAGED, "unparsable": MANAGED, "unreadable": FENCED, "directory": FENCED}
+
+    @contextlib.contextmanager
+    def host(self, location, state):
+        """The documented strings answer as a host with `state` at `location` (None, 'parsed', 'unparsable',
+        'unreadable' or 'directory') and nothing at the others; every other path answers truthfully."""
+        backing = None
+        if state is not None:
+            backing = Path(self.enterContext(tempfile.TemporaryDirectory())) / "managed-mcp.json"
+            if state == "directory":
+                backing.mkdir()
+            else:
+                backing.write_text(self.CONTENT.get(state, "{}"), encoding="utf-8")
+        documented = set(self.LOCATIONS.values()) | set(REAL_MANAGED_MCP_CONFIG_PATHS)
+        real_isfile, real_access = os.path.isfile, os.access
+
+        def isfile(path):
+            if path in documented:
+                return path == location and backing is not None and real_isfile(backing)
+            return real_isfile(path)
+
+        def access(path, mode, **kwargs):
+            if path in documented:
+                return (path == location and backing is not None and state != "unreadable"
+                        and real_access(backing, mode, **kwargs))
+            return real_access(path, mode, **kwargs)
+
+        with mock.patch.object(os.path, "isfile", isfile), mock.patch.object(os, "access", access):
+            yield
+
+    def test_each_documented_location_decides_the_form_alone(self):
+        for name, location in self.LOCATIONS.items():
+            for state, expected in self.EXPECTED.items():
+                with self.subTest(location=name, state=state), self.host(location, state):
+                    self.assertEqual(S.skill_doctor_argv(), expected)
+
+    def test_dropping_a_locations_detection_fails_its_cases(self):
+        # The matrix is sensitive to each location: with one documented path removed from the module's tuple, that
+        # location's present states keep the strict flag (so the matrix above fails on that location alone), the
+        # other locations still decide the form, and with all three removed no present state is seen.
+        for name, location in self.LOCATIONS.items():
+            kept = tuple(path for path in REAL_MANAGED_MCP_CONFIG_PATHS if path != location)
+            self.assertEqual(len(kept), len(REAL_MANAGED_MCP_CONFIG_PATHS) - 1, location)
+            with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", kept):
+                for state in ("parsed", "unparsable"):
+                    with self.subTest(dropped=name, state=state), self.host(location, state):
+                        self.assertEqual(S.skill_doctor_argv(), self.FENCED)
+                for other_name, other in self.LOCATIONS.items():
+                    if other != location:
+                        with self.subTest(dropped=name, still_seen=other_name), self.host(other, "parsed"):
+                            self.assertEqual(S.skill_doctor_argv(), self.MANAGED)
+        with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", ()):
+            for name, location in self.LOCATIONS.items():
+                with self.subTest(dropped="all", location=name), self.host(location, "parsed"):
+                    self.assertEqual(S.skill_doctor_argv(), self.FENCED)
+
+    def test_run_skill_doctor_takes_the_default_route(self):
+        captured = {}
+
+        def fake_runner(argv, **kwargs):
+            captured["argv"] = argv
+            return subprocess.CompletedProcess(argv, 0, "[]", "")
+
+        for state, expected in ((None, self.FENCED), ("parsed", self.MANAGED)):
+            with self.subTest(state=state), self.host(self.LOCATIONS["Linux"], state):
+                S.run_skill_doctor(runner=fake_runner)
+                self.assertEqual(captured["argv"], expected)
 
 
 class CodexRolloutScan(unittest.TestCase):

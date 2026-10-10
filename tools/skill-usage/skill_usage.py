@@ -5,9 +5,14 @@ Claude side reads native `/skill-doctor` (its table is the only per-skill invoke
 Claude Code exposes; see the README for why OTel, a custom hook, agentsview and ccusage cannot
 answer this):
 
-    claude -p "/skill-doctor" --output-format json > /path/outside/checkout/skill-doctor.json
+    claude -p /skill-doctor --output-format json --permission-mode dontAsk --permission-prompts none \\
+        --tools '' --strict-mcp-config --max-turns 1 --max-budget-usd 0.05 > /path/outside/checkout/skill-doctor.json
     python3 tools/skill-usage/skill_usage.py --claude-skill-doctor /path/outside/checkout/skill-doctor.json \\
         --codex-root ~/.codex/sessions --out /path/outside/checkout/report.json
+
+On a host with a managed MCP config (managed-mcp.json), drop --strict-mcp-config from that command: the client
+refuses the flag there ("You cannot use --strict-mcp-config when an enterprise MCP config is present", 2.1.296), and
+--run-skill-doctor drops it itself.
 
 Or run it directly (refuses the result unless the native call was the synthetic, zero-cost
 local command it is documented to be):
@@ -195,10 +200,52 @@ def parse_claude_output(raw: str) -> dict:
             "total_cost_usd": total_cost_usd, "num_turns": num_turns}
 
 
-def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run) -> dict:
-    """Run exactly `claude -p "/skill-doctor" --output-format json`, stdin from /dev/null."""
+# /skill-doctor is a local command (0 turns, $0), so these fences change nothing while the client recognises it:
+# measured 2026-10-10 on Claude Code 2.1.295 and 2.1.296, each client's table sha256-identical at $0 and 0 turns with
+# the fences of b2189ba0 and with these. If a client stopped recognising it, they would keep the prompt from reaching a
+# model with tools or MCP servers under the host's inherited bypassPermissions and cap what the run spends (untested: no
+# such client exists). Sources: `claude --help` (2.1.295, 2.1.296) lists --permission-mode, --permission-prompts,
+# --tools, --strict-mcp-config and --max-budget-usd; --max-turns is accepted but hidden from --help and documented in
+# the CLI reference, https://code.claude.com/docs/en/cli-reference. Denying anything not pre-approved without prompting
+# is the repository's rule PERM-03 (docs/harness-rules-convergence-20260922.md).
+SKILL_DOCTOR_ARGV = ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
+                     "--permission-prompts", "none", "--tools", "", "--strict-mcp-config", "--max-turns", "1",
+                     "--max-budget-usd", "0.05"]
+
+# A deployed managed-mcp.json holds exclusive control of the MCP servers, and Claude Code refuses --strict-mcp-config
+# while it is there: the 2.1.296 binary carries "You cannot use --strict-mcp-config when an enterprise MCP config is
+# present" (read 2026-10-10), and https://code.claude.com/docs/en/managed-mcp (read 2026-10-10) says "If a user passes it
+# while such a file is deployed, Claude Code exits at startup on a workstation and in a cloud session alike". The file
+# already keeps every other server out, so on such a host the argv drops only that flag and keeps the other fences.
+# What the client checks, read from the 2.1.296 binary (sha256
+# 24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de, 2026-10-10): its refusal applies only when the file is
+# present and loads without a read, JSON or schema error (the reader at byte 217796118, the refusal at byte 217799919), so a
+# present file it cannot read or parse gets no refusal, and its own `plugin eval init` launcher drops the flag on presence
+# alone (byte 247738504). This check drops the flag for any file it can read, parsed or not, and keeps it when the file is
+# absent, unreadable or not a regular file, the cases in which the client does not refuse it.
+# System paths: the same page's configuration summary ("/Library/Application Support/ClaudeCode/", "/etc/claude-code/",
+# "C:\Program Files\ClaudeCode\"); all three are checked, because another system's path cannot exist on this one, so no
+# platform branch is needed (Linux covers WSL).
+MANAGED_MCP_CONFIG_PATHS = (
+    "/Library/Application Support/ClaudeCode/managed-mcp.json",
+    "/etc/claude-code/managed-mcp.json",
+    "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
+)
+
+
+def skill_doctor_argv(managed_paths=None) -> list:
+    """SKILL_DOCTOR_ARGV, without --strict-mcp-config when a readable managed MCP config is deployed."""
+    paths = MANAGED_MCP_CONFIG_PATHS if managed_paths is None else managed_paths
+    if any(os.path.isfile(path) and os.access(path, os.R_OK) for path in paths):
+        return [word for word in SKILL_DOCTOR_ARGV if word != "--strict-mcp-config"]
+    return list(SKILL_DOCTOR_ARGV)
+
+
+def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run, managed_paths=None) -> dict:
+    """Run skill_doctor_argv() (SKILL_DOCTOR_ARGV; without --strict-mcp-config on a host with a managed MCP config),
+    stdin from /dev/null."""
     try:
-        completed = runner(["claude", "-p", "/skill-doctor", "--output-format", "json"],
+        completed = runner(skill_doctor_argv(managed_paths),
                             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout)
     except (OSError, subprocess.TimeoutExpired) as error:
         return {"format": None, "rows": {}, "total_cost_usd": None, "num_turns": None,
@@ -2213,19 +2260,18 @@ def render_lanes_text(report: dict) -> str:
 # --------------------------------------------------------------------------- CLI
 
 
-def main(argv=None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     claude_source = parser.add_mutually_exclusive_group()
     claude_source.add_argument("--claude-skill-doctor", type=Path, metavar="FILE",
-                                help="Parse a captured 'claude -p \"/skill-doctor\" --output-format "
-                                     "json' result object or JSON array (its result event's "
-                                     "'result' text), or a plain-text /skill-doctor table, from "
+                                help=f"Parse a captured '{shlex.join(SKILL_DOCTOR_ARGV)}' result object or JSON array "
+                                     "(its result event's 'result' text), or a plain-text /skill-doctor table, from "
                                      "this file")
     claude_source.add_argument("--run-skill-doctor", action="store_true",
-                                help="Run 'claude -p \"/skill-doctor\" --output-format json' now "
-                                     "(stdin from /dev/null); refused unless total_cost_usd == 0 "
-                                     "and num_turns == 0")
+                                help=f"Run '{shlex.join(SKILL_DOCTOR_ARGV)}' now (stdin from /dev/null; without "
+                                     "--strict-mcp-config where a managed MCP config is deployed); refused "
+                                     "unless total_cost_usd == 0 and num_turns == 0")
     parser.add_argument("--claude-timeout", type=int, default=30, metavar="SECONDS",
                          help="Timeout for --run-skill-doctor (default: 30)")
     parser.add_argument("--codex-root", action="append", default=[], type=Path, metavar="DIR",
@@ -2261,6 +2307,11 @@ def main(argv=None) -> int:
                        help="Also write the private per-call ledger (codex-call-ledger/1 JSONL: thread and call ids with "
                             "each call's state) to this new file, mode 0600; refused inside any git work tree, over an "
                             "existing path, or with a measurement kernel that exports no callLedger (--lanes)")
+    return parser
+
+
+def main(argv=None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     try:
