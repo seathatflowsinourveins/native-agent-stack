@@ -42,7 +42,10 @@ GIT_ID = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_
           "GIT_COMMITTER_EMAIL": "t@example.invalid"}
 
 # A stand-in for `gh api` with the REST shapes the worker uses. --paginate walks pages of 100 and applies --jq to each
-# page, as gh does; without --paginate only the first page comes back. Every call is logged with its JSON body.
+# page, as gh does; without --paginate only the first page comes back. Every call is logged with its JSON body. Posted
+# statuses and comments persist in FAKE_GH_STATE across ticks. fixtures["heads"]["<repo>#<n>"] lists the heads that
+# successive GETs of that pull request return (the last repeats; "closed" closes it); without one, the listing's head.
+# A path in fixtures["accept_then_fail"] is accepted and stored, then answered with an error (a lost response).
 FAKE_GH = r'''#!/usr/bin/env python3
 import json, os, re, sys
 fx = json.load(open(os.environ["FAKE_GH_FIXTURES"]))
@@ -71,6 +74,17 @@ with open(os.environ["FAKE_GH_LOG"], "a") as log:
 if path in fx["fail"]:
     sys.stderr.write("gh: HTTP 502\n")
     sys.exit(1)
+state_path = os.environ["FAKE_GH_STATE"]
+state = json.load(open(state_path)) if os.path.exists(state_path) else {"statuses": {}, "comments": {}, "next": 1,
+                                                                         "reads": {}}
+def keep():
+    json.dump(state, open(state_path, "w"))
+def answer(value):
+    keep()
+    if path in fx.get("accept_then_fail", []):
+        sys.stderr.write("gh: HTTP 502 after the write\n")
+        sys.exit(1)
+    sys.stdout.write(json.dumps(value)); sys.exit(0)
 def pages(items):
     chunks = [items[k:k + 100] for k in range(0, len(items), 100)] or [[]]
     return chunks if paginate else chunks[:1]
@@ -91,10 +105,45 @@ if method == "GET" and m:
 m = re.fullmatch(r"repos/([^/]+/[^/]+)", path or "")
 if method == "GET" and m:
     emit([{"full_name": m.group(1), "private": fx["repos"][m.group(1)]["private"]}]); sys.exit(0)
-if method == "POST" and re.fullmatch(r"repos/[^/]+/[^/]+/statuses/[0-9a-f]{40}", path or ""):
-    sys.stdout.write("{}"); sys.exit(0)
-if method == "POST" and re.fullmatch(r"repos/[^/]+/[^/]+/issues/[0-9]+/comments", path or ""):
-    sys.stdout.write("{}"); sys.exit(0)
+if method == "GET" and path == "user":
+    emit([{"login": "crw-poster"}]); sys.exit(0)
+m = re.fullmatch(r"repos/([^/]+/[^/]+)/pulls/([0-9]+)", path or "")
+if method == "GET" and m:
+    name, number = m.group(1), int(m.group(2))
+    listed = [p for p in fx["repos"][name]["pulls"] if p["number"] == number]
+    sequence = fx.get("heads", {}).get(f"{name}#{number}") or [listed[0]["head"]["sha"] if listed else "closed"]
+    seen = state["reads"].get(f"{name}#{number}", 0)
+    state["reads"][f"{name}#{number}"] = seen + 1
+    keep()
+    head = sequence[min(seen, len(sequence) - 1)]
+    emit([{"number": number, "state": "closed" if head == "closed" else "open",
+           "head": {"sha": None if head == "closed" else head}}]); sys.exit(0)
+m = re.fullmatch(r"repos/([^/]+/[^/]+)/commits/([0-9a-f]{40})/statuses\?per_page=100", path or "")
+if method == "GET" and m:
+    emit(pages(list(reversed(state["statuses"].get(f"{m.group(1)}@{m.group(2)}", []))))); sys.exit(0)
+m = re.fullmatch(r"repos/([^/]+/[^/]+)/issues/([0-9]+)/comments\?per_page=100", path or "")
+if method == "GET" and m:
+    emit(pages(state["comments"].get(f"{m.group(1)}#{m.group(2)}", []))); sys.exit(0)
+m = re.fullmatch(r"repos/([^/]+/[^/]+)/statuses/([0-9a-f]{40})", path or "")
+if method == "POST" and m:
+    item = {**json.loads(body), "id": state["next"], "creator": {"login": "crw-poster"}}
+    state["next"] += 1
+    state["statuses"].setdefault(f"{m.group(1)}@{m.group(2)}", []).append(item)
+    answer(item)
+m = re.fullmatch(r"repos/([^/]+/[^/]+)/issues/([0-9]+)/comments", path or "")
+if method == "POST" and m:
+    item = {"id": state["next"], "body": json.loads(body)["body"], "user": {"login": "crw-poster"}}
+    state["next"] += 1
+    state["comments"].setdefault(f"{m.group(1)}#{m.group(2)}", []).append(item)
+    answer(item)
+m = re.fullmatch(r"repos/([^/]+/[^/]+)/issues/comments/([0-9]+)", path or "")
+if method == "PATCH" and m:
+    for items in state["comments"].values():
+        for item in items:
+            if item["id"] == int(m.group(2)):
+                item["body"] = json.loads(body)["body"]
+                answer(item)
+    sys.exit(95)
 sys.exit(98)
 '''
 
@@ -245,7 +294,7 @@ class Harness:
         self.claude.write_text(FAKE_CLAUDE.replace("#!/usr/bin/env python3", shebang, 1))
         self.claude.chmod(0o755)
         self.fixtures = {"repos": {}, "fail": []}
-        self.gh_fixtures, self.gh_log = self.base / "gh.json", self.base / "gh.log"
+        self.gh_fixtures, self.gh_log, self.gh_state = self.base / "gh.json", self.base / "gh.log", self.base / "gh-state.json"
         self.script, self.claude_log = self.base / "claude-script.json", self.base / "claude.log"
         self.state = self.base / "state"
         self.ledger_path = self.base / "ledger" / "api-actions-ledger.jsonl"
@@ -258,7 +307,8 @@ class Harness:
 
     def env(self) -> dict:
         return {"PATH": f"{self.bin}{os.pathsep}{os.environ.get('PATH', os.defpath)}", "HOME": str(self.home),
-                "LANG": "C.UTF-8", "FAKE_GH_FIXTURES": str(self.gh_fixtures), "FAKE_GH_LOG": str(self.gh_log)}
+                "LANG": "C.UTF-8", "FAKE_GH_FIXTURES": str(self.gh_fixtures), "FAKE_GH_LOG": str(self.gh_log),
+                "FAKE_GH_STATE": str(self.gh_state)}
 
     def repo(self, name, visibility="private", *, every_pr=True, paths=(), private_api=None, heads=None,
              rules=("AGENTS.md",)):
@@ -296,6 +346,9 @@ class Harness:
 
     def posts(self):
         return [call for call in self.gh_calls() if call["method"] == "POST"]
+
+    def remote(self):
+        return json.loads(self.gh_state.read_text()) if self.gh_state.exists() else {"statuses": {}, "comments": {}}
 
     def rows(self):
         if not self.ledger_path.exists():
@@ -588,6 +641,102 @@ class ReviewRunTest(unittest.TestCase):
         self.assertEqual([p["path"] for p in h.posts()], [f"repos/o/priv/statuses/{sha}", "repos/o/priv/issues/3/comments"])
         h.worker([repo], post=True).tick()
         self.assertEqual(len(h.posts()), 2)
+
+    MOVED = "b" * 40
+
+    def post_states(self, h, repo, sha):
+        return h.record(repo, 3, sha)["attempts"][-1]["post"]
+
+    def test_a_head_that_moved_after_the_review_gets_no_status_and_no_comment(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.fixtures["heads"] = {"o/priv#3": [self.MOVED]}
+        h.queue([run_of(REPORT)])
+        self.assertEqual(h.worker([repo], post=True).tick(), 0)
+        self.assertEqual(h.posts(), [])
+        post = self.post_states(h, repo, sha)
+        self.assertEqual((post["status"], post["comment"], post["superseded"]["head"]),
+                         ("superseded", "superseded", self.MOVED))
+        h.worker([repo], post=True).tick()  # a later tick posts nothing for the superseded review either
+        self.assertEqual(h.posts(), [])
+
+    def test_a_head_that_moves_between_the_status_and_the_comment_gets_no_comment(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.fixtures["heads"] = {"o/priv#3": [sha, self.MOVED]}
+        h.queue([run_of(REPORT)])
+        h.worker([repo], post=True).tick()
+        self.assertEqual([p["path"] for p in h.posts()], [f"repos/o/priv/statuses/{sha}"])  # bound to the old commit
+        post = self.post_states(h, repo, sha)
+        self.assertEqual((post["status"], post["comment"], post["superseded"]["stage"]),
+                         ("posted", "superseded", "the comment"))
+
+    def test_a_head_that_moves_while_posting_marks_the_comment_superseded(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.fixtures["heads"] = {"o/priv#3": [sha, sha, "closed"]}
+        h.queue([run_of(REPORT)])
+        h.worker([repo], post=True).tick()
+        comments = h.remote()["comments"]["o/priv#3"]
+        self.assertEqual(len(comments), 1)
+        self.assertTrue(comments[0]["body"].startswith("**Superseded:**"))
+        self.assertIn(f"This verdict is for `{sha}` only.", comments[0]["body"])
+        self.assertTrue(self.post_states(h, repo, sha)["superseded"]["comment_marked"])
+
+    def test_a_stored_result_whose_head_moved_before_publication_is_not_posted(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.queue([run_of(REPORT)])
+        h.worker([repo], post=False).tick()
+        h.fixtures["heads"] = {"o/priv#3": [self.MOVED]}  # the listing still shows the old head; the PR read does not
+        h.worker([repo], post=True).tick()
+        self.assertEqual(h.posts(), [])
+        self.assertEqual(self.post_states(h, repo, sha)["status"], "superseded")
+
+    def test_a_comment_whose_reply_was_lost_is_found_not_posted_again(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.fixtures["accept_then_fail"] = ["repos/o/priv/issues/3/comments"]
+        h.queue([run_of(REPORT)])
+        h.worker([repo], post=True).tick()
+        self.assertEqual(self.post_states(h, repo, sha)["comment"], "failed")
+        h.fixtures["accept_then_fail"] = []
+        h.worker([repo], post=True).tick()
+        h.worker([repo], post=True).tick()
+        self.assertEqual([p["path"] for p in h.posts()].count("repos/o/priv/issues/3/comments"), 1)
+        self.assertEqual(len(h.remote()["comments"]["o/priv#3"]), 1)
+        post = self.post_states(h, repo, sha)
+        self.assertEqual((post["comment"], post["comment_id"]), ("posted", h.remote()["comments"]["o/priv#3"][0]["id"]))
+
+    def test_a_tick_that_stops_after_a_post_before_saving_it_never_posts_it_twice(self):
+        class Stopped(BaseException):
+            pass
+
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.queue([run_of(REPORT)])
+        for target in (f"repos/o/priv/statuses/{sha}", "repos/o/priv/issues/3/comments", None):
+            worker = h.worker([repo], post=True)
+            real = worker.gh.post
+
+            def stop_after(path, body, real=real, target=target):
+                reply = real(path, body)
+                if path == target:
+                    raise Stopped(path)  # the process ends after GitHub took the POST, before the state is saved
+                return reply
+
+            worker.gh.post = stop_after
+            if target is None:
+                worker.tick()
+            else:
+                with self.assertRaises(Stopped):
+                    worker.tick()
+        remote = h.remote()
+        self.assertEqual((len(remote["statuses"][f"o/priv@{sha}"]), len(remote["comments"]["o/priv#3"])), (1, 1))
+        self.assertEqual([p["path"] for p in h.posts()],
+                         [f"repos/o/priv/statuses/{sha}", "repos/o/priv/issues/3/comments"])
+        post = self.post_states(h, repo, sha)
+        self.assertEqual((post["status"], post["comment"]), ("posted", "posted"))
 
     def test_a_diff_over_250000_bytes_is_refused_before_any_debit(self):
         h = Harness(self)

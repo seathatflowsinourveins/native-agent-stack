@@ -405,8 +405,11 @@ class GitHub:
     def get(self, path: str):
         return json.loads(self._run(["api", path]))
 
-    def post(self, path: str, body: dict) -> None:
-        self._run(["api", "--method", "POST", path, "--input", "-"], stdin=json.dumps(body))
+    def post(self, path: str, body: dict):
+        return json.loads(self._run(["api", "--method", "POST", path, "--input", "-"], stdin=json.dumps(body)) or "{}")
+
+    def patch(self, path: str, body: dict):
+        return json.loads(self._run(["api", "--method", "PATCH", path, "--input", "-"], stdin=json.dumps(body)) or "{}")
 
 
 # --------------------------------------------------------------------------- git (model-free; host git config ignored)
@@ -995,6 +998,11 @@ def sanitize_comment(text: str, *, prefixes, home: str, names, limit: int = COMM
     return text, None
 
 
+def comment_marker(repo: Repo, pr: int, sha: str, attempt: int) -> str:
+    """The comment's identity, hidden in its body: a retry finds the comment it already posted by this line."""
+    return f"<!-- {STATUS_CONTEXT} {repo.name}#{pr}@{sha} attempt {attempt} -->"
+
+
 def comment_body(repo: Repo, pr: int, sha: str, attempt: int, parsed: dict, stop: str, state: str,
                  version: str, findings: str) -> str:
     """The comment: generated lines only, and the findings (sanitize_comment's output, which holds no backtick)
@@ -1009,7 +1017,7 @@ def comment_body(repo: Repo, pr: int, sha: str, attempt: int, parsed: dict, stop
     if parsed.get("upstream"):
         lines += [f"Upstream-alignment findings (tagged [upstream]): {parsed['upstream']}.", ""]
     lines += ["The findings as the model wrote them, shown as plain text:", "```text", findings or "No findings.",
-              "```", "", "The full report is kept on the reviewing host."]
+              "```", "", "The full report is kept on the reviewing host.", comment_marker(repo, pr, sha, attempt)]
     return "\n".join(lines)
 
 
@@ -1318,6 +1326,7 @@ class Worker:
         self.visibility: dict = {}
         self.binary: dict = {}
         self.preflight_detail = ""
+        self.login: str | None = None  # the gh login that posts, read once a tick when a retry must be reconciled
 
     # ---- tick -----------------------------------------------------------------------------------------------------
 
@@ -1855,36 +1864,138 @@ class Worker:
     def comment_allowed(self, repo: Repo) -> bool:
         return repo.visibility == "private" and self.visibility.get(repo.name) is True
 
+    UNSENT = ("pending", "sending", "failed")  # sending: the POST may have reached GitHub (a crash or a lost reply)
+
+    def current_head(self, repo: Repo, pr: int) -> str | None:
+        """The pull request's head sha read now, or None when it is no longer open."""
+        pull = self.gh.get(f"repos/{repo.name}/pulls/{pr}")
+        if not isinstance(pull, dict) or pull.get("state") != "open":
+            return None
+        sha = (pull.get("head") or {}).get("sha")
+        return sha if isinstance(sha, str) and SHA.fullmatch(sha) else None
+
+    def poster(self) -> str:
+        if self.login is None:
+            user = self.gh.get("user")
+            login = user.get("login") if isinstance(user, dict) else None
+            if not isinstance(login, str) or not login:
+                raise ApiError("gh user: no login")
+            self.login = login
+        return self.login
+
+    def status_on_github(self, repo: Repo, sha: str, payload: dict) -> bool:
+        """True when the commit's latest claude-review/local status, by this login, already is payload."""
+        login = self.poster()
+        for status in self.gh.items(f"repos/{repo.name}/commits/{sha}/statuses?per_page=100"):  # newest first
+            if isinstance(status, dict) and status.get("context") == STATUS_CONTEXT:
+                return ((status.get("creator") or {}).get("login") == login and status.get("state") == payload["state"]
+                        and status.get("description") == payload["description"])
+        return False
+
+    def comment_on_github(self, repo: Repo, pr: int, marker: str) -> int | None:
+        """The id of this attempt's comment when this login already posted it."""
+        login = self.poster()
+        for comment in self.gh.items(f"repos/{repo.name}/issues/{pr}/comments?per_page=100"):
+            if (isinstance(comment, dict) and marker in str(comment.get("body", ""))
+                    and (comment.get("user") or {}).get("login") == login and is_count(comment.get("id"))):
+                return comment["id"]
+        return None
+
     def publish(self, repo: Repo, pr: int, sha: str, record: dict, attempt: dict) -> None:
+        """Posts the stored result while the reviewed sha is the open head, read just before each POST. Each side
+        effect is saved as it happens; a POST whose outcome is unknown (sending, or failed) is first looked up on
+        GitHub, so a retry never posts it twice. A head that moved marks what is unsent superseded; one that moved
+        while posting gets a superseded line on the comment already posted."""
         post = attempt.get("post") or {}
         if not self.settings.post:
             return
         report_dir = self.state / attempt["report_path"]
-        if post.get("status") in ("pending", "failed"):
-            payload = read_json(report_dir / "status.json", None)
+        label = f"{repo.name}#{pr}@{sha[:12]}"
+
+        def save() -> None:
+            attempt["post"] = post
+            self.attempts.save(repo, record)
+
+        def current(stage: str) -> bool | None:
             try:
-                self.gh.post(f"repos/{repo.name}/statuses/{sha}", payload)
-                post["status"] = "posted"
-            except (ApiError, TypeError) as error:
-                post["status"] = "failed"
-                self.log(f"{repo.name}#{pr}: status not posted ({error})")
-        if post.get("comment") in ("pending", "failed"):
+                head = self.current_head(repo, pr)
+            except (ApiError, ValueError) as error:
+                self.log(f"{label}: the head could not be read before {stage} ({error}); left for the next tick")
+                return None
+            if head == sha:
+                return True
+            post["superseded"] = {"stage": stage, "head": head, "at": iso(self.clock())}
+            for part in ("status", "comment"):
+                if post.get(part) in self.UNSENT:
+                    post[part] = "superseded"
+            save()
+            self.log(f"{label}: superseded before {stage}: the head is now "
+                     f"{head[:12] if head else 'closed'}; nothing more is posted for this review")
+            return False
+
+        def send(part: str, posted_already, do_post) -> None:
+            try:
+                if post[part] != "pending" and posted_already():
+                    post[part] = "posted"
+                else:
+                    post[part] = "sending"
+                    save()
+                    do_post()
+                    post[part] = "posted"
+            except (ApiError, OSError, TypeError, ValueError) as error:
+                post[part] = "failed"
+                self.log(f"{label}: {part} not posted ({error})")
+            save()
+
+        if post.get("status") in self.UNSENT:
+            if not current("the status"):
+                return
+            payload = read_json(report_dir / "status.json", None)
+            send("status", lambda: self.status_on_github(repo, sha, payload),
+                 lambda: self.gh.post(f"repos/{repo.name}/statuses/{sha}", payload))
+        if post.get("comment") in self.UNSENT:
             if not self.comment_allowed(repo):
                 post["comment"] = "not_applicable"
+                save()
                 self.log(f"{repo.name}#{pr}: no comment: the repository is not private by both config and API")
             else:
-                try:
+                if not current("the comment"):
+                    return
+                marker = comment_marker(repo, pr, sha, attempt["number"])
+
+                def found() -> bool:
+                    post["comment_id"] = self.comment_on_github(repo, pr, marker)
+                    return post["comment_id"] is not None
+
+                def create() -> None:
                     body = (report_dir / "comment.md").read_text(encoding="utf-8")
-                    self.gh.post(f"repos/{repo.name}/issues/{pr}/comments", {"body": body})
-                    post["comment"] = "posted"
-                except (ApiError, OSError) as error:
-                    post["comment"] = "failed"
-                    self.log(f"{repo.name}#{pr}: comment not posted ({error})")
-        attempt["post"] = post
-        self.attempts.save(repo, record)
+                    reply = self.gh.post(f"repos/{repo.name}/issues/{pr}/comments", {"body": body})
+                    post["comment_id"] = reply.get("id") if isinstance(reply, dict) else None
+
+                send("comment", found, create)
+        if post.get("status") == "posted" and "superseded" not in post and current("the end of posting") is False:
+            self.mark_superseded(repo, pr, sha, post, report_dir)
+            save()
+
+    def mark_superseded(self, repo: Repo, pr: int, sha: str, post: dict, report_dir: Path) -> None:
+        """The head moved while this review was posted: its comment says so. The status stays on the reviewed commit
+        only, which is no longer the head, so no current verdict is left."""
+        if post.get("comment") != "posted" or not is_count(post.get("comment_id")):
+            return
+        head = post["superseded"].get("head")
+        note = (f"**Superseded:** the pull request's head moved to `{head or 'a closed state'}` while this review "
+                f"was being posted. This verdict is for `{sha}` only.\n\n")
+        try:
+            body = (report_dir / "comment.md").read_text(encoding="utf-8")
+            self.gh.patch(f"repos/{repo.name}/issues/comments/{post['comment_id']}", {"body": note + body})
+            post["superseded"]["comment_marked"] = True
+        except (ApiError, OSError, ValueError) as error:
+            post["superseded"]["comment_marked"] = False
+            self.log(f"{repo.name}#{pr}: the superseded line was not added to the comment ({error})")
 
     def publish_pending(self, heads: list) -> None:
-        """A result not posted yet (CLAUDE_REVIEW_POST was 0, or a post failed) is posted while its head is current."""
+        """A result not posted yet (CLAUDE_REVIEW_POST was 0, a post failed, or a tick stopped mid-post) is posted
+        while its head is current; publish() reads the head again itself."""
         if not self.settings.post:
             return
         for candidate in heads:
@@ -1893,7 +2004,7 @@ class Worker:
                 continue
             latest = record["attempts"][-1]
             post = latest.get("post") or {}
-            if post.get("status") in ("pending", "failed") or post.get("comment") in ("pending", "failed"):
+            if post.get("status") in self.UNSENT or post.get("comment") in self.UNSENT:
                 self.publish(candidate.repo, candidate.pr, candidate.sha, record, latest)
 
 
