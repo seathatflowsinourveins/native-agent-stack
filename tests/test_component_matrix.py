@@ -403,6 +403,24 @@ class CheckFreshnessTests(unittest.TestCase):
             exit_code = cm.main(["--root", str(REPO_ROOT), "--check"])
         self.assertEqual(exit_code, 0, buffer.getvalue())
 
+    def test_real_repository_matrix_includes_published_completed_sweeps(self):
+        # Publishing a sweep updates both its dated manifest and ledger. The
+        # checked-in report must include those inputs; newer reports remain
+        # eligible, so this does not pin the matrix to one permanent latest date.
+        ledger = json.loads((REPO_ROOT / cm.SATURATION_LEDGER_FILE).read_text(encoding="utf-8"))
+        matrix = json.loads((REPO_ROOT / cm.OUTPUT_JSON).read_text(encoding="utf-8"))
+        convergence = matrix["summary"]["convergence"]
+        reported = {entry["sweep_id"]: entry for entry in convergence["sources"]["completed_sweeps"]}
+        completed = [entry for entry in ledger["sweeps"] if entry.get("status") == "completed"
+                     and entry.get("manifest_ref")]
+        self.assertTrue(completed, "published-sweep freshness must inspect recorded inputs")
+        for sweep in completed:
+            with self.subTest(sweep=sweep["sweep_id"]):
+                manifest = json.loads((REPO_ROOT / sweep["manifest_ref"]).read_text(encoding="utf-8"))
+                self.assertIn(sweep["sweep_id"], reported)
+                self.assertEqual(reported[sweep["sweep_id"]]["manifest_ref"], sweep["manifest_ref"])
+                self.assertGreaterEqual(convergence["newest_manifest"]["checked_at"], manifest["checked_at"])
+
 
 class AlternativeAndDecisionJoinTests(unittest.TestCase):
     def test_alternative_defaults_to_not_run(self):

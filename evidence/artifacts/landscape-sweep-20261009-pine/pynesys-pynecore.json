@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-pynesys-pynecore",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/PyneSys/pynecore",
+ "reviewed_commit": "cab1266911a31245e885dc06789f900717be9e98",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "backtesting-engine"
+ ],
+ "claim": "Source and documentation review of PyneSys/pynecore at commit cab1266911a31245e885dc06789f900717be9e98 (license Apache-2.0), read from README.md at that commit. Repository description: \"Pine Script-compatible Python runtime for indicators and strategies, validated against TradingView on real published scripts\". Survived the landscape-sweep-20261009-pine facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 199,
+  "pushed_at": "2026-10-09T22:19:23Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@cab1266911a31245e885dc06789f900717be9e98",
+   "text": "**Have Pine Script code? [Convert it to Python](#converting-pine-script)**"
+  },
+  {
+   "source": "README.md@cab1266911a31245e885dc06789f900717be9e98",
+   "text": "PyneCore runs Pine Script-style trading code in Python. You write ordinary Python, and PyneCore rewrites it at import time with AST transformations, so it executes bar by bar with Pine Script's semantics: series with history, variables that keep their value between bars, and `na` for missing data. The rest of the Python ecosystem stays available to the same code."
+  },
+  {
+   "source": "README.md@cab1266911a31245e885dc06789f900717be9e98",
+   "text": "PyneCore is tested against TradingView on <!--wild:scripts_total-->1,000<!--/wild--> published TradingView scripts (Pine Script v4 to v6, converted to Pyne code with [PyneComp](https://pynesys.io)). All <!--wild:tv_verified-->1,353<!--/wild--> comparable outputs match, <!--wild:bars_exact_pct-->99.771<!--/wild-->% of <!--wild:bars_compared_millions-->132<!--/wild--> million plotted values are bit-identical, and <!--wild:strategy_trades-->353,577<!--/wild--> strategy trades match TradingView's ti"
+  }
+ ]
+}

@@ -17107,8 +17107,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "c761d3e6ec61a3c2d822d36f0afc7d49c6cb0da0269245e1c06516818b23aa00",
-      "bytes": 314853
+      "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
+      "bytes": 315225
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17202,8 +17202,8 @@
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
-      "bytes": 403074
+      "sha256": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2",
+      "bytes": 413173
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -17234,6 +17234,11 @@
       "path": "catalogs/sota-convergence/manifest-20260929.json",
       "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
       "bytes": 1149103
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261009.json",
+      "sha256": "3f061eeb261a91e8eec0f586bc135179e56bacd6216adcf9ddfa526877879153",
+      "bytes": 269693
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -17697,8 +17702,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "a1af27458583cabaebfe3d0299b239fdf23f42740165f02f9323d33f0647d26f",
-      "bytes": 32903
+      "sha256": "0fad007a8e9568b4271e2ac2b1996a57dd1fa52883f902b8c784eeca07e968a7",
+      "bytes": 32981
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -36479,6 +36484,51 @@
       "path": "evidence/artifacts/landscape-sweep-20260929/vshulcz-deja-vu.json",
       "sha256": "1ecffbbd16d616fe5a3728d23cf16824fd84579c55544c4fc131086486b628d1",
       "bytes": 2160
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine-attempts/child-usage-wf_638ac506-e83.json",
+      "sha256": "13a2760dc905fb85f9ac6cc083389af066f32adf465c7864a8e88c6f2168d3d0",
+      "bytes": 342409
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json",
+      "sha256": "b70eed9caf7988665c6a79a1731ec536882ba37479560b8852320b043ad02680",
+      "bytes": 1941
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json",
+      "sha256": "2854b27c93951eba97cdc3390a9be9998e5968c53a85c80f648b934c5ef16cfa",
+      "bytes": 1667
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json",
+      "sha256": "644ad3cd5bdcc4fda990de2a9270e8ef5f210f2a3efbae17355d344d9511bc51",
+      "bytes": 2217
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json",
+      "sha256": "4a3ff379c088dfe4c4fa9970735c9a822cc951bc93bae003422c727ca1568904",
+      "bytes": 1777
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json",
+      "sha256": "6cea6e67ea0284eae4f0e46fcc853d8a8950ad38559522ce83f3eeb7a47a0db8",
+      "bytes": 2259
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json",
+      "sha256": "6a36d6cf7b86f16007f74e16bb9b6eb795fb26b576b8449441aad4168e5b8137",
+      "bytes": 2204
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json",
+      "sha256": "8b91d1acc81d71d8a911916cd1869a4d0a5742f95bb529c76d321c9793e2f961",
+      "bytes": 253490
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json",
+      "sha256": "b49a2055540b21e281f5a8ee58ae422b10a86ac00895a511c9f22f72ad767567",
+      "bytes": 1623
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",
@@ -60317,8 +60367,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "a98574895dd7e4dda8c45d6d993af8ec335a5a4a02644efaee64e1688d162de4",
-      "bytes": 83131
+      "sha256": "da4fe0a1c18baeaeaf65675b21f5ab0ed748f2d9eaab1a1675ea89144851a166",
+      "bytes": 84487
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",
