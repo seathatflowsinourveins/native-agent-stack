@@ -96,6 +96,10 @@ jobs:
         env:
           # The action turns full output on when this is "true" in its environment; pin it off for this step.
           ACTIONS_STEP_DEBUG: 'false'
+          # No CLAUDE.md memory file (user, project, rules, nested or imported) loads, so the repository's own
+          # instruction files are read only as evidence. The action hands its whole environment to Claude Code
+          # (base-action/src/parse-sdk-options.ts:279 at the pin).
+          CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1'
         with:
           anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
           anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
@@ -136,7 +140,7 @@ jobs:
       # kept in the record only.
       # The cost bound is the 5 USD budget times 1.10, because the client stops only after crossing its budget. A
       # budget stop at or under the bound is exempt from the success and result-text checks only; every other bound
-      # still applies to it. When it passes, the publish step names the stop under the report.
+      # still applies to it. For a budget stop without result text, the text counted is what the model wrote until then. When it passes, the publish step names the stop under the report.
       - name: Keep the run's numbers and check the bounds
         id: bounds
         if: ${{ always() && steps.claude_audit.outputs.execution_file != '' }}
@@ -161,7 +165,11 @@ jobs:
             ($init.tools // []) as $listed |
             ($listed | map(select(type == "string"))) as $tools |
             ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
-              as $text |
+              as $result_text |
+            ([.[] | select(.type == "assistant") | .message | objects | .content | arrays | .[] | objects
+              | select(.type == "text") | .text | strings | select(. != "")] | join("\n\n")) as $written |
+            (if $result_text != "" then $result_text
+             elif $result.subtype == "error_max_budget_usd" then $written else "" end) as $text |
             ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
             {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
              result_chars: ($text | length),
@@ -215,7 +223,8 @@ jobs:
           fi
 
       # The report is the last non-empty result text, capped and shown as preformatted text so nothing in it renders
-      # as Markdown or HTML on the run page. It is published whenever the bounds check passed: the action fails its
+      # as Markdown or HTML on the run page. A budget stop can end without result text after the model has written
+      # part of its report; the report is then the text of the assistant messages, joined, as in claude-pr-review.yml. It is published whenever the bounds check passed: the action fails its
       # own step on any result but a success, so after a budget stop within the bound only the check's outcome, not
       # success(), says that the bounds were met. A budget stop is named under the report here, where every bound is
       # known to have passed, so the note never stands without a report.
@@ -227,8 +236,15 @@ jobs:
         run: |
           set -euo pipefail
           report="$(mktemp)"
-          jq -j '[.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // ""' \
-            "$EXECUTION_FILE" > "$report"
+          jq -j '
+            ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
+              as $result_text |
+            if $result_text != "" then $result_text
+            elif (map(select(.type == "result")) | last | .subtype) == "error_max_budget_usd" then
+              [.[] | select(.type == "assistant") | .message | objects | .content | arrays | .[] | objects
+               | select(.type == "text") | .text | strings | select(. != "")] | join("\n\n")
+            else "" end
+          ' "$EXECUTION_FILE" > "$report"
           size="$(wc -c < "$report")"
           {
             echo '### Harness audit: report'
@@ -244,7 +260,7 @@ jobs:
             fi
             jq -r 'map(select(.type == "result")) | last |
               if .subtype == "error_max_budget_usd"
-              then "", "The run stopped at its client budget (error_max_budget_usd), at a client cost estimate of \(.total_cost_usd) USD, within the 5.5 bound (the budget times 1.10). The report above is the result text it returned, if any."
+              then "", "The run stopped at its client budget (error_max_budget_usd), at a client cost estimate of \(.total_cost_usd) USD, within the 5.5 bound (the budget times 1.10). The report above is the result text it returned or, without one, the text the model wrote until then."
               else empty end' "$EXECUTION_FILE"
           } >> "$GITHUB_STEP_SUMMARY"
           rm -f "$report"

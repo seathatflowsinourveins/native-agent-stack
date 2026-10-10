@@ -144,7 +144,8 @@ class HarnessAuditShapeTests(unittest.TestCase):
     def test_the_action_is_pinned_and_takes_federation_inputs_only(self):
         run = step(AUDIT)
         self.assertEqual(run["uses"], ACTION)
-        self.assertEqual(run["env"], {"ACTIONS_STEP_DEBUG": "false"})
+        # Codex P2 thread at harness-audit.yml:125 (R10): no CLAUDE.md memory file loads in the audit session.
+        self.assertEqual(run["env"], {"ACTIONS_STEP_DEBUG": "false", "CLAUDE_CODE_DISABLE_CLAUDE_MDS": "1"})
         inputs = run["with"]
         # The complete reviewed input set (J8 micro N8; GPT read of 0cf13fc2): an input added to the action step, such
         # as claude_code_version or settings, fails here even when no test names it.
@@ -380,18 +381,42 @@ class HarnessAuditStepTests(unittest.TestCase):
                 self.assertEqual(code, 0, console)
                 self.assertEqual(json.loads(usage)["result_subtype"], "error_max_budget_usd")
                 self.assertNotIn("The run stopped at its client budget", summary)
+                for message in log:
+                    if message["type"] == "assistant" and message["message"]["content"][0]["type"] == "text":
+                        message["message"]["content"][0]["text"] = "written " + message["message"]["id"]
                 code, console, summary, _ = run_step(REPORT, log)
                 self.assertEqual(code, 0, console)
-                self.assertIn(f"<pre>\n{result or ''}\n</pre>\n\nThe run stopped at its client budget "
+                # Without result text, the report is what the model wrote before the stop (Codex P2 thread at
+                # harness-audit.yml:231, R10); with it, the result text alone.
+                shown = result or "\n\n".join(f"written msg_{turn:02d}" for turn in range(9))
+                self.assertIn(f"<pre>\n{shown}\n</pre>\n\nThe run stopped at its client budget "
                               f"(error_max_budget_usd), at a client cost estimate of {cost} USD, within the 5.5 bound "
-                              f"(the budget times 1.10). The report above is the result text it returned, if any.\n",
-                              summary)
+                              f"(the budget times 1.10). The report above is the result text it returned or, without "
+                              f"one, the text the model wrote until then.\n", summary)
         code, console, summary, _ = run_step(NUMBERS, execution(subtype="error_max_budget_usd", is_error=True,
                                                                 total_cost_usd=5.51))
         self.assertNotEqual(code, 0)
         self.assertIn("Bounds not met: the run did not end in success (subtype error_max_budget_usd); client cost "
                       "estimate 5.51 USD, above 5.5\n", console)
         self.assertNotIn("The run stopped at its client budget", summary)
+
+    def test_written_text_counts_and_is_published_only_for_a_budget_stop_without_result_text(self):
+        # R10: the written-text fallback counts toward result_chars for a budget stop only; a success without result
+        # text still fails "no result text", and its written text is never published.
+        log = execution(subtype="error_max_budget_usd", is_error=True, total_cost_usd=5.2)
+        del log[-1]["result"]
+        code, console, _, usage = run_step(NUMBERS, log)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(json.loads(usage)["result_chars"], 9 * len(TRANSCRIPT_MARKER) + 8 * 2)
+        log = execution(result="")
+        code, console, _, usage = run_step(NUMBERS, log)
+        self.assertNotEqual(code, 0)
+        self.assertEqual(json.loads(usage)["result_chars"], 0)
+        self.assertIn("no result text", console)
+        code, console, summary, _ = run_step(REPORT, log)
+        self.assertEqual(code, 0, console)
+        self.assertIn("<pre>\n\n</pre>", summary)
+        self.assertNotIn(TRANSCRIPT_MARKER, summary)
 
     def test_a_budget_stop_has_no_lower_cost_limit(self):
         # J8 micro N9 (GPT read of 0cf13fc2): the exemption takes any budget stop at or under the bound, however low

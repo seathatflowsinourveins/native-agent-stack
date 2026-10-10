@@ -54,8 +54,8 @@ step and the `show_full_output` input were still missing. All are listed here.
   assistant turns, outside 1 to 20", "client cost estimate <x> USD, above 5.5", "no cache read" and "no result text".
   A budget stop (`error_max_budget_usd`) at or under the $5.50 cost bound fails with neither the first message nor
   the last, and the summary then names it: "The run stopped at its client budget (error_max_budget_usd), at a client
-  cost estimate of <x> USD, within the 5.5 bound (the budget times 1.10). The report below is the result text it
-  returned, if any."
+  cost estimate of <x> USD, within the 5.5 bound (the budget times 1.10). The report above is the result text it
+  returned or, without one, the text the model wrote until then." (wording and fallback from R10)
 - New step "Publish the report to the job summary" (`!cancelled()`, when the bounds step passed) copies the report
   (After the run, below).
 - New step "Require the run's execution file" (`success()`, without an execution file) fails the job with "The audit
@@ -154,7 +154,8 @@ Neither planted `CLAUDE.md` changed the answer. That does not show that `--restr
 out: the runs also set `claudeMdExcludes` over the `pr-head` subdirectory, which this workflow does not set; for the
 root `CLAUDE.md`, outside that pattern and planted in two of the three runs, the receipt records only that its
 instruction did not take effect, not whether the file was loaded; and the 2.1.295 `--help` text for `--restricted`
-names settings files, not instruction files.
+names settings files, not instruction files. R10 measures which flags keep instruction files out and adds the
+documented switch that does so on its own.
 
 The `.git` and `.env` deny rules bind Glob and Grep as well as Read, measured on 2026-10-09 by two local
 subscription runs of Claude Code 2.1.295 on Haiku 5.5 with this workflow's fence flags, in a scratch git repository
@@ -200,7 +201,7 @@ subtype, in the message ("the run did not end in success (subtype error_max_turn
 subtype column, so a turn-limit stop and a budget stop (`error_max_budget_usd`) read apart; a `success` result
 flagged `is_error` reads `(subtype success)`, and a missing subtype reads `unknown`. The execution file itself holds
 the whole transcript and is never printed or uploaded. A second step, which runs only when the check passed (it reads the check's outcome, because the action fails its own step on a budget stop), copies the last
-non-empty result text to the job summary, escaped, inside `<pre>`, capped at 60,000 bytes on a character boundary,
+non-empty result text (after a budget stop without one, the text the model wrote until then; R10) to the job summary, escaped, inside `<pre>`, capped at 60,000 bytes on a character boundary,
 with a line saying so when the report was longer.
 
 Prompt caching needs no configuration here: Claude Code caches the tools, the system prompt and the growing
@@ -596,6 +597,58 @@ handbacks as the complete report. The command center ruled that N1 to N3 are fix
 
 The module runs 33 tests, up from 30 (32 at R7).
 
+## R10: the two Codex P2 threads at b41b969a (2026-10-10)
+
+The command center asked for both threads to be fixed before landing (2026-10-09 23:53Z). Both were valid.
+
+- **Partial output on budget stops (thread at harness-audit.yml:231).** A budget stop can end without result text
+  after the model has written part of its report; the publish step showed an empty `<pre>` and dropped that paid text.
+  - Both steps now use the text of the assistant messages, joined by blank lines, when the last result has no text
+    and its subtype is `error_max_budget_usd`. This is the same rule, in the same jq, as
+    `.github/workflows/claude-pr-review.yml` (the bounds step and the publish step).
+  - A run of any other subtype still gets result text only. A `success` without result text still fails "no result
+    text", and its written text is never published.
+  - The note under the report now reads "The report above is the result text it returned or, without one, the text
+    the model wrote until then."
+- **Repository instruction files (thread at harness-audit.yml:125).** The audit step's environment now sets
+  `CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1'`, which the Claude Code environment-variable reference documents as
+  preventing "loading any CLAUDE.md memory files into context, including user, project, and auto memory files". The
+  action hands its whole environment to Claude Code (`base-action/src/parse-sdk-options.ts:279` at the pin,
+  `{ ...process.env }`), so the step's `env` reaches the session.
+  - **Measured** on 2026-10-09/10 by local subscription runs of Claude Code 2.1.295 on Opus 5.5 with the audit's
+    `claude_args` (no `--add-dir`), in a throwaway tree whose root `CLAUDE.md` imports an `AGENTS.md`, with a
+    `.claude/rules` file and a nested `sub/CLAUDE.md`. Each file states one fact, and the prompt asks for all four
+    from context only. Script: `claudemd_probe.sh`; receipts: `readers/claudemd-probe-20261010/` (coordination
+    record).
+
+    | `--setting-sources` | `--restricted` | switch | facts known |
+    | --- | --- | --- | --- |
+    | `user` | yes | off | none (the workflow before R10) |
+    | `user` | yes | on | none (the workflow at R10) |
+    | `user,project` | yes | off | none |
+    | `user,project` | yes | on | none |
+    | `user` | no | off | none |
+    | `user,project` | no | off | all four |
+    | `user,project` | no | on | none |
+
+  - So the thread's premise does not hold for the workflow as it was: on 2.1.295 either `--setting-sources user` or
+    `--restricted` alone already kept these files out. Neither flag documents that for instruction files, though.
+    The switch is the documented control, and it holds even with both flags removed.
+  - **Not adopted:** a temporary `CLAUDE_CONFIG_DIR` (the review worker's isolation). The hosted runner has no user
+    configuration of its own, the guard step already refuses pre-existing Claude settings, and the switch also
+    covers user memory files. `claudeMdExcludes` is not needed beside a switch that turns all of them off.
+  - Two earlier probe forms are kept as failed attempts in the receipts:
+    - r1: asking the model to quote its standing instructions was refused by the Opus 5.5 safeguard in one arm.
+    - r2: imperative canaries were never followed, even in the arm that loads the files, so they told nothing.
+- **Mutations** (`synthetic`; each variant applied to a copy of the workflow and the module run against it), all
+  killed:
+  - the switch dropped;
+  - the fallback dropped from the bounds step;
+  - the fallback dropped from the publish step;
+  - the fallback applied to every subtype.
+
+The module runs 34 tests, up from 33.
+
 ## Alternatives considered
 
 - **Keep `gh issue create`.** Rejected: it is the one write path the model had, and `--body-file` makes it a read
@@ -630,6 +683,8 @@ named above. No hosted run of this workflow is part of this record.
 
 ## SOTA sources
 
+- Claude Code environment variables, `CLAUDE_CODE_DISABLE_CLAUDE_MDS` (R10):
+  <https://code.claude.com/docs/en/env-vars>.
 - anthropics/claude-code-action at `2dca132ff0e0c4094ce6048b422c6915a071210b` (v1.0.247): `action.yml` (inputs
   `anthropic_federation_rule_id`, `anthropic_organization_id`, `anthropic_service_account_id`,
   `anthropic_workspace_id`, `claude_args`, `show_full_output` (lines 156-159), `track_progress` (lines 136-139) and
