@@ -367,6 +367,7 @@ jobs:
           printf '%s  %s\n' "$GITLEAKS_SHA256" "$RUNNER_TEMP/gitleaks/archive.tar.gz" | sha256sum --check
           tar -xzf "$RUNNER_TEMP/gitleaks/archive.tar.gz" -C "$RUNNER_TEMP/gitleaks" gitleaks
           "$RUNNER_TEMP/gitleaks/gitleaks" version
+          /usr/bin/time --version | grep -F '(GNU Time)'
       - name: Run the gitleaks allowlist regression tests with the pinned binary
         if: always()
         env:
@@ -376,23 +377,46 @@ jobs:
           GITLEAKS_TESTS_REQUIRED: '1'
         run: |
           export PATH="$RUNNER_TEMP/gitleaks:$PATH"
-          python3 -m unittest tests.test_gitleaks_config -v
+          python3 -m unittest tests.test_gitleaks_config tests.test_secret_scan_size.GitleaksLargeFileTests tests.test_secret_scan_size.ScannerTimerTests -v
       - name: Scan git history for secrets
         if: always()
         run: |
-          # --config: reviewed allowlists (.gitleaks.toml); --max-target-megabytes 2: the
-          # generated explorer HTML is skipped (recorded as incomplete coverage in
-          # docs/github-automation.md); measured 2026-09-22: 522 commits, 777 MB, 34 s locally.
+          # --config: reviewed allowlists (.gitleaks.toml), including the exact generated
+          # explorer HTML path. There is no size cap: large manifests/catalogs stay covered.
+          # GNU time measures this full command; fixture measurements stay separate.
           # --log-opts=HEAD: scan what this run would land (a pull request's merge commit, or
           # main on push). The default is every fetched ref, so one open branch's finding
           # failed every other pull request (2026-09-23: #116's branch failed #117).
-          "$RUNNER_TEMP/gitleaks/gitleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
+          status=0
+          /usr/bin/time --quiet --format '{"elapsed_seconds":%e,"peak_rss_kib":%M,"exit_status":%x}' --output "$RUNNER_TEMP/gitleaks/full-git.time.json" "$RUNNER_TEMP/gitleaks/gitleaks" git . --config .gitleaks.toml \
             --log-opts="HEAD" \
-            --redact --no-banner --report-format json --report-path "$RUNNER_TEMP/gitleaks/gitleaks.json"
+            --redact --no-banner --report-format json --report-path "$RUNNER_TEMP/gitleaks/gitleaks.json" || status=$?
+          metrics_status=0
+          python3 scripts/secret_scan_metrics.py --scanner gitleaks --mode git --version 8.30.1 \
+            --timing "$RUNNER_TEMP/gitleaks/full-git.time.json" --output "$RUNNER_TEMP/gitleaks/full-git.metrics.json" \
+            --report "$RUNNER_TEMP/gitleaks/gitleaks.json" --exit-status "$status" --timeout-minutes 10 || metrics_status=$?
+          if [ "$status" -ne 0 ]; then exit "$status"; fi
+          exit "$metrics_status"
       - name: Scan working tree for secrets
         if: always()
         run: |
-          "$RUNNER_TEMP/gitleaks/gitleaks" dir . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner
+          status=0
+          /usr/bin/time --quiet --format '{"elapsed_seconds":%e,"peak_rss_kib":%M,"exit_status":%x}' --output "$RUNNER_TEMP/gitleaks/full-dir.time.json" "$RUNNER_TEMP/gitleaks/gitleaks" dir . --config .gitleaks.toml --redact --no-banner || status=$?
+          metrics_status=0
+          python3 scripts/secret_scan_metrics.py --scanner gitleaks --mode dir --version 8.30.1 \
+            --timing "$RUNNER_TEMP/gitleaks/full-dir.time.json" --output "$RUNNER_TEMP/gitleaks/full-dir.metrics.json" \
+            --exit-status "$status" --timeout-minutes 10 || metrics_status=$?
+          if [ "$status" -ne 0 ]; then exit "$status"; fi
+          exit "$metrics_status"
+      - name: Retain full gitleaks timing receipts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: secret-scan-metrics-gitleaks-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/gitleaks/full-*.metrics.json
+          if-no-files-found: warn
+          include-hidden-files: false
+          retention-days: 30
       - name: Upload redacted secret-scan report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -409,12 +433,14 @@ jobs:
     # moved to Betterleaks. Its context is not in .github/main-ruleset.json, so no run of it blocks a merge;
     # the required secret-scan job above is unchanged. Verification, parity and triage:
     # evidence/artifacts/betterleaks-parity-20260927/. The job is report-only, like security-scan.yml's
-    # zizmor online audits: findings and fixture-test assertion failures go to the step summary as counts
-    # and do not fail it, so it is red only when verification, the scanner or the test run errors. Its
+    # zizmor online audits: findings and parity-fixture assertion failures go to the step summary as
+    # counts and do not fail it. The large-target detection regressions must pass. The job is red when
+    # verification, scanning or a test run errors, a required large-target regression fails, or the
+    # resource-receipt writer fails after a successful scan. Its
     # green therefore does not say that a change adds no secret: secret-scan stays the gate.
     runs-on: ubuntu-24.04
-    # On the recording workstation the full-history scan took 55 s wall, 1,546 CPU-seconds and a 7.9 GiB
-    # peak resident set (gitleaks: 74 s, 3.3 GiB); the hosted-runner figures are pending its first run.
+    # Native hosted full git scan at run38053675250:19.01 s/1,074,456 KiB peak; the complete job
+    # took64 s of1,200 s, including verification/regressions/post steps. The decision retains scope.
     timeout-minutes: 20
     permissions:
       contents: read
@@ -519,12 +545,17 @@ jobs:
             status=0
           fi
           exit "$status"
+      - name: Require detection in large working-tree fixtures with verified betterleaks
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          BETTERLEAKS_TEST_BINARY: ${{ runner.temp }}/betterleaks/betterleaks
+        run: python3 -m unittest tests.test_secret_scan_size.BetterleaksLargeFileTests -v
       - name: Scan git history for secrets with betterleaks (findings do not fail this job)
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
-          # The secret-scan job's arguments. betterleaks 1.8.1 applies --max-target-megabytes to dir-mode
-          # files only (cmd/directory.go); its git source (cmd/git.go) has no size limit, so this scan
-          # also reads the generated explorer HTML in history that gitleaks skips as over 2 MB.
+          # The secret-scan job's config, including the exact generated explorer path exclusion.
+          # No size cap: large current targets stay scanned. The native large-file tests above
+          # measure Linux elapsed time/peak RSS after the verified binary installation.
           # Two flags keep gitleaks's behaviour (betterleaks cmd/root.go at v1.8.1):
           # --max-archive-depth 0, because betterleaks opens archives to depth 8 by default (line 103)
           # and gitleaks 8.30.1 does not open them (its cmd/root.go line 92); and --gitleaks-ignore-path
@@ -538,9 +569,14 @@ jobs:
           # summary counts findings by rule.
           report="$RUNNER_TEMP/betterleaks/history.json"
           status=0
-          "$RUNNER_TEMP/betterleaks/betterleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
+          /usr/bin/time --version | grep -F '(GNU Time)'
+          /usr/bin/time --quiet --format '{"elapsed_seconds":%e,"peak_rss_kib":%M,"exit_status":%x}' --output "$RUNNER_TEMP/betterleaks/full-git.time.json" "$RUNNER_TEMP/betterleaks/betterleaks" git . --config .gitleaks.toml \
             --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore --log-opts="HEAD" \
             --redact --no-banner --report-format json --report-path "$report" --exit-code 0 || status=$?
+          metrics_status=0
+          python3 scripts/secret_scan_metrics.py --scanner betterleaks --mode git --version 1.8.1 \
+            --timing "$RUNNER_TEMP/betterleaks/full-git.time.json" --output "$RUNNER_TEMP/betterleaks/full-git.metrics.json" \
+            --report "$report" --exit-status "$status" --timeout-minutes 20 || metrics_status=$?
           if [ -s "$report" ]; then
             jq -r '(. // [])[] | [.RuleID, .File, (.StartLine | tostring)] | @tsv' "$report" | sort | uniq -c
           fi
@@ -551,16 +587,21 @@ jobs:
             fi
             echo "betterleaks exit status: $status"
           } >> "$GITHUB_STEP_SUMMARY"
-          exit "$status"
+          if [ "$status" -ne 0 ]; then exit "$status"; fi
+          exit "$metrics_status"
       - name: Scan working tree for secrets with betterleaks (findings do not fail this job)
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
           # The same flags, exit status and step summary as the history scan above.
           report="$RUNNER_TEMP/betterleaks/tree.json"
           status=0
-          "$RUNNER_TEMP/betterleaks/betterleaks" dir . --config .gitleaks.toml --max-target-megabytes 2 \
+          /usr/bin/time --quiet --format '{"elapsed_seconds":%e,"peak_rss_kib":%M,"exit_status":%x}' --output "$RUNNER_TEMP/betterleaks/full-dir.time.json" "$RUNNER_TEMP/betterleaks/betterleaks" dir . --config .gitleaks.toml \
             --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore \
             --redact --no-banner --report-format json --report-path "$report" --exit-code 0 || status=$?
+          metrics_status=0
+          python3 scripts/secret_scan_metrics.py --scanner betterleaks --mode dir --version 1.8.1 \
+            --timing "$RUNNER_TEMP/betterleaks/full-dir.time.json" --output "$RUNNER_TEMP/betterleaks/full-dir.metrics.json" \
+            --report "$report" --exit-status "$status" --timeout-minutes 20 || metrics_status=$?
           if [ -s "$report" ]; then
             jq -r '(. // [])[] | [.RuleID, .File, (.StartLine | tostring)] | @tsv' "$report" | sort
           fi
@@ -571,5 +612,15 @@ jobs:
             fi
             echo "betterleaks exit status: $status"
           } >> "$GITHUB_STEP_SUMMARY"
-          exit "$status"
+          if [ "$status" -ne 0 ]; then exit "$status"; fi
+          exit "$metrics_status"
+      - name: Retain full betterleaks timing receipts
+        if: ${{ always() && steps.install.outcome == 'success' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: secret-scan-metrics-betterleaks-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/betterleaks/full-*.metrics.json
+          if-no-files-found: warn
+          include-hidden-files: false
+          retention-days: 30
 

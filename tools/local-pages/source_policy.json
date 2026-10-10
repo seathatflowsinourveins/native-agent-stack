@@ -2122,6 +2122,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/secret_scan_metrics.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/skills_status.py"
     },
     {
