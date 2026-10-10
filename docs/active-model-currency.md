@@ -69,16 +69,31 @@ or evaluation of computed commands. Codex's short `-m` model flag retains its
 meaning behind wrapper chains when Codex is the invoked program, following
 [Codex rust-v0.162.0's shared option](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/utils/cli/src/shared_options.rs#L22-L23).
 The checker resolves executable positions through `env`, `rtk proxy`, `timeout`,
-`nice`, `nohup`, `flock`, and shell `command`/`exec`, consuming each wrapper's
-option and pathname operands. Unknown programs are not guessed to be wrappers.
+`nice`, `ionice`, `nohup`, `flock`, and shell `command`/`exec`, consuming each
+wrapper's option and pathname operands. The `ionice` contract comes from
+[util-linux v2.41.3 schedutils/ionice.c:140–157](https://github.com/util-linux/util-linux/blob/v2.41.3/schedutils/ionice.c#L140-L157):
+`-c`/`--class` and `-n`/`--classdata` take values; `-t`/`--ignore` is a switch.
+Attached short values and clustered ignore flags work. PID, process-group and
+user targeting, help and version modes do not invoke a child program.
+`hcom [--go] [N] codex` follows
+[hcom v0.7.28's launch parser](https://github.com/aannoo/hcom/blob/v0.7.28/src/commands/launch.rs),
+consuming launcher operands such as tags and prompts before checking forwarded
+Codex arguments. `timeout` requires a literal duration. Unknown launchers,
+user-defined shell functions and shell keywords stop the executable walk;
+the extractor does not infer a function's argument forwarding from its body.
 Claude Code 2.1.296 advertises `--model`, without short `-m`. Git messages,
 Python module names and ordinary operands named `codex`/`claude` do not establish
 native-client context. Markdown command spans use the matching backtick
 delimiters described by [CommonMark 0.31.2 section 6.1](https://spec.commonmark.org/0.31.2/#code-spans);
-independent spans stay separate, and formatting/prose punctuation is outside
-the command value. A flag and value may use separate adjacent spans.
+independent command spans stay separate. Inline formatting of individual command
+tokens or a model value preserves surrounding command text. Commands outside
+spans are also checked. [Fenced code, section 4.5](https://spec.commonmark.org/0.31.2/#fenced-code-blocks),
+stays literal: backticks in shell comments do not suppress the command.
+A pending flag can pair with the next code span on that line.
 Shell operators create command boundaries in command strings; in literal argv
 they remain ordinary argument data and cannot introduce another executable.
+Quoted or escaped punctuation remains data in command strings too, following
+[CPython v3.13.16's lexer states](https://github.com/python/cpython/blob/v3.13.16/Lib/shlex.py#L163-L218).
 Each text selector field contributes only its first lexical value; its
 explanatory tail is not scanned for further values and need not be shell syntax.
 Structured JSON selector lists and command/argv values retain their own

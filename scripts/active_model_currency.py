@@ -254,7 +254,24 @@ def command_identifiers(value: str | list[str], locate: bool = False):
         return []
     try:
         if isinstance(value, str):
+            punctuation = "\n;&|()"
+            # CPython v3.13.16 shlex.py: quote/escape state is available while
+            # the lexer reads its stream. Protect literal punctuation at that
+            # boundary; keep upstream tokenization and decode token values later.
+            protected = {}
+            for character in punctuation:
+                marker = chr(0xE000 + len(protected))
+                while marker in value or marker in protected.values():
+                    marker = chr(ord(marker) + 1)
+                protected[character] = marker
+            decode = str.maketrans({marker: character for character, marker in protected.items()})
             class CommandInput(io.StringIO):
+                def read(self, size=-1):
+                    character = super().read(size)
+                    if size == 1 and self.lexer.state in ("'", '"', "\\"):
+                        return protected.get(character, character)
+                    return character
+
                 def readline(self, size=-1):
                     # shlex skips comments with readline(). Keep their newline
                     # available as a command boundary, as with uncommented lines.
@@ -263,28 +280,39 @@ def command_identifiers(value: str | list[str], locate: bool = False):
                         self.seek(self.tell() - 1)
                         return line[:-1]
                     return line
-            lexer = shlex.shlex(CommandInput(value), posix=True, punctuation_chars="\n;&|()")
+            stream = CommandInput(value)
+            lexer = shlex.shlex(stream, posix=True, punctuation_chars=punctuation)
+            stream.lexer = lexer
             lexer.whitespace = " \t\r"
             lexer.whitespace_split = True
-            tokens = list(lexer)
+            raw_tokens = list(lexer)
+            boundaries = {index for index, token in enumerate(raw_tokens)
+                          if token and set(token) <= set(punctuation)}
+            tokens = [token.translate(decode) for token in raw_tokens]
         else:
             tokens = value
+            boundaries = set()
     except ValueError:
         raise CurrencyError("active command string could not be parsed") from None
     def native_short_flag(prefix):
         # Codex rust-v0.162.0 shared_options.rs advertises -m; Claude 2.1.296
         # advertises only --model. Resolve executable positions, never operands.
         # Wrapper grammar: uutils/coreutils 0.10.0 nice/env/timeout/nohup;
-        # util-linux v2.41.3 flock.c; existing rtk proxy and shell builtins.
+        # util-linux v2.41.3 flock.c and schedutils/ionice.c:140-157
+        # (+n:c:p:P:u:tVh); existing rtk proxy and shell builtins.
         values = {
             "nice": {"-n", "--adjustment"},
             "env": {"-u", "--unset", "-C", "--chdir", "-a", "--argv0", "-f", "--file"},
             "timeout": {"-k", "--kill-after", "-s", "--signal"},
             "flock": {"-w", "--timeout", "-E", "--conflict-exit-code"},
+            "ionice": {"-n", "--classdata", "-c", "--class"},
+            "hcom": {"--name"},
             "exec": {"-a"},
         }
         switches = {
             "nice": set(), "nohup": set(),
+            "ionice": {"-t", "--ignore"},
+            "hcom": {"--go"},
             "env": {"-i", "--ignore-environment", "-v", "--debug"},
             "timeout": {"-f", "--foreground", "-p", "--preserve-status", "-v", "--verbose"},
             "flock": {"-s", "--shared", "-x", "--exclusive", "-u", "--unlock", "-n", "--nonblock",
@@ -308,6 +336,22 @@ def command_identifiers(value: str | list[str], locate: bool = False):
                 if token == "--" or (program == "env" and token == "-"):
                     index += 1
                     break
+                if program == "ionice" and not token.startswith("--"):
+                    # getopt permits clustered -t and attached -c/-n values.
+                    # PID/PGID/UID targeting and help/version never exec a child.
+                    offset = 1
+                    while offset < len(token) and token[offset] == "t":
+                        offset += 1
+                    if offset == len(token) and offset > 1:
+                        index += 1
+                    elif offset < len(token) and token[offset] in "nc":
+                        attached = offset + 1 < len(token)
+                        if not attached and index + 1 >= len(prefix):
+                            return False
+                        index += 1 if attached else 2
+                    else:
+                        return False
+                    continue
                 option = token.split("=", 1)[0]
                 if option in values.get(program, set()):
                     index += 1 if "=" in token else 2
@@ -322,6 +366,27 @@ def command_identifiers(value: str | list[str], locate: bool = False):
                     index += 1
                 else:
                     return False
+            if program == "hcom":
+                # hcom v0.7.28 commands/launch.rs: [N] tool, then strip
+                # launcher flags/operands before forwarding native tool args.
+                if index < len(prefix) and prefix[index].isdigit():
+                    index += 1
+                if index >= len(prefix) or prefix[index] != "codex":
+                    return False
+                index += 1
+                launch_values = {"--name", "--tag", "--terminal", "--device", "--dir",
+                                 "--hcom-prompt", "--hcom-system-prompt", "--batch-id"}
+                while index < len(prefix):
+                    token = prefix[index]
+                    if token == "--":
+                        break  # hcom forwards subsequent tokens unchanged
+                    if token.split("=", 1)[0] in launch_values:
+                        if "=" not in token and index + 1 >= len(prefix):
+                            return False  # the candidate -m is a launcher value
+                        index += 1 if "=" in token else 2
+                    else:
+                        index += 1
+                return True
             if program == "env":
                 while index < len(prefix) and re.match(r"^[A-Za-z_]\w*=", prefix[index]):
                     index += 1
@@ -337,7 +402,7 @@ def command_identifiers(value: str | list[str], locate: bool = False):
     result = []
     start = 0
     for index, token in enumerate(tokens):
-        if isinstance(value, str) and token and set(token) <= set("\n;&|()"):
+        if index in boundaries:
             start = index + 1
             continue
         flag = token.rstrip(",")
@@ -467,13 +532,34 @@ def selectors(text: str, path: Path):
              and any(part in {"docs", "blueprints", "adoption"} for part in path.parts))
     historical_setup = prose and bool(re.search(r"setup below records.*?earlier.*?historical", text[:1500], re.S | re.I))
     record_section = False
+    fence = None
     for number, line in enumerate(text.splitlines(), 1):
         code_spans = []
+        outside_command = formatted_command = None
         if path.suffix == ".md":
-            # CommonMark 0.31.2 section 6.1: matching backtick delimiters.
-            code_spans = [match[2] for match in re.finditer(r"(?<!`)(`+)(?!`)(.*?)(?<!`)\1(?!`)", line)]
-            # Formatting delimiters separate code from adjacent prose punctuation.
-            line = line.replace("`", " ")
+            # CommonMark 0.31.2 sections 4.5/6.1: fenced content is literal;
+            # inline formatting must not discard surrounding command text.
+            delimiter = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+            if delimiter:
+                mark, tail = delimiter.groups()
+                if fence is None and (mark[0] != "`" or "`" not in tail):
+                    fence = (mark[0], len(mark))
+                    continue
+                if fence and mark[0] == fence[0] and len(mark) >= fence[1] and not tail.strip():
+                    fence = None
+                    continue
+            if fence is None:
+                spans = r"(?<!`)(`+)(?!`)(.*?)(?<!`)\1(?!`)"
+                code_spans = [match[2] for match in re.finditer(spans, line)]
+                outside_command = re.sub(spans, " ", line)
+                line = re.sub(spans, lambda match: " " + match[2] + " ", line)
+                # Join formatted command tokens, not independent prose snippets.
+                # Full command spans are parsed separately below.
+                if (code_spans and all(not re.search(r"\s", span.strip()) for span in code_spans)
+                        and re.match(r"^\s*(?:[A-Za-z_]\w*=\S+\s+)*"
+                                     r"(?:codex\s+(?:exec\b|-)|claude\s+-|"
+                                     r"(?:nice|ionice|nohup|env|timeout|flock|rtk|hcom|command|exec)\b)", line)):
+                    formatted_command = line
         stripped = line.strip()
         if not stripped or stripped.startswith(("#", "//", "<!--", ";")):
             if prose and stripped.startswith("#"):
@@ -501,12 +587,16 @@ def selectors(text: str, path: Path):
                 results.append((number, identifier))
         if argument:
             commands = code_spans or [line]
+            if code_spans:
+                commands = [*commands, outside_command]
+                if formatted_command is not None:
+                    commands.append(formatted_command)
             selected = []
             try:
                 for index, command in enumerate(commands):
                     # A model flag and its value may use separate adjacent spans.
                     # Do not combine independent commands or bare client mentions.
-                    if (code_spans and index + 1 < len(commands)
+                    if (code_spans and index + 1 < len(code_spans)
                             and re.search(r"(?:--model(?:-id)?|-m)\s*$", command)):
                         command += " " + commands[index + 1]
                     selected.extend(command_identifiers(command.rstrip().removesuffix("\\")))

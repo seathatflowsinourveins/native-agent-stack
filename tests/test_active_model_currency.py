@@ -350,6 +350,105 @@ class ActiveModelCurrencyTests(unittest.TestCase):
                     pointer = f"/argv/{len(argv) - 1}" if form == "argv" else "/command"
                     self.assertEqual(finding["json_pointer"], pointer)
 
+    def test_readiness_ionice_launch_reports_stale_model_in_strings_and_argv(self):
+        # util-linux v2.41.3 schedutils/ionice.c:140-157; the readiness
+        # launch uses attached class/classdata operands after nice.
+        prefixes = [
+            ["nice", "-n", "10", "ionice", "-c2", "-n7"],
+            ["nice", "-n", "10", "ionice", "--class", "2", "--classdata=7", "--ignore"],
+            ["nice", "-n", "10", "ionice", "-tc2", "-n", "7", "--"],
+        ]
+        for prefix in prefixes:
+            argv = [*prefix, "codex", "exec", "-m", "gpt-6-sol"]
+            for form in ("command", "argv"):
+                with self.subTest(prefix=prefix, form=form):
+                    self.write("catalogs/north-star/readiness.json", json.dumps({
+                        "launch": {form: argv if form == "argv" else shlex.join(argv)},
+                    }))
+                    code, stdout, _ = self.cli("check")
+                    self.assertEqual(code, 1)
+                    result = json.loads(stdout)
+                    self.assertEqual((result["status"], result["stale_count"]), ("stale", 1))
+                    finding, = result["findings"]
+                    self.assertEqual(finding["model"], "gpt-6-sol")
+                    pointer = f"/launch/argv/{len(argv) - 1}" if form == "argv" else "/launch/command"
+                    self.assertEqual(finding["json_pointer"], pointer)
+
+    def test_hcom_launch_checks_only_the_invoked_codex_and_forwarded_model_option(self):
+        # hcom v0.7.28 commands/launch.rs strips global and launcher operands
+        # before forwarding the remaining arguments to its selected tool.
+        prefixes = [
+            ["hcom", "--go", "codex", "--tag", "fixture", "--dir", "/tmp/codex",
+             "--hcom-prompt", "compare codex and claude", "exec"],
+            ["hcom", "--name", "fixture", "--go", "2", "codex", "--terminal=wt-tmux"],
+        ]
+        for prefix in prefixes:
+            argv = [*prefix, "-m", "gpt-6-sol"]
+            for form in ("command", "argv"):
+                with self.subTest(prefix=prefix, form=form):
+                    self.write("config/commands.json", json.dumps({
+                        form: argv if form == "argv" else shlex.join(argv),
+                    }))
+                    self.assertEqual(self.check()["stale_count"], 1)
+
+        for argv in (["hcom", "--name", "codex", "send", "claude", "-m", "gpt-6-sol"],
+                     ["hcom", "--go", "claude", "-m", "claude-opus-5"],
+                     ["hcom", "--go", "codex", "--tag", "-m", "gpt-6-sol"],
+                     ["hcom", "--go", "codex", "--hcom-prompt", "-m", "gpt-6-sol"]):
+            for form in ("command", "argv"):
+                with self.subTest(argv=argv, form=form):
+                    self.write("config/commands.json", json.dumps({
+                        form: argv if form == "argv" else shlex.join(argv),
+                    }))
+                    self.assertEqual(self.check()["stale_count"], 0)
+
+    def test_markdown_formatting_preserves_surrounding_native_commands(self):
+        documents = [
+            "```sh\ncodex exec -m gpt-6-sol # select `default`\n```\n",
+            "codex exec -m `gpt-6-sol`\n",
+            "`codex` exec `-m` `gpt-6-sol`\n",
+        ]
+        for text in documents:
+            with self.subTest(text=text):
+                self.write("docs/launch.md", text)
+                result = self.check()
+                self.assertEqual((result["status"], result["stale_count"]), ("stale", 1))
+                finding, = result["findings"]
+                self.assertEqual(finding["model"], "gpt-6-sol")
+
+    def test_quoted_and_escaped_punctuation_remains_an_operand_in_command_strings(self):
+        commands = ["echo ';' codex -m gpt-6-sol", r"echo \; codex -m gpt-6-sol",
+                    'echo "&&" codex -m gpt-6-sol']
+        for command in commands:
+            for form in ("command", "argv"):
+                with self.subTest(command=command, form=form):
+                    self.write("config/commands.json", json.dumps({
+                        form: shlex.split(command) if form == "argv" else command,
+                    }))
+                    self.assertEqual(self.check()["stale_count"], 0)
+        self.write("config/commands.json", json.dumps({
+            "command": "echo x; codex exec -m gpt-6-sol",
+        }))
+        self.assertEqual(self.check()["stale_count"], 1)
+
+    def test_ionice_targeting_and_message_operands_do_not_establish_native_context(self):
+        prefixes = [
+            ["ionice", "-p", "123", "codex"], ["ionice", "-P123", "codex"],
+            ["ionice", "--uid=1000", "codex"], ["ionice", "-tp123", "codex"],
+            ["ionice", "--help", "codex"], ["ionice", "--version", "codex"],
+            ["ionice", "--class", "codex"],
+            ["ionice", "-c2", "echo", "codex"],
+            ["nice", "-n", "10", "ionice", "-c2", "git", "-C", "codex", "commit"],
+        ]
+        for prefix in prefixes:
+            argv = [*prefix, "-m", "gpt-6-sol"]
+            for form in ("command", "argv"):
+                with self.subTest(prefix=prefix, form=form):
+                    self.write("config/commands.json", json.dumps({
+                        form: argv if form == "argv" else shlex.join(argv),
+                    }))
+                    self.assertEqual(self.check()["stale_count"], 0)
+
     def test_published_g5_catalog_record_does_not_mask_active_copies_or_size_gaps(self):
         name = "catalogs/landscape/grand-catalog-20261008.json"
         document = {"schema_version": 1, "kind": "g5-compact-landscape", "release_tag": "v2026.10.08",

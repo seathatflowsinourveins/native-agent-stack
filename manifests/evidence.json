@@ -17607,8 +17607,8 @@
     },
     {
       "path": "docs/active-model-currency.md",
-      "sha256": "d8a0744056ad058eafb4fc48a4a57ca1ec9e9c984fd21b1471deddcd87cdac8a",
-      "bytes": 13890
+      "sha256": "80a396c8897c51a76bede42dc6a4fcf2f41853d080e5dcc50f598d13e1d3c6d9",
+      "bytes": 15124
     },
     {
       "path": "docs/automation-upgrade-evidence.json",
@@ -59507,8 +59507,8 @@
     },
     {
       "path": "scripts/active_model_currency.py",
-      "sha256": "8ceee4b5063208328b4c5962ea203f8a224a1df38b01462dbaa0bb2b74834a7c",
-      "bytes": 38013
+      "sha256": "b15aef8e0507895d9c45d2a0a74cf19aaef26c8e356b55fc4d9ed5327daa7050",
+      "bytes": 42860
     },
     {
       "path": "scripts/adoption_status.py",
@@ -59927,8 +59927,8 @@
     },
     {
       "path": "tests/test_active_model_currency.py",
-      "sha256": "73869ddb578eced68960d7c0889f2b2d85615f6a9bb4c19cd69d482397e52f45",
-      "bytes": 44784
+      "sha256": "947caf4859ab93afba03828cd2a3ca2e3d61f8edbf8ded63bb8aecc171d3da3d",
+      "bytes": 50158
     },
     {
       "path": "tests/test_active_recovery_plans.py",
