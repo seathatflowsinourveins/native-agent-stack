@@ -357,7 +357,7 @@
       "status": "PENDING_G5_FINAL_CHOICE",
       "prior_documented_choice": "agentsview",
       "prior_disposition": "conditional",
-      "deciding_source": "docs/command-center.md:55",
+      "deciding_source": "docs/command-center.md:109",
       "alternatives": [],
       "checked_at": "2026-10-09",
       "overturn_when": "A named better-evidenced archive route meets role coverage and native qualification.",
@@ -546,7 +546,7 @@
       "role_id": "CC",
       "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
       "role_slot": "coordinator",
-      "definition": "docs/command-center.md:9-30,45-61,137-155",
+      "definition": "docs/command-center.md:9-85,99-115,191-209",
       "expected_tool_ids": [
         "ai-memory",
         "qmd",
@@ -1836,7 +1836,7 @@
           "overlap_disposition": "final slot disposition pending",
           "deciding_sources": [
             "docs/decisions/2026-10-08-skills-cc-lanes-picks.md:21",
-            "docs/command-center.md:45-55"
+            "docs/command-center.md:99-109"
           ]
         },
         "wiring": {
@@ -2005,7 +2005,7 @@
       "version": "0.44.0",
       "source_pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
       "slot_id": "session-archive-observation",
-      "source": "docs/command-center.md:55",
+      "source": "docs/command-center.md:109",
       "note": "Existing archive route; CC observed six calls, co-op retains archive capability. Per-tool PSS and independent shared-client acceptance unmeasured.",
       "evidence_class": "source_review",
       "stages": {
