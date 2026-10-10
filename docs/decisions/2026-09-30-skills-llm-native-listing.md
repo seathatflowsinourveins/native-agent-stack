@@ -1,12 +1,12 @@
 # Decision: every model-invocable skill listed in full for Claude and enabled for Codex (2026-09-30)
 
-**Decided by:** the user's directive of 2026-09-30, quoted exactly: "make sure all the skills can invoke seamlessly
-with llm native end, rather than user end". Carried out as unit F3 of coordinator session `native-agent-stack-c5`, on
+**Decided by:** the owner's September 30 directive to make skills seamlessly invocable by the model rather than only the operator, using [Claude's skill visibility settings](https://code.claude.com/docs/en/skills#override-skill-visibility-from-settings)
+and [Codex's native catalog/config](https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/config/src/skills_config.rs). Carried out as unit F3 of coordinator session `native-agent-stack-c5`, on
 branch `claude/sota-defaults-f3-20260930` from `origin/main@e45328d3`, rebuilt on `origin/main@11227bfd`. The branch
-is opened for review and merged with the Gate A owner's batch. The user restated the directive later that day: "make
-sure the skills will be full landscape ecosystem lifecycle for llm seamless invoke, research the best for their tasks
-that is the skills for all the sota repos sources, full lifecycle and seamless skills search and use" (Decision,
-point 8).
+is opened for review and merged with the Gate A owner's batch. Later that day the owner restated the requirement for
+a complete ecosystem lifecycle: research suitable SOTA skill sources for each task, then support seamless model-native
+discovery, installation, invocation, verification, update and withdrawal (Decision, point 8), through the lifecycle guide and [Vercel Skills CLI 1.7.0](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/cli.ts).
+Each upstream skill's declared eligibility and the two clients' actual catalog exposure remain the invocation boundaries.
 
 **Scope:** `adoption/skills/manifest.json`, the skill keys of the two client templates
 (`adoption/templates/claude.settings.template.json` `skillOverrides`, `skillListingBudgetFraction` and the Skills CLI
@@ -33,7 +33,7 @@ measures ([preregistration](../../evidence/artifacts/token-adoption-e2e-20260926
   changes the same way.
 - The applied Claude settings are frozen values too: `claude.settings.user.sha256` and `permissions_deny_count`
   ([token-e2e](../../tools/token-e2e/README.md)).
-- The Gate A owner's decision is Decision, point 9.
+- The Gate A owner's decision is Decision, point 9; its frozen inputs and M4/M8 thresholds retain their declared amendment and re-seal boundaries.
 
 ## Context
 
@@ -55,7 +55,7 @@ Upstream defines those states from the model's side:
   enabled.
 
 Only the user could start 3 skills, the model could not see the descriptions of 5, and Codex could not use 17. The
-directive asks for the opposite.
+owner's directive asks for model-native invocation instead; the upstream user-only declarations below remain explicit exceptions.
 
 Two skills are user-only by upstream design. `grill-me` and `improve-codebase-architecture` set
 `disable-model-invocation: true` in their SKILL.md frontmatter at `mattpocock/skills@c55ee46`, and their
@@ -84,7 +84,7 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
 
 ## Alternatives
 
-1. **Keep the 2026-09-26 and 2026-09-28 states.** Rejected: they rest on a context-saving rule the directive
+1. **Keep the 2026-09-26 and 2026-09-28 states.** Rejected: they rest on a context-saving rule that the owner's September 30 directive
    overrides. The trial kept deliberate-invocation and long-description skills `name-only`, and `find-skills`,
    `grill-me` and `improve-codebase-architecture` `user-invocable-only`. Either state leaves the choice to the user or
    to a name without its description.
@@ -99,7 +99,7 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
 3. **A fixed `SLASH_COMMAND_TOOL_CHAR_BUDGET`.** Rejected: it sets "a fixed character count" (skills page) that does not
    scale with the window. The settings key is the documented fraction, and the template never sets both.
 4. **Keep the default 1% and demote only low-priority entries to `name-only`** (the skills page's other remedy).
-   Rejected: that is the user-end state the directive removes. The fraction is set high now and lowered after
+   Rejected: that retains the operator-only listing state the owner's directive removes. The fraction is set high now and lowered after
    measurement (see Decision, point 5).
 5. **Codex `skill-creator`:**
    - (a) **Enable the pinned copy as well.** Codex dedupes skills by SKILL.md path only
@@ -237,8 +237,8 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
   the warning at 200k. Then lower the template to that value.
 - **Measured proactive invocation.** Suppose `/skill-doctor` and `tools/skill-usage` counts over a skill's clean `on`
   window show no model-initiated use, while its listing cost is measured, or a misfire costs a turn. Then the review
-  keeps or removes that skill through a dated record. A move back to `name-only` or `user-invocable-only` needs the user
-  to revise this directive.
+  keeps or removes that skill through a dated record. A move back to `name-only` or `user-invocable-only` requires the owner
+  to revise their September 30 directive; reduced listing cost alone supplies no such authority.
 - **Client or pin change:**
   - a Claude Code release changes the listing budget, the `skillOverrides` states or the absent-key default;
   - Codex changes its catalog budget or `allow_implicit_invocation`;

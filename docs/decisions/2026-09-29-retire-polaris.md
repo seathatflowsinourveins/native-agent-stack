@@ -1,9 +1,9 @@
 # Decision: retire the Polaris WSL distro on the workstation (2026-09-29)
 
-**Decided by:** the user, on the Windows PC that hosts `nativestack-5975wx-20260925`. The user's instructions on
-2026-09-29 were "resolute the legacy with sota resolution" and "retire those that is not needed, nas can be pick
-up later with sota practice in the new env". A Claude Code session in NativeStack carried out the retirement the
-same day. It followed the procedure of the
+**Decided by:** the owner on 2026-09-29, on the Windows PC hosting `nativestack-5975wx-20260925`; they authorized
+retiring the unneeded Polaris distribution while preserving the still-used workspace and deferring NAS work for later resumption.
+The [official WSL export/unregister contract](https://learn.microsoft.com/en-us/windows/wsl/basic-commands) defines the irreversible unregister operation they authorized.
+A Claude Code session in NativeStack carried out the retirement that day, following the procedure of the
 [Vela and VelaNext retirement](2026-09-25-retire-vela-velanext.md).
 
 **Scope:** the Windows Subsystem for Linux distros on that PC, plus the Windows-side items that pointed at Polaris:

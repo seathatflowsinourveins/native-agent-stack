@@ -1,15 +1,15 @@
 # Decision: the Codex layer lane and adjudication judge default to effort max (2026-09-29)
 
 **Decided by:** session `native-agent-stack-76` on host `nativestack-5975wx-20260925`, on a hand-off from `native-agent-stack-79` routed through
-`ecosystem-roadmap-2026`, for the user's standing rule that GPT-6 lanes run at `max` (never `ultra`), which this repository records in
+`ecosystem-roadmap-2026`, implementing the owner's standing rule that GPT-6 lanes run at `max` (never `ultra`); the [official Codex reasoning-effort configuration](https://developers.openai.com/codex/config-reference/) describes the setting mechanism, and the dated repository decision is recorded in
 [`2026-09-27-model-currency.md`](2026-09-27-model-currency.md), [`2026-09-26-codex-worker-lane.md`](2026-09-26-codex-worker-lane.md) and
 [`recipes/README.md`](../../recipes/README.md).
 
 **The defect.** [`tools/sota-convergence/codex_lane.py`](../../tools/sota-convergence/codex_lane.py) set `DEFAULT_EFFORT = "high"`,
 `tools/sota-convergence/adjudicate.py codex` set `--effort` to `high`, and `recipes/sota-convergence-practice.md` step 4 and the
 `tools/sota-convergence/README.md` blind-wave example passed `--effort high`. A caller who followed them ran the layer lane and the judge below the
-recorded rule: the model-currency record has judgment at `gpt-6-astra` and `model_reasoning_effort=max` (row for Codex CLI 0.157.1), the worker-lane
-record says "`max` is what every GPT-6 step here runs at", and the recipe says "`max`, not the user default `ultra`". The 2026-09-22 verdict wave ran
+recorded owner rule: the model-currency record has judgment at `gpt-6-astra` and `model_reasoning_effort=max` (row for Codex CLI 0.157.1), and the worker-lane
+record and recipe also select `max` for GPT-6 steps. This is the repository's declared default, not a vendor claim of superior measured quality. The 2026-09-22 verdict wave ran
 at `high` (`docs/grand-catalog-handbook.md`), which stays a dated fact about that wave.
 
 **Decision.**
@@ -64,8 +64,8 @@ the standing rule.
 
 ## Amendment (2026-09-30)
 
-The user changed the standing rule on 2026-09-30: "yes no limit, for highest quality resolution, gpt6.1sol at ultra
-and astra when tasks truly needed it". A lane may stage ultra; its stager chooses per the current GPT worker
+On 2026-09-30 the owner amended the standing rule for highest-quality resolution without limits, selecting GPT-6.1 Sol at Ultra
+and reserving Astra for tasks that truly need it. A lane may stage Ultra; its stager chooses per the current GPT worker
 standard. The landscape-sweep harness default stays max. Blind or isolated review lanes must stay at max,
 because ultra auto-delegates through proactive multi-agent mode (openai/codex `rust-v0.159.2`, `ff6aec96948b`,
 `codex-rs/core/src/session/multi_agents.rs:77-103`). This amendment supersedes the blanket prohibition above;

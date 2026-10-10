@@ -14,6 +14,35 @@ from tests import test_local_pages_fleet_data as fixtures
 fleet_data = fixtures.fleet_data
 
 
+def _process_is_active(status: Path) -> bool:
+    """A disappeared process or a zombie is no longer active."""
+    try:
+        stat = status.read_text()
+    except (ProcessLookupError, FileNotFoundError):
+        return False
+    return stat.split()[2] != 'Z'
+
+
+class ProcessStatRegressionTests(unittest.TestCase):
+    def test_a_process_disappearing_during_the_stat_read_is_not_active(self):
+        status = Path('/proc/123/stat')
+        for error in (ProcessLookupError, FileNotFoundError):
+            with self.subTest(error=error.__name__):
+                with patch.object(Path, 'exists', return_value=True) as exists:
+                    with patch.object(Path, 'read_text', side_effect=error) as read:
+                        self.assertFalse(_process_is_active(status))
+                        read.assert_called_once_with()
+                        exists.assert_not_called()
+
+    def test_live_processes_remain_active_and_zombies_do_not(self):
+        status = Path('/proc/123/stat')
+        for state, active in (('R', True), ('S', True), ('Z', False)):
+            with self.subTest(state=state):
+                with patch.object(Path, 'read_text', return_value=f'123 (python3) {state} 1 1') as read:
+                    self.assertEqual(_process_is_active(status), active)
+                    read.assert_called_once_with()
+
+
 class FleetReviewRegressionTests(unittest.TestCase):
     setUp = fixtures.FleetDataTests.setUp
     write_json = fixtures.FleetDataTests.write_json
@@ -325,7 +354,7 @@ class FleetProducerReviewRegressionTests(unittest.TestCase):
                 self.assertTrue(sentinel.exists(), 'The actual producer must have spawned its descendant.')
                 pid = int(sentinel.read_text())
                 status = Path(f'/proc/{pid}/stat')
-                active = status.exists() and status.read_text().split()[2] != 'Z'
+                active = _process_is_active(status)
                 self.assertFalse(active, 'The producer descendant survived timeout.')
             finally:
                 if sentinel.exists():

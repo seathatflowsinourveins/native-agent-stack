@@ -5050,6 +5050,11 @@
       "bytes": 5951
     },
     {
+      "path": ".github/workflows/harness-audit.yml",
+      "sha256": "22c470acd8d8896d8fc215697bde0246fe152cb308f4fa53a510b64b3799bb87",
+      "bytes": 18634
+    },
+    {
       "path": ".github/workflows/native-foundation-e2e.yml",
       "sha256": "ba868797728981c49effa4094a39c70466073c0a98d78fd893c296e71b2c09d7",
       "bytes": 8326
@@ -16512,17 +16517,17 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "0428df473d1245ce9222692bf78dd2fa8d6957271cc02bead76a1aebc7e34c60",
-      "bytes": 35736
+      "sha256": "7b17a09e24eb1ec85ab84a354c3a69b4fe489f11980a962599192bcf3fde19b4",
+      "bytes": 38252
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
-      "sha256": "c0b2dc45cbe77949969eeb94f65e5b98750a720333b9fd337ca5903337baac44",
-      "bytes": 13990
+      "sha256": "564082b6b13655d2da3db3d825314809c44182536691b01065a8e1c7a0e2a994",
+      "bytes": 14560
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "dbe61ddab078356a24430cf7b5ef91643a88506fbb6748c888bb3665f2900ee9",
+      "sha256": "78b212139108ec8767806ad3a3b7bf338af6c3a71080066b49d91a751720f251",
       "bytes": 20381
     },
     {
@@ -17631,6 +17636,11 @@
       "bytes": 159318
     },
     {
+      "path": "docs/decisions/2026-09-23-max-effort-default.md",
+      "sha256": "5df52d0fa2440419a8bd31db737fe33c4bb95e724737aaeb5ef147fea75b9449",
+      "bytes": 23193
+    },
+    {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
       "sha256": "2976b2d2f245ecb3129ff14e7758b7131e779fee04b71e7828099f2ecb89935c",
       "bytes": 33407
@@ -17657,8 +17667,13 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "1c20e7da87850c067b1fe174f100f57747d2ae7de693284f25fd9d8c6f18d852",
-      "bytes": 146558
+      "sha256": "8abe5324f26cfc389d2aaa9117dd8f10ad6b654c928f2feafa9d69fb0b398784",
+      "bytes": 147879
+    },
+    {
+      "path": "docs/decisions/2026-09-25-top-rule-sota-sources.md",
+      "sha256": "6d3f575b608c77b9bd1f976c3a67e509181afe758f534eac4f7e30df4457da77",
+      "bytes": 5226
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -17672,8 +17687,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
-      "sha256": "42dea622e815a233987ddf1e80157ac21392b925db70d7399aba3ccd203f6b67",
-      "bytes": 26706
+      "sha256": "361849c533f505d330e8794599ccbd30a5739069d7ce8dda7c6e5ad4f55be076",
+      "bytes": 26839
     },
     {
       "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
@@ -17697,8 +17712,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-tool-invoke-rates.md",
-      "sha256": "6ec9ae5ee58551f19aa554750414e7a1d3918012cccdee78f3eabbf9a740a394",
-      "bytes": 19479
+      "sha256": "da4fd5556f66cc398505e66d7889fa5ed6fb6264c0f639fa6fb0aa045f7aa4fa",
+      "bytes": 19711
     },
     {
       "path": "docs/decisions/2026-09-26-workstation-tool-refresh.md",
@@ -17711,39 +17726,44 @@
       "bytes": 6492
     },
     {
+      "path": "docs/decisions/2026-09-27-claude-harness-settings.md",
+      "sha256": "d7b28b3aa8d20cf6fe3be9274c8b4d98d26eb0a58cc4469b7cb3f32d76cfd7b4",
+      "bytes": 28851
+    },
+    {
       "path": "docs/decisions/2026-09-27-codeql-quality-suites.md",
       "sha256": "410966614ded535434660197d8ff4a517fc876fd54b2cce8b83d0e87f20c5440",
       "bytes": 20402
     },
     {
       "path": "docs/decisions/2026-09-27-mac-single-writer-staged.md",
-      "sha256": "517441575c63c19ff252f6fb53eca2e09a5c910e565aabde45da221e6922247f",
-      "bytes": 7782
+      "sha256": "ac57e507c28d620dfdff48aab91b93df9d9bd50a5503cf9e6c9803cb3efcd1fc",
+      "bytes": 8062
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "387f9250e7c5f4848644b36d708c94740df7867105bdb062e3baab1d3502b38f",
-      "bytes": 59664
+      "sha256": "4d34666cb1a18a5e8a86729b03d4caf46ea3d6164f908e92df65dd84babaa4f5",
+      "bytes": 61791
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
-      "sha256": "c6ea6e295f60a0f390b1e63cacf62bc37d72636bcc3019deeaca62ee3a2690b4",
-      "bytes": 42094
+      "sha256": "54b624ebca57fe29497e4a0599ba78005878aaf85c5becefee1bb5e47d905dc2",
+      "bytes": 42932
     },
     {
       "path": "docs/decisions/2026-09-27-prompt-audit-resolution.md",
-      "sha256": "2e53ff003bad0bdd3d2f5a5f433e016b288beeddaf700b425831b4dff326eb35",
-      "bytes": 51417
+      "sha256": "eadb255afba071faee747310b409e0030ed41dd000acf53e6fe9bf6131813b87",
+      "bytes": 52153
     },
     {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "5953f7058de0f34fd6d7a9f2abcc5a3bbefe1fd4a4744d6a5efe5f042cd37c65",
-      "bytes": 70941
+      "sha256": "a6e146f859a156e1921c5ba492eccf7960b606cd8700bf6194862a99c1f2fabf",
+      "bytes": 71662
     },
     {
       "path": "docs/decisions/2026-09-28-an13-m4-m5.md",
-      "sha256": "ab2c308ae656680d3eda27e91d78e2965245c9f178b36ad27ab1e2af695987c6",
-      "bytes": 18885
+      "sha256": "87f2205dce12a6c7bf712f2ab69c502ef8dcbf4bc9011ac85246ac22a1414fe9",
+      "bytes": 19143
     },
     {
       "path": "docs/decisions/2026-09-28-community-sweep.md",
@@ -17752,28 +17772,33 @@
     },
     {
       "path": "docs/decisions/2026-09-28-delegated-decisions.md",
-      "sha256": "ef93948f54a2ed1695a1d332f01423d2ba6266c5429146fe547142c16e986698",
-      "bytes": 16692
+      "sha256": "9d80456244d3c002ab47f143c8fd5a1acaf2036fb33669fb1b7614b213c9862f",
+      "bytes": 17396
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "80474ecd31df167df851c649d24faf2d17cd6ca71e870f58dd8f99a95d7c54a4",
-      "bytes": 35977
+      "sha256": "fcdf0ff4a6e3f2a6818933bbd3310ed7ac717fddb3f92fa1e999e9135f4b25b3",
+      "bytes": 37047
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "66528f4383af140504dafc2529db2e778e0db7a575b19c1c5fa9a9244b7bcae0",
-      "bytes": 120216
+      "sha256": "366fc099c4ec91c13bd5163556b2b2e3b9eacfb613bda834c496837837c65ea9",
+      "bytes": 120483
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "565b666f18c56f11d0519d4968fb3129a1f42d00547621b27939e9cd07630fc9",
-      "bytes": 138336
+      "sha256": "2f6d6be6f06156b1389df79113f9156650f6cff793afdd00e2be99b49ebd39b4",
+      "bytes": 138702
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
-      "sha256": "826140eac711a22332bf65f7ed7c0d30cb0846502efbd06d3f92eeb1d466a69d",
-      "bytes": 31908
+      "sha256": "a6d491e2941c2a91de6362e9b9cbed64fe39bdb4896c8ad460cdb583d53cd292",
+      "bytes": 32172
+    },
+    {
+      "path": "docs/decisions/2026-09-29-codex-lane-default-effort.md",
+      "sha256": "a1677a1cddc6050f37919268f4fb552be2e79655849799ffe17237e9800cec68",
+      "bytes": 9158
     },
     {
       "path": "docs/decisions/2026-09-29-frozen-check-grader.md",
@@ -17782,13 +17807,18 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "76d68d3e49eff51bc471539b57baca672afa000233d5ebe447c39b9a74cca357",
-      "bytes": 93607
+      "sha256": "e3a34084ab1682dbbaa17e9d58649e50a2700f7df1d87a42f7c976f4cd21df56",
+      "bytes": 94496
+    },
+    {
+      "path": "docs/decisions/2026-09-29-max-default-effort.md",
+      "sha256": "1afd0893dd96f526a80b7b1efe456379af383d514586febbca71d6648751a45e",
+      "bytes": 26135
     },
     {
       "path": "docs/decisions/2026-09-29-retire-polaris.md",
-      "sha256": "1b5b1b866e70ca58aed0ca8391de2355dd1a7a5497134e4d64d65bbfd35b39b6",
-      "bytes": 5307
+      "sha256": "f7816518890bae79ae7c86f98a1b4c6a9b244da03d8af8d72437d1ea863a97dc",
+      "bytes": 5445
     },
     {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
@@ -17797,8 +17827,13 @@
     },
     {
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
-      "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
-      "bytes": 28168
+      "sha256": "ce4560edaefcaf681141420b03fd5d38a87514e44cd3e0e3b93cd01d8cd94e9d",
+      "bytes": 28449
+    },
+    {
+      "path": "docs/decisions/2026-09-29-token-spend-attribution.md",
+      "sha256": "f7034f1dce4901afc0f940f14474a076661810d759cc97a048bfc185624889bf",
+      "bytes": 12576
     },
     {
       "path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md",
@@ -17807,8 +17842,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
-      "sha256": "31f4e291358a275ab8ebde3f2512f94b59a49eec7cebceca8b4757afb6edbcd0",
-      "bytes": 39025
+      "sha256": "2c11528a4e1c8efa9343ac1db12a57e35cde7603808395770456f34c036ae5e6",
+      "bytes": 39845
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
@@ -17816,14 +17851,29 @@
       "bytes": 11606
     },
     {
+      "path": "docs/decisions/2026-09-30-rule-text-every-layer.md",
+      "sha256": "dfbfecc9849082c0af8bdebfedd5643767982f3e210d1d5a6f4f036b5773b384",
+      "bytes": 38153
+    },
+    {
+      "path": "docs/decisions/2026-09-30-skills-llm-native-listing.md",
+      "sha256": "0d967ae02a60b3ea4cb2375b573e8b121c19801e4e41a8a9d48a8be73536bcfe",
+      "bytes": 30818
+    },
+    {
       "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
-      "sha256": "0df000b556a5cad6a7ba0caf1a9eb24a44e0b74ceff7b30b7c51b761650012bb",
-      "bytes": 11321
+      "sha256": "ac48bfd52e9b50d297de2da25c0b9411c9b4ab93f470585c3c3e19836eb9fa7e",
+      "bytes": 11584
     },
     {
       "path": "docs/decisions/2026-09-30-task-model-routing.md",
       "sha256": "0fcd4c4d3ddf7f23121ff85f58dc23a2d4c5ac543044949f9342a129e11085d4",
       "bytes": 44901
+    },
+    {
+      "path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md",
+      "sha256": "fdc768067befb4a186a2a44bb941bf48e7a3829cb930cb4f9b7181bda1e3fd23",
+      "bytes": 54259
     },
     {
       "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
@@ -17834,6 +17884,11 @@
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
       "sha256": "8aecf90eec8f7ab52087f4aec141b2a56e5caf90c482aa88eea020850823b805",
       "bytes": 8576
+    },
+    {
+      "path": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md",
+      "sha256": "ddad8d30f46f6fc46922abe485dd9b328d713690b36df7e63875a912723fa6a5",
+      "bytes": 24788
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
@@ -17977,13 +18032,13 @@
     },
     {
       "path": "docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
-      "sha256": "0b643c9cb062e534a0aa7cd6d8205d98cb9b87f95565f0b6ba1857fc2672edcf",
-      "bytes": 34261
+      "sha256": "e4cd76e825f3c3649a56cf271c4f83d04e6c7b4fc50be0c7fd02d341a0914ed9",
+      "bytes": 36513
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "f97025072022743b2b3f10a38efc45017849c7b3b644c8919a86eca542e94174",
-      "bytes": 42252
+      "sha256": "69f7fcd2c2f91412dc478f8d10503820a186efba9788f09f723d3212695cf3d0",
+      "bytes": 43157
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18266,6 +18321,11 @@
       "bytes": 6955
     },
     {
+      "path": "docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md",
+      "sha256": "e74fced9eaa05161cdb335b070b880219d59625e05e3f7d5e6863e3b4f3839ac",
+      "bytes": 63427
+    },
+    {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
       "sha256": "ae0a32b4875d7ddae697cbb9c2d2f18fb5accaed69863e3511e3fc6049cc3bed",
       "bytes": 59968
@@ -18487,8 +18547,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "ccc7c8b9c951a39e537f42819a5c29ece64a8db5c6d4caf60d70e9dc945d61c6",
-      "bytes": 103436
+      "sha256": "28a97e3dea87e15a141bb297e4654fc235bc7445ba54941a23e19de90eaf75c8",
+      "bytes": 103924
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -19729,6 +19789,11 @@
       "path": "evidence/artifacts/child-lane-baseline-20260926/skill-invoke-rate.json",
       "sha256": "5c1e13b427dd9c8818721a1788eab19d55ef0ceef269d5eb644c25557760238b",
       "bytes": 39479
+    },
+    {
+      "path": "evidence/artifacts/claude-actions-fence-smoke-20261008/deny-probe-receipt.json",
+      "sha256": "7b6fcee51e75d84623ae80474f4864d181358db8f101b66ff78b67f07a264e27",
+      "bytes": 6272
     },
     {
       "path": "evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json",
@@ -59746,6 +59811,11 @@
       "bytes": 22660
     },
     {
+      "path": "tests/test_claude_harness_audit_bounds.py",
+      "sha256": "2119d4e93b000d820d0018364cd2daace48b2b5cc9f61e6630b41e88e550b41c",
+      "bytes": 32715
+    },
+    {
       "path": "tests/test_claude_pr_review_workflow.py",
       "sha256": "cfaa2b171fcffdd1c31ce65269482efe15a5d6b9a515330f81aa314bd8274759",
       "bytes": 59337
@@ -60596,6 +60666,11 @@
       "bytes": 10502
     },
     {
+      "path": "tests/test_trading_2604_source_acceptance.py",
+      "sha256": "190385d4cbcd0758ccc764a45f2315ebf89716cc78492d79f35b2ddbb82e205f",
+      "bytes": 4564
+    },
+    {
       "path": "tests/test_trading_gates.py",
       "sha256": "36d822afc6da90a0976f15b36a01706a3ba1512c2ca870e8f563ece629e52d70",
       "bytes": 64398
@@ -60652,8 +60727,8 @@
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "598f6d8ea8d5b7224581396b35b998a9cec7440f2e7b849acf97bde4a9c5c36f",
-      "bytes": 84974
+      "sha256": "2c132e9fee2c59d15bac9b42d28c6bb9b53ecfebcf331066199b9178fecf065f",
+      "bytes": 85103
     },
     {
       "path": "tests/test_workflow_security.py",

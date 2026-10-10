@@ -1,0 +1,843 @@
+{
+  "schema": "architecture-user-bindings/1",
+  "captured_utc": "2026-10-09T18:55:40Z",
+  "source_pin": "f96f2cd2decef021c259d853d442956dc73f1ecf",
+  "reviewed_bindings": [
+    {
+      "role": "architecture_design",
+      "source": ".agents/skills/frontend-design/SKILL.md",
+      "target": ".agents/skills/frontend-design/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/blind-adjudicator.md",
+      "target": ".claude/agents/blind-adjudicator.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/blind-judge.md",
+      "target": ".claude/agents/blind-judge.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/blind-lane-reviewer.md",
+      "target": ".claude/agents/blind-lane-reviewer.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/codebase-memory-auditor.md",
+      "target": ".claude/agents/codebase-memory-auditor.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/codebase-memory-scout.md",
+      "target": ".claude/agents/codebase-memory-scout.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/codebase-memory.md",
+      "target": ".claude/agents/codebase-memory.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/evidence-reviewer.md",
+      "target": ".claude/agents/evidence-reviewer.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/isolated-builder.md",
+      "target": ".claude/agents/isolated-builder.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/landscape-sweep-worker.md",
+      "target": ".claude/agents/landscape-sweep-worker.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/security-reviewer.md",
+      "target": ".claude/agents/security-reviewer.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/semantic-evidence-reviewer.md",
+      "target": ".claude/agents/semantic-evidence-reviewer.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/semble-search.md",
+      "target": ".claude/agents/semble-search.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/source-scout.md",
+      "target": ".claude/agents/source-scout.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/stack-researcher.md",
+      "target": ".claude/agents/stack-researcher.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/stack-verifier.md",
+      "target": ".claude/agents/stack-verifier.md"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".codex/agents/codebase-memory-auditor.toml",
+      "target": ".codex/agents/codebase-memory-auditor.toml"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".codex/agents/codebase-memory-scout.toml",
+      "target": ".codex/agents/codebase-memory-scout.toml"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".codex/agents/codebase-memory.toml",
+      "target": ".codex/agents/codebase-memory.toml"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".codex/agents/semble-search.toml",
+      "target": ".codex/agents/semble-search.toml"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/agentsview.service",
+      "target": ".config/systemd/user/agentsview.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ai-memory.service",
+      "target": ".config/systemd/user/ai-memory.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/cc-guest-memory-caps.service",
+      "target": ".config/systemd/user/cc-guest-memory-caps.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/cc-win-mem-reclaim.service",
+      "target": ".config/systemd/user/cc-win-mem-reclaim.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/clock-change-check.service",
+      "target": ".config/systemd/user/clock-change-check.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/clock-change-check.timer",
+      "target": ".config/systemd/user/clock-change-check.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/clock-offset-check.service",
+      "target": ".config/systemd/user/clock-offset-check.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/clock-offset-check.timer",
+      "target": ".config/systemd/user/clock-offset-check.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/dagu.service",
+      "target": ".config/systemd/user/dagu.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/disk-headroom-guard.service",
+      "target": ".config/systemd/user/disk-headroom-guard.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/disk-headroom-guard.timer",
+      "target": ".config/systemd/user/disk-headroom-guard.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/docker.service",
+      "target": ".config/systemd/user/docker.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/git-maintenance@.service",
+      "target": ".config/systemd/user/git-maintenance@.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/git-maintenance@daily.timer",
+      "target": ".config/systemd/user/git-maintenance@daily.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/git-maintenance@hourly.timer",
+      "target": ".config/systemd/user/git-maintenance@hourly.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/git-maintenance@weekly.timer",
+      "target": ".config/systemd/user/git-maintenance@weekly.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/headroom-ns2604-headroom.service",
+      "target": ".config/systemd/user/headroom-ns2604-headroom.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/hindsight-research.service",
+      "target": ".config/systemd/user/hindsight-research.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/jcodemunch-mcp-http.service",
+      "target": ".config/systemd/user/jcodemunch-mcp-http.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/mineru.service",
+      "target": ".config/systemd/user/mineru.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-agent-pages-refresh.path",
+      "target": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.path"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-agent-pages-refresh.service",
+      "target": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-agent-pages-refresh.timer",
+      "target": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-agent-pages.service",
+      "target": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-grafana-monitoring-validation.service",
+      "target": ".config/systemd/user/native-grafana-monitoring-validation.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-node-exporter.service",
+      "target": ".config/systemd/user/native-node-exporter.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-nvidia-gpu-exporter.service",
+      "target": ".config/systemd/user/native-nvidia-gpu-exporter.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-process-exporter.service",
+      "target": ".config/systemd/user/native-process-exporter.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-stack-qmd-shared.service",
+      "target": ".config/systemd/user/native-stack-qmd-shared.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-wsl-distro-metrics.service",
+      "target": ".config/systemd/user/native-wsl-distro-metrics.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-wsl-distro-metrics.timer",
+      "target": ".config/systemd/user/native-wsl-distro-metrics.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-alertmanager.service",
+      "target": ".config/systemd/user/ns2604-alertmanager.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.service",
+      "target": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.timer",
+      "target": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-grafana.service",
+      "target": ".config/systemd/user/ns2604-grafana.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-loki.service",
+      "target": ".config/systemd/user/ns2604-loki.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-otelcol-contrib.service",
+      "target": ".config/systemd/user/ns2604-otelcol-contrib.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.service",
+      "target": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.timer",
+      "target": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-prometheus.service",
+      "target": ".config/systemd/user/ns2604-prometheus.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-research-progress.service",
+      "target": ".config/systemd/user/ns2604-research-progress.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-research-progress.timer",
+      "target": ".config/systemd/user/ns2604-research-progress.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ollama.service",
+      "target": ".config/systemd/user/ollama.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/omniroute.service",
+      "target": ".config/systemd/user/omniroute.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/openhands-job@.service",
+      "target": ".config/systemd/user/openhands-job@.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-alert@.service",
+      "target": ".config/systemd/user/paper-alert@.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-ext-20261006.service",
+      "target": ".config/systemd/user/paper-ext-20261006.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-ext-20261006.timer",
+      "target": ".config/systemd/user/paper-ext-20261006.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-ctl-20261008.service",
+      "target": ".config/systemd/user/paper-n2-ctl-20261008.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-ctl-20261008.timer",
+      "target": ".config/systemd/user/paper-n2-ctl-20261008.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-gate-decision-20261009.service",
+      "target": ".config/systemd/user/paper-n2-gate-decision-20261009.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-gate-decision-20261009.timer",
+      "target": ".config/systemd/user/paper-n2-gate-decision-20261009.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-gate-go-20261009.service",
+      "target": ".config/systemd/user/paper-n2-gate-go-20261009.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-gate-go-20261009.timer",
+      "target": ".config/systemd/user/paper-n2-gate-go-20261009.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-open-20261008.service",
+      "target": ".config/systemd/user/paper-n2-open-20261008.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-open-20261008.timer",
+      "target": ".config/systemd/user/paper-n2-open-20261008.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-open-20261009.service",
+      "target": ".config/systemd/user/paper-n2-open-20261009.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-open-20261009.timer",
+      "target": ".config/systemd/user/paper-n2-open-20261009.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-wake-20261009.service",
+      "target": ".config/systemd/user/paper-n2-wake-20261009.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-wake-20261009.timer",
+      "target": ".config/systemd/user/paper-n2-wake-20261009.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-pre-20261006.service",
+      "target": ".config/systemd/user/paper-pre-20261006.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-pre-20261006.timer",
+      "target": ".config/systemd/user/paper-pre-20261006.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-recover-a2-gate-20261006.service",
+      "target": ".config/systemd/user/paper-recover-a2-gate-20261006.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-recover-a2-gate-20261006.timer",
+      "target": ".config/systemd/user/paper-recover-a2-gate-20261006.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/qmd-mcp-http.service",
+      "target": ".config/systemd/user/qmd-mcp-http.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/restic-backup-nativestack2604.service",
+      "target": ".config/systemd/user/restic-backup-nativestack2604.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/restic-backup-nativestack2604.timer",
+      "target": ".config/systemd/user/restic-backup-nativestack2604.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/restic-prune-nativestack2604.service",
+      "target": ".config/systemd/user/restic-prune-nativestack2604.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/restic-prune-nativestack2604.timer",
+      "target": ".config/systemd/user/restic-prune-nativestack2604.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/secret-guard-canary.service",
+      "target": ".config/systemd/user/secret-guard-canary.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/secret-guard-canary.timer",
+      "target": ".config/systemd/user/secret-guard-canary.timer"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/stack-alert@.service",
+      "target": ".config/systemd/user/stack-alert@.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/vllm-embed.service",
+      "target": ".config/systemd/user/vllm-embed.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/wu-watch-20261006.service",
+      "target": ".config/systemd/user/wu-watch-20261006.service"
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/wu-watch-20261006.timer",
+      "target": ".config/systemd/user/wu-watch-20261006.timer"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/agentic-actions-auditor/SKILL.md",
+      "target": ".agents/skills/agentic-actions-auditor/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/codebase-design/SKILL.md",
+      "target": ".agents/skills/codebase-design/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/codeql/SKILL.md",
+      "target": ".agents/skills/codeql/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/diagnosing-bugs/SKILL.md",
+      "target": ".agents/skills/diagnosing-bugs/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/find-skills/SKILL.md",
+      "target": ".agents/skills/find-skills/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/fp-check/SKILL.md",
+      "target": ".agents/skills/fp-check/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/frontend-design/SKILL.md",
+      "target": ".agents/skills/frontend-design/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/gh-address-comments/SKILL.md",
+      "target": ".agents/skills/gh-address-comments/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/gh-fix-ci/SKILL.md",
+      "target": ".agents/skills/gh-fix-ci/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/hcom-agent-messaging/SKILL.md",
+      "target": ".agents/skills/hcom-agent-messaging/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/hf-cli/SKILL.md",
+      "target": ".agents/skills/hf-cli/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/iterative-retrieval/SKILL.md",
+      "target": ".agents/skills/iterative-retrieval/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/loki/SKILL.md",
+      "target": ".agents/skills/loki/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/mcp-builder/SKILL.md",
+      "target": ".agents/skills/mcp-builder/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/mineru/SKILL.md",
+      "target": ".agents/skills/mineru/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/modern-python/SKILL.md",
+      "target": ".agents/skills/modern-python/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/native-stack-research/SKILL.md",
+      "target": ".agents/skills/native-stack-research/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/native-stack-worker/SKILL.md",
+      "target": ".agents/skills/native-stack-worker/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/promptfoo-evals/SKILL.md",
+      "target": ".agents/skills/promptfoo-evals/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/property-based-testing/SKILL.md",
+      "target": ".agents/skills/property-based-testing/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/qmd/SKILL.md",
+      "target": ".agents/skills/qmd/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/sarif-parsing/SKILL.md",
+      "target": ".agents/skills/sarif-parsing/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/search-first/SKILL.md",
+      "target": ".agents/skills/search-first/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/security-audit/SKILL.md",
+      "target": ".agents/skills/security-audit/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/security-best-practices/SKILL.md",
+      "target": ".agents/skills/security-best-practices/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/security-threat-model/SKILL.md",
+      "target": ".agents/skills/security-threat-model/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/supply-chain-risk-auditor/SKILL.md",
+      "target": ".agents/skills/supply-chain-risk-auditor/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/tdd/SKILL.md",
+      "target": ".agents/skills/tdd/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/typesafe-ai/SKILL.md",
+      "target": ".agents/skills/typesafe-ai/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/variant-analysis/SKILL.md",
+      "target": ".agents/skills/variant-analysis/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/writing-for-agents/SKILL.md",
+      "target": ".agents/skills/writing-for-agents/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/agentic-actions-auditor/SKILL.md",
+      "target": ".agents/skills/agentic-actions-auditor/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/codebase-design/SKILL.md",
+      "target": ".agents/skills/codebase-design/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/codebase-memory/SKILL.md",
+      "target": ".claude/skills/codebase-memory/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/codeql/SKILL.md",
+      "target": ".agents/skills/codeql/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/diagnosing-bugs/SKILL.md",
+      "target": ".agents/skills/diagnosing-bugs/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/find-skills/SKILL.md",
+      "target": ".agents/skills/find-skills/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/fp-check/SKILL.md",
+      "target": ".agents/skills/fp-check/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/frontend-design/SKILL.md",
+      "target": ".agents/skills/frontend-design/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/gh-address-comments/SKILL.md",
+      "target": ".agents/skills/gh-address-comments/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/gh-fix-ci/SKILL.md",
+      "target": ".agents/skills/gh-fix-ci/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/hcom-agent-messaging/SKILL.md",
+      "target": ".agents/skills/hcom-agent-messaging/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/hf-cli/SKILL.md",
+      "target": ".agents/skills/hf-cli/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/iterative-retrieval/SKILL.md",
+      "target": ".agents/skills/iterative-retrieval/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/loki/SKILL.md",
+      "target": ".agents/skills/loki/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/mcp-builder/SKILL.md",
+      "target": ".agents/skills/mcp-builder/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/mineru/SKILL.md",
+      "target": ".agents/skills/mineru/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/modern-python/SKILL.md",
+      "target": ".agents/skills/modern-python/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/native-stack-research/SKILL.md",
+      "target": ".claude/skills/native-stack-research/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/native-stack-worker/SKILL.md",
+      "target": ".claude/skills/native-stack-worker/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/promptfoo-evals/SKILL.md",
+      "target": ".agents/skills/promptfoo-evals/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/property-based-testing/SKILL.md",
+      "target": ".agents/skills/property-based-testing/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/qmd/SKILL.md",
+      "target": ".agents/skills/qmd/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/sarif-parsing/SKILL.md",
+      "target": ".agents/skills/sarif-parsing/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/search-first/SKILL.md",
+      "target": ".agents/skills/search-first/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/security-audit/SKILL.md",
+      "target": ".agents/skills/security-audit/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/security-best-practices/SKILL.md",
+      "target": ".agents/skills/security-best-practices/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/security-threat-model/SKILL.md",
+      "target": ".agents/skills/security-threat-model/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/skill-creator/SKILL.md",
+      "target": ".claude/skills/skill-creator/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/supply-chain-risk-auditor/SKILL.md",
+      "target": ".agents/skills/supply-chain-risk-auditor/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/tdd/SKILL.md",
+      "target": ".agents/skills/tdd/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/typesafe-ai/SKILL.md",
+      "target": ".agents/skills/typesafe-ai/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/variant-analysis/SKILL.md",
+      "target": ".agents/skills/variant-analysis/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/writing-for-agents/SKILL.md",
+      "target": ".agents/skills/writing-for-agents/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/imagegen/SKILL.md",
+      "target": ".codex/skills/.system/imagegen/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/openai-docs/SKILL.md",
+      "target": ".codex/skills/.system/openai-docs/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/review-agent/SKILL.md",
+      "target": ".codex/skills/.system/review-agent/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/skill-creator/SKILL.md",
+      "target": ".codex/skills/.system/skill-creator/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/skill-installer/SKILL.md",
+      "target": ".codex/skills/.system/skill-installer/SKILL.md"
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/codebase-memory/SKILL.md",
+      "target": ".codex/skills/codebase-memory/SKILL.md"
+    }
+  ],
+  "counts": {
+    "reviewed_bindings": 165,
+    "content_targets": 41,
+    "metadata_targets": 94,
+    "design_targets": 1,
+    "aliases": 33
+  },
+  "limits": [
+    "Reviewed relative bindings are static proposal inputs; runtime discovery never adds permission.",
+    "User service and agent configuration bindings grant metadata only; their bodies are not read."
+  ]
+}

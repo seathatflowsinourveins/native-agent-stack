@@ -6,6 +6,7 @@ from contextlib import redirect_stderr, redirect_stdout
 import base64
 import builtins
 import hashlib
+from http.client import HTTPException
 from html.parser import HTMLParser
 import importlib.util
 import io
@@ -14,8 +15,10 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import tarfile
 import tempfile
 import unittest
+from unittest import mock
 from unittest.mock import patch
 
 
@@ -264,7 +267,7 @@ class LocalPagesTests(unittest.TestCase):
                 self.assertTrue((self.output / "fleet.html").is_file())
 
     def test_failed_fleet_adapter_preserves_all_pages_with_unknown_observations(self) -> None:
-        for failure in (OverflowError("fixture timestamp"), AttributeError("fixture memfd"), RecursionError("fixture structure")):
+        for failure in (OverflowError("fixture timestamp"), AttributeError("fixture memfd"), RecursionError("fixture structure"), HTTPException("PRIVATE-TRANSPORT-DETAIL")):
             with self.subTest(failure=type(failure).__name__), patch.object(BUILDER, "collect_fleet", side_effect=failure):
                 result = self.refresh()
                 self.assertEqual(result["fleet"]["fleet_source"], "not reported")
@@ -273,6 +276,27 @@ class LocalPagesTests(unittest.TestCase):
                 html = (self.output / "fleet.html").read_text()
                 self.assertIn("UNKNOWN</strong> live Codex lanes", html)
                 self.assertIn(type(failure).__name__, html)
+
+    def test_http_fleet_failure_keeps_tracking_availability_visible(self) -> None:
+        with patch.object(BUILDER, "collect_fleet", side_effect=HTTPException("PRIVATE-TRANSPORT-DETAIL")):
+            result = self.refresh()
+        tracking = result["fleet"]["tracking"]
+        self.assertEqual(tracking["status"], "UNREPORTED")
+        self.assertIn("HTTPException", tracking["reason"])
+        html = (self.output / "fleet.html").read_text()
+        self.assertTrue("Telemetry and invocation coverage" in html)
+        self.assertTrue("unreported" in html.lower())
+        self.assertNotIn("PRIVATE-TRANSPORT-DETAIL", html)
+        self.assertNotIn("PRIVATE-TRANSPORT-DETAIL", self.receipt.read_text())
+
+    def test_main_handles_http_transport_failure_without_exception_payload(self) -> None:
+        output = io.StringIO()
+        with patch.object(BUILDER, "refresh", side_effect=HTTPException("PRIVATE-TRANSPORT-DETAIL")), redirect_stderr(output):
+            with self.assertRaises(SystemExit) as raised:
+                BUILDER.main([])
+        self.assertEqual(raised.exception.code, 1)
+        self.assertIn("HTTPException", output.getvalue())
+        self.assertNotIn("PRIVATE-TRANSPORT-DETAIL", output.getvalue())
 
     def test_fleet_source_notes_render_reported_actions_cache_ttl(self) -> None:
         for seconds in (540, 731):
@@ -295,10 +319,65 @@ class LocalPagesTests(unittest.TestCase):
                 self.assertIn("</section>", text)
                 self.assertNotIn("<[personal identifier omitted]", text)
 
+    def test_architecture_failure_refreshes_other_pages_and_preserves_previous_page(self) -> None:
+        self.refresh()
+        architecture = self.output / "architecture.html"
+        architecture.write_bytes(b"previous Architecture publication")
+        (self.state / "coordination/ns2604-coop/notes/adoption-evidence-20261008").mkdir(parents=True)
+        original = BUILDER.load_local
+        for failure in (ValueError("synthetic protected input"), OSError("synthetic source unavailable"),
+                        tarfile.ReadError("synthetic private archive"),
+                        subprocess.TimeoutExpired("synthetic private command", 1)):
+            with self.subTest(failure=type(failure).__name__):
+                adapter = mock.Mock()
+                adapter.refresh_if_changed.side_effect = failure
+                with patch.object(BUILDER, "load_local", side_effect=lambda name: adapter if name == "architecture_builder" else original(name)):
+                    result = self.refresh()
+                self.assertEqual(result["architecture"]["status"], "UNREPORTED")
+                self.assertEqual(architecture.read_bytes(), b"previous Architecture publication")
+                for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
+                    self.assertTrue((self.output / (name + ".html")).is_file())
+                self.assertIn(type(failure).__name__, result["architecture"]["reason"])
+                self.assertNotIn("synthetic protected input", json.dumps(result["architecture"]))
+                self.assertNotIn("synthetic private", json.dumps(result["architecture"]))
+
+    def test_first_architecture_failure_publishes_explicit_unreported_page(self) -> None:
+        (self.state / "coordination/ns2604-coop/notes/adoption-evidence-20261008").mkdir(parents=True)
+        original = BUILDER.load_local
+        adapter = mock.Mock()
+        adapter.refresh_if_changed.side_effect = ValueError("controlled input refusal")
+        with patch.object(BUILDER, "load_local", side_effect=lambda name: adapter if name == "architecture_builder" else original(name)):
+            result = self.refresh()
+        page = (self.output / "architecture.html").read_text()
+        self.assertIn("UNREPORTED", page)
+        self.assertNotIn("controlled input refusal", page)
+        self.assertEqual(result["architecture"]["status"], "UNREPORTED")
+        self.assertIn("architecture.html", result["outputs"])
+
+    def test_deep_role_registry_preserves_snapshot_and_all_pages(self) -> None:
+        registry = self.state / "coordination/ns2604-coop/lanes/hcom-lanes.json"
+        registry.parent.mkdir(parents=True)
+        registry.write_text('{"nested":' + '[' * 25000 + '0' + ']' * 25000 + '}')
+        source_bytes = self.adoption_path.read_bytes()
+        receipt = self.refresh()
+        attribution = receipt["adoption_role_attribution"]
+        self.assertEqual(attribution["status"], "UNREPORTED")
+        self.assertIn("RecursionError", attribution["reason"])
+        self.assertNotIn("nested", json.dumps(attribution))
+        self.assertEqual(receipt["adoption"]["sha256"], hashlib.sha256(source_bytes).hexdigest())
+        self.assertEqual(self.adoption_path.read_bytes(), source_bytes)
+        for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
+            self.assertTrue((self.output / (name + ".html")).is_file())
+        self.assertIn("attribution unavailable (RecursionError)", (self.output / "fleet.html").read_text())
+
     def real_fleet_adapter(self, state, cache, root):
         def native_transport(command, **kwargs):
             return subprocess.CompletedProcess(command, 0, stdout="[]" if command[0] == "gh" else "", stderr="")
-        return BUILDER.load_local("fleet_data").collect(state, cache, root, run=native_transport)
+        return BUILDER.load_local("fleet_data").collect(
+            state, cache, root, run=native_transport,
+            tracking_fetch=lambda *args, **kwargs: {"status": "success", "data": {"resultType": "vector", "result": []}},
+            tracking_probe=lambda *args, **kwargs: None,
+        )
 
     def test_real_fleet_adapter_rejects_snapshot_symlink_before_publication(self) -> None:
         producer = self.state / "coordination/ns2604-coop/tools/fleet_block.py"
@@ -507,6 +586,23 @@ class LocalPagesTests(unittest.TestCase):
         self.assertLess(fleet.index('id="fleet-view"'), fleet.index('id="adoption-by-role"'))
         self.assertEqual(self.adoption_path.read_bytes(), source_bytes)
         self.assertEqual(receipt["adoption"]["sha256"], hashlib.sha256(source_bytes).hexdigest())
+
+    def test_native_orchestration_keeps_owner_role_and_unattributed_counts(self) -> None:
+        projection = {"document": self.adoption, "window": {}, "sources": [], "source_errors": [], "instances": {"role_map": {"fixture-instance": None}}, "orchestration": {"claude_by_role": {"native-agent-stack-1a": {"Agent": 1}}, "codex_by_role": {}, "codex_unattributed": {"spawn_agent": 2}}, "sdk": {"status": "UNREPORTED"}}
+        role_module = type("RoleProjection", (), {"project": staticmethod(lambda *unused: projection)})
+        original = BUILDER.load_local
+        def local(name):
+            return role_module if name == "adoption_roles" else original(name)
+        registry = self.state / "coordination/ns2604-coop/lanes/hcom-lanes.json"
+        self.write_json(registry, {})
+        with patch.object(BUILDER, "load_local", side_effect=local):
+            self.refresh()
+        text = (self.output / "fleet.html").read_text()
+        self.assertIn("owner session (reports to CC)", text)
+        self.assertNotIn("native-agent-stack-1a", text)
+        self.assertIn("unattributed instances", text)
+        self.assertIn("spawn_agent", text)
+        self.assertIn("SDK client observations", text)
 
     def test_cc_current_schema_failure_preserves_last_successful_render(self) -> None:
         self.refresh()
