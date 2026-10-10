@@ -743,6 +743,22 @@ class ReviewRunTest(unittest.TestCase):
         self.assertEqual((attempt["outcome"], attempt["final"]), ("unreadable_stream", False))
         self.assertEqual(h.posts()[0]["body"]["description"], "Claude local review: the run's stream could not be read")
 
+    def test_output_with_no_readable_record_keeps_its_reservation_and_counts_the_attempt(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.queue([["this is not JSON"], ["{not json either", "[1, 2]"], [init()]])
+        for _ in range(3):
+            self.assertEqual(h.worker([repo], post=True).tick(), 0)
+        self.assertEqual(len(h.claude_log.read_text().splitlines()), 2)  # two counted attempts; the third starts none
+        rows = h.rows()
+        self.assertEqual([r["kind"] for r in rows], ["debit", "settle", "debit", "settle"])
+        self.assertEqual({(r["actual_usd"], r["outcome"]) for r in rows if r["kind"] == "settle"}, {(11.0, "unknown")})
+        attempts = h.record(repo, 3, sha)["attempts"]
+        self.assertEqual([(a["outcome"], a.get("counted", True)) for a in attempts],
+                         [("unreadable_stream", True), ("unreadable_stream", True)])
+        self.assertEqual(crw.classify(crw.analyze([], 2))[0], "unreadable_stream")
+        self.assertEqual(crw.classify(crw.analyze([], 0))[0], "no_stream")
+
     def test_a_head_with_nothing_to_review_gets_no_attempt_no_status_and_is_not_selected_again(self):
         h = Harness(self)
         repo, shas = h.repo("o/priv", heads={8: None, 9: {}})  # main's own commit; a commit that changes nothing

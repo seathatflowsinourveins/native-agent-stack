@@ -851,6 +851,9 @@ def analyze(records: list, unparseable: int, masked: bool = False) -> dict:
 
 def classify(numbers: dict) -> tuple:
     """(stop class, unmet bounds). Classes: end_turn and budget_stop pass; the rest do not."""
+    if numbers["records"] == 0 and numbers["unparseable_lines"]:
+        # Output that does not parse is no proof that nothing was sent: the reservation is kept and the attempt counts.
+        return "unreadable_stream", [f"{numbers['unparseable_lines']} stream lines and no readable record"]
     if numbers["records"] == 0:
         return "no_stream", ["the run wrote no stream records"]
     if numbers["result_records"] == 0:
@@ -1747,7 +1750,7 @@ class Worker:
         if stop in ("credit_exhausted", "api_refused", "no_api_response"):
             status = numbers["api_error_status"]
             self.ledger.void(ref, f"refused before any model call ({stop}, HTTP {status})", detail, now)
-        elif stop == "no_stream":
+        elif stop == "no_stream":  # an empty or absent stream only; output that does not parse is unreadable_stream
             self.ledger.void(ref, "the run wrote no stream record, so no request was sent", detail, now)
         elif numbers["total_cost_usd"] is None or launch.timed_out:
             self.ledger.settle_unknown(ref, f"no usable cost ({stop})", detail, now)
