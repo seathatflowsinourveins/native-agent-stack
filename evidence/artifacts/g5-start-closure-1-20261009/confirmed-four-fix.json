@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "kind": "g5-confirmed-four-and-j8-fix",
+  "profile": "start-closure/1",
+  "prepared_observed_utc": "2026-10-09T21:07:49Z",
+  "worktree_parent": "c54b4a464ac00c3b9e2af4e8b4081ca101aae262",
+  "row_baseline_head": "503c470149069caaf2bf9c87f24caa38091ce3a6",
+  "authority": "CC final confirmed-four decision relayed 2026-10-09T20:17:04Z; g5-878-blind-adjudication-503c4701.md, workflow wf_f376e72c-132. Other 38 units are NOT and unchanged.",
+  "scope": "Four confirmed current rows plus separately prepared J8 F1/TA-N1..N12 source, tests, docs and qualification. No population-wide false-positive correction, new model read, production draw, release or landing.",
+  "confirmed_changes": [
+    {
+      "before_key": {"repository_or_entry": "https://github.com/openhands/extensions", "slot": "agent-sdks", "qualification": {"catalog": "foundation"}},
+      "after_key": {"repository_or_entry": "https://github.com/openhands/extensions", "slot": "instructions-skills", "qualification": {"catalog": "foundation"}},
+      "unit": "reread-1968ad390c366395",
+      "disposition": "TRIAL",
+      "fields": ["slot", "note", "origin_claim_ids"],
+      "correction": "Pinned AGENTS.md identifies the skills/plugins registry and assigns the SDK to OpenHands/software-agent-sdk. Correct current placement; remove aliases that bind only old SDK/workers slots. Original claim facts and valid workers row remain unchanged. No new native installation/trial acceptance is asserted.",
+      "primary_source": "https://github.com/openhands/extensions/blob/ba3f165139cd3705c5d56a4ca26293d11a464c7b/AGENTS.md#L3-L17",
+      "retained_primary_body_sha256": "d71111c39c773c9c238e32e517c074b8b7ab6115592440bf6c0d243b331326c9"
+    },
+    {
+      "key": {"repository_or_entry": "https://github.com/openbb-finance/openbb", "slot": "identity-provenance", "qualification": {"catalog": "us-equities", "slot": "identity-provenance"}},
+      "unit": "reread-31959579a4f50e26",
+      "fields": ["note"],
+      "correction": "Current source-entry list pin is explicit; candidate implementation pin remains UNESTABLISHED/PENDING. Original R4 null-pin note, current pin, residue and settling measurement are preserved."
+    },
+    {
+      "key": {"repository_or_entry": "https://github.com/pmorissette/ffn", "slot": "evaluation-experiments", "qualification": {"catalog": "us-equities", "slot": "evaluation-experiments"}},
+      "unit": "reread-a462f8b29d505dfb",
+      "fields": ["note"],
+      "correction": "Current source-entry list pin is explicit; candidate implementation pin remains UNESTABLISHED/PENDING. Original R4 null-pin note, current pin, residue and settling measurement are preserved."
+    },
+    {
+      "key": {"repository_or_entry": "https://github.com/pola-rs/polars", "slot": "identity-provenance", "qualification": {"catalog": "us-equities", "slot": "identity-provenance"}},
+      "unit": "reread-ec36f04b03a29a39",
+      "fields": ["note"],
+      "correction": "Current source-entry list pin is explicit; candidate implementation pin remains UNESTABLISHED/PENDING. Original R4 null-pin note, current pin, residue and settling measurement are preserved."
+    }
+  ],
+  "row_integrity": {"rows": 4606, "changed": 4, "other_rows_identical": 4602, "valid_workers_row_identical": true, "actions": 83, "census": 96, "retained_origins": 4582, "pending_census_origins": 24, "unreachable_sampled_rows": 0},
+  "canonical_asset": {
+    "name": "g5-landscape-evidence-2026-10-08.tar.zst",
+    "sha256": "bcba48bab1aa8371c2b8ea8ce7812528fb4cb85818018d2c883d14c59f73171d",
+    "bytes": 50333229,
+    "rows_sha256": "506968758aee718ee8a9bbfc8be7df779ea3c94ad0ed14360412948370e3d075",
+    "coverage_sha256": "75933405909eb689c399c1613a88872b64a2fa521016593a663032dba2a1aa07",
+    "manifest_sha256": "4d453182cd177d042d137fe7d0fbf5810731eee2d2d9b7248dfd3203ee95e0f6",
+    "origin_map_sha256": "a7bb04e413cf5c7a533c671e745a7a61fc3459690c9c59bdd0309367c71a4ea6",
+    "publication_status": "NOT_PUBLISHED"
+  },
+  "native_qualification": {
+    "commands": ["compact_manifest.py --profile start-closure/1 --write", "compact_manifest.py --profile start-closure/1 --check", "start_closure_sampler.py --profile start-closure/1 --derive-origin-map"],
+    "exit_codes": [0, 0, 0],
+    "status": "PASS",
+    "blockers": 0,
+    "write_and_check_output_sha256": "c4b8fb717330cdb1e6d1fec1313f165ca9ea92a5b042a82bc2fe4b832c6974cc",
+    "origin_derivation_output_sha256": "72551bd41d9af293eb603b031bfe86b5b3687e99f2135abfc37780d200a1a8ec",
+    "scope": "Actual complete native qualification and independent asset-only rebuild equality; metadata integrity, not model or upstream runtime acceptance."
+  },
+  "population_hash_table": {
+    "receipt": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-population-receipt.json",
+    "sha256": "16ab3fe58f8b685c7d57ab1e14f8d97d322e301540017a6f3bba19591f6814d0",
+    "strata": 414,
+    "unchanged": 414,
+    "changed": 0,
+    "selected_key_lists_equal": 414,
+    "unit": "Native sealed R3 population_key_sha256 and START stratum contract; no ad-hoc population hash",
+    "before_packet_manifest_sha256": "ca58df85668ce66d05e46a2fa2bba2af261cde74c9ca8bff320605eb4dba5a6b",
+    "stratum_contract_sha256": "744e1729ddd16a7d91378aebd35feea0acfba9932e49b831675fb1246a32ffde",
+    "seed_replayed_only_for_key_comparison": 209912885797751507,
+    "redraw_required": false,
+    "new_redraw_seed": null,
+    "read_boundary": "CC population rule retains existing sampled draws/reads. Corrected row hashes and J8/code delta still require designated reads; measurement establishes no new zero-defect verdict.",
+    "serialization_rebinding": {
+      "previous_sha256": "90200fa69a2f23c8a73e01b7ceb2875df05216b93ab18dc2aabd37a83b1efbde",
+      "previous_bytes": null,
+      "parsed_receipt_values_unchanged": true,
+      "native_stratum_safe_separators": true,
+      "evidence": "evidence/artifacts/g5-start-closure-1-20261009/gitleaks-n1-fix.json"
+    }
+  },
+  "archive_member_integrity": {
+    "receipt": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-archive-delta.json",
+    "sha256": "8e6f4e2eb4bfc56bee699df0733100b471c90e3ebffbd6a8f664752dc2c12a76",
+    "members": 13486,
+    "changed_members": ["SHA256SUMS", "compact/coverage.json", "compact/rows.json"],
+    "all_original_capture_members_byte_identical": true
+  },
+  "implementation_pins": {
+    "sampler": "6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a",
+    "native_protocol": "7a0ebf0c99e2587de1c7fdad6ffca8a23bc6ad29f721a67f16a86607745ee558",
+    "sealed_r3": "759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7",
+    "historical_r3": "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627",
+    "native_random": "CPython 3.14.4 random.sample, random.py SHA256 62dca8cdae7482513b99bb093ff038afd5131954e7eb78166d673a772cee871c",
+    "sources": ["https://github.com/python/cpython/blob/v3.14.4/Lib/random.py", "https://www.gnu.org/software/tar/manual/", "https://github.com/facebook/zstd", "tools/sota-convergence/compact_manifest.py", "tools/sota-convergence/start_closure_sampler.py"]
+  },
+  "historical_j8_preparation": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json; its unchanged-E03 row statement precedes these four changes and retains its recorded source/time scope",
+  "failed_attempts": [
+    {
+      "stage": "slot-only qualification",
+      "exit_code": 1,
+      "blockers": ["origin-claim-id-repository-slot-unbound (2)", "row-census-mismatch (missing1/unexpected1)"],
+      "correction": "Remove unsupported current aliases and update derived census key; immutable claim captures and valid worker unchanged. Failed archive, native manifest and actual output are retained.",
+      "usage": "Local artifact checks only; no model/provider usage."
+    },
+    {"stage": "derived checksum binding", "correction": "Update only rows/coverage entries in the checksum index; preserve the preceding archive. No original capture rewritten."},
+    {
+      "stage": "initial post-four-row system3.14 broad discovery",
+      "exit_code": 124,
+      "timeout_seconds": 1800,
+      "status": "INCOMPLETE_EXCLUDED",
+      "retained_logs": ["full-unittest.stdout.log", "full-unittest.stderr.log"],
+      "boundary": "Wrong environment for the retained CI3.13.16 comparison and incomplete termination. No pass, baseline equivalence or new model/provider acceptance is inferred. The corrected complete CI-environment run is recorded separately."
+    }
+  ],
+  "final_local_checks": {
+    "status": "COMPLETE_WITH_RETAINED_BASELINE_FAILURES",
+    "sampler_controls": {
+      "status": "REUSED_COMPLETE_PASS_INPUTS_UNCHANGED",
+      "receipt": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json#/synthetic_controls",
+      "observed_utc": "2026-10-09T19:13:24.308345+00:00",
+      "interpreter": "CPython 3.14.4",
+      "tests": 41,
+      "skipped": 0,
+      "exit_code": 0,
+      "stdout_sha256": "063db481565dc504673da733358ef2fc0c76c68045cd58e5f718c22ca41a0fcc",
+      "stderr_sha256": "e75d7aea77701e0231a69eb2f8b88ef4ab5bd40178a14a47f9379f9c23b66d30",
+      "input_binding": "Sampler, test module, compact protocol and sealed R3 helper retain the exact J8 preparation hashes. These controls use native synthetic fixtures; the new production asset was qualified independently above. This is reused passing evidence, not a fresh post-four-row run."
+    },
+    "post_four_row_sampler_attempt": {
+      "exit_code": 0,
+      "tests": 6,
+      "skipped_classes": 1,
+      "stderr_sha256": "bdab1dd2dfb0cc65fb44fc7add8a7fd818c5d01ded3127344ac74b107f7870a8",
+      "boundary": "The retained sampler-native41 log omitted G5_R3_GENERATOR, so NativeSamplerTests skipped. Its filename is not a 41-test result. The complete earlier J8 controls are retained separately."
+    },
+    "repository_discovery": {
+      "command": "python -m unittest discover -s tests -v",
+      "resource_prefix": ["timeout", "3600", "nice", "-n", "10", "ionice", "-c2", "-n7"],
+      "interpreter": "CPython 3.13.16, retained repository CI environment",
+      "environment_scope": "Fixed sealed R3 generator; coordinator-owned temporary directory and CI bin PATH prefix; G5 source remained unchanged during the run.",
+      "exit_code": 1,
+      "tests": 11834,
+      "failures": 22,
+      "errors": 0,
+      "skipped": 1187,
+      "elapsed_seconds": 2192.765,
+      "stdout_sha256": "640bec6d49398714fc80c9218f3061363e043f7664afa4634e08980cf23b8868",
+      "stderr_sha256": "f0dfa8e08ed74d4090395cbcee7055b938fab5757ab513a39c355b6d7ddf5a79",
+      "comparison_receipt": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-suite-comparison.json",
+      "comparison_receipt_sha256": "d643d71b32cc639610b84685b999d2cf3189c4f363fc02d93c5e8b0e440540b8",
+      "strict_full_block_matches": 21,
+      "source_supported_diagnostic_order_variations": 1,
+      "pre_existing_classification": 22,
+      "introduced": 0,
+      "unresolved_causal_classification": 0,
+      "boundary": "This remains a failed broad suite. The sampler module skipped for missing jsonschema in this CI environment. One unchanged set-assertion diagnostic differs in the order of the same two IDs: its raw strict difference is preserved, not normalized into equivalence. The complete pinned3.14.4 controls are bound separately."
+    },
+    "full_validation": {
+      "command": "/usr/bin/python3 scripts/validate.py",
+      "mode": "FULL; never --failed",
+      "exit_code": 0,
+      "components": 70,
+      "hashed_files": 10915,
+      "profiles": 4,
+      "receipts": 237,
+      "stdout_sha256": "fab658a318c95ae249ab3cf5b3f78664c5ec268789500bee76ec73ef6391dd45",
+      "stderr_bytes": 0,
+      "phase": "Complete comparison receipt and current implementation/asset are registered. The FULL checker passes with these counts; its result is repeated after recording this check summary and rehashing the registry, before the ONE commit."
+    },
+    "diff_check": {"command": "git diff --check", "exit_code": 0}
+  },
+  "gates": {"g5": "NOT_MET", "readiness_followups": ["G5-F1", "G5-F2", "G5-F3", "G5-F4"], "designated_reads": "PENDING", "trading_ack": "PENDING", "final_head_ci": "PENDING", "pre_cue": "PENDING", "cc_landing_release_cue": "PENDING"}
+}

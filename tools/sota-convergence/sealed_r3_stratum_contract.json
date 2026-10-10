@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "kind": "g5-predeclared-sample-stratum-contract",
+  "status": "WAIT_ROOT_ORIGIN_INVENTORY_AND_FINAL_DRAW_CUE",
+  "supersedes_proposal_sha256": "a25e4175e296e6a56a2b9fea25bd91d11a903e6764aa994aefe44705fb450cad",
+  "root_receipt": 59744,
+  "seed": 202610081850,
+  "source_inventory": {
+    "fields": ["fragment_id", "artifact_sha256", "parent_family", "owner_lane"],
+    "parent_families": ["a-stars", "b-field-landscape", "c-slot-index"],
+    "rule": "Literal input fragment artifacts remain strata; family labels are explicit root-owned rollups, never inferred origin or quality priority. Preserve multi-fragment qualified keys."
+  },
+  "primary_buckets": {
+    "kind": "FINAL-DISPOSITION",
+    "nonaction_sampled": ["WATCH", "REJECT", "NO-GAP", "OUT-OF-SCOPE", "PENDING"],
+    "nonaction_quota": "min(59,N)",
+    "action_census": ["ADOPT-NOW", "TRIAL"],
+    "action_quota": "ALL N; 100 percent census, never capped at59"
+  },
+  "source_action_buckets": {
+    "kind": "SOURCE-CLAIM-ONLY",
+    "classes": ["ADOPT-NOW", "TRIAL"],
+    "final_row_filter": "PENDING",
+    "quota": "ALL N qualified keys and ALL exact original source claim witnesses, never capped at59",
+    "binding": "Root map supplies explicit same-fragment/native-key/class/source SHA/archive member/pointer bindings that match the held choices. Preserve every matching witness and full PENDING row. Provisional or another fragment's class does not qualify membership."
+  },
+  "action_review": {
+    "required_distinct_model_families": 2,
+    "required_population_coverage_each": "100 percent for final ADOPT-NOW/TRIAL and every held source ADOPT-NOW/TRIAL claim",
+    "review_evidence_status": "NOT_RUN_BY_PACKET_GENERATOR",
+    "family_identity_owner": "CC/root designated readers; no family pass or quality ruling inferred from packet creation"
+  },
+  "identity": "Supported native decision_key(repository_or_entry,literal slot,canonical qualification)",
+  "stratum_key": ["literal fragment_id", "artifact_sha256", "bucket_kind", "literal disposition"],
+  "seed_derivation": "SHA256 canonical JSON [202610081850, fragment_id, artifact_sha256, bucket_kind, literal disposition]; separate Random.sample stream for each nonaction stratum",
+  "counts": {
+    "strata_bound": "Nine buckets per explicit fragment artifact, including empties",
+    "nonaction_sample_bound": "At most295 sampled memberships per artifact across five nonaction final buckets",
+    "action_budget": "Full actual action population and exact witness census; not bounded by59 or531",
+    "required_domains": ["nonaction_sample_memberships", "final_action_census_memberships", "held_action_census_memberships", "held_action_source_witnesses", "unique_rows", "empty_strata", "explicit parent-family rollups"]
+  },
+  "draw_gate": "Root-sealed literal input/origin/action map, final native PASS manifest, CATALOG-PR-RESHAPED literal integercheck0 at designated head and co-op/CC read item. BLOCKED preflight is not a cue.",
+  "limits": [
+    "Source action census rows remain final PENDING; no source claim is promoted to a final class or native acceptance.",
+    "The earlier531-per-fragment cap is superseded: only the five nonaction final buckets have a59 cap; action reads are complete censuses.",
+    "No actual final population was read, no samples drawn and no family reads executed by this contract record."
+  ]
+}

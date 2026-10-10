@@ -35,7 +35,7 @@
       "quote": "errors = [f\"the top rule lacks {phrase!r}\" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]"
      },
      {
-      "locator": "manifests/evidence.json:38815",
+      "locator": "seathatflowsinourveins/native-agent-stack@46184751ca4bfa09ac0905797dfd8e938c280351:manifests/evidence.json:38815",
       "quote": "\"path\": \"examples/claude-native/CLAUDE.md\",\n      \"sha256\": \"bd9cd167681b637aed3ea4d70c07e561ea64a30862c07a6bc3a06565f9426dd0\",\n      \"bytes\": 8480"
      },
      {
@@ -55,7 +55,7 @@
       "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)\n        self.assertEqual(len(top.split()), 120)"
      },
      {
-      "locator": "manifests/evidence.json:39930",
+      "locator": "seathatflowsinourveins/native-agent-stack@46184751ca4bfa09ac0905797dfd8e938c280351:manifests/evidence.json:39930",
       "quote": "\"path\": \"tests/test_codex_worker_lane.py\",\n      \"sha256\": \"3338942353fbcf0464e2437969c81da6d3e8a02baee87fdba07fc98fcd5d3cbf\",\n      \"bytes\": 95109"
      },
      {

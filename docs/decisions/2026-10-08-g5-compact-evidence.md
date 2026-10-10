@@ -1,0 +1,158 @@
+# A compact landscape catalog with retained release evidence
+
+The maintained landscape record keeps decisions and their source bindings reviewable in Git. Large discovery returns, mined-list occurrences and retained captures belong in a versioned release asset. Each decision names the repository or entry, its slot and literal role qualification, disposition, evidence class, actual source pin, primary locators, capture SHA256, owning lane and refresh date. Pending decisions also name a conservative provisional state, one settling measurement and its owner.
+
+GitHub [limits regular repository files](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github): it warns above 50 MiB, blocks files above 100 MiB and recommends releases for large distributed files. Its [release asset contract](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases#storage-and-bandwidth-quotas) permits up to 1000 assets per release, each under 2 GiB. These primary sources were read on 2026-10-08. A compact manifest and immutable `g5-landscape-evidence-2026-10-08.tar.zst` with `SHA256SUMS` follow those supported interfaces. The adoption manifest's existing release-tag/commit pointers provide the repository's release pin precedent.
+
+The generator rebuilds the compact decisions from the archive's rows and validates every retained capture hash, pinned locator and unique entry/slot/qualification key. A frozen input census must include every star and relevant mined-list occurrence. Different parser sections and occurrence kinds remain separate populations; mixed repository, query, referral and resource totals do not create a list denominator. Schema consistency and archive identity checks do not establish source truth or native acceptance.
+
+ADOPT-NOW and TRIAL rows require complete primary-source review by both designated reader families. Other rows use seeded sampling by fragment and disposition: 59 draws without replacement per stratum, or its full census when smaller. At zero observed defects, the exact one-sided 95% binomial upper bound is `1 - 0.05^(1/59)`, approximately `0.0495`; equivalently `0.95^59` is approximately `0.0485`. Sampling a finite population without replacement is at least as conservative. The related rule-of-three approximation is `3/n`; at 59 it is about 5.08%, so the stated 5% bound uses the exact calculation. Reference: Hanley JA and Lippman-Hand A, “If nothing goes wrong, is everything all right? Interpreting zero numerators,” JAMA 1983;249:1743–1745, [doi:10.1001/jama.1983.03330370053031](https://doi.org/10.1001/jama.1983.03330370053031). The DOI full text was inaccessible at the dated read; supported primary metadata and official exact-interval documentation identify the reference. The record retains its sampling population, sealed revision, seed, version, reader outcomes and every failed attempt. A defect triggers correction, a root-cause search and a new seed for the corrected stratum. Repeated draws until a pass without correcting the defect do not support the stated confidence bound, and per-stratum 95% claims do not imply simultaneous 95% coverage across all strata.
+
+Sampling requires the installed CPython 3.14.4 [random.sample implementation](https://github.com/python/cpython/blob/v3.14.4/Lib/random.py), with native `random.py` SHA256 `62dca8cdae7482513b99bb093ff038afd5131954e7eb78166d673a772cee871c`. The execution loader enforces the exact runtime version; the read packet records `random_sha256`, while execution receipts record the version prerequisite. Two reader families examine the same selected rows; their agreement does not double the number of draws.
+
+Packaging uses GNU tar 1.35 and [facebook/zstd v1.5.7](https://github.com/facebook/zstd/tree/v1.5.7/programs). The vendor CLI supplies compression and integrity tests. The local supported package is Ubuntu `zstd` 1.5.7+dfsg-3. A native round-trip fixture verifies the packaging seam; it is local integration evidence, separate from tool-model or host acceptance.
+
+Catalog membership does not install or authorize a candidate. A source-review recipe, historical receipt and current native result retain their own evidence classes. Scope splits preserve source wording and literal role qualifications; repeated claims keep every locator without becoming votes. Same-slot disagreement requires convergent pinned primary evidence, otherwise the record stays pending with its settling measurement. No ADOPT-NOW state follows from a source-only join, inventory count or schema check.
+
+The local asset is prepared before publication. The catalog and release receive their explicit publication cue, and the manifest's release tag and asset hash are verified after landing. An unpublished asset or prospective tag is reported as prepared, never as an available release. The dated owner direction is the trigger for this change; the documented practice stands on the primary sources above.
+
+The explicit `start-closure/1` profile records the bounded START gate separately from the default full qualification contract. Its practice basis is declared conformance with retained provenance: [SLSA v1.2 tracks at 19e4e2f005f871270c4f555fc47afecfb37f3efe](https://github.com/slsa-framework/slsa/blob/19e4e2f005f871270c4f555fc47afecfb37f3efe/docs/spec/v1.2/tracks.md) and [build levels](https://slsa.dev/spec/v1.2/build-track-basics) distinguish provenance existence from stronger build protections; [OpenSSF Scorecard's individual checks at 09a80e3f20a6412cff5aecf1ca124c139e51f86a](https://github.com/ossf/scorecard/blob/09a80e3f20a6412cff5aecf1ca124c139e51f86a/docs/checks.md) and its [project non-goals](https://github.com/ossf/scorecard/blob/09a80e3f20a6412cff5aecf1ca124c139e51f86a/README.md#project-non-goals) keep individual behavior visible. The catalog buckets are local policy. They do not claim SLSA certification, enforced human review or a Scorecard result.
+
+Only an explicit `--profile start-closure/1` selects the closure contract. Action rows retain valid row and primary pins and their source evidence. Non-action PENDING pin/locator residues retain reason codes and settling measurements, with each count visible on the manifest. Captured bytes, archive confinement, duplicate decision keys, schemas and source/pin disagreement detection remain checked. Mechanical pin resolution uses the installed Git blob hashing contract plus the official [GitHub tree](https://docs.github.com/en/rest/git/trees#get-a-tree) and [path-history](https://docs.github.com/en/rest/commits/commits#list-commits) interfaces: default head first, then at most 20 commits for a retained repository file, one cached recursive tree per repository, and an observed request ledger below 1,000 calls per hour. Missing source bodies do not create pins.
+
+Mined lists under this profile are counted at their exact captured snapshots. Physical source occurrences, existing typed source IDs, grouping units, removed duplicates, overlaps and promoted occurrences have distinct definitions and counters. The hash-bound unpromoted ID list is retained without creating a decision for each entry. Every declared promoted mapping retains its exact decision key, capture hash, archive member and original selector in both directions. Source-scope residue on non-action rows follows the mapping below. Approved omissions remain visible: `G5-F1` tracks complete typed list and field qualification, `G5-F2` tracks primary-source qualification, and `G5-F3` tracks occurrences outside the declared list union. An omission without a valid disposition still blocks. The passing manifest defines the final action read set.
+
+The nine source-defect append sites test final disposition before recording a blocker. Under the default profile each defect keeps its original blocking behavior. Under `start-closure/1`, ADOPT-NOW and TRIAL remain blockers for every row-level class below; any row carrying these residue reasons is barred from action dispositions. Other rows retain a `closure.residue` event with the exact reason code, bucket, count and settling measurement. The generator recomputes events from input defects, preserving prior origin evidence when it writes a literal unresolved marker.
+
+| Non-action reason code | Profile bucket | Follow-up |
+| --- | --- | --- |
+| `original-list-occurrence-scope-unverified` | counted-inventory | Complete the source-scope binding; promoted mapping integrity stays checked |
+| `foreign-primary-pin-scope-unqualified` | PENDING-PIN | Establish the actual candidate/source subject |
+| `skill-entry-primary-bytes-unestablished` | PENDING-PIN, or PENDING-LOCATOR when that locator is the gap | G5-F2 |
+| `native-skill-entry-witness-unverified` | PENDING-PIN or PENDING-LOCATOR | G5-F2 |
+| `original-source-entry-identity-unbound` | origin-unresolved; literal `origin_pointer: "unresolved"` | Bind the original entry identity |
+| `unsupported-json-pointer-capture` | PENDING-LOCATOR | Establish the original capture selector |
+| `unbound-field-selector` | G5-F1 | Complete the typed list and field census |
+| `evidence-class-unassessed` | G5-F4 | Assess retained primary sources and record a witnessed evidence class |
+| `source-review-claim-unpinned` | PENDING-PIN | Pin the cited source, retain its bytes at that pin, then re-assess the class |
+
+An original SOURCE-REVIEW claim with a null source pin remains UNKNOWN and has `source-review-claim-unpinned` in PENDING-PIN. Its old capture, owner, claim and PENDING disposition remain explicit. It receives no F4 event. This distinguishes the missing-pin measurement from assessment of an originally declared UNKNOWN class; the face counts the row in one of these buckets, never both.
+
+An F4 row's inherited missing-pin flag remains historical qualification metadata used by the pin checks. It is excluded from the counted PENDING-PIN row union and the sampler's pin projection. The face reports those historical flags separately; the counted F4/PENDING-PIN intersection is zero. SOURCE-REVIEW claims with missing pins remain in PENDING-PIN and never gain an F4 event.
+
+The later class assessment rule also gates UNKNOWN by final disposition. Default qualification and every action row retain the `unknown-evidence-class` blocker. Under START, a non-action declared UNKNOWN row has one `evidence-class-unassessed` event in G5-F4. An unsupported original claim retains its existing skill-source or identity reason and bucket, verified against the exact original row reference; it does not gain another F4 event for that same claim. The manifest prints `f4` and its unit alongside F1–F3. A profile acceptance carries all four follow-ups open.
+
+The pending merger chooses the strongest witnessed original class in the order UNKNOWN, DOCUMENTARY, SOURCE-REVIEW, then RECORDED classes, with its output capped at SOURCE-REVIEW. A retained execution receipt is checked at its original class before that cap. SOURCE-REVIEW requires retained source bytes at the declared pin; DOCUMENTARY requires a documentation capture that resolves by hash. An unresolved capture supports UNKNOWN. The source class and native qualification use the same witness functions; qualification residue never manufactures evidence support. This definition is bound to local policy record `ROW-ns2604-coop-20261009T0330Z-g5-unknown-evidence`, SHA256 `1a141e7d630cc30e976e947ecd0a8705aca8e4260bd602ba12bdd532b2bc3f99`.
+
+Primary pin witnesses retain raw Git commit, root and intermediate tree objects, and the exact source blob. The checker uses native Git v2.53.0 [object hashing](https://git-scm.com/docs/git-hash-object) and [tree lookup](https://git-scm.com/docs/git-ls-tree) to verify the commit→tree→path→blob relationship offline. Generated object IDs or snapshot metadata do not substitute for these bytes. Public declarations use confined archive members and SHA256 references; original source captures and owners remain retained. GitHub file URLs use `#L<n>` or `#L<a>-L<b>` fragments; colon line selectors remain valid only in the declared repo@commit:file form and are rejected inside URL paths.
+
+After a population changes, the production sampler accepts an explicit new `--redraw-seed` and records it for every sampled stratum. It calls the unchanged sealed R3 selection function with that seed and quota 59. The historical seed `202610081850`, resealed source bytes and original/reseal equality receipt remain unchanged; equivalence-proof mode does not permit a redraw override. The co-op builds the replacement packet on the final head, and both families read all replacement strata.
+
+`occurrences-outside-declared-union` is partitioned by the mapped row's final disposition. Every ADOPT-NOW or TRIAL mapping blocks under every profile. Only non-action mappings can enter G5-F3, with their measured count and sorted occurrence-ID-list hash. Their resolution is to complete the union declaration or exclude each source with its reason. Duplicate or stale declarations fail. The previous 803-mapping census included six logical source/field-provenance IDs on five TRIAL rows; their retained records show that they are not physical mined-list entries. Removing only the erroneous list-occurrence labels, preserving each exact source reference and recording its reason, leaves 797 non-action mappings and zero action mappings outside the union. No disposition was demoted. Default qualification continues to block the omission.
+
+The manifest face records `validation.profile`, every class and bucket count, and the exact non-action G5-F3 ID-list hash. PENDING-PIN and PENDING-LOCATOR count distinct rows with either explicit flags or residue in that bucket, with G5-F4 rows excluded from the counted PENDING-PIN union even when they retain historical pin flags. Their `pending_pin` and `pending_locator` units are declared in `count_units`. Other row-level counters sum append events, so qualification-specific mappings remain distinct. G5-F2 overlaps its pin/locator bucket. `f1` and `f2` count row-level field/skill residue separately from declared omissions; `f3` counts only non-action outside-union mappings. `origin_unresolved` is the declared alias for distinct original claim IDs plus legacy unresolved rows without claim IDs. A separate row counter preserves the current 47-claim/50-row mapping after the confirmed OpenHands slot correction; the preceding 51-row count is historical. These overlapping units must not be added.
+
+The G5-F2 omission's 4,091 unit is historical PENDING decision rows at preparation, computed by `prepare_inventory.py` (SHA256 `7c7e981270148ba35a72eb1193b65701159aee5e90f87e80c2c2e1d628ce09c9`) from retained `provenance/r4-input-rows.original.json`, SHA256 `3f9db58d7082cac1165813a6a33d48474d1089fdb043ff8df8ad6bfe42212243`. That snapshot has 4,582 rows, 4,091 PENDING. It is separate from current PENDING decision rows (4,058), pin/locator buckets (3,340/2,117) and F2 residue events (166). `count_units` declares this historical unit; it does not claim that 4,091 is a fresh primary-evidence qualification count.
+
+The direct TRIAL scope witness for `massive-com/client-python`, `market-data-reference`, retains awesome-quant commit `48e48a76b2054b5fe6eede6852ffef7783b992ce`, README blob `5fd2caf71fcdacc47d1e64ff37e8d9abc34b7303` and SHA256 `fa346fdbc05f651f500795e7ea95e90b6d8c0cb394daee1f7b612470650caa86`. Line 683 lies inside Commercial & Proprietary Services, lines 675–760. The native proof recomputes that ATX heading range and hashes its exact line/section bytes; cached commit/tree, original ledger selector and frozen field selector bind source membership and slot. The existing list-boundary receipt binds full-file identity and lexical population, not a separate declared section range. This adapter handles the retained ATX form and does not establish general Markdown semantics or candidate behavior. The file has 781 physical lines; the historical boundary receipt's 782 includes its terminal empty split element.
+
+Production packet builds require an explicit `--asset` matching the canonical manifest's asset pin. Optional `--asset-sha256` confirms that same pin and cannot authorize an alternate archive. The sampler reuses `compact_manifest.py`'s complete native asset-only build under `start-closure/1`: capture/coverage qualification must pass, every computed ordered row field must match, and the entire pinned manifest must reproduce byte for byte before selection or writes. Input rows and computed output remain distinct under normalization and residue recomputation. The packet records the native qualification, actual archive/member hashes and measured row-difference success invariant; mismatch diagnostics name the observed/expected hash or differing row index/field. Header fields `manifest_asset_sha256` and `asset_rebinding` remain explicit compatibility metadata; the canonical path has no changed asset binding. Preparation/proof modes reject asset flags and retain their original inputs. These checks qualify the local integration and establish no model read or G5 acceptance.
+
+The companion sampler profile reuses the sealed R3 selection procedure. Seed `202610081850` belongs to the historical equivalence proof; a changed population requires a new explicitly recorded `--redraw-seed`. Both designated families read every final ADOPT-NOW/TRIAL row and every PENDING-CONFLICT row; conflicts retain their conservative provisional choice, settling measurement and original action-side claim IDs and are excluded from samples. Other final dispositions and PENDING-PIN/PENDING-LOCATOR buckets receive 59 draws or a complete census when smaller. Overlapping rows and reader families do not become extra independent draws. The manifest binds row/coverage schema hashes; the packet's `implementations` and `profile_review_sources` bind implementation and code/test hashes. Prepared family-review fields remain `NOT_RUN`; actual outcomes and failed attempts belong in separate receipts. Both designated reads cover the profile code/tests and the census/sample packet. Omission disposition IDs are operator declarations checked for the supported follow-up pairing, not cryptographic proof of a CC decision; G5-F3 additionally requires its exact literal ID and census hash.
+
+The tracked companion is `tools/sota-convergence/start_closure_sampler.py`, SHA256 `6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a`; its tracked START contract is `tools/sota-convergence/start-closure-stratum-contract.json`, SHA256 `744e1729ddd16a7d91378aebd35feea0acfba9932e49b831675fb1246a32ffde`. The R3 source reseal at `tools/sota-convergence/sealed_r3_generator.py` has SHA256 `759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7`. It changes only the two historical path defaults to sibling repository inputs. Seed `202610081850`, QUOTA `59`, every function and all remaining source bytes match the original. Historical source SHA256 `80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627` remains in private research custody. The historical R2 contract is retained unchanged at `tools/sota-convergence/sealed_r3_stratum_contract.json`, SHA256 `c12428493bd8aa76785a6b08f15b1e0e20b5cc169f2bcd6831c7d75ea84573fd`; it is distinct from the START contract. The immutable START contract retains the original source hash as its selection-specification reference (`R3_CUSTODY_SHA256`); the accepted execution loader independently pins the reseal through `R3_SHA256`. Both source identities are explicit. The companion supplies the current protocol and START contract instead of invoking historical R3 native-loading defaults.
+
+The reseal comparison ran both native selection paths on passing manifest `04dbfd7f…`, origin map `0155eb32…`, and common comparison head `aac97d5aa66b39df53977de269d1257d8dde4d53`. Both commands returned 0. Both full packet files are 24,319,223 bytes with SHA256 `c94f316fed3f0197f3872e7d4557b88ba0873ccc002f471609973ce295f890e6`: their entire bytes match, including selected row IDs and `population_key_sha256` for all 414 strata. There are 4,458 sample memberships covering 2,673 distinct sampled rows; the required census is 83 actions plus 13 conflicts. These overlapping units are not added. The [reseal proof receipt](../../evidence/artifacts/g5-start-closure-1-20261009/r3-reseal-proof.json) records actual output hashes, both commands and source/input bindings. Only after this comparison passed did the companion's accepted R3 pin change to `759facff…`. The privacy checker is unchanged. Neither the comparison nor packet preparation establishes a completed designated read.
+
+These are the historical reseal-proof commands at comparison head `aac97d5aa66b39df53977de269d1257d8dde4d53`, using its corresponding protocol, manifest and map. Check out that revision to replay this receipt with Python 3.14.4. Resolve `G5_CUSTODY_R3` to the original private 80e69ff9 source; `G5_ORIGIN_MAP` to the old hash-bound map; output variables to new owned proof files. Later repaired manifests and code hashes have their own receipts:
+
+```sh
+timeout 600 nice -n 10 ionice -c2 -n7 python3 tools/sota-convergence/start_closure_sampler.py \
+  --profile start-closure/1 --draw-proof \
+  --manifest catalogs/landscape/grand-catalog-20261008.json \
+  --manifest-sha256 04dbfd7faf7595c25e88bcff12000cc16c00bfb85de1331c238105b1c37ce807 \
+  --origin-map "$G5_ORIGIN_MAP" --origin-map-sha256 0155eb321619338889195dd6427a2a0413b290eb8afd045eb29d3e807277befa \
+  --protocol-sha256 d67f8a1dc9f66a6ee4e97fc1dc30691f960ac2258a2e05e8458c3d5d31303917 \
+  --r3-generator "$G5_CUSTODY_R3" --proof-r3-sha256 80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627 \
+  --head aac97d5aa66b39df53977de269d1257d8dde4d53 --output "$G5_ORIGINAL_PROOF"
+timeout 600 nice -n 10 ionice -c2 -n7 python3 tools/sota-convergence/start_closure_sampler.py \
+  --profile start-closure/1 --draw-proof \
+  --manifest catalogs/landscape/grand-catalog-20261008.json \
+  --manifest-sha256 04dbfd7faf7595c25e88bcff12000cc16c00bfb85de1331c238105b1c37ce807 \
+  --origin-map "$G5_ORIGIN_MAP" --origin-map-sha256 0155eb321619338889195dd6427a2a0413b290eb8afd045eb29d3e807277befa \
+  --protocol-sha256 d67f8a1dc9f66a6ee4e97fc1dc30691f960ac2258a2e05e8458c3d5d31303917 \
+  --r3-generator tools/sota-convergence/sealed_r3_generator.py --proof-r3-sha256 759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7 \
+  --head aac97d5aa66b39df53977de269d1257d8dde4d53 --output "$G5_RESEAL_PROOF"
+```
+
+The native `--derive-origin-map` seam joins the current passing manifest to its retained asset member `provenance/compact-origin-map.json`, SHA256 `72125c0c9ddf5ba5ce5ca4f2adb05b26ddeede79e26a2aa67ad9f6534a68ecdf`. It preserves each literal fragment, artifact, owner and source reference. The [root-owned family declaration](../../evidence/artifacts/g5-start-closure-1-20261009/origin-family-declarations.json), SHA256 `6350a713b79c12677d8c5de62539ea6dad40c6a758864b3b071e4e56167d850d`, explicitly groups 45 field fragments and the retained stars-gap intake. These rollups are declarations under the historical R2 contract; they are not inferred original fields. The [tracked derived map](../../evidence/artifacts/g5-start-closure-1-20261009/origin-map.json) has SHA256 `50a577cb25fc0650355c3ddf9b709b18d0fadb5a426415b6f497c1e78fe83e7a`: 4,582 retained origins, 24 declared PENDING origins, 46 fragment/artifact keys, and zero unreachable sampled rows. The 24 missing origins belong to TRIAL rows retained in the full action census. Every one of the 13 PENDING-CONFLICT rows has retained native provenance and remains census-only. The three broader `trading.rows.json` owner conflicts are not native-map fragment keys and do not make sampled origins unreachable. A sampled row without explicit provenance still prevents drawing.
+
+The order is profile controls, required pin resolution, derived locator normalization and all ten disagreement outcomes, counted inventories and witnesses, full asset, then explicit profile `--write` and independent `--check`. Only actual check 0 and both passing designated reads permit G5 to be recorded MET under `start-closure/1`, with G5-F1, G5-F2, G5-F3 and G5-F4 open on the readiness manifest. The pre-cue tool, required CI and explicit cue remain required before landing and publication. Default-profile check 0 is the later qualification target; a check, model read, cue or release is never inferred from this definition.
+
+The earlier prepared asset `1359fb196f46d0983c0d180fa982ceb1e4decaa58fc0aee96e19ffefaca0a1eb` (28,981,260 bytes) passed the independent native profile check on 2026-10-09. Its manifest is `04dbfd7faf7595c25e88bcff12000cc16c00bfb85de1331c238105b1c37ce807`. The face has 4,606 rows, 83 TRIAL actions, 1,648 pinned rows, 3,816 PENDING-PIN rows, 2,117 PENDING-LOCATOR rows, 1,082 counted scope events, 143 unresolved-origin units, G5-F1 10, G5-F2 166 and G5-F3 803, with all ten original disagreements resolved and 1,047 list populations. Origin units retain 47 original claims plus 96 non-action identity rows. The [compact integration receipt](../../evidence/artifacts/g5-start-closure-1-20261009/class-gates.json) records actual output hashes, class/bucket units, native module controls and remaining acceptance steps. Check 0 establishes mechanical consistency under this profile; both designated reads, pre-cue, hosted CI, landing and release remain separate.
+
+The historical fix asset `bb076b04c5afd6ca0eccdfbc7905ba547c5eb189c2e19d657f947c51ae48d4e7` (56,392,501 bytes) remains preserved. The historical J8 prepared asset is `a996bfd60cdd16a673d51c46f88cce5bf4b3e8fe59c861b1c5c96d60eb94d3b6` (56,466,790 bytes), with rows member `fb8f6d40bc00a9ec5fc6cc6aadc8921c5baf0d020f1827177925b29bbfb4a398`. Native asset-only regeneration binds it directly while preserving every one of the 4,606 computed decisions and 83 action dispositions. The face retains 3,340 counted PENDING-PIN rows, 2,117 PENDING-LOCATOR rows, 476 G5-F4 events and 875 `source-review-claim-unpinned` events; F4 is excluded from the counted pin union. F1/F2/F3 remain 10/166/797. Original captures and prior failed/check evidence remain retained. The historical [strict fix receipt](../../evidence/artifacts/g5-start-closure-1-20261009/strict-class-fix.json), [row hash delta](../../evidence/artifacts/g5-start-closure-1-20261009/row-hash-delta.json) and [asset synchronization receipt](../../evidence/artifacts/g5-start-closure-1-20261009/asset-row-sync.json) keep their original revision scopes. The [J8 preparation receipt](../../evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json) records its actual preparation qualification and controls. Publication, designated reads, trading acknowledgement, pre-cue, hosted CI and explicit cue remain separate.
+## Confirmed-four fix — October 9, 2026
+
+The CC's final adjudication confirms four current rows only: OpenHands/extensions
+in agent-sdks, OpenBB in identity-provenance, ffn in evaluation-experiments, and
+Polars in identity-provenance. The extension registry is mapped to
+instructions-skills using its pinned AGENTS.md; the valid workers row and all
+historical claim captures remain unchanged. The obsolete SDK-slot alias links
+are removed from that current row because the original claims declare only
+SDK/workers. The other three current notes now distinguish their retained
+source-entry list revision from an unestablished candidate implementation pin.
+Their immutable original null-pin source notes remain intact.
+
+The four-row fix qualified archive at b5c215ac is
+`bcba48bab1aa8371c2b8ea8ce7812528fb4cb85818018d2c883d14c59f73171d`
+(50,333,229 bytes), with native manifest
+`4d453182cd177d042d137fe7d0fbf5810731eee2d2d9b7248dfd3203ee95e0f6`.
+Native write and independent asset-only check both return PASS/0 blockers.
+Exactly four computed rows change; the other 4,602 rows and every original
+capture member are identical. Only the assembled rows, derived expected-key
+census and checksum index change inside the archive.
+
+The [complete native population receipt](../../evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-population-receipt.json)
+records EVERY one of the 414 strata before pinned 503c4701 and after this fix.
+All native `population_key_sha256` membership/disposition hashes and selected
+key lists remain equal. Under the CC's population-based rule there is no new
+redraw seed or sampled-stratum re-read. The four corrected rows and code delta
+still require the designated reads. The [fix receipt](../../evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-fix.json)
+retains input/code bindings, archive-member delta, failed qualification and
+remaining gates. No generation result establishes G5 MET or authorizes landing
+or publication.
+
+## CC note-class correction, 2026-10-10
+
+The subsequent CC ruling extends only the null-pin note contradiction to the
+remaining 90 PENDING rows: 39 backtesting-engine, 23 execution-broker,
+17 agents-models-workers, seven identity-provenance and four
+evaluation-experiments. The native `sync_source_entry_note` operation applies
+the same source-entry-list versus candidate-implementation wording as the
+three confirmed note fixes. Every other row field and original capture remains
+identical. The four affected NOT units retain their adjudicated verdicts. An
+actual null-pin row keeps its null-pin note. The strict validator rejects an
+unsynced note that claims a null row pin despite a recorded source-entry revision.
+
+The resulting unpublished archive is
+`0aeb16e1142a22a69d2e1bcded70a74df2db3e81fe6c01d42771d00589d3d35a`
+(56,463,125 bytes), with native manifest
+`afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb`.
+The [class-fix receipt](../../evidence/artifacts/g5-start-closure-1-20261009/note-class-fix.json)
+records the exact GNU tar/zstd build arguments, native sync source, all 90 keys,
+changed-member comparison and fresh checks. Only `compact/rows.json` and
+`SHA256SUMS` change from the preceding archive; coverage and every original
+capture retain their hashes. Compressed sizes alone establish no missing data
+or causal compression claim. The tracked compact rows now match the current
+archive's immutable rows member, from which the native manifest is recomputed.
+
+The [new native population table](../../evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json)
+records all 414 membership/disposition hashes at b5c215ac and after this
+correction, plus selected-key equality from native replay. Those hashes also
+match the pinned 503c4701 populations.
+All are unchanged: no redraw seed, sampled re-read or re-adjudication is required.
+The designated code/class micros, final-head CI and separate CC landing rebase
+remain pending. The current J8 receipt retains its historical preparation and
+records the fresh pinned sampler run: 42 tests, zero skips, with
+`G5_R3_GENERATOR` set. These checks establish no new model verdict or G5 MET.

@@ -112,7 +112,7 @@ def _scan_findings(scan_args: list, report_path: Path, cwd=None) -> list:
     findings are read only from a completed scan. Raises _LockBusy for the guarded launcher's busy lock,
     so the caller can skipTest instead.
     """
-    argv = [GITLEAKS, *scan_args, "--no-banner", "--exit-code", "0",
+    argv = [GITLEAKS, *scan_args, "--redact", "--no-banner", "--exit-code", "0",
             "--report-format", "json", "--report-path", str(report_path)]
     proc = subprocess.run(argv, cwd=None if cwd is None else str(cwd), capture_output=True, text=True, check=False)
     if proc.returncode == LOCK_BUSY_STATUS and LOCK_BUSY_MESSAGE in proc.stderr:
@@ -124,7 +124,42 @@ def _scan_findings(scan_args: list, report_path: Path, cwd=None) -> list:
     report = report_path.read_text() if report_path.exists() else ""
     if not report.strip():
         raise _ScannerError(f"gitleaks {scan_args[0]} exited 0 without writing its report: {stderr_tail}")
-    return _findings(report)
+    findings = _findings(report)
+    for finding in findings:
+        # A redacted finding's full line can still contain adjacent values.
+        # Assertions need only the redacted match and location metadata.
+        finding.pop("Line", None)
+    return findings
+
+
+def _finding_fields(findings):
+    """Identify JSON keys from redacted matches without reading secret values."""
+    fields = set()
+    for finding in findings:
+        match = re.search(r'([A-Za-z0-9_./-]+)"?\s*:\s*"?REDACTED', finding.get("Match", ""))
+        if match:
+            fields.add(match.group(1))
+    return fields
+
+
+def _pr_scan_range():
+    """Use the actual main merge base; never expand into HEAD ancestry."""
+    try:
+        base = subprocess.run(["git", "merge-base", "HEAD", "refs/remotes/origin/main"],
+                              cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    except subprocess.CalledProcessError as exc:
+        raise unittest.SkipTest("PR-range history check requires HEAD and origin/main; no history scanned") from exc
+    if not re.fullmatch(r"[0-9a-f]{40}", base):
+        raise _ScannerError("Cannot establish the PR merge base for the bounded scan")
+    expected = f"{base}..HEAD"
+    configured = os.environ.get("GITLEAKS_TEST_RANGE", expected)
+    if configured != expected:
+        raise _ScannerError("GITLEAKS_TEST_RANGE must equal the actual merge-base..HEAD range")
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
+                          capture_output=True, text=True, check=True).stdout.strip()
+    if head == base:
+        raise unittest.SkipTest("empty PR range on main; no history scanned")
+    return expected
 
 
 def _run_gitleaks(target_dir: Path) -> list:
@@ -160,9 +195,9 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 json.dumps({"api_key": HEX64, "token": HEX40}, indent=2)
             )
             findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(HEX64, secrets, "64-hex api_key under a non-allowlisted path must be detected")
-            self.assertIn(HEX40, secrets, "40-hex token under a non-allowlisted path must be detected")
+            fields = _finding_fields(findings)
+            self.assertIn("api_key", fields, "64-hex api_key under a non-allowlisted path must be detected")
+            self.assertIn("token", fields, "40-hex token under a non-allowlisted path must be detected")
 
     def test_b_allowlisted_path_named_digest_field_is_not_detected(self):
         """A `"disk_token": "<64hex>"` line under an allowlisted evidence path is suppressed.
@@ -200,9 +235,9 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 json.dumps({"disk_token": HEX64}, indent=2)
             )
             findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
+            fields = _finding_fields(findings)
             self.assertIn(
-                HEX64, secrets,
+                "disk_token", fields,
                 "disk_token field outside the allowlisted paths must still be detected",
             )
 
@@ -223,13 +258,12 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 json.dumps({"next_page_token": CURSOR, "leaked_token": GH_PAT_SHAPED_VALUE}, indent=2) + "\n"
             )
             findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(
-                GH_PAT_SHAPED_VALUE, secrets,
+            self.assertTrue(
+                any(f["RuleID"] == "github-pat" for f in findings),
                 "a ghp_ token on a different line from the allowlisted cursor must still be detected",
             )
             self.assertNotIn(
-                CURSOR, secrets,
+                "next_page_token", _finding_fields(findings),
                 "the legitimate opaque pagination cursor, alone on its own line, must remain suppressed",
             )
 
@@ -257,9 +291,9 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             line = json.dumps({"sha256": HEX64, "api_key": HEX64})
             (allow_dir / "guest-after.json").write_text(line + "\n")
             findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
+            fields = _finding_fields(findings)
             self.assertIn(
-                HEX64, secrets,
+                "api_key", fields,
                 f"the api_key finding co-located with an allowlisted sha256 field on the "
                 f"same line must still be detected, got: {findings}",
             )
@@ -278,12 +312,129 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 json.dumps({"next_page_token": CURSOR, "api_key": CURSOR}, indent=2) + "\n"
             )
             findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
+            fields = _finding_fields(findings)
             self.assertIn(
-                CURSOR, secrets,
+                "api_key", fields,
                 "the same base64-shaped value under an unrelated 'api_key' field must be detected "
                 "even though the identical value under 'next_page_token' is legitimately suppressed",
             )
+
+    def test_population_receipt_hash_fields_are_not_credentials(self):
+        for name in ("confirmed-four", "note-class"):
+            for compact in (False, True):
+                with self.subTest(receipt=name, compact=compact), tempfile.TemporaryDirectory() as tmp:
+                    target = Path(tmp)
+                    path = target / f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                    path.parent.mkdir(parents=True)
+                    path.write_text(json.dumps({"before_population_key_sha256": HEX64,
+                                                "after_population_key_sha256": HEX64[::-1]},
+                                               indent=None if compact else 2) + "\n")
+                    self.assertEqual(self._scan(target), [], "reviewed population digests are not credentials")
+
+    def test_population_fragment_boundary_rejects_partial_matches_and_accepts_safe_separators(self):
+        # gitleaks v8.30.1 sources/file.go:21,166-246 and sources/common.go:16,56-125:
+        # a 100,000-byte read peeks up to 25,000 more bytes. Put the digest's
+        # last byte in the next fragment, matching the hosted findings.
+        # Retain the complete-digest allowlist and use the upstream reader's
+        # double-newline boundary instead of suppressing truncated values.
+        fragment_end = 125_001
+        for name in ("confirmed-four", "note-class"):
+            for field in ("before_population_key_sha256", "after_population_key_sha256"):
+                with self.subTest(receipt=name, field=field), tempfile.TemporaryDirectory() as tmp:
+                    target = Path(tmp)
+                    path = target / f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                    path.parent.mkdir(parents=True)
+                    prefix = '{"padding":"'
+                    middle = f'","{field}":"'
+                    padding = "x" * (fragment_end - len(prefix + middle + HEX64))
+                    content = prefix + padding + middle + HEX64 + '"}\n'
+                    path.write_text(content)
+                    self.assertIn("generic-api-key", {f["RuleID"] for f in self._scan(target)},
+                                  "an incomplete native match must not gain a broader digest exception")
+                    path.write_text(json.dumps(json.loads(content), indent=2,
+                                               separators=(",\n", ": ")) + "\n")
+                    self.assertEqual(self._scan(target), [],
+                                     "native safe separators preserve complete reviewed population digests")
+
+    def test_population_receipts_scan_clean_with_native_file_fragments(self):
+        # Byte-for-byte public receipt fixtures exercise the serialization
+        # that the hosted working-tree scanner actually sees. The PR-range
+        # history check alone missed this failure because its fragments differ.
+        for name in ("confirmed-four", "note-class"):
+            with self.subTest(receipt=name), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                relative = f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                source = ROOT / relative
+                if not source.is_file():
+                    self.skipTest(f"repository population receipt absent from isolated fixture: {name}")
+                path = target / relative
+                path.parent.mkdir(parents=True)
+                shutil.copyfile(source, path)
+                self.assertEqual(self._scan(target), [],
+                                 "the actual population receipt must scan clean in native file mode")
+
+    def test_population_fragment_boundary_keeps_other_contexts_detectable(self):
+        cases = [
+            ("unreviewed", "after_population_key_sha256", HEX64, "generic-api-key"),
+            ("note-class", "api_key", HEX64, "generic-api-key"),
+            ("note-class", "after_population_key_sha256", HEX64.upper(), "generic-api-key"),
+            ("note-class", "after_population_key_sha256", HEX64[:-1], "generic-api-key"),
+            ("note-class", "after_population_key_sha256", HEX64 + "a", "generic-api-key"),
+            ("note-class", "after_population_key_sha256", GH_PAT_SHAPED_VALUE, "github-pat"),
+        ]
+        for name, field, value, rule in cases:
+            with self.subTest(receipt=name, field=field, length=len(value), rule=rule), \
+                    tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                path = target / f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                path.parent.mkdir(parents=True)
+                prefix = '{"padding":"'
+                middle = f'","{field}":"'
+                # The PAT rule needs its terminating delimiter in the
+                # fragment; keep that delimiter at the same boundary.
+                end = 125_000 if rule == "github-pat" else 125_001
+                padding = "x" * (end - len(prefix + middle + value))
+                path.write_text(prefix + padding + middle + value + '"}\n')
+                self.assertIn(rule, {f["RuleID"] for f in self._scan(target)})
+
+    def test_population_fragment_boundary_same_line_api_key_still_fires(self):
+        for name in ("confirmed-four", "note-class"):
+            with self.subTest(receipt=name), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                path = target / f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                path.parent.mkdir(parents=True)
+                prefix = '{"padding":"'
+                middle = '","after_population_key_sha256":"'
+                padding = "x" * (125_001 - len(prefix + middle + HEX64))
+                path.write_text(prefix + padding + middle + HEX64 + '","api_key":"' + HEX64 + '"}\n')
+                self.assertIn("api_key", _finding_fields(self._scan(target)))
+
+    def test_population_receipt_same_line_api_key_still_fires(self):
+        for name in ("confirmed-four", "note-class"):
+            with self.subTest(receipt=name), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                path = target / f"evidence/artifacts/g5-start-closure-1-20261009/{name}-population-receipt.json"
+                path.parent.mkdir(parents=True)
+                path.write_text(json.dumps({"before_population_key_sha256": HEX64,
+                                            "after_population_key_sha256": HEX64[::-1],
+                                            "api_key": HEX64}) + "\n")
+                findings = self._scan(target)
+                self.assertIn("api_key", _finding_fields(findings))
+                self.assertTrue(all(f["Secret"] == "REDACTED" for f in findings))
+
+    def test_population_receipt_exception_is_path_field_shape_and_rule_scoped(self):
+        cases = [
+            ("unreviewed-population-receipt.json", {"before_population_key_sha256": HEX64}, "generic-api-key"),
+            ("note-class-population-receipt.json", {"before_population_key_sha256": HEX64.upper()}, "generic-api-key"),
+            ("note-class-population-receipt.json", {"after_population_key_sha256": GH_PAT_SHAPED_VALUE}, "github-pat"),
+        ]
+        for name, obj, rule in cases:
+            with self.subTest(receipt=name, rule=rule), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                path = target / "evidence/artifacts/g5-start-closure-1-20261009" / name
+                path.parent.mkdir(parents=True)
+                path.write_text(json.dumps(obj) + "\n")
+                self.assertIn(rule, {f["RuleID"] for f in self._scan(target)})
 
     def _manifest_fixture(self, target: Path, relative: str, extra: dict) -> None:
         """A manifest-shaped file whose text names Sourcegraph, so the sourcegraph-access-token
@@ -456,7 +607,7 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
             own = [f for f in findings if f["File"] == self.RETURNED_REPORT_PATH]
             self.assertEqual(len(own), 3, "unreviewed key, api_key and token must remain detected")
-            self.assertEqual({f["Secret"] for f in own}, {HEX64, HEX64[::-1]})
+            self.assertEqual(_finding_fields(own), {"key", "api_key", "token"})
             self.assertEqual(sum(f["File"].endswith("results-20260928.json") for f in findings), 7)
             self.assertEqual(sum(f["File"].endswith("memory-scheduled-20260923.json") for f in findings), 3)
 
@@ -469,7 +620,7 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             path.write_text(json.dumps({"key": self.RETURNED_REPORT_FINGERPRINTS[0],
                                         "api_key": HEX64}) + "\n")
             findings = self._scan(target)
-            self.assertIn(HEX64, {f["Secret"] for f in findings})
+            self.assertIn("api_key", _finding_fields(findings))
 
     SOURCE_HASHES_PATH = "blueprints/us-equities/adaptive-paper/source-hashes.json"
 
@@ -505,9 +656,9 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 "api_key": HEX64,
             })
             findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(HEX64[::-1], secrets, f"a 'credential.key' value in the reviewed manifest must still be detected: {findings}")
-            self.assertIn(HEX64, secrets, f"an 'api_key' value in the reviewed manifest must still be detected: {findings}")
+            fields = _finding_fields(findings)
+            self.assertIn("credential.key", fields, "a credential.key value in the reviewed manifest must still be detected")
+            self.assertIn("api_key", fields, "an api_key value in the reviewed manifest must still be detected")
 
     def test_f2b_dot_segment_path_key_holding_a_digest_is_detected(self):
         """The dedicated allowlist refuses path segments starting with ".", so a key that only
@@ -520,9 +671,10 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 "blueprints/us-equities/adaptive-paper/./api_key.py": HEX64[::-1],
             })
             findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(HEX64, secrets, f"a '..' path key must not be exempted: {findings}")
-            self.assertIn(HEX64[::-1], secrets, f"a '.' path key must not be exempted: {findings}")
+            fields = _finding_fields(findings)
+            self.assertEqual(len(findings), 2, "both dot-segment keys must still be detected")
+            self.assertIn("credential_store.py", fields, "a '..' path key must not be exempted")
+            self.assertIn("api_key.py", fields, "a '.' path key must not be exempted")
 
     def test_f3_non_hex_value_under_a_path_shaped_key_is_detected(self):
         """The allowlist's value alternative is exactly `[0-9a-f]{64}`: a same-length value that is
@@ -548,8 +700,7 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 {"blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64, "api_key": HEX64[::-1]},
                 compact=True)
             findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(HEX64[::-1], secrets,
+            self.assertIn("api_key", _finding_fields(findings),
                           f"an api_key sharing a line with an allowlisted path digest must still be detected: {findings}")
 
     def test_f5_same_path_keyed_line_in_a_different_file_is_detected(self):
@@ -815,8 +966,8 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         # --config and --gitleaks-ignore-path point at THIS repository's real,
         # live files (not whatever the worktree's checked-out HEAD happens to
         # contain), so the test reflects the actual working-tree config even
-        # when run before these files are committed. No --redact: the test
-        # needs to find the injected marker in the report.
+        # when run before these files are committed. Match the injected marker
+        # by detector and exact location; all native scans remain redacted.
         try:
             findings = _scan_findings(["git", str(worktree), "--config", str(CONFIG_PATH),
                                        "--gitleaks-ignore-path", str(ROOT), f"--log-opts=-1 {sha}"], report_path)
@@ -824,7 +975,8 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
             self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
         matches = [
             f for f in findings
-            if injected_marker in (f.get("Match") or "") or injected_marker in (f.get("Secret") or "")
+            if f.get("RuleID") == "github-pat" and f.get("File") == target_path
+            and f.get("StartLine") == marker_idx + 1
         ]
         self.assertTrue(
             matches,
@@ -834,24 +986,13 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
 
 
 class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
-    """Regression coverage for the branch-ancestry acceptance result recorded in
-    .gitleaks.toml's header comment: PR-3-codexfix-major-2.
+    """Real-history acceptance on the actual PR range, without a full-history scan.
 
-    A prior review round found that the published acceptance command (default
-    log-opts, i.e. all refs reachable in this shared repository) does not reach
-    zero findings because a concurrently active sibling branch contains an
-    unrelated synthetic-fixture leak that is not an ancestor of this branch.
-    `--log-opts="HEAD"` scopes the scan to commits this branch actually owns
-    (its own ancestry) and is this unit's real acceptance-relevant result; this
-    test asserts that scoped scan stays at zero findings for the real repository
-    history, independent of what other branches in the shared repo contain.
-
-    This is a local integration check against the real git history in this
-    worktree (not a synthetic fixture): it is slower (full-history scan, ~30s)
-    than the synthetic-fixture tests above, and it is skipped, not failed, if
-    gitleaks is absent or its per-user scan lock is held by another scan. A scan
-    that does not complete errors it (_scan_findings) instead of reading as zero
-    findings.
+    The historical test name is retained. The current scan is bounded to
+    merge-base..HEAD; an explicit GITLEAKS_TEST_RANGE must name that same range.
+    Main's empty range and checkouts without origin/main are explicit skips,
+    with no history scanned. HEAD/--all remain rejected. Scanner errors remain
+    errors, never an empty passing result.
     """
 
     def setUp(self):
@@ -860,6 +1001,7 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
         self.assertTrue(CONFIG_PATH.exists(), ".gitleaks.toml must exist at repo root")
 
     def test_head_ancestry_scoped_scan_has_zero_findings(self):
+        scope = _pr_scan_range()
         report_path = Path(tempfile.mkstemp(suffix=".json")[1])
         try:
             # This scan reads the real history, and CI logs on this public repository are world-readable, so
@@ -868,13 +1010,13 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
             # the failure message names only non-secret fields.
             try:
                 findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH), "--max-target-megabytes", "2",
-                                           "--log-opts=HEAD", "--redact"], report_path, cwd=ROOT)
+                                           f"--log-opts={scope}"], report_path, cwd=ROOT)
             except _LockBusy as exc:
                 self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
             located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]
             self.assertEqual(
                 located, [],
-                "this branch's own ancestry (--log-opts=HEAD) must scan clean; a nonempty "
+                "this branch's actual PR range must scan clean; a nonempty "
                 f"result here is this unit's own regression, not a sibling branch: {located}",
             )
         finally:
@@ -936,7 +1078,7 @@ class ScannerErrorTests(unittest.TestCase):
         class Detection(unittest.TestCase):
             def test_detected(inner):
                 with tempfile.TemporaryDirectory() as tmp:
-                    inner.assertIn(HEX64, {f["Secret"] for f in _run_gitleaks(Path(tmp))})
+                    inner.assertIn("api_key", _finding_fields(_run_gitleaks(Path(tmp))))
 
         for returncode, report, status_line in ((-11, None, "FAILED (errors=1)"), (139, None, "FAILED (errors=1)"),
                                                 (1, None, "FAILED (errors=1)"), (1, "null\n", "FAILED (errors=1)"),
@@ -985,15 +1127,47 @@ class ScannerErrorTests(unittest.TestCase):
 
         stream = io.StringIO()
         with mock.patch.object(subprocess, "run", side_effect=run), \
-                mock.patch(f"{__name__}.GITLEAKS", "gitleaks"):
+                mock.patch(f"{__name__}.GITLEAKS", "gitleaks"), \
+                mock.patch(f"{__name__}._pr_scan_range", return_value="a" * 40 + "..HEAD"):
             unittest.TextTestRunner(stream=stream, verbosity=0).run(
                 GitleaksBranchAncestryHistoryTests("test_head_ancestry_scoped_scan_has_zero_findings"))
         output = stream.getvalue()
         self.assertEqual(len(argvs), 1, argvs)
         self.assertIn("--redact", argvs[0])
+        self.assertIn("--log-opts=" + "a" * 40 + "..HEAD", argvs[0])
         self.assertEqual(output.strip().splitlines()[-1], "FAILED (failures=1)")
         self.assertIn(finding["Fingerprint"], output)
         self.assertNotIn(sentinel, output)
+
+    def test_g_history_range_rejects_unbounded_or_unrelated_overrides(self):
+        completed = subprocess.CompletedProcess([], 0, "b" * 40 + "\n", "")
+        for scope in ("HEAD", "--all", "a" * 40 + "..HEAD"):
+            with self.subTest(scope=scope), mock.patch.dict(os.environ, {"GITLEAKS_TEST_RANGE": scope}), \
+                    mock.patch.object(subprocess, "run", return_value=completed):
+                with self.assertRaisesRegex(_ScannerError, "actual merge-base"):
+                    _pr_scan_range()
+
+    def test_h_history_range_uses_the_actual_merge_base(self):
+        completed = subprocess.CompletedProcess([], 0, "b" * 40 + "\n", "")
+        head = subprocess.CompletedProcess([], 0, "c" * 40 + "\n", "")
+        with mock.patch.dict(os.environ, {"GITLEAKS_TEST_RANGE": "b" * 40 + "..HEAD"}), \
+                mock.patch.object(subprocess, "run", side_effect=[completed, head]) as run:
+            self.assertEqual(_pr_scan_range(), "b" * 40 + "..HEAD")
+        self.assertEqual([call.args[0] for call in run.call_args_list],
+                         [["git", "merge-base", "HEAD", "refs/remotes/origin/main"],
+                          ["git", "rev-parse", "HEAD"]])
+
+    def test_i_history_range_skips_an_empty_main_range(self):
+        completed = subprocess.CompletedProcess([], 0, "b" * 40 + "\n", "")
+        with mock.patch.dict(os.environ, {"GITLEAKS_TEST_RANGE": "b" * 40 + "..HEAD"}), \
+                mock.patch.object(subprocess, "run", return_value=completed):
+            with self.assertRaisesRegex(unittest.SkipTest, "empty PR range"):
+                _pr_scan_range()
+
+    def test_j_history_range_skips_a_checkout_without_origin_main(self):
+        with mock.patch.object(subprocess, "run", side_effect=subprocess.CalledProcessError(128, ["git"])), \
+                self.assertRaisesRegex(unittest.SkipTest, "origin/main"):
+            _pr_scan_range()
 
 
 class GithubAutomationDocConsistencyTests(unittest.TestCase):

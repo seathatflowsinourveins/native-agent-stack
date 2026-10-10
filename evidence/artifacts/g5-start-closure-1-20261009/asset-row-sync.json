@@ -1,0 +1,94 @@
+{
+  "compact_rows": {
+    "action_rows": 83,
+    "archive_member": "compact/rows.json",
+    "bytes": 25019837,
+    "ordered_rows_sha256": "214d1c580c4912fb7afa6511942eec52edbd6caf6a4cf643cc7d8149d1e67084",
+    "path": "evidence/artifacts/g5-start-closure-1-20261009/compact/rows.json",
+    "rows": 4606,
+    "rows_diff": 0,
+    "sha256": "fb8f6d40bc00a9ec5fc6cc6aadc8921c5baf0d020f1827177925b29bbfb4a398"
+  },
+  "gate": {
+    "all_ordered_row_fields_required": true,
+    "check_before_selection_and_writes": true,
+    "default_asset_pin": "manifest.asset.sha256",
+    "explicit_pin_cannot_waive_row_equality": true,
+    "explicit_rebuilt_asset_pin": "--asset-sha256",
+    "function": "verify_asset_rows",
+    "path": "tools/sota-convergence/start_closure_sampler.py",
+    "sha256": "8f42c4332388dc0e3b45c2677bc54b3620f61cebdd8175ff089e16aea60a4fda"
+  },
+  "kind": "g5-asset-row-sync",
+  "manifest": {
+    "historical_asset_sha256": "bb076b04c5afd6ca0eccdfbc7905ba547c5eb189c2e19d657f947c51ae48d4e7",
+    "path": "catalogs/landscape/grand-catalog-20261008.json",
+    "sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
+    "unchanged": true
+  },
+  "native_rebuild": {
+    "evidence_class": "local_integration",
+    "public_receipt": "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json",
+    "public_receipt_sha256": "bae10cadcfe61166087f8bf79609ed0896d0760eb71721392297fb5515fc30a3",
+    "rebuild_receipt_sha256": "35a5ad7595f1c35148d0ac35b84c622bc24532e2ad18d88c42dcd0365f624fc8",
+    "tar_exit_code": 0,
+    "zstd_exit_code": 0
+  },
+  "real_asset_gate": {
+    "evidence_class": "local_integration",
+    "exit_code": 0,
+    "historical_stale_asset": "EXPECTED_REJECTION",
+    "manifest_sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
+    "packet_written": false,
+    "rebuilt_rows_diff": 0,
+    "selection_executed": false,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8aa355f6868e77c877b683880ef6611a6084c3d6ad565e7bbc357e05566982c6",
+    "tested_sampler_sha256": "8f42c4332388dc0e3b45c2677bc54b3620f61cebdd8175ff089e16aea60a4fda"
+  },
+  "rebuilt_asset": {
+    "archive_members": 13486,
+    "bytes": 56466790,
+    "changed_members": [
+      "compact/rows.json",
+      "SHA256SUMS"
+    ],
+    "published": false,
+    "sha256": "a996bfd60cdd16a673d51c46f88cce5bf4b3e8fe59c861b1c5c96d60eb94d3b6",
+    "unchanged_member_hashes": 13484,
+    "uncompressed_payload_bytes": 485536086
+  },
+  "review_boundary": {
+    "asset_delta_micro_read_required": true,
+    "j8_reason": "The follow-up changes tests/test_start_closure_sampler.py.",
+    "j8_required": true,
+    "landing_requires_final_head_ci_and_owner_cue": true,
+    "no_full_row_reread_required_for_unchanged_manifest": true
+  },
+  "row_verdict_binding": {
+    "asset_hash_is_not_the_row_verdict_binding": true,
+    "head": "503c470149069caaf2bf9c87f24caa38091ce3a6",
+    "manifest_sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
+    "packet_redrawn": false
+  },
+  "schema_version": 1,
+  "source_head": "503c470149069caaf2bf9c87f24caa38091ce3a6",
+  "source_reuse": [
+    "native compact_manifest.py read_archive/row_list at source_head",
+    "sealed_r3_generator.py canonical JSON at unchanged SHA256 759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7",
+    "Native GNU tar and Zstandard; retained recipe source pin in the rebuild receipt"
+  ],
+  "status": "historical-preparation",
+  "historical_scope": "The source_head, E03 manifest, 8f42c433 gate and 32-test observations are the original asset-only delta. The current canonical binding/full qualification and revised tests are recorded in j8-preparation.json; this receipt is not a new run.",
+  "tests": {
+    "drift_test": "NativeSamplerTests.test_packet_build_refuses_asset_manifest_row_drift_before_selection",
+    "evidence_class": "synthetic",
+    "exit_code": 0,
+    "module": "tests.test_start_closure_sampler",
+    "rebind_test": "NativeSamplerTests.test_explicit_asset_rebinding_preserves_manifest_hash_and_all_rows",
+    "runtime": "Python 3.14.4",
+    "stale_row_mutant": "REJECTED",
+    "stderr_sha256": "27a7030f0289028049a38e1400a1d375a1428fbfde00a5d1af5dad8cba4814d3",
+    "tests": 32
+  }
+}

@@ -1,0 +1,1431 @@
+{
+  "kind": "g5-compact-slot-index",
+  "release_state": "PREPARED_NOT_PUBLISHED",
+  "release_tag": "v2026.10.08",
+  "schema_version": 1,
+  "slots": [
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 506,
+        "original_inventory_sha256": "e72e8a2bc0aceb568bafe20402b9c784433ad7375672a0a7997fad84a129afde",
+        "pointer": "/slots/0/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:36:16.120Z",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "native-clients",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:11",
+        "text": "Native Codex and Claude Code; application SDKs only for a demonstrated application requirement."
+      },
+      "reopen_when": "A required structured-event, custom-tool or application state capability is unavailable through the native path and a supported SDK implementation passes the same task, account, effect and recovery checks.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Native clients"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 580,
+        "original_inventory_sha256": "0b9c8fb204cdb68320dbcc161681023b4051a3c0e0f2e5cb3ccce04b50b6fd33",
+        "pointer": "/slots/1/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:36:16.120Z",
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "instructions-skills",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:269",
+        "text": "Selected ECC search-first/iterative-retrieval skills, native project instructions, on-demand references and the optional Agent Skills reference validator; task-selected TypeSafe, gh-fix-ci and security-best-practices for Codex/Claude."
+      },
+      "reopen_when": "A specific task exposes a missing procedure, and a pinned candidate works in native discovery and task execution with less conflict or better measured results than the current procedure.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Instructions and skills"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 2200,
+        "original_inventory_sha256": "519a9e614537052bfc10c25002cd264ce71fd32954c2582c974674dad9b5de3b",
+        "pointer": "/slots/2/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T16:16Z",
+          "2026-10-08T15:48Z",
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:36:16.120Z",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "workers",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:604",
+        "text": "Native Claude/Codex workers with owned Worktrunk worktrees; optional Beads when dependency tracking is needed, optional qualified cross-client review and an opt-in semantic-evidence-reviewer with explicit TypeSafe context."
+      },
+      "reopen_when": "A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger passes frozen cancellation, replay, ownership and integration cases.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Workers and task ownership"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 993,
+        "original_inventory_sha256": "23eccc6789becd175819a69978ec8ef5df32950ca54a25c68dcf5f44a06def95",
+        "pointer": "/slots/3/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:36:16.120Z"
+        ]
+      },
+      "layer_id": "isolation",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:991",
+        "text": "Worktrunk/Git worktrees for edit ownership and sandbox-runtime for qualified Linux restrictions. Apple Container remains conditional on an eligible macOS host and a matching container requirement."
+      },
+      "reopen_when": "Untrusted code or a deployment target requires a stronger VM/OCI boundary, and the selected alternative passes workload, network, resource, cleanup and host compatibility checks.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Isolation"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 788,
+        "original_inventory_sha256": "9e15bde88f990500ebc4299f80536df0bf23182c47ea33c3547310c5299abfd6",
+        "pointer": "/slots/4/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08T15:38:54.757607+00:00",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "code-navigation",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:1243",
+        "text": "Focused source reads, Serena symbols, ast-grep, scoped codebase-memory and jCodeMunch; SocratiCode handles conceptual search in the semantic layer."
+      },
+      "reopen_when": "A sealed task set in the target languages shows a challenger returning more correct source/references at an acceptable total indexing, retrieval and maintenance cost.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Code navigation"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 1044,
+        "original_inventory_sha256": "db273f9a66ecf7143d553cebfe827220b5b308f93428f03e2dbbccce69ab310c",
+        "pointer": "/slots/5/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08T15:49:04Z",
+          "2026-10-08T15:30:29.295762+00:00"
+        ]
+      },
+      "layer_id": "document-retrieval",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:1423",
+        "text": "Scoped QMD BM25; Context Hub for selected developer docs; MarkItDown HTML and Poppler PDF conversion in their accepted scopes."
+      },
+      "reopen_when": "A sealed representative corpus/query set shows useful quality gains with acceptable repeated end-to-end latency, or layout/OCR failures justify a separately qualified parser.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Documents and ingestion"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 526,
+        "original_inventory_sha256": "204213576d674edc9cc765e9d4c53882a1cd8734f18ff624b5b303618487c05c",
+        "pointer": "/slots/6/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:30:29.295762+00:00",
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "semantic-rag",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:1640",
+        "text": "SocratiCode, Qdrant and the accepted vLLM/Nemotron embedding runtime; use exact source navigation after retrieval."
+      },
+      "reopen_when": "A sealed project/domain retrieval set shows improved source-grounded quality and acceptable latency, memory and lifecycle costs, or a supported target model cannot run in the current service.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Semantic code retrieval"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 863,
+        "original_inventory_sha256": "897f8aeaf9915890aae2ca65935fc244334227af66132e9e24b5d0a156cea7bb",
+        "pointer": "/slots/7/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z",
+          "2026-10-08T15:38:54.757607+00:00"
+        ]
+      },
+      "layer_id": "durable-memory",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows.",
+        "PENDING-RETURN: deep memory supplement (memory-h2h) has no matching verified relayed field triplet in this snapshot."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:1910",
+        "text": "One ai-memory store as the cross-client memory of record; retain separate code, document and transient-context retrieval layers."
+      },
+      "reopen_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Durable memory"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 1076,
+        "original_inventory_sha256": "b56a93b498092ec750f467d517b77fcc5b0d6853b97ef7a10c38509e1e5a96ac",
+        "pointer": "/slots/8/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:41Z",
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "web-research",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:2267",
+        "text": "agent-browser, selected Playwright CLI operations, OpenResearch literature retrieval and Tavily CLI search/extract skills."
+      },
+      "reopen_when": "A defined source-coverage or ingestion task exceeds the current commands and a candidate improves attributable retrieval completeness, accuracy and total runtime/cost on the same frozen source set.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Web research"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 1175,
+        "original_inventory_sha256": "ad2ec44f16e65bb287ccee45ccd3aabf319e3863c245212e63f87840188995ea",
+        "pointer": "/slots/9/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z",
+          "2026-10-08T15:34:56Z"
+        ]
+      },
+      "layer_id": "token-efficiency",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:2545",
+        "text": "Focused reads and scoped retrieval first; task-selected RTK, Context Mode and explicit-file Repomix; optional guarded Headroom and TOON only after a suitable same-artifact comparison; ccusage observes native usage."
+      },
+      "reopen_when": "A frozen task/artifact and repeated controlled comparison improves answer correctness or retrieval completeness while reducing complete provider use or latency, with successful raw-input recovery.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Context and usage efficiency"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 1437,
+        "original_inventory_sha256": "fc78accf571d7cb539c4c893709a86c0ab3e3d1556c5484127d0cd5bf06fb6cb",
+        "pointer": "/slots/10/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z",
+          "2026-10-08T15:34:56Z"
+        ]
+      },
+      "layer_id": "quality-evaluation",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:2788",
+        "text": "Project/upstream tests, Playwright browser checks, bounded Promptfoo assertions, ShellCheck and Difftastic where applicable. MCP Inspector supports scoped protocol checks; TypeSafe supplies task-specific advisory judgments, and selected OpenAI skills supply CI or security procedures when needed."
+      },
+      "reopen_when": "A defined tool-use/extraction or experiment-tracking requirement cannot be expressed adequately in the current test lane and a challenger passes a representative frozen oracle with usable failure inspection.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Quality and evaluation"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 907,
+        "original_inventory_sha256": "cd2790e0fbedbca769bd4f6f140a5cad433b34b409f1da30bc4409acbf3ceb78",
+        "pointer": "/slots/11/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:34:56Z",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "ci-supply-chain",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows.",
+        "PENDING-RETURN: deep CI/supply-chain supplement (github-ci-finalize) has no matching verified relayed field triplet in this snapshot."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:3078",
+        "text": "Native GitHub Actions/Dependabot/attestation interfaces with actionlint, zizmor, gitleaks and selected Syft inventory; automation.json owns exact pins and qualification."
+      },
+      "reopen_when": "A specific dependency/update or vulnerability gap is demonstrated and one alternative covers it with pinned database/provenance, manageable findings and no duplicate ownership of the same dependency.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "CI and supply chain"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 742,
+        "original_inventory_sha256": "7e618970ec46272554aa32f2ce298e9a47cece9a1aee999d1c7cd1a0d3063cc7",
+        "pointer": "/slots/12/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:41Z",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "scheduling-supervision",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:3368",
+        "text": "Dagu for selected local workflows and systemd user-manager supervision; native client workflows remain their own qualified lane."
+      },
+      "reopen_when": "Real jobs require host-loss survival, days-long waits or durable cross-host effects, and one challenger passes the declared effect/retry/recovery cases with acceptable operational burden.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Scheduling and supervision"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 2128,
+        "original_inventory_sha256": "13250a070ae7377d24384477ca21598b8818432c95dcba75df17dd8f794c6cc8",
+        "pointer": "/slots/13/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z",
+          "2026-10-08T15:41Z"
+        ]
+      },
+      "layer_id": "hosting-services",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:3595",
+        "text": "Locked Next.js/React/FastAPI/PostgreSQL local fixture and loopback services; platform-specific containers or gateway trials only when needed."
+      },
+      "reopen_when": "A defined production, remote-team or GPU deployment requirement exceeds the local fixture, and one alternative passes its account, data, networking, rollback and workload-cost acceptance.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Application and service hosting"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 225,
+        "original_inventory_sha256": "1111963885623c3f42a8f907b97711113e5f9f0a7a441f86d9ce78a010683d90",
+        "pointer": "/slots/14/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:41Z",
+          "2026-10-08"
+        ]
+      },
+      "layer_id": "recovery-portability",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:3935",
+        "text": "Owned native install/rollback recipes, existing uv lock-based adoption, Restic and application-native backups, and qualified native session resume."
+      },
+      "reopen_when": "A real multi-language/system dependency or state-loss case exceeds the selected recipes, and the proposed environment/backup alternative passes install, restore, resume and cleanup on the target host.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Recovery and portability"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 1302,
+        "original_inventory_sha256": "02b1ae43d46109d911910b6ae1c81b572475ed1773e16ef796f1cd64268f4a32",
+        "pointer": "/slots/15/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z",
+          "2026-10-08T15:41Z"
+        ]
+      },
+      "layer_id": "observation-inference",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows.",
+        "PENDING-RETURN: deep observation/inference supplement (codex-token-parity) has no matching verified relayed field triplet in this snapshot."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:4183",
+        "text": "OTel Collector Contrib, Prometheus/Loki/Grafana, Alertmanager/ntfy, scoped AgentsView/otel-tui and the native Claude HUD; inference/gateway trials retain separate qualification."
+      },
+      "reopen_when": "A required trace, evaluation or supported model/hardware workload is unanswerable by the current path, and one alternative passes privacy, fidelity, latency/cost and recovery comparisons without duplicate capture.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Observation and optional inference"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 2452,
+        "original_inventory_sha256": "f5b26bd9b76b461483f60849bf221f4d0a2603b695a79788dc67048bf2775d89",
+        "pointer": "/slots/16/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T16:16Z",
+          "2026-10-08T15:48Z",
+          "2026-10-08T15:36:16.120Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "agent-sdks",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:4566",
+        "text": "Codex SDK/CLI (component codex) for supported start/run/resume; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain source-reviewed, unselected alternatives."
+      },
+      "reopen_when": "A concrete application needs durable multi-host state/replay (Temporal), explicit graph checkpoints (LangGraph), a remote/container worker (OpenHands SDK) or programmatic Claude session control (Claude Agent SDK), and a matched comparison passes.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Agent SDKs and runtime workers"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 4561,
+        "original_inventory_sha256": "27be53f355d02b014fbb155966424594b8f3d9b07656ecf29de90bfba30211cc",
+        "pointer": "/slots/17/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:30:29.295762+00:00",
+          "2026-10-08T15:38:49Z",
+          "2026-10-08",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "mcp-surfaces",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows.",
+        "PENDING-RETURN: landscape-mcp relay is excluded because at least one posted artifact hash no longer matches; no payload from the failed triplet is used."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:4773",
+        "text": "mcporter for CLI bridging, mcp-inspector for stdio inspection, and the recipes/README.md native project MCP policy for configuration; broad registries remain discovery only."
+      },
+      "reopen_when": "A concrete MCP surface gap needs a new server, and a reviewed registry entry passes the same bridge/inspection acceptance as mcporter/mcp-inspector.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "MCP servers and client surfaces"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 570,
+        "original_inventory_sha256": "c2cd4472fa85c36cabd36f47120146c04d9b06aa8d8d300833109e573d9ffe12",
+        "pointer": "/slots/18/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:34:56Z"
+        ]
+      },
+      "layer_id": "secrets-credentials",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:4919",
+        "text": "Native per-client logins on the target host plus gitleaks detection; openbao remains an unused, unqualified candidate."
+      },
+      "reopen_when": "A concrete multi-host or multi-operator secret-sharing need appears, and openbao (or a comparable secret manager) passes an actual installed/queried comparison against the native-login-only policy.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Secrets and credentials"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 569,
+        "original_inventory_sha256": "5479ff7ad3492c378ea604ab75929dd2ab8e56328876c3dd4a3e2fb95c527ea8",
+        "pointer": "/slots/19/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "foundation",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08T15:49:04Z",
+          "2026-10-08T15:34:56Z"
+        ]
+      },
+      "layer_id": "git-github-automation",
+      "pending": [
+        "PENDING-RETURN: landscape-gap complete mined-list return is absent from the frozen verified relay snapshot.",
+        "INCOMPLETE: Current-month Claude-family discovery and native workflow scope, role returns/votes, child usage, refute-facts/refute-fit and saturation binding are not established by these source-review rows.",
+        "PENDING-RETURN: deep Git/GitHub supplement (github-ci-finalize) has no matching verified relayed field triplet in this snapshot."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed current_choice. G5 source-review dispositions do not establish native acceptance or authorize a default flip.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:5035",
+        "text": "worktrunk for worktree lifecycle, gh CLI for GitHub operations, difftastic for structural diffs, and the codex-for-claude review bridge for a concrete cross-client review task; see docs/github-automation.md."
+      },
+      "reopen_when": "A concrete cross-repository or multi-host Git/GitHub workflow needs capabilities beyond gh/worktrunk/difftastic, and a challenger passes a matched comparison.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Git practice and GitHub automation"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 388,
+        "original_inventory_sha256": "389d0ac4f8e5719ab19d0d258a9823afd808b2ced6efeaeb3abef9f40645457a",
+        "pointer": "/slots/20/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08T15:23:08.260862+00:00",
+          "2026-10-08T15:23:08.716523+00:00",
+          "2026-10-08T15:23:08.044417+00:00",
+          "2026-10-08T15:23:08.316556+00:00"
+        ]
+      },
+      "layer_id": "market-data-reference",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 3 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:12",
+        "text": "Official alpaca-py for the bounded selected market-data path; EdgarTools for selected filing parsing/acquisition; DuckDB and Parquet for local analysis; exchange_calendars for explicit session semantics. Dataset manifests and schema checks are requirements, while DVC/Pandera remain source-reviewed implementation candidates."
+      },
+      "reopen_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Market data and reference"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 101,
+        "original_inventory_sha256": "accf43eeecedc97b9f8dd3f304cf32ac270af62587f9d3fa9520dcbd30eeedc8",
+        "pointer": "/slots/21/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08"
+        ]
+      },
+      "layer_id": "identity-provenance",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 3 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:432",
+        "text": "Official alpaca-py for the bounded selected market-data path; EdgarTools for selected filing parsing/acquisition; DuckDB and Parquet for local analysis; exchange_calendars for explicit session semantics. Dataset manifests and schema checks are requirements, while DVC/Pandera remain source-reviewed implementation candidates."
+      },
+      "reopen_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Identity, provenance and lineage"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 695,
+        "original_inventory_sha256": "89c6f0ae070a5695b7d9b084702447b43e89f59bdaf5efe7c2da11fba7891b0c",
+        "pointer": "/slots/22/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08T15:22:34.755525+00:00"
+        ]
+      },
+      "layer_id": "storage-compute",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 3 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:772",
+        "text": "Official alpaca-py for the bounded selected market-data path; EdgarTools for selected filing parsing/acquisition; DuckDB and Parquet for local analysis; exchange_calendars for explicit session semantics. Dataset manifests and schema checks are requirements, while DVC/Pandera remain source-reviewed implementation candidates."
+      },
+      "reopen_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Storage and compute"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 126,
+        "original_inventory_sha256": "934a5399eaaf0be6d6832f847ee8908fe5c68436bdc75adbe8ef97e36cc6da74",
+        "pointer": "/slots/23/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08"
+        ]
+      },
+      "layer_id": "data-quality-orchestration",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 4 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:1152",
+        "text": "Native Codex and Claude for bounded research and review; Dagu/systemd for selected local command workflows; one OpenTelemetry Collector with Prometheus/Loki/Grafana; native sandboxing and Restic for their separately qualified scopes. Optional gateways and agent frameworks remain task-specific."
+      },
+      "reopen_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Data quality and orchestration"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 363,
+        "original_inventory_sha256": "a1ce75df9c9526784a2aa0c18778762c7e2a19a411fa6558cad1147bd7cc655a",
+        "pointer": "/slots/24/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08T15:23:08.089987+00:00",
+          "2026-10-08T15:22:38.432991+00:00",
+          "2026-10-08T15:49:04Z"
+        ]
+      },
+      "layer_id": "research-factors-ml",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 4 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:1530",
+        "text": "NautilusTrader 2.0.0rc5 is the user-selected destination; LEAN remains the retained historical comparison engine. Nautilus native IBKR awaits broker acceptance; Alpaca uses official alpaca-py and a separately qualified deterministic paper path. No strategy is promoted as profitable."
+      },
+      "reopen_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Research, factors and ML"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 242,
+        "original_inventory_sha256": "3d6fb0cf4093974e2c7a110e659077853d19996b874ba10ca023eb88193a1045",
+        "pointer": "/slots/25/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08T15:22:32.553567+00:00"
+        ]
+      },
+      "layer_id": "backtesting-engine",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 4 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:2058",
+        "text": "NautilusTrader 2.0.0rc5 is the user-selected destination; LEAN remains the retained historical comparison engine. Nautilus native IBKR awaits broker acceptance; Alpaca uses official alpaca-py and a separately qualified deterministic paper path. No strategy is promoted as profitable."
+      },
+      "reopen_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Backtesting engine"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 128,
+        "original_inventory_sha256": "84b2eaa0a3edb8cef10b89170c6b1ec01e704c7a42167e979ad5b91a164b4c5e",
+        "pointer": "/slots/26/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08T15:23:08.089987+00:00"
+        ]
+      },
+      "layer_id": "execution-broker",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 4 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:2396",
+        "text": "NautilusTrader 2.0.0rc5 is the user-selected destination; LEAN remains the retained historical comparison engine. Nautilus native IBKR awaits broker acceptance; Alpaca uses official alpaca-py and a separately qualified deterministic paper path. No strategy is promoted as profitable."
+      },
+      "reopen_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Execution and broker adapters"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 263,
+        "original_inventory_sha256": "b3517cf958279c2f75f6193eaadb6adf7d138ae74a54837977cdd7f44e092d4e",
+        "pointer": "/slots/27/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08T15:23:08.292662+00:00"
+        ]
+      },
+      "layer_id": "portfolio-risk",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 4 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:2638",
+        "text": "NautilusTrader 2.0.0rc5 is the user-selected destination; LEAN remains the retained historical comparison engine. Nautilus native IBKR awaits broker acceptance; Alpaca uses official alpaca-py and a separately qualified deterministic paper path. No strategy is promoted as profitable."
+      },
+      "reopen_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Portfolio and risk"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 81,
+        "original_inventory_sha256": "a34fe3ba33adabee2034e0215db571ddf092a2fc479ad32d7eb3c8d1afa65b37",
+        "pointer": "/slots/28/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08 15:42:04 UTC",
+          "2026-10-08T15:22:34.417881+00:00"
+        ]
+      },
+      "layer_id": "evaluation-experiments",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 4 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:2939",
+        "text": "Native Codex and Claude for bounded research and review; Dagu/systemd for selected local command workflows; one OpenTelemetry Collector with Prometheus/Loki/Grafana; native sandboxing and Restic for their separately qualified scopes. Optional gateways and agent frameworks remain task-specific."
+      },
+      "reopen_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Evaluation and experiments"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 99,
+        "original_inventory_sha256": "ad0ae7dfd87300a888db964c1f92b5bf5b05833e38c42b3ea14fcab64db0f987",
+        "pointer": "/slots/29/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08 15:42:04 UTC"
+        ]
+      },
+      "layer_id": "agents-models-workers",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:3370",
+        "text": "ai-memory as the shared memory of record; QMD BM25 for documents; Serena for exact symbols; SocratiCode with Qdrant for conceptual code search; Context Mode and RTK for selected large outputs. These are complementary lanes, not one benchmark winner."
+      },
+      "reopen_when": "Run a preregistered, representative held-out financial/document and code retrieval set at the same context budget; replace or supplement a lane only if a candidate improves source/answer fidelity, abstention and measured task cost while preserving isolation, exact source recovery and native client behavior.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Agents, models and workers"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 130,
+        "original_inventory_sha256": "294b601e96452a46f722c62d43b813e5268b889d7d84ef097bb26e4c3a52cb54",
+        "pointer": "/slots/30/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08 15:42:04 UTC"
+        ]
+      },
+      "layer_id": "observability-hosting",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 4 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:3987",
+        "text": "Native Codex and Claude for bounded research and review; Dagu/systemd for selected local command workflows; one OpenTelemetry Collector with Prometheus/Loki/Grafana; native sandboxing and Restic for their separately qualified scopes. Optional gateways and agent frameworks remain task-specific."
+      },
+      "reopen_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Observability and hosting"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 95,
+        "original_inventory_sha256": "5c3f80bfdc6e0aed7228500234362d9169af495d30131ef6abfbdfb144fbfe81",
+        "pointer": "/slots/31/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "us-equities",
+      "date": {
+        "incumbent_checked_at": "2026-09-22",
+        "return_checked_at": [
+          "2026-10-08",
+          "2026-10-08 15:42:04 UTC"
+        ]
+      },
+      "layer_id": "security-supply-chain",
+      "pending": [
+        "PENDING-RETURN: landscape-gap full list return has not passed the frozen relay/hash intake.",
+        "PENDING-RETURN: current-month Claude discovery/family companion and actual supported native workflow/role/usage/facts/fit bindings remain unestablished by this source-only index.",
+        "Grand-catalog binding and command-center acceptance are pending; this row does not close G5 or START."
+      ],
+      "pick": {
+        "decision_basis": "Provisional baseline: retain the exact committed current_choice and selected/winner references. The committed current_choice is copied/general domain prose shared across 4 trading slots; it is not a precise newly resolved per-slot pick. The G5 source/metadata/list dispositions establish comparison proposals only; no TRIAL/WATCH record changes a selection or closes native, strategy or broker gates.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/us-equities.json:4295",
+        "text": "Native Codex and Claude for bounded research and review; Dagu/systemd for selected local command workflows; one OpenTelemetry Collector with Prometheus/Loki/Grafana; native sandboxing and Restic for their separately qualified scopes. Optional gateways and agent frameworks remain task-specific."
+      },
+      "reopen_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+      "status": "RETURNED-SOURCE-REVIEW",
+      "title": "Security and supply chain"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 1,
+        "original_inventory_sha256": "71be07b4332a1bcb58a3a97314fd0f83ee0d908efabf9033749dfe6235a16027",
+        "pointer": "/slots/32/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": [
+          "2026-10-08T15:22:38.229596+00:00"
+        ]
+      },
+      "layer_id": "skills-research",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:52 (JSON pointer /tasks/0/installed)",
+        "text": "search-first, iterative-retrieval"
+      },
+      "reopen_when": "A skill-creator paired with-skill/without-skill benchmark (or a promptfoo config) on a frozen set of research-first prompts from this repository's adopt-or-build decisions, in Claude Code and in Codex at equal model and effort, shows a candidate beating the installed skills' pass rate without a higher token or time cost; or an installed skill's upstream is archived, removed, relicensed or changes its invocation flags.",
+      "status": "PENDING-RETURN",
+      "title": "research"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 7,
+        "original_inventory_sha256": "504416fb6853ee21a4f4c5b327dbdcfd90d95cce9d1abeb65ab94b19c3a31e44",
+        "pointer": "/slots/33/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": [
+          "2026-10-08T15:22:33.236245+00:00",
+          "2026-10-08T15:22:36.377491+00:00",
+          "2026-10-08T15:22:36.929523+00:00"
+        ]
+      },
+      "layer_id": "skills-skill-lifecycle",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:61 (JSON pointer /tasks/1/installed)",
+        "text": "find-skills, skill-creator, promptfoo-evals"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on a frozen skill-adoption walk-through (discover, evaluate at a pin, install through the manifest, verify the listing, A/B, record) shows a candidate completing more steps correctly than the current procedure at no higher token or time cost, in Claude Code and in Codex; or the pinned skills CLI changes its find or install behavior.",
+      "status": "PENDING-RETURN",
+      "title": "skill-lifecycle"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 4,
+        "original_inventory_sha256": "2a013a8c584c0df88b991805ed2888de0fba1beba1ef53585eea775e3c80f398",
+        "pointer": "/slots/34/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": [
+          "2026-10-08T15:22:34.498404+00:00",
+          "2026-10-08T15:22:36.514085+00:00"
+        ]
+      },
+      "layer_id": "skills-design-intake",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:73 (JSON pointer /tasks/2/installed)",
+        "text": "No installed skill declared (installed[] is empty)."
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen ambiguous-request and bounded-request prompts shows a model-invocable candidate asking the decisive questions on the ambiguous ones while adding no intake step to the bounded ones, in Claude Code and in Codex; or grill-me's upstream drops disable-model-invocation.",
+      "status": "PENDING-RETURN",
+      "title": "design-intake"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 8,
+        "original_inventory_sha256": "c7b27da510f61d79abc63ffcb7938affbaeccaeab4652c9ad2015d552bd90a0f",
+        "pointer": "/slots/35/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": [
+          "2026-10-08T15:22:33.356362+00:00",
+          "2026-10-08T15:22:34.921714+00:00",
+          "2026-10-08T15:22:36.381492+00:00",
+          "2026-10-08T15:22:37.773571+00:00"
+        ]
+      },
+      "layer_id": "skills-architecture",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:84 (JSON pointer /tasks/3/installed)",
+        "text": "codebase-design"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen refactor prompts over scripts/validate.py and scripts/landscape.py shows a model-invocable candidate producing accepted module and interface proposals more often than the installed pair at no higher token or time cost, in Claude Code and in Codex; or improve-codebase-architecture's upstream drops disable-model-invocation.",
+      "status": "PENDING-RETURN",
+      "title": "architecture"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 34,
+        "original_inventory_sha256": "d6265ce800dcbbe48e6cd825748165460a8b5e79bac2b4b741bb489e9d39f6c3",
+        "pointer": "/slots/36/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": []
+      },
+      "layer_id": "skills-implement",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:95 (JSON pointer /tasks/4/installed)",
+        "text": "modern-python, frontend-design"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen Python and HTML change requests from this repository shows a candidate passing more of the repository's own tests and checks than the installed skill at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed or relicensed.",
+      "status": "PENDING-RETURN",
+      "title": "implement"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 0,
+        "original_inventory_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "pointer": "/slots/37/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": []
+      },
+      "layer_id": "skills-test",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:106 (JSON pointer /tasks/5/installed)",
+        "text": "tdd, property-based-testing"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen test-first tasks and parser/sanitizer property tests shows a candidate producing failing-first tests that catch more seeded defects than the installed skills at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream changes its effort or invocation flags.",
+      "status": "PENDING-RETURN",
+      "title": "test"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 0,
+        "original_inventory_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "pointer": "/slots/38/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": []
+      },
+      "layer_id": "skills-debug",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:117 (JSON pointer /tasks/6/installed)",
+        "text": "diagnosing-bugs, hcom-agent-messaging, loki"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen failing-test, CI-failure and engine-fault reproductions shows a candidate reaching the root cause more often than diagnosing-bugs at no higher token or time cost, in Claude Code and in Codex; or diagnosing-bugs' upstream is archived, removed or relicensed. For hcom-agent-messaging and loki, the scoped primary-source alternatives and task-specific overturn conditions are recorded in docs/decisions/2026-10-08-skills-cc-lanes-picks.md; native bootstrap/help or a wired operation route that fully covers the actual task replaces the additional skill listing.",
+      "status": "PENDING-RETURN",
+      "title": "debug"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 1,
+        "original_inventory_sha256": "4069ccd650a6c21321ed91c0912c28badbf775066657a58784d44a86b88442cf",
+        "pointer": "/slots/39/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": []
+      },
+      "layer_id": "skills-review",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:128 (JSON pointer /tasks/7/installed)",
+        "text": "typesafe-ai, variant-analysis"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen evidence-review tasks and fixed-defect variant tasks with known answers shows a candidate finding more true issues with fewer false ones than the installed skills at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed or relicensed.",
+      "status": "PENDING-RETURN",
+      "title": "review"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 1,
+        "original_inventory_sha256": "f55e9e0a7cb66a7cdfa0cfbc4194774e90164a5433d50b30d1e6b3e56e98eb80",
+        "pointer": "/slots/40/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": [
+          "2026-10-08T15:22:34.560350+00:00"
+        ]
+      },
+      "layer_id": "skills-security",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:139 (JSON pointer /tasks/8/installed)",
+        "text": "security-best-practices, security-threat-model, codeql, supply-chain-risk-auditor, agentic-actions-auditor, sarif-parsing, fp-check, security-audit"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen security-review tasks with known true and false positives shows a candidate with higher precision and recall than the installed skill it would replace at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed, relicensed or fails a later audit.",
+      "status": "PENDING-RETURN",
+      "title": "security"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 1,
+        "original_inventory_sha256": "2ed850aa27d05f15eebdbc78c3ce587c4defd725d348ec5752df37c1483c600f",
+        "pointer": "/slots/41/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": []
+      },
+      "layer_id": "skills-ci-pr",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:152 (JSON pointer /tasks/9/installed)",
+        "text": "gh-fix-ci, gh-address-comments"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen failing-check, review-thread and rebase-conflict tasks shows a candidate resolving more of them correctly than the installed skill at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed or relicensed.",
+      "status": "PENDING-RETURN",
+      "title": "ci-pr"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 2,
+        "original_inventory_sha256": "9e2683a516d6360d9a9606337379cdb96537f0b7be943f9d63368b681bc6217f",
+        "pointer": "/slots/42/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": []
+      },
+      "layer_id": "skills-agent-docs",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:164 (JSON pointer /tasks/10/installed)",
+        "text": "writing-for-agents"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen AGENTS.md and CLAUDE.md edit tasks shows a candidate producing smaller, single-source edits that keep every canonical rule, more often than writing-for-agents at no higher token or time cost, in Claude Code and in Codex; or writing-for-agents' upstream is archived, removed or relicensed.",
+      "status": "PENDING-RETURN",
+      "title": "agent-docs"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 0,
+        "original_inventory_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "pointer": "/slots/43/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": []
+      },
+      "layer_id": "skills-browser",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:175 (JSON pointer /tasks/11/installed)",
+        "text": "agent-browser"
+      },
+      "reopen_when": "agent-browser fails a browser acceptance task that a candidate passes, measured with a skill-creator paired benchmark (or a promptfoo config) on frozen browser acceptance tasks against the pinned CLI, in Claude Code and in Codex; or the pinned agent-browser CLI stops shipping the skill.",
+      "status": "PENDING-RETURN",
+      "title": "browser"
+    },
+    {
+      "alternatives": {
+        "archive_member": "bulk/evidence/artifacts/g5-grand-catalog-20261008/index-draft.json",
+        "count": 0,
+        "original_inventory_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "pointer": "/slots/44/alternatives"
+      },
+      "boundary": "Source inventory and historical choice only; no current native acceptance or completed-family inference.",
+      "catalog": "skills-lifecycle",
+      "date": {
+        "incumbent_checked_at": "2026-09-30",
+        "return_checked_at": []
+      },
+      "layer_id": "skills-mcp-build",
+      "pending": [
+        "PENDING-RETURN: no hash-verified co-op-relayed discovery triplet with this exact skills-modality layer_id exists in the frozen 52-key relay snapshot.",
+        "The skills-lifecycle owner must bind a current-month GPT-family and Claude-family result through the supported skills-modality harness; family usage, role returns and votes remain unverified here."
+      ],
+      "pick": {
+        "decision_basis": "Retain the exact committed installed[] inventory pending the owner's October skills-modality returns; this is an inventory-based draft pick, without a new comparative acceptance claim.",
+        "source_pin": "7742970d31e384b478a0a23af79940c6e12d9b2c",
+        "source_ref": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/skills-lifecycle.json:184 (JSON pointer /tasks/12/installed)",
+        "text": "mcp-builder"
+      },
+      "reopen_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen MCP server build and fix tasks shows a candidate producing servers that pass their own tests and connect in Claude Code and Codex more often than mcp-builder at no higher token or time cost, in Claude Code and in Codex; or mcp-builder's upstream is archived, removed or relicensed.",
+      "status": "PENDING-RETURN",
+      "title": "mcp-build"
+    }
+  ],
+  "source_sha256": "988c96e77a9b37e82739743fb832bae0a7e13c64bd458946e4b655c3223b6738"
+}

@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "kind": "g5-six-logical-trial-ref-repairs",
+  "repairs": [
+    {
+      "row_id": [
+        "https://github.com/benchbox-dev/benchbox",
+        "storage-compute",
+        "{\"catalog\": \"us-equities\", \"role\": \"referral-source-screen\", \"slot\": \"storage-compute\"}"
+      ],
+      "disposition": "TRIAL",
+      "removed_occurrence_id": "data-fields:live:storage-local:12",
+      "source_ref_preserved": {
+        "archive_member": "g5-fields-b/trading-platform/public-safe/captures/storage-compute/custody.capture.json",
+        "owner_lane": "g5-fields-b",
+        "pointer": "/occurrences/91/exact_ledger_rows/0",
+        "sha256": "25397e43ea98a727e9a72951642620cc056fe6678c239bba39f38f124d923d7b",
+        "source_id": "data-fields"
+      },
+      "primary_capture_sha256": "25397e43ea98a727e9a72951642620cc056fe6678c239bba39f38f124d923d7b",
+      "primary_pointer": "/occurrences/91/exact_ledger_rows/0",
+      "source_kind": "query-or-source-review",
+      "source_locator": "data-fields/coverage.tsv:88",
+      "original_ledger_line": 2389,
+      "original_ledger_sha256": "a5e4e3fd5a85ec5d2a977b836a53c297c4ef8f829400cac3ea84a56c5f50f344",
+      "reason": "Reclassified logical input ID data-fields:live:storage-local:12 as source provenance: retained ledger record declares query-or-source-review at data-fields/coverage.tsv:88; it is not a physical mined-list occurrence. The exact captured source reference is retained."
+    },
+    {
+      "row_id": [
+        "https://github.com/benchbox-dev/benchbox",
+        "storage-compute",
+        "{\"catalog\": \"us-equities\", \"role\": \"referral-source-screen\", \"slot\": \"storage-compute\"}"
+      ],
+      "disposition": "TRIAL",
+      "removed_occurrence_id": "data-fields:survivor:BenchBox-dev__BenchBox:storage-compute",
+      "source_ref_preserved": {
+        "archive_member": "g5-fields-b/trading-platform/public-safe/captures/storage-compute/custody.capture.json",
+        "owner_lane": "g5-fields-b",
+        "pointer": "/occurrences/91/exact_ledger_rows/1",
+        "sha256": "25397e43ea98a727e9a72951642620cc056fe6678c239bba39f38f124d923d7b",
+        "source_id": "data-fields"
+      },
+      "primary_capture_sha256": "25397e43ea98a727e9a72951642620cc056fe6678c239bba39f38f124d923d7b",
+      "primary_pointer": "/occurrences/91/exact_ledger_rows/1",
+      "source_kind": "query-or-source-review",
+      "source_locator": "data-fields/coverage.tsv:234",
+      "original_ledger_line": 2535,
+      "original_ledger_sha256": "a5e4e3fd5a85ec5d2a977b836a53c297c4ef8f829400cac3ea84a56c5f50f344",
+      "reason": "Reclassified logical input ID data-fields:survivor:BenchBox-dev__BenchBox:storage-compute as source provenance: retained ledger record declares query-or-source-review at data-fields/coverage.tsv:234; it is not a physical mined-list occurrence. The exact captured source reference is retained."
+    },
+    {
+      "row_id": [
+        "https://github.com/databento/databento-python",
+        "market-data-reference",
+        "{\"catalog\": \"us-equities\", \"role\": \"referral-source-screen\", \"slot\": \"market-data-reference\"}"
+      ],
+      "disposition": "TRIAL",
+      "removed_occurrence_id": "data-fields:survivor:databento__databento-python:market-data-reference",
+      "source_ref_preserved": {
+        "archive_member": "g5-fields-b/trading-platform/public-safe/captures/market-data-reference/custody.capture.json",
+        "owner_lane": "g5-fields-b",
+        "pointer": "/occurrences/214/exact_ledger_rows/0",
+        "sha256": "391ae2d6ac1e35415c46d6fcdb323c6beee474e62b1632fdda3394baa8ac9621",
+        "source_id": "data-fields"
+      },
+      "primary_capture_sha256": "391ae2d6ac1e35415c46d6fcdb323c6beee474e62b1632fdda3394baa8ac9621",
+      "primary_pointer": "/occurrences/214/exact_ledger_rows/0",
+      "source_kind": "query-or-source-review",
+      "source_locator": "data-fields/coverage.tsv:218",
+      "original_ledger_line": 2519,
+      "original_ledger_sha256": "a5e4e3fd5a85ec5d2a977b836a53c297c4ef8f829400cac3ea84a56c5f50f344",
+      "reason": "Reclassified logical input ID data-fields:survivor:databento__databento-python:market-data-reference as source provenance: retained ledger record declares query-or-source-review at data-fields/coverage.tsv:218; it is not a physical mined-list occurrence. The exact captured source reference is retained."
+    },
+    {
+      "row_id": [
+        "https://github.com/databento/databento-python",
+        "market-data-reference",
+        "{\"catalog\": \"us-equities\", \"role\": \"vendor-comparison\", \"slot\": \"market-data-reference\"}"
+      ],
+      "disposition": "TRIAL",
+      "removed_occurrence_id": "frozen-field:us-equities/market-data-reference/databento/databento-python",
+      "source_ref_preserved": {
+        "archive_member": "g5-fields-b/trading-platform/public-safe/captures/market-data-reference/custody.capture.json",
+        "owner_lane": "g5-fields-b",
+        "pointer": "/occurrences/284/exact_ledger_rows/0",
+        "sha256": "391ae2d6ac1e35415c46d6fcdb323c6beee474e62b1632fdda3394baa8ac9621",
+        "source_id": "frozen-field"
+      },
+      "primary_capture_sha256": "391ae2d6ac1e35415c46d6fcdb323c6beee474e62b1632fdda3394baa8ac9621",
+      "primary_pointer": "/occurrences/284/exact_ledger_rows/0",
+      "source_kind": "historical-source-field-membership",
+      "source_locator": "native-frozen/inputs/market-data-reference.json#/eligible_field/6:",
+      "original_ledger_line": 2950,
+      "original_ledger_sha256": "a5e4e3fd5a85ec5d2a977b836a53c297c4ef8f829400cac3ea84a56c5f50f344",
+      "reason": "Reclassified logical input ID frozen-field:us-equities/market-data-reference/databento/databento-python as source provenance: retained ledger record declares historical-source-field-membership at native-frozen/inputs/market-data-reference.json#/eligible_field/6:; it is not a physical mined-list occurrence. The exact captured source reference is retained."
+    },
+    {
+      "row_id": [
+        "https://github.com/massive-com/client-python",
+        "market-data-reference",
+        "{\"catalog\": \"us-equities\", \"role\": \"referral-source-screen\", \"slot\": \"market-data-reference\"}"
+      ],
+      "disposition": "TRIAL",
+      "removed_occurrence_id": "data-fields:survivor:massive-com__client-python:market-data-reference",
+      "source_ref_preserved": {
+        "archive_member": "g5-fields-b/trading-platform/public-safe/captures/market-data-reference/custody.capture.json",
+        "owner_lane": "g5-fields-b",
+        "pointer": "/occurrences/215/exact_ledger_rows/0",
+        "sha256": "391ae2d6ac1e35415c46d6fcdb323c6beee474e62b1632fdda3394baa8ac9621",
+        "source_id": "data-fields"
+      },
+      "primary_capture_sha256": "391ae2d6ac1e35415c46d6fcdb323c6beee474e62b1632fdda3394baa8ac9621",
+      "primary_pointer": "/occurrences/215/exact_ledger_rows/0",
+      "source_kind": "query-or-source-review",
+      "source_locator": "data-fields/coverage.tsv:220",
+      "original_ledger_line": 2521,
+      "original_ledger_sha256": "a5e4e3fd5a85ec5d2a977b836a53c297c4ef8f829400cac3ea84a56c5f50f344",
+      "reason": "Reclassified logical input ID data-fields:survivor:massive-com__client-python:market-data-reference as source provenance: retained ledger record declares query-or-source-review at data-fields/coverage.tsv:220; it is not a physical mined-list occurrence. The exact captured source reference is retained."
+    },
+    {
+      "row_id": [
+        "https://github.com/nautechsystems/nautilus_trader",
+        "portfolio-risk",
+        "{\"catalog\": \"us-equities\", \"role\": \"referral-source-screen\", \"slot\": \"portfolio-risk\"}"
+      ],
+      "disposition": "TRIAL",
+      "removed_occurrence_id": "engine-fields:survivor:nautechsystems/nautilus_trader#portfolio-risk",
+      "source_ref_preserved": {
+        "archive_member": "g5-fields-b/trading-platform/public-safe/captures/portfolio-risk/custody.capture.json",
+        "owner_lane": "g5-fields-b",
+        "pointer": "/occurrences/229/exact_ledger_rows/0",
+        "sha256": "663d08fe9401f3500a47fd16936551179e602f82a821ec8226c47c03084b3435",
+        "source_id": "engine-fields"
+      },
+      "primary_capture_sha256": "663d08fe9401f3500a47fd16936551179e602f82a821ec8226c47c03084b3435",
+      "primary_pointer": "/occurrences/229/exact_ledger_rows/0",
+      "source_kind": "query-or-source-review",
+      "source_locator": "engine-fields/coverage.tsv:221",
+      "original_ledger_line": 2755,
+      "original_ledger_sha256": "a5e4e3fd5a85ec5d2a977b836a53c297c4ef8f829400cac3ea84a56c5f50f344",
+      "reason": "Reclassified logical input ID engine-fields:survivor:nautechsystems/nautilus_trader#portfolio-risk as source provenance: retained ledger record declares query-or-source-review at engine-fields/coverage.tsv:221; it is not a physical mined-list occurrence. The exact captured source reference is retained."
+    }
+  ],
+  "changed_rows": [
+    [
+      "https://github.com/benchbox-dev/benchbox",
+      "storage-compute",
+      "{\"catalog\": \"us-equities\", \"role\": \"referral-source-screen\", \"slot\": \"storage-compute\"}"
+    ],
+    [
+      "https://github.com/databento/databento-python",
+      "market-data-reference",
+      "{\"catalog\": \"us-equities\", \"role\": \"referral-source-screen\", \"slot\": \"market-data-reference\"}"
+    ],
+    [
+      "https://github.com/databento/databento-python",
+      "market-data-reference",
+      "{\"catalog\": \"us-equities\", \"role\": \"vendor-comparison\", \"slot\": \"market-data-reference\"}"
+    ],
+    [
+      "https://github.com/massive-com/client-python",
+      "market-data-reference",
+      "{\"catalog\": \"us-equities\", \"role\": \"referral-source-screen\", \"slot\": \"market-data-reference\"}"
+    ],
+    [
+      "https://github.com/nautechsystems/nautilus_trader",
+      "portfolio-risk",
+      "{\"catalog\": \"us-equities\", \"role\": \"referral-source-screen\", \"slot\": \"portfolio-risk\"}"
+    ]
+  ],
+  "action_rows": 83,
+  "resolved_refs": 6,
+  "outside_union_non_action": 797,
+  "outside_union_action": 0,
+  "outside_union_ids_sha256": "d96c99b2c0601db5659f38f44ed39e0067a25f2fadcc5e512163016103640139",
+  "original_capture_bytes_changed": 0,
+  "rows_before_sha256": "e7abe385adc1e1456ee3658299bf67705f2079c773b45653358d70a87ca54a10",
+  "rows_after_sha256": "cd2ea6288c6d3b8f3661601d952fa1e3ff9804b4fb06c6514fcb8a9a2c54007c"
+}

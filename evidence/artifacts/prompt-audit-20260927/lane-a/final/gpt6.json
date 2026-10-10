@@ -40,7 +40,7 @@
       "quote": "errors = [f\"the top rule lacks {phrase!r}\" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]"
      },
      {
-      "locator": "proposed/manifests/evidence.json:38710",
+       "locator": "seathatflowsinourveins/native-agent-stack@fa6ade3124f5387768025b0ea2de4f63daa78ccf:evidence/artifacts/prompt-audit-20260927/lane-a/final/proposal.diff:43 (quoted proposed registry hunk; captured hunk only, not the full proposed manifest or a checked tree; base 8315274f is not substituted)",
       "quote": "\"path\": \"examples/claude-native/CLAUDE.md\",\n      \"sha256\": \"a31b3551bb9be77f91a3ff841768bb30ef90d61a9870a657044df3b4e98f663a\",\n      \"bytes\": 8680"
      },
      {

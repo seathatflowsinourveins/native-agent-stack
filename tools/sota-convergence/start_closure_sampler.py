@@ -1,0 +1,610 @@
+#!/usr/bin/env python3
+"""Draw the explicit G5 START profile; generation never establishes read acceptance.
+
+The immutable R3 generator (80e69ff9...) supplies its supported select helper,
+canonical JSON, SHA256 and source-reference matching. compact_manifest.py supplies
+native identities, profile row validation and archive-member confinement. This
+adapter supplies only the CC-approved final-action/closure-flag population seam.
+"""
+from __future__ import annotations
+
+import argparse
+import copy
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import sys
+
+PROFILE = "start-closure/1"
+SEED = 202610081850
+QUOTA = 59
+R3_SHA256 = "759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7"
+R3_CUSTODY_SHA256 = "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627"
+CONTRACT = Path(__file__).with_name("start-closure-stratum-contract.json")
+CONTRACT_SHA256 = "744e1729ddd16a7d91378aebd35feea0acfba9932e49b831675fb1246a32ffde"
+PROTOCOL = Path(__file__).with_name("compact_manifest.py")
+ROW_SCHEMA = "tools/sota-convergence/schemas/compact-decision-start-closure-1.json"
+ACTION = ("ADOPT-NOW", "TRIAL")
+FLAGS = {"PENDING-PIN": "pending_pin", "PENDING-LOCATOR": "pending_locator"}
+CONFLICT_FLAG = "pending_conflict"
+SHA = re.compile(r"[0-9a-f]{64}\Z")
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def pinned_bytes(path, expected, limit=100 * 1024**2):
+    require(isinstance(expected, str) and SHA.fullmatch(expected), "Expected hash must be a lowercase SHA256")
+    path = Path(path)
+    require(path.is_file() and path.stat().st_size <= limit, "Missing or oversized pinned input: " + path.name)
+    raw = path.read_bytes()
+    require(hashlib.sha256(raw).hexdigest() == expected, "Pinned input changed: " + path.name)
+    return raw
+
+
+def import_verified(path, expected, name):
+    raw = pinned_bytes(path, expected)
+    spec = importlib.util.spec_from_file_location(name, path)
+    require(spec is not None and spec.loader is not None, "Pinned module cannot be loaded")
+    module = importlib.util.module_from_spec(spec)
+    # Execute the verified bytes, rather than ask a loader to reread the file.
+    exec(compile(raw, str(path), "exec"), module.__dict__)
+    return module
+
+
+def load_r3(path):
+    r3 = import_verified(Path(path), R3_SHA256, "g5_sealed_r3_sampler")
+    require(sys.version_info[:3] == (3, 14, 4), "The sealed R3 stream requires native Python 3.14.4")
+    pinned_bytes(Path(r3.random.__file__), r3.PINS["random"])
+    require(r3.SEED == SEED and r3.QUOTA == QUOTA, "Sealed R3 seed or quota differs")
+    return r3
+
+
+def load_native(protocol, expected, r3):
+    protocol = Path(protocol).resolve()
+    repo = protocol.parents[2]
+    for relative, pin in (("tools/sota-convergence/landscape-sweep/sweep_common.py", "common"),
+                          ("scripts/catalog_decisions.py", "catalog")):
+        pinned_bytes(repo / relative, r3.PINS[pin])
+    native = import_verified(protocol, expected, "g5_start_closure_native")
+    require(getattr(native, "START_CLOSURE_PROFILE", None) == PROFILE,
+            "Native protocol does not expose the approved START profile")
+    return native, repo
+
+
+def declared_capture_index(rows, origin_map, native):
+    """Bind declarations already checked by the exact PASS manifest, without a new byte-read claim."""
+    index = {}
+
+    def visit(value):
+        if isinstance(value, dict):
+            if "archive_member" in value:
+                expected = value.get("capture_sha256", value.get("sha256", value.get("artifact_sha256")))
+                require(expected is not None, "Archive declaration lacks its capture hash")
+                member = native.member_name(value["archive_member"])
+                native.sha(expected, "declared capture SHA256")
+                require(member not in index or index[member]["sha256"] == expected,
+                        "Hash-mismatched capture declarations: " + member)
+                index[member] = {"sha256": expected}
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    visit(rows)
+    visit(origin_map)
+    return index
+
+
+def derive_origin_map(manifest, manifest_sha, provenance, provenance_sha, declarations, native, r3):
+    """Join native retained provenance with explicit root-owned family declarations."""
+    require(manifest.get("validation", {}).get("status") == "PASS" and manifest["validation"].get("profile") == PROFILE,
+            "Origin derivation requires the passing START manifest")
+    require(provenance.get("schema_version") == 1 and isinstance(provenance.get("origins"), list), "Unsupported retained origin provenance")
+    require(declarations.get("source_provenance_sha256") == provenance_sha, "Family declarations do not bind retained provenance")
+    families = {}
+    for declaration in declarations.get("declarations", []):
+        fragment_key = (declaration["fragment"], declaration["artifact_sha256"])
+        require(fragment_key not in families and declaration["parent_family"] in r3.PARENT_FAMILIES, "Duplicate or unknown declared parent family")
+        families[fragment_key] = declaration
+    retained = {}
+    for origin in provenance["origins"]:
+        key = native.decision_key(origin)
+        require(key not in retained, "Duplicate retained origin key")
+        retained[key] = origin
+    output = {"schema_version": 1, "manifest_sha256": manifest_sha, "stratum_contract_sha256": CONTRACT_SHA256,
+              "source_provenance_sha256": provenance_sha, "origins": [], "pending_origins": [],
+              "family_declarations": copy.deepcopy(declarations), "unreachable_sampled_rows": []}
+    keys = set()
+    for row in manifest["rows"]:
+        key = native.decision_key(row)
+        require(key not in keys, "Duplicate native origin derivation key")
+        keys.add(key)
+        key_record = {name: copy.deepcopy(row[name]) for name in ("repository_or_entry", "slot", "qualification") if name in row}
+        if key not in retained:
+            pending = {"key": key_record, "status": "PENDING", "reason_code": "retained-provenance-missing",
+                       "measurement": "Recover an explicit original fragment, artifact hash and owner from custody; do not infer an origin."}
+            output["pending_origins"].append(pending)
+            if row["disposition"] not in ACTION and CONFLICT_FLAG not in row.get("closure", {}):
+                output["unreachable_sampled_rows"].append({"key": key_record, "disposition": row["disposition"]})
+            continue
+        original = retained[key]
+        row_refs = row.get("source_refs", []) + [ref for choice in row.get("choices", []) for ref in choice["source_refs"]]
+        groups = {}
+        for ref in original["source_refs"]:
+            require(any(r3.source_ref_matches(ref, old) for old in row_refs), "Retained origin reference differs from the exact final reference")
+            fragment_key = (ref["source_id"], ref["sha256"])
+            require(ref["source_id"] in original["fragments"] and fragment_key in families, "Origin lacks its explicit fragment/family declaration")
+            declaration = families[fragment_key]
+            require(declaration["owner_lane"] == ref["owner_lane"], "Declared family owner differs from retained source owner")
+            group = groups.setdefault(fragment_key, {"fragment": ref["source_id"], "artifact_sha256": ref["sha256"],
+                "owner_lane": ref["owner_lane"], "parent_family": declaration["parent_family"], "source_refs": []})
+            require(group["owner_lane"] == ref["owner_lane"], "Retained fragment has inconsistent owners")
+            if ref not in group["source_refs"]:
+                group["source_refs"].append(copy.deepcopy(ref))
+        require(bool(groups), "Retained origin has no literal source reference")
+        output["origins"].append({"key": key_record, "fragments": [groups[k] for k in sorted(groups)]})
+    require(set(retained) <= keys, "Retained provenance contains orphan native keys")
+    output["counts"] = {"rows": len(keys), "origins_retained": len(output["origins"]), "origins_pending": len(output["pending_origins"]),
+                        "pending_census_origins": len(output["pending_origins"]) - len(output["unreachable_sampled_rows"]),
+                        "unreachable_sampled_rows": len(output["unreachable_sampled_rows"]), "declared_fragments": len(families)}
+    return output
+
+
+def rows_and_origins(manifest, origin_map, manifest_sha, native, validator, r3):
+    require(manifest.get("kind") == "g5-compact-landscape" and manifest.get("schema_version") == 1,
+            "Input is not a native compact manifest")
+    validation = manifest.get("validation", {})
+    require(validation.get("status") == "PASS" and validation.get("blockers") == [], "Manifest is not native PASS")
+    require(validation.get("profile") == PROFILE, "Manifest validation profile is not start-closure/1")
+    require(manifest.get("release_tag") == "v2026.10.08", "Unexpected G5 release tag")
+    require(isinstance(manifest.get("rows"), list), "Manifest rows are missing")
+    native.sha(manifest.get("asset", {}).get("sha256"), "manifest asset SHA256")
+    require(origin_map.get("schema_version") == 1 and origin_map.get("manifest_sha256") == manifest_sha,
+            "Origin map does not bind the exact manifest")
+    require(origin_map.get("stratum_contract_sha256") == CONTRACT_SHA256,
+            "Origin map does not bind the START stratum contract")
+    require(isinstance(origin_map.get("origins"), list), "Original fragment bindings are missing")
+    index = declared_capture_index(manifest["rows"], origin_map, native)
+    reference_validator = validator.evolve(schema={**validator.schema["$defs"]["sourceRef"],
+                                                 "$defs": validator.schema["$defs"]})
+    rows, origins, fragments = {}, {}, {}
+    for position, row in enumerate(manifest["rows"]):
+        validator.validate(row)
+        require(not native.validate_row(row, index, profile=PROFILE, record_residue=False), "Native profile row validation blocked")
+        key = native.decision_key(row)
+        require(key not in rows, "Duplicate native identity+slot+qualification key")
+        if row["disposition"] in ACTION:
+            require(row["pin"] is not None and all(s["pin"] is not None for s in row["primary_sources"]),
+                    "An action row or primary source has a null pin")
+            require(not any(flag in row.get("closure", {}) for flag in (*FLAGS.values(), CONFLICT_FLAG, "residue")),
+                    "An action row has closure residue")
+        rows[key] = {"manifest_pointer": f"/rows/{position}",
+                     "row_sha256": r3.digest(r3.canonical(row).encode()), "row": row}
+    for binding in origin_map["origins"]:
+        key = native.key(binding["key"])
+        require(key in rows and key not in origins, "Duplicate or orphan origin key")
+        require(isinstance(binding.get("fragments"), list) and binding["fragments"], "Origin has no fragment")
+        origins[key] = binding["fragments"]
+        row = rows[key]["row"]
+        original_refs = row.get("source_refs", []) + [ref for choice in row.get("choices", []) for ref in choice["source_refs"]]
+        for fragment in binding["fragments"]:
+            name = native.text(fragment.get("fragment"), "origin fragment")
+            artifact_sha = native.sha(fragment.get("artifact_sha256"), "origin fragment SHA256")
+            owner = native.text(fragment.get("owner_lane"), "origin owner")
+            parent = fragment.get("parent_family")
+            require(parent in r3.PARENT_FAMILIES, "Unknown explicit parent-family rollup")
+            metadata = {"fragment": name, "artifact_sha256": artifact_sha,
+                        "owner_lane": owner, "parent_family": parent}
+            fragment_key = (name, artifact_sha)
+            require(fragment_key not in fragments or fragments[fragment_key] == metadata,
+                    "Fragment has inconsistent owner or family")
+            fragments[fragment_key] = metadata
+            refs = fragment.get("source_refs")
+            require(isinstance(refs, list) and refs, "Fragment has no original source-reference proof")
+            for ref in refs:
+                r3.checked_source_ref(ref, reference_validator)
+                native.validate_ref(ref, index)
+                require(ref["sha256"] == artifact_sha and ref.get("source_id") == name,
+                        "Source proof does not bind its literal fragment and hash")
+                require("owner_lane" not in ref or ref["owner_lane"] == owner, "Source proof owner differs")
+                require(any(r3.source_ref_matches(ref, old) for old in original_refs),
+                        "Fragment source proof is not an original row reference")
+    for pending in origin_map.get("pending_origins", []):
+        key = native.key(pending["key"])
+        require(key in rows and key not in origins, "Duplicate or orphan PENDING origin key")
+        require(pending.get("status") == "PENDING" and pending.get("reason_code") == "retained-provenance-missing"
+                and isinstance(pending.get("measurement"), str) and bool(pending["measurement"].strip()), "PENDING origin requires an explicit reason and measurement")
+        row = rows[key]["row"]
+        require(row["disposition"] in ACTION or CONFLICT_FLAG in row.get("closure", {}),
+                "A sampled row cannot have PENDING origin; report its unreachable stratum before drawing")
+        origins[key] = []  # Explicit census-only absence; no fragment/owner is invented.
+        rows[key]["origin_pending"] = copy.deepcopy(pending)
+    require(set(origins) == set(rows), "Origin map does not cover every final row")
+    return rows, origins, fragments
+
+
+def in_closure_bucket(row, label, flag):
+    residue = row.get("closure", {}).get("residue", [])
+    if label == "PENDING-PIN" and any(item["bucket"] == "G5-F4" for item in residue):
+        return False
+    return flag in row.get("closure", {}) or any(item["bucket"] == label for item in residue)
+
+
+def select(rows, origins, fragments, classes, r3, *, seed=SEED):
+    """Call the sealed draw helper and restore original, unprojected evidence."""
+    require(type(seed) is int and 0 < seed < 2**64, "Draw seed must be a positive 64-bit integer")
+    eligible = {key: item for key, item in rows.items() if CONFLICT_FLAG not in item["row"].get("closure", {}) and origins[key]}
+    draw_origins = copy.deepcopy(origins)
+    for bindings in draw_origins.values():
+        for fragment in bindings:
+            fragment["held_action_claims"] = []
+    packets = [p for p in r3.select(eligible, draw_origins, fragments, classes, seed, QUOTA)
+               if p["stratum"]["bucket_kind"] == r3.FINAL_BUCKET]
+    for label, flag in FLAGS.items():
+        projected = {}
+        for key, item in eligible.items():
+            if in_closure_bucket(item["row"], label, flag):
+                projected[key] = {**item, "row": {**item["row"], "disposition": label}}
+        packets.extend(p for p in r3.select(projected, draw_origins, fragments, [label], seed, QUOTA)
+                       if p["stratum"]["bucket_kind"] == r3.FINAL_BUCKET)
+    for packet in packets:
+        packet.pop("held_action_source_witnesses", None)
+        packet.update(profile=PROFILE, stratum_contract_sha256=CONTRACT_SHA256,
+                      acceptance_number=0, family_review={"status": "NOT_RUN", "required_distinct_model_families": 2,
+                                                         "zero_defects_established": False})
+        for selected in packet["selected"]:
+            key = tuple(selected["native_key"])
+            selected.update(copy.deepcopy(rows[key]))
+            selected["origin_bindings"] = copy.deepcopy(origins[key])
+            selected["matching_origin_bindings"] = [copy.deepcopy(f) for f in origins[key]
+                if (f["fragment"], f["artifact_sha256"]) == (packet["stratum"]["fragment"], packet["stratum"]["artifact_sha256"])]
+    return sorted(packets, key=lambda p: p["stratum_id"])
+
+
+def packet_counts(packets, rows):
+    samples = [p for p in packets if p["selection_mode"] == "SAMPLED"]
+    sampled_keys = {tuple(i["native_key"]) for p in samples for i in p["selected"]}
+    selected_keys = {tuple(i["native_key"]) for p in packets for i in p["selected"]}
+    conflicts = {key for key, item in rows.items() if CONFLICT_FLAG in item["row"].get("closure", {})}
+    actions = {key for key, item in rows.items() if item["row"]["disposition"] in ACTION}
+    memberships = sum(p["selected_count"] for p in samples)
+    return {"strata": len(packets), "empty_strata": sum(p["population_size"] == 0 for p in packets),
+            "unique_final_action_rows": len(actions), "unique_pending_conflict_rows": len(conflicts),
+            "unique_census_rows": len(actions | conflicts), "pending_conflict_census_memberships": len(conflicts),
+            "final_action_census_memberships": sum(p["selected_count"] for p in packets if p["selection_mode"] == "FULL-CENSUS"),
+            "sample_memberships": memberships, "unique_sampled_rows": len(sampled_keys),
+            "sample_overlap_memberships": memberships - len(sampled_keys), "unique_selected_rows": len(selected_keys | conflicts | actions),
+            "pending_origin_census_rows": sum("origin_pending" in item for item in rows.values()),
+            "pending_origins_excluded_from_samples": sum("origin_pending" in item for item in rows.values()),
+            "rows_with_both_closure_flags": sum(all(in_closure_bucket(i["row"], label, f) for label, f in FLAGS.items()) for i in rows.values()),
+            "pending_conflict_excluded_from_samples": len(conflicts),
+            "conflict_sample_flag_exclusions": {label: sum(in_closure_bucket(rows[key]["row"], label, flag) for key in conflicts)
+                                                for label, flag in FLAGS.items()},
+            "origin_pointer_unresolved_rows": sum(i["row"].get("origin_pointer") == "unresolved" for i in rows.values()),
+            "action_origin_pointer_unresolved_rows": sum(rows[key]["row"].get("origin_pointer") == "unresolved" for key in actions),
+            "conflict_sample_exclusion_reason": "CC 2026-10-08T23:09:31Z requires full both-family census and no sample membership for PENDING-CONFLICT, including rows with pin/locator flags.",
+            "counting_note": "Memberships are not distinct observations. Unique row counts remove fragment and closure-stratum overlap; selected rows include the separate conflict census."}
+
+
+def read_projection(key, item):
+    return {"row_id": list(key), "pin": item["row"]["pin"],
+            "locator": [s["locator"] for s in item["row"]["primary_sources"]],
+            "capture_sha256": item["row"]["capture_sha256"]}
+
+
+def action_read_set(rows, manifest, manifest_sha, head):
+    return {"schema_version": 1, "kind": "g5-final-action-read-set", "profile": PROFILE,
+            "manifest_sha256": manifest_sha, "asset_sha256": manifest["asset"]["sha256"], "head": head,
+            "row_id_definition": "Native decision_key: canonical repository_or_entry, literal slot, canonical qualification",
+            "rows": [read_projection(key, item)
+                     for key, item in sorted(rows.items()) if item["row"]["disposition"] in ACTION]}
+
+
+def pending_conflict_census(rows, origins, manifest, manifest_sha, head):
+    census = {"schema_version": 1, "kind": "g5-pending-conflict-census", "profile": PROFILE,
+              "manifest_sha256": manifest_sha, "asset_sha256": manifest["asset"]["sha256"], "head": head,
+              "family_review": {"status": "NOT_RUN", "required_distinct_model_families": 2,
+                                "coverage_required_each": "ALL ROWS"}, "rows": []}
+    for key, item in sorted(rows.items()):
+        if CONFLICT_FLAG in item["row"].get("closure", {}):
+            census["rows"].append({**copy.deepcopy(read_projection(key, item)), **copy.deepcopy(item),
+                "action_side_row_ids": copy.deepcopy(item["row"]["closure"][CONFLICT_FLAG]["action_side_row_ids"]),
+                "origin_bindings": copy.deepcopy(origins[key])})
+    census["count"] = len(census["rows"])
+    return census
+
+
+def census_read_set(actions, conflicts, rows, action_sha, conflict_sha):
+    combined = {"schema_version": 1, "kind": "g5-required-census-read-set", "profile": PROFILE,
+        "manifest_sha256": actions["manifest_sha256"], "asset_sha256": actions["asset_sha256"], "head": actions["head"],
+        "row_id_definition": actions["row_id_definition"], "rows": [],
+        "counts_by_type": {"FINAL-ACTION": len(actions["rows"]), "PENDING-CONFLICT": len(conflicts["rows"])},
+        "sources": [{"census_type": "FINAL-ACTION", "path": "action-read-set.json", "sha256": action_sha},
+                    {"census_type": "PENDING-CONFLICT", "path": "pending-conflict-census.json", "sha256": conflict_sha}],
+        "family_review": {"status": "NOT_RUN", "required_distinct_model_families": 2,
+                          "coverage_required_each": "ALL ROWS"}}
+    for kind, source, filename in (("FINAL-ACTION", actions, "action-read-set.json"),
+                                   ("PENDING-CONFLICT", conflicts, "pending-conflict-census.json")):
+        for position, entry in enumerate(source["rows"]):
+            item = rows[tuple(entry["row_id"])]
+            selected = {"census_type": kind, **copy.deepcopy(read_projection(tuple(entry["row_id"]), item)),
+                        "read_source": {"path": filename, "pointer": f"/rows/{position}"}}
+            if kind == "PENDING-CONFLICT":
+                selected["action_side_row_ids"] = copy.deepcopy(entry["action_side_row_ids"])
+            if "origin_pointer" in item["row"]:
+                selected["origin_pointer"] = copy.deepcopy(item["row"]["origin_pointer"])
+            if "origin_pending" in item:
+                selected["origin_pending"] = copy.deepcopy(item["origin_pending"])
+            combined["rows"].append(selected)
+    combined["count"] = len(combined["rows"])
+    return combined
+
+
+def output_directory(root, name):
+    root = Path(root)
+    require(root.is_dir() and not root.is_symlink() and ".." not in root.parts, "Output root must be an existing, canonical directory")
+    require(isinstance(name, str) and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name), "Output must be a single safe directory name")
+    output = root.resolve() / name
+    require(not output.exists() and not output.is_symlink(), "Output already exists")
+    return output
+
+
+def verify_asset_rows(manifest, asset_path, native, r3, manifest_raw=None):
+    """Qualify the entire asset and compare its native-computed output, not its inputs."""
+    manifest_rows = manifest.get("rows")
+    require(isinstance(manifest_rows, list), "Manifest rows must be a list")
+    qualified, qualified_raw = native.build_manifest(
+        Path(asset_path), manifest.get("release_tag"), profile=PROFILE)
+    require(qualified["validation"]["status"] == "PASS",
+            "Asset native qualification blocked: " + r3.canonical(qualified["validation"]["blockers"]))
+    computed_rows = qualified["rows"]
+    differences = [position for position in range(max(len(computed_rows), len(manifest_rows)))
+                   if position >= len(computed_rows) or position >= len(manifest_rows)
+                   or r3.canonical(computed_rows[position]) != r3.canonical(manifest_rows[position])]
+    if differences:
+        position = differences[0]
+        actual = computed_rows[position] if position < len(computed_rows) else None
+        expected = manifest_rows[position] if position < len(manifest_rows) else None
+        field = "<row>"
+        if isinstance(actual, dict) and isinstance(expected, dict):
+            field = next((name for name in sorted(set(actual) | set(expected))
+                          if name not in actual or name not in expected
+                          or r3.canonical(actual[name]) != r3.canonical(expected[name])), "<row>")
+        raise ValueError("Native-computed rows differ from manifest rows: rows_diff="
+                         + str(len(differences)) + "; first_index=" + str(position) + "; field=" + field)
+    require(qualified == manifest,
+            "Manifest differs from native asset-only rebuild; run the native --write and FULL --check")
+    if manifest_raw is not None:
+        require(qualified_raw == manifest_raw,
+                "Manifest bytes differ from native asset-only rebuild; run the native --write and FULL --check")
+    asset = qualified["asset"]
+    return {"asset_sha256": asset["sha256"], "member": native.ROWS_MEMBER,
+            "rows": len(computed_rows), "rows_diff": len(differences),
+            "ordered_rows_sha256": r3.digest(r3.canonical(computed_rows).encode()),
+            "rows_member_sha256": asset["rows_sha256"], "coverage_member_sha256": asset["coverage_sha256"],
+            "native_qualification": {"status": "PASS", "profile": PROFILE,
+                                     "manifest_sha256": r3.digest(qualified_raw),
+                                     "byte_exact": manifest_raw is not None},
+            "comparison": "Complete native-computed ordered rows and the full asset-only manifest, including capture/coverage qualification"}
+
+
+def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, origin_map_sha256,
+                 protocol_sha256, r3_generator, head, output_root, output_name, protocol=PROTOCOL,
+                 redraw_seed=None, asset_path=None, asset_sha256=None):
+    require(profile == PROFILE, "Select --profile start-closure/1 explicitly")
+    require(isinstance(head, str) and re.fullmatch(r"[0-9a-f]{40}", head), "Head must be a full lowercase commit ID")
+    require(asset_path is not None, "Packet build requires --asset to check asset/manifest row equality")
+    output = output_directory(output_root, output_name)
+    r3 = load_r3(r3_generator)
+    native, repo = load_native(protocol, protocol_sha256, r3)
+    manifest_raw = pinned_bytes(manifest_path, manifest_sha256)
+    origin_raw = pinned_bytes(origin_map_path, origin_map_sha256)
+    contract_raw = pinned_bytes(CONTRACT, CONTRACT_SHA256)
+    manifest, origin_map = native.load(manifest_raw), native.load(origin_raw)
+    require(isinstance(manifest, dict), "Manifest must be an object")
+    require(isinstance(manifest.get("asset"), dict), "Manifest asset must be an object")
+    manifest_asset_sha = manifest["asset"].get("sha256")
+    require(isinstance(manifest_asset_sha, str) and SHA.fullmatch(manifest_asset_sha),
+            "Manifest asset pin must be a full lowercase SHA256")
+    expected_asset_sha = manifest_asset_sha if asset_sha256 is None else asset_sha256
+    require(isinstance(expected_asset_sha, str) and SHA.fullmatch(expected_asset_sha),
+            "Asset pin must be a full lowercase SHA256")
+    require(expected_asset_sha == manifest_asset_sha,
+            "Asset SHA256 differs from manifest binding: explicit=" + expected_asset_sha
+            + "; manifest=" + manifest_asset_sha + "; qualify and rebuild the canonical manifest")
+    asset_path = Path(asset_path)
+    require(asset_path.is_file() and asset_path.stat().st_size <= native.ASSET_LIMIT,
+            "Missing or oversized asset")
+    with asset_path.open("rb") as stream:
+        actual_asset_sha, _ = native.digest_stream(stream)
+    require(actual_asset_sha == expected_asset_sha,
+            "Asset SHA256 differs: observed=" + actual_asset_sha + "; expected=" + expected_asset_sha
+            + "; source=hash-checked manifest" + (" and explicit confirmation" if asset_sha256 is not None else ""))
+    asset_verification = verify_asset_rows(manifest, asset_path, native, r3, manifest_raw)
+    require(asset_verification["asset_sha256"] == actual_asset_sha,
+            "Asset changed during native qualification")
+    require(manifest.get("row_schema", {}).get("path") == ROW_SCHEMA, "Manifest does not bind the profile row schema")
+    schema_raw = pinned_bytes(repo / ROW_SCHEMA, manifest["row_schema"]["sha256"])
+    from jsonschema import Draft202012Validator
+    validator = Draft202012Validator(native.load(schema_raw))
+    rows, origins, fragments = rows_and_origins(manifest, origin_map, manifest_sha256, native, validator, r3)
+    classes = validator.schema["properties"]["disposition"]["enum"]
+    if redraw_seed is not None:
+        require(type(redraw_seed) is int and 0 < redraw_seed < 2**64 and redraw_seed != SEED,
+                "Redraw seed must be a new positive 64-bit integer")
+    seed = SEED if redraw_seed is None else redraw_seed
+    packets = select(rows, origins, fragments, classes, r3, seed=seed)
+    actions = action_read_set(rows, manifest, manifest_sha256, head)
+    actions["count"] = len(actions["rows"])
+    conflicts = pending_conflict_census(rows, origins, manifest, manifest_sha256, head)
+    for read_set in (actions, conflicts):
+        read_set.update({"asset_sha256": asset_verification["asset_sha256"],
+                         "manifest_asset_sha256": manifest_asset_sha,
+                         "row_binding": "manifest_sha256"})
+    files = {"inputs/manifest.json": manifest_raw, "inputs/origin-map.json": origin_raw,
+             "inputs/row-schema.json": schema_raw, "stratum-contract.json": contract_raw,
+             "action-read-set.json": (r3.canonical(actions) + "\n").encode(),
+             "pending-conflict-census.json": (r3.canonical(conflicts) + "\n").encode()}
+    combined = census_read_set(actions, conflicts, rows, r3.digest(files["action-read-set.json"]),
+                               r3.digest(files["pending-conflict-census.json"]))
+    combined.update({"manifest_asset_sha256": manifest_asset_sha, "row_binding": "manifest_sha256"})
+    files["census-read-set.json"] = (r3.canonical(combined) + "\n").encode()
+    review_sources = {
+        "compact_manifest.py": Path(protocol),
+        "test_compact_manifest.py": repo / "tests/test_compact_manifest.py",
+        "start_closure_sampler.py": Path(__file__),
+        "test_start_closure_sampler.py": Path(__file__).resolve().parents[2] / "tests/test_start_closure_sampler.py",
+    }
+    for name, path in review_sources.items():
+        require(path.is_file() and path.stat().st_size < 100 * 1024**2, "Profile review source is missing or oversized: " + name)
+        files["profile-code/" + name] = path.read_bytes()
+    require(r3.digest(files["profile-code/compact_manifest.py"]) == protocol_sha256,
+            "Native protocol changed while assembling its review packet")
+    for packet in packets:
+        files["strata/" + packet["stratum_id"] + ".json"] = (r3.canonical(packet) + "\n").encode()
+    counts = packet_counts(packets, rows)
+    summary = {"schema_version": 1, "kind": "g5-start-closure-sample-packet", "profile": PROFILE,
+               "seed": seed, "head": head, "manifest_sha256": manifest_sha256,
+                "asset_sha256": asset_verification["asset_sha256"], "origin_map_sha256": origin_map_sha256,
+                "manifest_asset_sha256": manifest_asset_sha, "row_binding": "manifest_sha256",
+                "asset_rebinding": {"explicit_pin": asset_sha256 is not None,
+                                    "changed": asset_verification["asset_sha256"] != manifest_asset_sha},
+                "redraw": {"enabled": redraw_seed is not None, "historical_sealed_seed": SEED,
+                           "population_scope": "every sampled stratum", "seed": seed},
+               "stratum_contract_sha256": CONTRACT_SHA256,
+               "implementations": {"sealed_r3_generator_sha256": R3_SHA256, "native_protocol_sha256": protocol_sha256,
+                                   "random_sha256": r3.PINS["random"], "sampler_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
+               "action_read_set": {"path": "action-read-set.json", "rows": len(actions["rows"]),
+                                   "sha256": r3.digest(files["action-read-set.json"]), "reads": "NOT_RUN"},
+               "pending_conflict_census": {"path": "pending-conflict-census.json", "rows": conflicts["count"],
+                                           "sha256": r3.digest(files["pending-conflict-census.json"]), "reads": "NOT_RUN"},
+               "census_read_set": {"path": "census-read-set.json", "rows": combined["count"],
+                                   "counts_by_type": combined["counts_by_type"],
+                                   "sha256": r3.digest(files["census-read-set.json"]), "reads": "NOT_RUN"},
+               "counts": counts, "family_review": {"status": "NOT_RUN", "required_distinct_model_families": 2,
+                                                     "profile_code_and_tests": "NOT_RUN", "zero_defects_established": False},
+               "profile_review_sources": [{"path": "profile-code/" + name, "sha256": r3.digest(files["profile-code/" + name])}
+                                          for name in sorted(review_sources)],
+               "asset_rows_verification": asset_verification,
+               "capture_verification": "The native asset-only builder qualifies every declared capture and coverage binding, compares complete computed rows and reproduces the exact PASS manifest bytes before selection. Immutable asset inputs and computed output remain distinct.",
+               "strata": [{"stratum": p["stratum"], "path": "strata/" + p["stratum_id"] + ".json",
+                           "sha256": r3.digest(files["strata/" + p["stratum_id"] + ".json"])} for p in packets]}
+    files["manifest.json"] = (r3.canonical(summary) + "\n").encode()
+    files["manifest.sha256"] = "".join(r3.digest(raw) + "  " + name + "\n" for name, raw in sorted(files.items())).encode()
+    output.mkdir()
+    try:
+        for name, raw in sorted(files.items()):
+            path = output / native.member_name(name)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with path.open("xb") as stream:
+                stream.write(raw)
+    except BaseException:
+        shutil.rmtree(output)
+        raise
+    return {"output": str(output), "profile": PROFILE, "action_rows": len(actions["rows"]),
+            "action_read_set_sha256": summary["action_read_set"]["sha256"],
+            "pending_conflict_rows": conflicts["count"], "pending_conflict_census_sha256": summary["pending_conflict_census"]["sha256"],
+            "census_rows": combined["count"], "census_read_set_sha256": summary["census_read_set"]["sha256"],
+            "packet_manifest_sha256": r3.digest(files["manifest.json"]), "counts": counts, "reads": "NOT_RUN"}
+
+
+def draw_proof(*, manifest_path, manifest_sha256, origin_map_path, origin_map_sha256,
+               protocol_sha256, r3_generator, r3_sha256, head, output):
+    """Run the native selector under an explicit comparison pin without a model read."""
+    require(isinstance(head, str) and re.fullmatch(r"[0-9a-f]{40}", head), "Comparison head must be a full commit id")
+    r3 = import_verified(Path(r3_generator), r3_sha256, "g5_r3_comparison")
+    require(sys.version_info[:3] == (3, 14, 4), "The sealed R3 stream requires native Python 3.14.4")
+    pinned_bytes(Path(r3.random.__file__), r3.PINS["random"])
+    require(r3.SEED == SEED and r3.QUOTA == QUOTA, "Comparison seed or quota differs")
+    native, repo = load_native(PROTOCOL, protocol_sha256, r3)
+    manifest = native.load(pinned_bytes(manifest_path, manifest_sha256))
+    origin_map = native.load(pinned_bytes(origin_map_path, origin_map_sha256))
+    from jsonschema import Draft202012Validator
+    schema = native.load(pinned_bytes(repo / ROW_SCHEMA, manifest["row_schema"]["sha256"]))
+    rows, origins, fragments = rows_and_origins(manifest, origin_map, manifest_sha256, native, Draft202012Validator(schema), r3)
+    packets = select(rows, origins, fragments, schema["properties"]["disposition"]["enum"], r3)
+    proof = {"schema_version": 1, "kind": "g5-paired-native-draw", "profile": PROFILE,
+             "manifest_sha256": manifest_sha256, "origin_map_sha256": origin_map_sha256,
+             "head": head, "seed": SEED, "quota": QUOTA, "packets": packets}
+    raw = (r3.canonical(proof) + "\n").encode()
+    destination = Path(output)
+    require(not destination.exists(), "Draw-proof output already exists")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(raw)
+    return {"packet_sha256": r3.digest(raw), "packet_bytes": len(raw), "strata": len(packets),
+            "manifest_sha256": manifest_sha256, "origin_map_sha256": origin_map_sha256, "head": head,
+            "r3_sha256": r3_sha256, "counts": packet_counts(packets, rows), "family_review": "NOT_RUN"}
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", choices=[PROFILE], required=True)
+    parser.add_argument("--derive-origin-map", action="store_true")
+    parser.add_argument("--draw-proof", action="store_true")
+    parser.add_argument("--proof-r3-sha256")
+    parser.add_argument("--redraw-seed", type=int)
+    parser.add_argument("--asset")
+    parser.add_argument("--asset-sha256", help="optional confirmation of the canonical manifest asset pin; never an override")
+    for name in ("manifest", "manifest-sha256", "origin-map", "origin-map-sha256", "protocol-sha256", "r3-generator", "head", "output-root", "output"):
+        parser.add_argument("--" + name)
+    for name in ("origin-provenance", "origin-provenance-sha256", "family-declarations", "family-declarations-sha256", "origin-map-output"):
+        parser.add_argument("--" + name)
+    args = parser.parse_args(argv)
+    try:
+        from jsonschema.exceptions import ValidationError
+    except ImportError:
+        parser.exit(2, "start_closure_sampler: jsonschema is required to validate a draw; install the declared dependency before running this mode\n")
+    try:
+        require(not (args.derive_origin_map and args.draw_proof), "Choose one native preparation mode")
+        require(args.redraw_seed is None or not (args.derive_origin_map or args.draw_proof),
+                "Redraw seed applies only to the new production packet, never the historical equivalence proof")
+        require(not (args.derive_origin_map or args.draw_proof)
+                or (args.asset is None and args.asset_sha256 is None),
+                "Asset flags apply only to production packet mode, never preparation or proof modes")
+        if args.derive_origin_map:
+            for name in ("manifest", "manifest_sha256", "protocol_sha256", "r3_generator", "origin_provenance", "origin_provenance_sha256", "family_declarations", "family_declarations_sha256", "origin_map_output"):
+                require(getattr(args, name) is not None, "Missing --" + name.replace("_", "-"))
+            r3 = load_r3(args.r3_generator)
+            native, _ = load_native(PROTOCOL, args.protocol_sha256, r3)
+            manifest = native.load(pinned_bytes(args.manifest, args.manifest_sha256))
+            provenance = native.load(pinned_bytes(args.origin_provenance, args.origin_provenance_sha256))
+            declarations = native.load(pinned_bytes(args.family_declarations, args.family_declarations_sha256))
+            derived = derive_origin_map(manifest, args.manifest_sha256, provenance, args.origin_provenance_sha256, declarations, native, r3)
+            destination = Path(args.origin_map_output)
+            require(not destination.exists(), "Origin-map output already exists")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            raw = (r3.canonical(derived) + "\n").encode()
+            destination.write_bytes(raw)
+            print(json.dumps({"origin_map_sha256": r3.digest(raw), "counts": derived["counts"], "unreachable_sampled_rows": derived["unreachable_sampled_rows"]}, sort_keys=True))
+            return 1 if derived["unreachable_sampled_rows"] else 0
+        if args.draw_proof:
+            for name in ("manifest", "manifest_sha256", "origin_map", "origin_map_sha256", "protocol_sha256", "r3_generator", "proof_r3_sha256", "head", "output"):
+                require(getattr(args, name) is not None, "Missing --" + name.replace("_", "-"))
+            result = draw_proof(manifest_path=args.manifest, manifest_sha256=args.manifest_sha256,
+                origin_map_path=args.origin_map, origin_map_sha256=args.origin_map_sha256,
+                protocol_sha256=args.protocol_sha256, r3_generator=args.r3_generator,
+                r3_sha256=args.proof_r3_sha256, head=args.head, output=args.output)
+            print(json.dumps(result, sort_keys=True))
+            return 0
+        for name in ("asset", "manifest", "manifest_sha256", "origin_map", "origin_map_sha256", "protocol_sha256", "r3_generator", "head", "output_root", "output"):
+            require(getattr(args, name) is not None, "Missing --" + name.replace("_", "-"))
+        result = build_packet(profile=args.profile, manifest_path=args.manifest, manifest_sha256=args.manifest_sha256,
+                              origin_map_path=args.origin_map, origin_map_sha256=args.origin_map_sha256,
+                              protocol_sha256=args.protocol_sha256, r3_generator=args.r3_generator, head=args.head,
+                               output_root=args.output_root, output_name=args.output, redraw_seed=args.redraw_seed,
+                               asset_path=args.asset, asset_sha256=args.asset_sha256)
+    except (ValueError, OSError, KeyError, TypeError, ValidationError) as error:
+        parser.exit(2, "start_closure_sampler: " + str(error) + "\n")
+    print(json.dumps(result, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

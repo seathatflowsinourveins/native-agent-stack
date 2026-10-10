@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/tools/sota-convergence/schemas/compact-coverage.json",
+  "title": "G5 immutable release-asset coverage census",
+  "description": "Asset member compact/coverage.json. Subset exports retain INCOMPLETE and explicit omissions. The assembler's final census must exactly match all canonical decision keys, disposition all 368 stars and bind every relevant physical mined-list occurrence. Parser names are provenance; this validator never executes them or proves search completeness from a declared census alone.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "expected_keys", "starred_identities", "list_populations", "omissions"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "status": {"enum": ["FROZEN", "INCOMPLETE"]},
+    "expected_keys": {"type": "array", "items": {"$ref": "#/$defs/key"}},
+    "starred_identities": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "list_populations": {"type": "array", "items": {"$ref": "#/$defs/population"}},
+    "omissions": {
+      "type": "array",
+      "description": "Preserve each named missing producer, input, field or occurrence. Every nonempty omission array makes the manifest BLOCKED.",
+      "items": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "object", "minProperties": 1}]}
+    },
+    "source_inventory": {"type": "array", "items": {"type": "object", "minProperties": 1}},
+    "source_inventory_witness": {"$ref": "compact-decision.json#/properties/acceptance_witness"},
+    "field_inventory_witness": {"$ref": "compact-decision.json#/properties/acceptance_witness"},
+    "star_inventory_witness": {"$ref": "compact-decision.json#/properties/acceptance_witness"},
+    "note": {"type": "string", "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "FROZEN"}}},
+      "then": {
+        "properties": {
+          "starred_identities": {"minItems": 368, "maxItems": 368},
+          "expected_keys": {"minItems": 368},
+          "list_populations": {"minItems": 1},
+          "omissions": {"maxItems": 0}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_or_entry", "slot"],
+      "properties": {
+        "repository_or_entry": {"type": "string", "minLength": 1},
+        "slot": {"$ref": "compact-decision.json#/properties/slot"},
+        "qualification": {"$ref": "compact-decision.json#/properties/qualification"}
+      }
+    },
+    "population": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_repository", "pin", "path", "capture_sha256", "archive_member", "parser", "expected_occurrences"],
+      "properties": {
+        "source_repository": {"type": "string", "minLength": 1},
+        "pin": {"anyOf": [{"$ref": "compact-decision.json#/$defs/pin"}, {"type": "null"}]},
+        "path": {"type": "string", "minLength": 1},
+        "capture_sha256": {"$ref": "compact-decision.json#/$defs/sha256"},
+        "archive_member": {"$ref": "compact-decision.json#/$defs/member"},
+        "parser": {"type": "string", "minLength": 1},
+        "expected_occurrences": {"type": "array", "items": {"$ref": "#/$defs/occurrence"}},
+        "source_witness": {"$ref": "compact-decision.json#/properties/acceptance_witness"},
+        "census_witness": {"$ref": "compact-decision.json#/properties/acceptance_witness"}
+      }
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["occurrence_id", "repository_or_entry", "slot", "capture_sha256", "archive_member", "pointer"],
+      "properties": {
+        "occurrence_id": {"type": "string", "minLength": 1},
+        "repository_or_entry": {"type": "string", "minLength": 1},
+        "slot": {"$ref": "compact-decision.json#/properties/slot"},
+        "qualification": {"$ref": "compact-decision.json#/properties/qualification"},
+        "capture_sha256": {"$ref": "compact-decision.json#/$defs/sha256"},
+        "archive_member": {"$ref": "compact-decision.json#/$defs/member"},
+        "pointer": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

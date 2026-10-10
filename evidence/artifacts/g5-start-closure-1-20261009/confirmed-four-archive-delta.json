@@ -1,0 +1,41 @@
+{
+  "after_asset_sha256": "bcba48bab1aa8371c2b8ea8ce7812528fb4cb85818018d2c883d14c59f73171d",
+  "all_original_capture_members_byte_identical": true,
+  "before_asset_sha256": "a996bfd60cdd16a673d51c46f88cce5bf4b3e8fe59c861b1c5c96d60eb94d3b6",
+  "changed_members": [
+    {
+      "after": {
+        "bytes": 1978010,
+        "sha256": "9d1417b1c9363b1c4cad0ec09f2bbbc331756ae43dbe998308fa2647bd0d1a6b"
+      },
+      "before": {
+        "bytes": 1978010,
+        "sha256": "267df3996259ecb4074082021e38d4307929aa1fea6d94b31205d4b9fb2f12f8"
+      },
+      "path": "SHA256SUMS"
+    },
+    {
+      "after": {
+        "bytes": 3845920,
+        "sha256": "75933405909eb689c399c1613a88872b64a2fa521016593a663032dba2a1aa07"
+      },
+      "before": {
+        "bytes": 3845911,
+        "sha256": "6c0535a581b5788a1fb2c61587db01f6dd5769084814b8641cc703b8b488caa9"
+      },
+      "path": "compact/coverage.json"
+    },
+    {
+      "after": {
+        "bytes": 25020084,
+        "sha256": "506968758aee718ee8a9bbfc8be7df779ea3c94ad0ed14360412948370e3d075"
+      },
+      "before": {
+        "bytes": 25019837,
+        "sha256": "fb8f6d40bc00a9ec5fc6cc6aadc8921c5baf0d020f1827177925b29bbfb4a398"
+      },
+      "path": "compact/rows.json"
+    }
+  ],
+  "members": 13486
+}

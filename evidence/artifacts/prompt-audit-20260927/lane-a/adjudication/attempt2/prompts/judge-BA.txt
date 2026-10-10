@@ -98,7 +98,7 @@ Task: adjudicate unit X5 (items X5a and X5c) and answer only in the required JSO
       "quote": "The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one."
      },
      {
-      "locator": "manifests/evidence.json:38815",
+      "locator": "seathatflowsinourveins/native-agent-stack@46184751ca4bfa09ac0905797dfd8e938c280351:manifests/evidence.json:38815",
       "quote": "\"path\": \"examples/claude-native/CLAUDE.md\","
      }
     ]

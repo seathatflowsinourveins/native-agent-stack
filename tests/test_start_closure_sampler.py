@@ -1,0 +1,913 @@
+"""Synthetic sampler controls; these tests run no designated reads or upstream acceptance.
+
+Set G5_R3_GENERATOR to tools/sota-convergence/sealed_r3_generator.py, the
+tracked SHA-pinned privacy reseal. G5_PROFILE_PROTOCOL
+may point at the read-only profile worker source before its commit is integrated.
+Neither environment variable supplies a credential or changes the required pins.
+"""
+from __future__ import annotations
+
+import copy
+from contextlib import redirect_stderr
+import hashlib
+import importlib.util
+import io
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tarfile
+import tempfile
+import unittest
+from unittest import mock
+from tests import test_compact_manifest as compact_fixture
+
+try:
+    from jsonschema import Draft202012Validator, ValidationError
+except ImportError as error:
+    raise unittest.SkipTest("jsonschema is not installed; sampler validation controls require it") from error
+
+TOOL = Path(__file__).resolve().parents[1] / "tools/sota-convergence/start_closure_sampler.py"
+SPEC = importlib.util.spec_from_file_location("start_closure_sampler_test", TOOL)
+sampler = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(sampler)
+
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def raw(value):
+    return (json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n").encode()
+
+
+class FileGuardTests(unittest.TestCase):
+    def test_changed_pinned_file_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "input.json"
+            path.write_bytes(b"original")
+            expected = digest(path.read_bytes())
+            path.write_bytes(b"changed")
+            with self.assertRaisesRegex(ValueError, "Pinned input changed"):
+                sampler.pinned_bytes(path, expected)
+
+    def test_stratum_contract_exact_hash(self):
+        contract = json.loads(sampler.pinned_bytes(sampler.CONTRACT, sampler.CONTRACT_SHA256))
+        self.assertEqual(contract["profile"], sampler.PROFILE)
+        self.assertEqual(contract["seed"], 202610081850)
+        self.assertEqual(contract["r3_generator_sha256"], sampler.R3_CUSTODY_SHA256)
+
+    def test_accepted_reseal_pin_matches_tracked_bytes_and_keeps_historical_contract(self):
+        source = sampler.PROTOCOL.with_name("sealed_r3_generator.py")
+        self.assertEqual(digest(source.read_bytes()), sampler.R3_SHA256)
+        self.assertNotEqual(sampler.R3_SHA256, sampler.R3_CUSTODY_SHA256)
+
+    def test_profile_must_be_explicit(self):
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
+            sampler.main([])
+        self.assertEqual(error.exception.code, 2)
+        with self.assertRaisesRegex(ValueError, "explicitly"):
+            sampler.build_packet(profile=None, manifest_path=None, manifest_sha256=None,
+                origin_map_path=None, origin_map_sha256=None, protocol_sha256=None, r3_generator=None,
+                head="a" * 40, output_root=None, output_name=None)
+
+    def test_output_confinement_and_no_overwrite(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("../escape", "/absolute", ".", "..", "nested/output", "C:\\escape"):
+                with self.subTest(name=name), self.assertRaises(ValueError):
+                    sampler.output_directory(root, name)
+            (root / "existing").mkdir()
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                sampler.output_directory(root, "existing")
+            (root / "link").symlink_to(root / "existing", target_is_directory=True)
+            with self.assertRaises(ValueError):
+                sampler.output_directory(root / "link", "packet")
+            self.assertEqual(sampler.output_directory(root, "new-packet"), root / "new-packet")
+
+    def test_oversized_or_invalid_hash_input_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "input"
+            path.write_bytes(b"bytes")
+            with self.assertRaisesRegex(ValueError, "oversized"):
+                sampler.pinned_bytes(path, digest(b"bytes"), limit=1)
+            with self.assertRaisesRegex(ValueError, "lowercase SHA256"):
+                sampler.pinned_bytes(path, "not-a-hash")
+
+
+class NativeSamplerTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        source = os.environ.get("G5_R3_GENERATOR")
+        if not source:
+            raise unittest.SkipTest("Set G5_R3_GENERATOR to tools/sota-convergence/sealed_r3_generator.py for native draw controls")
+        cls.r3_path = Path(source)
+        cls.r3 = sampler.load_r3(cls.r3_path)
+        cls.protocol = Path(os.environ.get("G5_PROFILE_PROTOCOL", str(sampler.PROTOCOL)))
+        cls.protocol_sha = digest(cls.protocol.read_bytes())
+        cls.native, cls.repo = sampler.load_native(cls.protocol, cls.protocol_sha, cls.r3)
+        cls.schema_raw = (cls.repo / sampler.ROW_SCHEMA).read_bytes()
+        cls.validator = Draft202012Validator(cls.native.load(cls.schema_raw))
+        print("G5_SAMPLER_TEST_INPUTS " + json.dumps({"protocol_sha256": cls.protocol_sha,
+            "row_schema_sha256": digest(cls.schema_raw), "r3_generator_sha256": sampler.R3_SHA256}, sort_keys=True))
+
+    def setUp(self):
+        self.rows = []
+        self.bindings = []
+        self.fragment_sha = digest(b"synthetic original fragment bytes")
+        self.fragment_ref = {"source_id": "fixture-fragment", "sha256": self.fragment_sha,
+            "archive_member": "captures/original-fragment.json", "pointer": "/rows/0",
+            "owner_lane": "synthetic-controls"}
+
+    def add_row(self, disposition="WATCH", *, flags=(), held_action=False, conflict=False, origin_pointer=None):
+        number = len(self.rows)
+        repository = f"example/project-{number:03d}"
+        pin = {"kind": "commit", "version_or_commit": "a" * 40,
+            "repository_or_source": repository, "subject": "implementation"}
+        ref = {**self.fragment_ref, "pointer": f"/rows/{number}"}
+        row = {"repository_or_entry": repository, "slot": "native-clients", "disposition": disposition,
+            "evidence_class": "SOURCE-REVIEW", "pin": pin,
+            "primary_sources": [{"locator": f"https://github.com/{repository}/blob/{'a' * 40}/README.md",
+                "pin": pin, "subject": "pinned implementation README",
+                "capture_sha256": self.fragment_sha, "archive_member": ref["archive_member"]}],
+            "capture_sha256": self.fragment_sha, "archive_member": ref["archive_member"],
+            "owner_lane": "synthetic-controls", "refresh_date": "2026-10-08", "source_refs": [ref]}
+        if disposition == "PENDING":
+            row["pending"] = {"provisional_disposition": "WATCH", "measurement": "Read the pinned primary README", "owner": "synthetic-controls"}
+        if disposition == "REJECT":
+            row["searched"] = "Pinned primary README"
+        if disposition == "ADOPT-NOW":
+            row["evidence_class"] = "RECORDED-LIVE-ACCEPTANCE"
+            row["acceptance_witness"] = {"archive_member": ref["archive_member"], "sha256": self.fragment_sha, "pointer": "/acceptance"}
+        if "pending_pin" in flags:
+            row["pin"] = row["primary_sources"][0]["pin"] = None
+            row.setdefault("closure", {})["pending_pin"] = {"reason_code": "no-match", "measurement": "Find a tree containing the captured blob"}
+        if "pending_locator" in flags:
+            row["primary_sources"][0]["locator"] = "UNKNOWN"
+            row.setdefault("closure", {})["pending_locator"] = {"reason_code": "unsupported-transport", "measurement": "Establish the primary locator"}
+        fragment = {"fragment": "fixture-fragment", "artifact_sha256": self.fragment_sha,
+            "owner_lane": "synthetic-controls", "parent_family": "a-stars", "source_refs": [ref]}
+        if held_action or conflict:
+            row["choices"] = [{"disposition": "ADOPT-NOW", "source_refs": [ref]}]
+            fragment["held_action_claims"] = [{"disposition": "ADOPT-NOW", "source_refs": [ref]}]
+        if conflict:
+            row["choices"].append({"disposition": "WATCH", "source_refs": [ref]})
+            row.setdefault("closure", {})[sampler.CONFLICT_FLAG] = {
+                "provisional_disposition": row["pending"]["provisional_disposition"],
+                "measurement": row["pending"]["measurement"],
+                "action_side_row_ids": [f"baseline-action-{number:03d}"]}
+        if origin_pointer is not None:
+            row["origin_pointer"] = copy.deepcopy(origin_pointer)
+        self.rows.append(row)
+        self.bindings.append({"key": {"repository_or_entry": repository, "slot": "native-clients"}, "fragments": [fragment]})
+        return row
+
+    def inputs(self):
+        manifest = {"schema_version": 1, "kind": "g5-compact-landscape", "release_tag": "v2026.10.08",
+            "validation": {"status": "PASS", "profile": sampler.PROFILE, "blockers": []},
+            "row_schema": {"path": sampler.ROW_SCHEMA, "sha256": digest(self.schema_raw)},
+            "asset": {"sha256": digest(b"synthetic declared release asset")}, "rows": copy.deepcopy(self.rows)}
+        manifest_sha = digest(raw(manifest))
+        origins = {"schema_version": 1, "manifest_sha256": manifest_sha,
+            "stratum_contract_sha256": sampler.CONTRACT_SHA256, "origins": copy.deepcopy(self.bindings)}
+        return manifest, origins, manifest_sha
+
+    def packet_inputs(self, root):
+        self.assertIsNotNone(shutil.which("zstd"), "required native packet controls need zstd; skipping is not acceptance")
+        case = compact_fixture.CompactManifestTests()
+        case.setUp()
+        self.addCleanup(case.doCleanups)
+        tested = copy.deepcopy(self.rows)
+        rows = [case.row(f"example/project-{number:03d}") for number in range(368)]
+        for number, source in enumerate(tested):
+            source["evidence_class"] = "DOCUMENTARY"
+            source["archive_member"] = "captures/source.json"
+            source["capture_sha256"] = digest(case.capture)
+            for primary in source["primary_sources"]:
+                primary.update(archive_member="captures/source.json", capture_sha256=digest(case.capture))
+            rows[number] = source
+        original = raw({"rows": [{"repository_or_entry": row["repository_or_entry"],
+                                   "slot": row["slot"], "disposition": row["disposition"]} for row in rows]})
+        fragment_sha = digest(original)
+        case.files["captures/original-fragment.json"] = original
+        bindings = []
+        for number, row in enumerate(rows):
+            ref = {**self.fragment_ref, "sha256": fragment_sha, "pointer": f"/rows/{number}"}
+            row["source_refs"] = [ref]
+            for choice in row.get("choices", []):
+                choice["source_refs"] = [copy.deepcopy(ref)]
+            if isinstance(row.get("origin_pointer"), dict):
+                row["origin_pointer"] = copy.deepcopy(ref)
+            fragment = {"fragment": "fixture-fragment", "artifact_sha256": fragment_sha,
+                        "owner_lane": "synthetic-controls", "parent_family": "a-stars", "source_refs": [ref]}
+            bindings.append({"key": case.row_key(row), "fragments": [fragment]})
+        census = raw({"rows": [{"entry_id": str(number), "repository_or_entry": rows[0]["repository_or_entry"],
+                                "slot": rows[0]["slot"]} for number in (0, 1)]})
+        case.files["captures/list-census.json"] = census
+        occurrences = case.coverage["list_populations"][0]["expected_occurrences"]
+        for number, occurrence in enumerate(occurrences):
+            occurrence.update(repository_or_entry=rows[0]["repository_or_entry"], slot=rows[0]["slot"],
+                              capture_sha256=digest(census), pointer=f"/rows/{number}")
+            rows[0]["source_refs"].append({"occurrence_id": occurrence["occurrence_id"],
+                "sha256": digest(census), "archive_member": "captures/list-census.json", "pointer": f"/rows/{number}"})
+        case.rows = rows
+        case.coverage["expected_keys"] = [case.row_key(row) for row in case.rows]
+        case.coverage["starred_identities"] = [row["repository_or_entry"] for row in case.rows]
+        case.add_authority_witnesses()
+        asset_path = case.archive()
+        manifest, manifest_raw = self.native.build_manifest(asset_path, "v2026.10.08", profile=sampler.PROFILE)
+        self.assertEqual(manifest["validation"]["status"], "PASS", manifest["validation"]["blockers"])
+        manifest_sha = digest(manifest_raw)
+        origins = {"schema_version": 1, "manifest_sha256": manifest_sha,
+                   "stratum_contract_sha256": sampler.CONTRACT_SHA256, "origins": bindings}
+        manifest_path, origin_path = root / "input.json", root / "origin.json"
+        manifest_path.write_bytes(manifest_raw)
+        origin_path.write_bytes(raw(origins))
+        kwargs = dict(profile=sampler.PROFILE, manifest_path=manifest_path, manifest_sha256=manifest_sha,
+            origin_map_path=origin_path, origin_map_sha256=digest(raw(origins)), protocol_sha256=self.protocol_sha,
+            r3_generator=self.r3_path, head="f" * 40, output_root=root, output_name="packet",
+            protocol=self.protocol, asset_path=asset_path)
+        self.packet_case = case
+        return manifest, origins, manifest_sha, kwargs
+
+    def rewrite_packet_manifest(self, kwargs, manifest, origins):
+        encoded = self.native.json_text(self.native.sorted_tree(manifest), indent=2).encode("utf-8")
+        kwargs["manifest_path"].write_bytes(encoded)
+        kwargs["manifest_sha256"] = digest(encoded)
+        origins["manifest_sha256"] = digest(encoded)
+        kwargs["origin_map_path"].write_bytes(raw(origins))
+        kwargs["origin_map_sha256"] = digest(raw(origins))
+
+    def validated(self, manifest=None, origins=None, manifest_sha=None):
+        if manifest is None:
+            manifest, origins, manifest_sha = self.inputs()
+        return sampler.rows_and_origins(manifest, origins, manifest_sha, self.native, self.validator, self.r3)
+
+    def draw(self):
+        rows, origins, fragments = self.validated()
+        return rows, sampler.select(rows, origins, fragments, list(self.native.CLASSES), self.r3)
+
+    @staticmethod
+    def bucket(packets, name):
+        return next(p for p in packets if p["stratum"]["disposition"] == name)
+
+    def test_native_r3_stream_repeatable_and_minimum_population(self):
+        for _ in range(70):
+            self.add_row("WATCH")
+        for _ in range(4):
+            self.add_row("REJECT")
+        rows, origins, fragments = self.validated()
+        classes = self.validator.schema["properties"]["disposition"]["enum"]
+        first = sampler.select(rows, origins, fragments, classes, self.r3)
+        second = sampler.select(dict(reversed(list(rows.items()))), origins, fragments, classes, self.r3)
+        self.assertEqual(first, second)
+        self.assertEqual(self.bucket(first, "WATCH")["selected_count"], 59)
+        self.assertEqual(self.bucket(first, "REJECT")["selected_count"], 4)
+        direct = self.r3.select(rows, {key: [{**f, "held_action_claims": []} for f in value] for key, value in origins.items()}, fragments, classes, sampler.SEED, 59)
+        self.assertEqual([i["native_key"] for i in self.bucket(first, "WATCH")["selected"]],
+            [i["native_key"] for i in self.bucket(direct, "WATCH")["selected"]])
+
+    def test_new_population_redraw_uses_recorded_seed_without_changing_sealed_source(self):
+        for _ in range(80):
+            self.add_row("PENDING", flags=("pending_pin", "pending_locator"))
+        rows, origins, fragments = self.validated()
+        classes = list(self.native.CLASSES)
+        historic = sampler.select(rows, origins, fragments, classes, self.r3)
+        redraw = sampler.select(rows, origins, fragments, classes, self.r3, seed=202610090430)
+        again = sampler.select(dict(reversed(list(rows.items()))), origins, fragments, classes, self.r3, seed=202610090430)
+        self.assertEqual(redraw, again)
+        self.assertEqual(self.r3.SEED, sampler.SEED)
+        self.assertEqual(digest(self.r3_path.read_bytes()), sampler.R3_SHA256)
+        self.assertEqual({packet["stratum_id"] for packet in historic}, {packet["stratum_id"] for packet in redraw})
+        historical_by_id = {packet["stratum_id"]: packet for packet in historic}
+        for packet in redraw:
+            previous = historical_by_id[packet["stratum_id"]]
+            self.assertEqual(packet["population_key_sha256"], previous["population_key_sha256"])
+            self.assertNotEqual(packet["derived_seed"], previous["derived_seed"])
+            self.assertEqual(len(packet["selected"]), min(59, packet["population_size"]))
+        for invalid in (0, -1, True, 2**64):
+            with self.subTest(seed=invalid), self.assertRaisesRegex(ValueError, "positive 64-bit integer"):
+                sampler.select(rows, origins, fragments, classes, self.r3, seed=invalid)
+
+    def test_f4_precedence_keeps_historical_pin_flag_out_of_counted_pin_stratum(self):
+        self.add_row("PENDING", flags=("pending_pin",))
+        self.rows[0]["evidence_class"] = "UNKNOWN"
+        self.rows[0]["closure"]["residue"] = [{"reason_code": "evidence-class-unassessed", "bucket": "G5-F4", "count": 1, "measurement": "Assess retained evidence"}]
+        rows, packets = self.draw()
+        self.assertTrue("pending_pin" in self.rows[0]["closure"])
+        self.assertFalse(any(p["stratum"]["disposition"] == "PENDING-PIN" and p["population_size"] for p in packets))
+        self.assertEqual(self.bucket(packets, "PENDING")["selected_count"], 1)
+
+    def test_final_actions_are_full_census_and_held_claims_do_not_qualify(self):
+        for _ in range(70):
+            self.add_row("TRIAL")
+        self.add_row("ADOPT-NOW")
+        pending = self.add_row("PENDING", held_action=True)
+        rows, packets = self.draw()
+        self.assertEqual(self.bucket(packets, "TRIAL")["selected_count"], 70)
+        self.assertEqual(self.bucket(packets, "ADOPT-NOW")["selected_count"], 1)
+        self.assertTrue(all(p["stratum"]["bucket_kind"] == "FINAL-DISPOSITION" for p in packets))
+        manifest, _, manifest_sha = self.inputs()
+        actions = sampler.action_read_set(rows, manifest, manifest_sha, "f" * 40)
+        self.assertEqual(len(actions["rows"]), 71)
+        self.assertNotIn(list(self.native.decision_key(pending)), [r["row_id"] for r in actions["rows"]])
+        selected_pending = self.bucket(packets, "PENDING")["selected"][0]
+        self.assertEqual(selected_pending["row"], pending)
+        self.assertEqual(selected_pending["origin_bindings"], self.bindings[-1]["fragments"])
+
+    def test_each_closure_flag_is_a_seeded_overlapping_stratum(self):
+        for _ in range(70):
+            self.add_row("PENDING", flags=("pending_pin", "pending_locator"))
+        rows, packets = self.draw()
+        for label in ("PENDING", "PENDING-PIN", "PENDING-LOCATOR"):
+            packet = self.bucket(packets, label)
+            self.assertEqual(packet["population_size"], 70)
+            self.assertEqual(packet["selected_count"], 59)
+            self.assertEqual(packet["selection_mode"], "SAMPLED")
+            self.assertTrue(all(i["row"]["disposition"] == "PENDING" for i in packet["selected"]))
+            self.assertTrue(all(i["row"] == rows[tuple(i["native_key"])]["row"] for i in packet["selected"]))
+        counts = sampler.packet_counts(packets, rows)
+        self.assertEqual(counts["sample_memberships"], 177)
+        self.assertEqual(counts["rows_with_both_closure_flags"], 70)
+        self.assertLessEqual(counts["unique_sampled_rows"], 70)
+        self.assertEqual(counts["sample_overlap_memberships"], 177 - counts["unique_sampled_rows"])
+
+    def test_no_family_read_or_zero_defect_acceptance_is_inferred(self):
+        self.add_row()
+        _, packets = self.draw()
+        for packet in packets:
+            self.assertEqual(packet["family_review"]["status"], "NOT_RUN")
+            self.assertFalse(packet["family_review"]["zero_defects_established"])
+            self.assertEqual(packet["acceptance_number"], 0)
+
+    def test_source_residue_buckets_join_seeded_pin_and_locator_strata(self):
+        for bucket, reason in (("PENDING-PIN", "foreign-primary-pin-scope-unqualified"), ("PENDING-LOCATOR", "unsupported-json-pointer-capture")):
+            row = self.add_row("WATCH")
+            row["closure"] = {"residue": [{"reason_code": reason, "bucket": bucket, "count": 1, "measurement": "Verify retained primary source"}]}
+        rows, origins, fragments = self.validated()
+        packets = sampler.select(rows, origins, fragments, list(self.native.CLASSES), self.r3)
+        for bucket in ("PENDING-PIN", "PENDING-LOCATOR"):
+            self.assertEqual(self.bucket(packets, bucket)["selected_count"], 1)
+        for row in self.rows:
+            row["disposition"] = "TRIAL"
+        with self.assertRaises((ValueError, ValidationError, self.native.CompactError)):
+            self.validated()
+
+    def test_conflicts_are_uncapped_census_and_excluded_from_all_samples(self):
+        for _ in range(70):
+            self.add_row("PENDING", flags=("pending_pin", "pending_locator"), conflict=True)
+        for _ in range(4):
+            self.add_row("PENDING", flags=("pending_pin", "pending_locator"))
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        rows, origins, fragments = self.validated()
+        packets = sampler.select(rows, origins, fragments, list(self.native.CLASSES), self.r3)
+        conflicts = {key for key, item in rows.items() if sampler.CONFLICT_FLAG in item["row"].get("closure", {})}
+        for label in ("PENDING", "PENDING-PIN", "PENDING-LOCATOR"):
+            bucket = self.bucket(packets, label)
+            self.assertEqual(bucket["population_size"], 4)
+            self.assertEqual(bucket["selected_count"], 4)
+            self.assertFalse(conflicts & {tuple(i["native_key"]) for i in bucket["selected"]})
+        counts = sampler.packet_counts(packets, rows)
+        self.assertEqual(counts["unique_pending_conflict_rows"], 70)
+        self.assertEqual(counts["unique_census_rows"], 71)
+        self.assertEqual(counts["unique_selected_rows"], 75)
+        self.assertEqual(counts["sample_memberships"], 12)
+        self.assertEqual(counts["unique_sampled_rows"], 4)
+        self.assertEqual(counts["pending_conflict_excluded_from_samples"], 70)
+        self.assertEqual(counts["conflict_sample_flag_exclusions"], {"PENDING-PIN": 70, "PENDING-LOCATOR": 70})
+        manifest, _, manifest_sha = self.inputs()
+        census = sampler.pending_conflict_census(rows, origins, manifest, manifest_sha, "f" * 40)
+        self.assertEqual(census["count"], 70)
+        self.assertEqual(census["family_review"]["status"], "NOT_RUN")
+        for entry in census["rows"]:
+            key = tuple(entry["row_id"])
+            self.assertEqual(entry["row"], rows[key]["row"])
+            self.assertEqual(entry["row"]["disposition"], "PENDING")
+            self.assertEqual(entry["action_side_row_ids"], rows[key]["row"]["closure"][sampler.CONFLICT_FLAG]["action_side_row_ids"])
+            self.assertEqual(entry["origin_bindings"], origins[key])
+        self.assertEqual(len(sampler.action_read_set(rows, manifest, manifest_sha, "f" * 40)["rows"]), 1)
+
+    def test_conflict_metadata_requires_evidenced_action_conflict_and_measurement(self):
+        self.add_row("PENDING", conflict=True)
+        cases = ("single_choice", "no_action_choice", "different_measurement", "action_provisional", "duplicate_claim_ids", "action_disposition")
+        for case in cases:
+            manifest, origins, manifest_sha = self.inputs()
+            row = manifest["rows"][0]
+            flag = row["closure"][sampler.CONFLICT_FLAG]
+            if case == "single_choice":
+                row["choices"] = row["choices"][:1]
+            elif case == "no_action_choice":
+                row["choices"][0]["disposition"] = "REJECT"
+            elif case == "different_measurement":
+                flag["measurement"] = "A different settling measurement"
+            elif case == "action_provisional":
+                flag["provisional_disposition"] = row["pending"]["provisional_disposition"] = "TRIAL"
+            elif case == "duplicate_claim_ids":
+                flag["action_side_row_ids"] *= 2
+            else:
+                row["disposition"] = "TRIAL"
+                del row["pending"]
+            with self.subTest(case=case), self.assertRaises((ValueError, ValidationError)):
+                self.validated(manifest, origins, manifest_sha)
+
+    def test_unresolved_origin_keeps_action_and_bound_origin_is_preserved(self):
+        action = self.add_row("TRIAL", origin_pointer="unresolved")
+        bound = self.add_row("PENDING", conflict=True, origin_pointer=self.fragment_ref)
+        rows, packets = self.draw()
+        manifest, origins, manifest_sha = self.inputs()
+        final = sampler.action_read_set(rows, manifest, manifest_sha, "f" * 40)
+        self.assertEqual([r["row_id"] for r in final["rows"]], [list(self.native.decision_key(action))])
+        counts = sampler.packet_counts(packets, rows)
+        self.assertEqual(counts["origin_pointer_unresolved_rows"], 1)
+        self.assertEqual(counts["action_origin_pointer_unresolved_rows"], 1)
+        original_origins = self.validated(manifest, origins, manifest_sha)[1]
+        census = sampler.pending_conflict_census(rows, original_origins, manifest, manifest_sha, "f" * 40)
+        self.assertEqual(census["rows"][0]["row"]["origin_pointer"], bound["origin_pointer"])
+        manifest["rows"][1]["origin_pointer"]["archive_member"] = "../escape"
+        with self.assertRaises((ValueError, ValidationError)):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_profile_pass_and_exact_manifest_binding_are_required(self):
+        self.add_row()
+        for field, value in (("status", "BLOCKED"), ("profile", "default"), ("blockers", ["defect"])):
+            manifest, origins, manifest_sha = self.inputs()
+            manifest["validation"][field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.validated(manifest, origins, manifest_sha)
+        manifest, origins, manifest_sha = self.inputs()
+        origins["manifest_sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "exact manifest"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_native_key_uniqueness_and_full_origin_coverage(self):
+        self.add_row()
+        manifest, origins, manifest_sha = self.inputs()
+        manifest["rows"].append(copy.deepcopy(manifest["rows"][0]))
+        with self.assertRaisesRegex(ValueError, "Duplicate native"):
+            self.validated(manifest, origins, manifest_sha)
+        manifest, origins, manifest_sha = self.inputs()
+        origins["origins"] = []
+        with self.assertRaisesRegex(ValueError, "every final row"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_origin_map_must_bind_exact_start_stratum_contract(self):
+        self.add_row("WATCH")
+        manifest, origins, manifest_sha = self.inputs()
+        origins["stratum_contract_sha256"] = "d" * 64
+        with self.assertRaisesRegex(ValueError, "START stratum contract"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_declared_pending_action_origin_remains_full_census_without_sample_inference(self):
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        self.add_row("WATCH")
+        manifest, origins, manifest_sha = self.inputs()
+        missing = origins["origins"].pop(0)
+        origins["pending_origins"] = [{"key": missing["key"], "status": "PENDING", "reason_code": "retained-provenance-missing", "measurement": "Recover original fragment provenance"}]
+        rows, provenance, fragments = self.validated(manifest, origins, manifest_sha)
+        packets = sampler.select(rows, provenance, fragments, list(self.native.CLASSES), self.r3)
+        actions = sampler.action_read_set(rows, manifest, manifest_sha, "a" * 40)
+        self.assertEqual(len(actions["rows"]), 1)
+        self.assertFalse(any(item["row"]["disposition"] == "TRIAL" for packet in packets for item in packet["selected"]))
+        counts = sampler.packet_counts(packets, rows)
+        self.assertEqual(counts["unique_final_action_rows"], 1)
+        self.assertEqual(counts["pending_origin_census_rows"], 1)
+        self.assertEqual(counts["unique_selected_rows"], 2)
+
+    def test_pending_origin_cannot_exempt_sampled_rows_or_omit_reason_and_measurement(self):
+        self.add_row("WATCH")
+        manifest, origins, manifest_sha = self.inputs()
+        missing = origins["origins"].pop()
+        declaration = {"key": missing["key"], "status": "PENDING", "reason_code": "retained-provenance-missing", "measurement": "Recover original provenance"}
+        origins["pending_origins"] = [declaration]
+        with self.assertRaisesRegex(ValueError, "sampled row"):
+            self.validated(manifest, origins, manifest_sha)
+        self.add_row("TRIAL")
+        manifest, origins, manifest_sha = self.inputs()
+        missing = origins["origins"].pop()
+        origins["pending_origins"] = [{"key": missing["key"], "status": "PENDING", "reason_code": "retained-provenance-missing", "measurement": ""}]
+        with self.assertRaisesRegex(ValueError, "reason and measurement"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_native_origin_derivation_preserves_exact_refs_and_explicit_rollups(self):
+        self.add_row("WATCH")
+        self.add_row("TRIAL")
+        manifest, origins, manifest_sha = self.inputs()
+        binding = origins["origins"][0]
+        fragment = binding["fragments"][0]
+        provenance = {"schema_version": 1, "origins": [{**binding["key"], "fragments": [fragment["fragment"]], "source_refs": fragment["source_refs"]}]}
+        provenance_sha = digest(raw(provenance))
+        declarations = {"source_provenance_sha256": provenance_sha, "declarations": [{name: fragment[name] for name in ("fragment", "artifact_sha256", "owner_lane", "parent_family")}]}
+        derived = sampler.derive_origin_map(manifest, manifest_sha, provenance, provenance_sha, declarations, self.native, self.r3)
+        self.assertEqual(derived["counts"]["origins_retained"], 1)
+        self.assertEqual(derived["counts"]["origins_pending"], 1)
+        self.assertEqual(derived["counts"]["unreachable_sampled_rows"], 0)
+        self.assertEqual(derived["origins"][0]["fragments"][0]["source_refs"], fragment["source_refs"])
+        self.validated(manifest, derived, manifest_sha)
+        declarations["declarations"][0]["owner_lane"] = "invented-owner"
+        with self.assertRaisesRegex(ValueError, "owner differs"):
+            sampler.derive_origin_map(manifest, manifest_sha, provenance, provenance_sha, declarations, self.native, self.r3)
+
+    def test_native_draw_proof_uses_exact_inputs_and_preserves_population_hashes(self):
+        self.add_row("WATCH")
+        self.add_row("TRIAL")
+        manifest, origins, manifest_sha = self.inputs()
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        directory = Path(temporary.name)
+        manifest_path = directory / "manifest.json"
+        origin_path = directory / "origins.json"
+        manifest_path.write_bytes(raw(manifest))
+        origin_path.write_bytes(raw(origins))
+        result = sampler.draw_proof(manifest_path=manifest_path, manifest_sha256=manifest_sha,
+            origin_map_path=origin_path, origin_map_sha256=digest(origin_path.read_bytes()),
+            protocol_sha256=self.protocol_sha, r3_generator=self.r3_path, r3_sha256=sampler.R3_SHA256,
+            head="a" * 40, output=directory / "proof.json")
+        packets = json.loads((directory / "proof.json").read_bytes())
+        self.assertEqual(result["packet_sha256"], digest((directory / "proof.json").read_bytes()))
+        self.assertEqual(packets["manifest_sha256"], manifest_sha)
+        self.assertEqual(packets["origin_map_sha256"], digest(origin_path.read_bytes()))
+        self.assertTrue(all(len(p["population_key_sha256"]) == 64 for p in packets["packets"]))
+        with self.assertRaisesRegex(ValueError, "changed"):
+            sampler.draw_proof(manifest_path=manifest_path, manifest_sha256="d" * 64,
+                origin_map_path=origin_path, origin_map_sha256=digest(origin_path.read_bytes()),
+                protocol_sha256=self.protocol_sha, r3_generator=self.r3_path, r3_sha256=sampler.R3_SHA256,
+                head="a" * 40, output=directory / "invalid-proof.json")
+
+    def test_action_row_and_every_primary_source_remain_pinned(self):
+        self.add_row("TRIAL")
+        for target in ("row", "source"):
+            manifest, origins, manifest_sha = self.inputs()
+            row = manifest["rows"][0]
+            if target == "row":
+                row["pin"] = None
+            else:
+                row["primary_sources"][0]["pin"] = None
+            with self.subTest(target=target), self.assertRaises((ValueError, ValidationError)):
+                self.validated(manifest, origins, manifest_sha)
+
+    def test_action_row_cannot_carry_pending_closure_flag(self):
+        self.add_row("TRIAL")
+        manifest, origins, manifest_sha = self.inputs()
+        manifest["rows"][0]["closure"] = {"pending_pin": {"reason_code": "no-match", "measurement": "settle"}}
+        with self.assertRaises((ValueError, ValidationError)):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_unsafe_locator_and_archive_reference_are_rejected(self):
+        self.add_row("PENDING", flags=("pending_locator",))
+        for locator in ("file:/private", "/private", "https://name:secret@github.com/example/repo", "https://github.com/example/repo/blob/main/README.md"):
+            manifest, origins, manifest_sha = self.inputs()
+            manifest["rows"][0]["primary_sources"][0]["locator"] = locator
+            with self.subTest(locator=locator), self.assertRaises(ValueError):
+                self.validated(manifest, origins, manifest_sha)
+        manifest, origins, manifest_sha = self.inputs()
+        origins["origins"][0]["fragments"][0]["source_refs"][0]["archive_member"] = "../escape"
+        with self.assertRaises(ValueError):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_capture_and_original_fragment_evidence_cannot_drift(self):
+        self.add_row()
+        manifest, origins, manifest_sha = self.inputs()
+        manifest["rows"][0]["capture_sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "Hash-mismatched"):
+            self.validated(manifest, origins, manifest_sha)
+        manifest, origins, manifest_sha = self.inputs()
+        origins["origins"][0]["fragments"][0]["source_refs"][0]["pointer"] = "/unbound"
+        with self.assertRaisesRegex(ValueError, "original row reference"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_packet_hashes_projection_and_not_run_status(self):
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        self.add_row("PENDING", held_action=True)
+        self.add_row("PENDING", conflict=True)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, origins, manifest_sha, kwargs = self.packet_inputs(root)
+            result = sampler.build_packet(**kwargs)
+            packet = root / "packet"
+            summary = json.loads((packet / "manifest.json").read_bytes())
+            actions = json.loads((packet / "action-read-set.json").read_bytes())
+            conflicts = json.loads((packet / "pending-conflict-census.json").read_bytes())
+            combined = json.loads((packet / "census-read-set.json").read_bytes())
+            self.assertEqual(result["action_rows"], 1)
+            self.assertEqual(result["pending_conflict_rows"], 1)
+            self.assertEqual(result["census_rows"], 2)
+            self.assertEqual(result["reads"], "NOT_RUN")
+            self.assertEqual(result["action_read_set_sha256"], digest((packet / "action-read-set.json").read_bytes()))
+            self.assertEqual(actions["asset_sha256"], manifest["asset"]["sha256"])
+            self.assertEqual(actions["head"], "f" * 40)
+            expected_action = next(row for row in manifest["rows"] if row["disposition"] == "TRIAL")
+            expected_conflict = next(row for row in manifest["rows"] if sampler.CONFLICT_FLAG in row.get("closure", {}))
+            self.assertEqual(actions["rows"][0]["row_id"], list(self.native.decision_key(expected_action)))
+            self.assertEqual(actions["rows"][0]["locator"], [s["locator"] for s in expected_action["primary_sources"]])
+            self.assertEqual(conflicts["rows"][0]["row"], expected_conflict)
+            self.assertEqual(conflicts["family_review"]["status"], "NOT_RUN")
+            self.assertEqual(combined["counts_by_type"], {"FINAL-ACTION": 1, "PENDING-CONFLICT": 1})
+            self.assertEqual(combined["family_review"]["status"], "NOT_RUN")
+            self.assertEqual(combined["rows"][0]["origin_pointer"], "unresolved")
+            self.assertEqual({r["census_type"] for r in combined["rows"]}, {"FINAL-ACTION", "PENDING-CONFLICT"})
+            self.assertEqual(summary["action_read_set"]["reads"], "NOT_RUN")
+            self.assertEqual(summary["pending_conflict_census"]["reads"], "NOT_RUN")
+            self.assertEqual(summary["census_read_set"]["reads"], "NOT_RUN")
+            self.assertEqual(summary["asset_rows_verification"]["asset_sha256"], manifest["asset"]["sha256"])
+            self.assertEqual(summary["asset_rows_verification"]["rows"], len(manifest["rows"]))
+            self.assertEqual(summary["asset_rows_verification"]["rows_diff"], 0)
+            self.assertEqual(summary["asset_rows_verification"]["ordered_rows_sha256"],
+                             digest(self.r3.canonical(manifest["rows"]).encode()))
+            self.assertTrue(summary["asset_rows_verification"]["native_qualification"]["byte_exact"])
+            self.assertEqual(summary["asset_rows_verification"]["native_qualification"]["manifest_sha256"], manifest_sha)
+            self.assertEqual(result["pending_conflict_census_sha256"], digest((packet / "pending-conflict-census.json").read_bytes()))
+            self.assertEqual(result["census_read_set_sha256"], digest((packet / "census-read-set.json").read_bytes()))
+            for source in combined["sources"]:
+                self.assertEqual(digest((packet / source["path"]).read_bytes()), source["sha256"])
+            self.assertEqual(summary["family_review"]["profile_code_and_tests"], "NOT_RUN")
+            self.assertEqual(len(summary["profile_review_sources"]), 4)
+            for source in summary["profile_review_sources"]:
+                self.assertEqual(digest((packet / source["path"]).read_bytes()), source["sha256"])
+            for line in (packet / "manifest.sha256").read_text().splitlines():
+                expected, name = line.split("  ", 1)
+                self.assertEqual(digest((packet / name).read_bytes()), expected)
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                sampler.build_packet(**kwargs)
+            kwargs["manifest_path"].write_bytes(raw({**manifest, "tampered": True}))
+            kwargs["output_name"] = "second"
+            with self.assertRaisesRegex(ValueError, "Pinned input changed"):
+                sampler.build_packet(**kwargs)
+            self.assertFalse((root / "second").exists())
+
+    def test_packet_build_refuses_asset_manifest_row_drift_before_selection(self):
+        self.add_row("PENDING", conflict=True, origin_pointer="unresolved")
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        mutations = (
+            ("closure", lambda row: row["closure"].update({"pending_pin": {"reason_code": "no-body"}})),
+            ("closure_residue", lambda row: row["closure"].update({"residue": [{"reason_code": "unbound-field-selector"}]})),
+            ("origin_pointer", lambda row: row.update({"origin_pointer": "changed"})),
+            ("missing_origin_pointer", lambda row: row.pop("origin_pointer")),
+            ("disposition", lambda row: row.update({"disposition": "WATCH"})),
+            ("pending_disposition", lambda row: row["pending"].update({"provisional_disposition": "REJECT"})),
+            ("choice_disposition", lambda row: row["choices"][0].update({"disposition": "WATCH"})),
+            ("conflict_disposition", lambda row: row["closure"][sampler.CONFLICT_FLAG].update({"provisional_disposition": "REJECT"})),
+        )
+        for explicit in (False, True):
+            for name, mutate in mutations:
+                with self.subTest(field=name, explicit_pin=explicit), tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    manifest, origins, _, kwargs = self.packet_inputs(root)
+                    mutate(manifest["rows"][0])
+                    self.rewrite_packet_manifest(kwargs, manifest, origins)
+                    if explicit:
+                        kwargs["asset_sha256"] = manifest["asset"]["sha256"]
+                    with mock.patch.object(sampler, "select") as select:
+                        with self.assertRaisesRegex(ValueError, "Native-computed rows differ.*rows_diff=.*field="):
+                            sampler.build_packet(**kwargs)
+                        select.assert_not_called()
+                    self.assertFalse((root / "packet").exists())
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, origins, _, kwargs = self.packet_inputs(root)
+            manifest["rows"].reverse()
+            self.rewrite_packet_manifest(kwargs, manifest, origins)
+            kwargs["asset_sha256"] = manifest["asset"]["sha256"]
+            with self.assertRaisesRegex(ValueError, "Native-computed rows differ"):
+                sampler.build_packet(**kwargs)
+            self.assertFalse((root / "packet").exists())
+
+    def test_packet_build_requires_exact_asset_hash_binding(self):
+        self.add_row("TRIAL")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, origins, _, kwargs = self.packet_inputs(root)
+            manifest["asset"]["sha256"] = "0" * 64
+            self.rewrite_packet_manifest(kwargs, manifest, origins)
+            with mock.patch.object(sampler, "select") as select:
+                with self.assertRaisesRegex(ValueError, "Asset SHA256 differs"):
+                    sampler.build_packet(**kwargs)
+                select.assert_not_called()
+            self.assertFalse((root / "packet").exists())
+
+    def test_packet_build_requires_asset(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(shutil, "which", return_value=None), self.assertRaisesRegex(ValueError, "Packet build requires --asset"):
+                sampler.build_packet(profile=sampler.PROFILE, manifest_path=root / "not-read.json",
+                    manifest_sha256="0" * 64, origin_map_path=root / "not-read-map.json",
+                    origin_map_sha256="0" * 64, protocol_sha256=self.protocol_sha,
+                    r3_generator=self.r3_path, head="f" * 40, output_root=root, output_name="packet")
+            self.assertFalse((root / "packet").exists())
+
+    def test_required_packet_fixture_fails_instead_of_skipping_without_zstd(self):
+        with mock.patch.object(shutil, "which", return_value=None):
+            with self.assertRaisesRegex(AssertionError, "required native packet controls need zstd"):
+                self.packet_inputs(Path("not-created"))
+
+    def test_explicit_asset_pin_confirms_canonical_binding_and_preserves_manifest_bytes(self):
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        self.add_row("PENDING", conflict=True)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, origins, _, kwargs = self.packet_inputs(root)
+            manifest_raw = kwargs["manifest_path"].read_bytes()
+            manifest_sha = digest(manifest_raw)
+            canonical_sha = manifest["asset"]["sha256"]
+            kwargs["asset_sha256"] = digest(b"unqualified alternate archive")
+            with self.assertRaisesRegex(ValueError, "Asset SHA256 differs"):
+                sampler.build_packet(**kwargs)
+            self.assertFalse((root / "packet").exists())
+            kwargs["asset_sha256"] = canonical_sha
+            sampler.build_packet(**kwargs)
+            self.assertEqual(kwargs["manifest_path"].read_bytes(), manifest_raw)
+            packet = root / "packet"
+            self.assertEqual((packet / "inputs/manifest.json").read_bytes(), manifest_raw)
+            for name in ("manifest.json", "action-read-set.json", "pending-conflict-census.json", "census-read-set.json"):
+                metadata = json.loads((packet / name).read_bytes())
+                self.assertEqual(metadata["manifest_sha256"], manifest_sha)
+                self.assertEqual(metadata["row_binding"], "manifest_sha256")
+                self.assertEqual(metadata["asset_sha256"], canonical_sha)
+                self.assertEqual(metadata["manifest_asset_sha256"], canonical_sha)
+            summary = json.loads((packet / "manifest.json").read_bytes())
+            self.assertEqual(summary["asset_rebinding"], {"explicit_pin": True, "changed": False})
+            self.assertEqual(summary["asset_rows_verification"]["rows_diff"], 0)
+
+    def test_packet_uses_native_computed_rows_not_immutable_input_rows(self):
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, _, _, kwargs = self.packet_inputs(root)
+            _, _, captured = self.native.read_archive(kwargs["asset_path"], wanted={self.native.ROWS_MEMBER})
+            immutable_inputs = self.native.row_list(captured[self.native.ROWS_MEMBER])
+            self.assertNotEqual(immutable_inputs, manifest["rows"])
+            sampler.build_packet(**kwargs)
+            self.assertEqual((root / "packet/inputs/manifest.json").read_bytes(), kwargs["manifest_path"].read_bytes())
+
+    def test_explicit_asset_rebinding_cannot_replace_manifest_binding(self):
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        self.add_row("PENDING", conflict=True)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, origins, _, kwargs = self.packet_inputs(root)
+            actual_sha = manifest["asset"]["sha256"]
+            manifest["asset"]["sha256"] = digest(b"historical prepared asset")
+            self.rewrite_packet_manifest(kwargs, manifest, origins)
+            manifest_raw = kwargs["manifest_path"].read_bytes()
+            kwargs["asset_sha256"] = actual_sha
+            with mock.patch.object(sampler, "select") as selection:
+                with self.assertRaisesRegex(ValueError, "differs from manifest binding"):
+                    sampler.build_packet(**kwargs)
+                selection.assert_not_called()
+            self.assertEqual(kwargs["manifest_path"].read_bytes(), manifest_raw)
+            self.assertFalse((root / "packet").exists())
+
+    def test_explicit_pin_cannot_waive_added_or_removed_computed_rows(self):
+        self.add_row("TRIAL")
+        for added in (False, True):
+            with self.subTest(added=added), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                manifest, origins, _, kwargs = self.packet_inputs(root)
+                if added:
+                    manifest["rows"].append(copy.deepcopy(manifest["rows"][-1]))
+                else:
+                    manifest["rows"].pop()
+                self.rewrite_packet_manifest(kwargs, manifest, origins)
+                kwargs["asset_sha256"] = manifest["asset"]["sha256"]
+                with mock.patch.object(sampler, "select") as selection:
+                    with self.assertRaisesRegex(ValueError, "Native-computed rows differ.*rows_diff=1"):
+                        sampler.build_packet(**kwargs)
+                    selection.assert_not_called()
+                self.assertFalse((root / "packet").exists())
+
+    def test_canonical_row_type_difference_returns_clean_diagnostic(self):
+        self.add_row("PENDING", flags=("pending_pin",))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, origins, _, kwargs = self.packet_inputs(root)
+            self.packet_case.rows[0]["evidence_class"] = "UNKNOWN"
+            asset = self.packet_case.archive()
+            qualified, _ = self.native.build_manifest(asset, "v2026.10.08", profile=sampler.PROFILE)
+            self.assertEqual(qualified["validation"]["status"], "PASS")
+            self.assertEqual(qualified["rows"][0]["closure"]["residue"][0]["count"], 1)
+            kwargs["asset_sha256"] = qualified["asset"]["sha256"]
+            for incorrect_type in (1.0, True):
+                manifest = copy.deepcopy(qualified)
+                manifest["rows"][0]["closure"]["residue"][0]["count"] = incorrect_type
+                self.rewrite_packet_manifest(kwargs, manifest, origins)
+                with self.subTest(count=incorrect_type), mock.patch.object(sampler, "select") as selection:
+                    with self.assertRaisesRegex(ValueError, "Native-computed rows differ.*field=closure"):
+                        sampler.build_packet(**kwargs)
+                    selection.assert_not_called()
+            self.assertFalse((root / "packet").exists())
+
+    def test_explicit_pin_cannot_waive_capture_or_coverage_qualification(self):
+        self.add_row("TRIAL")
+        for condition in ("capture", "coverage"):
+            with self.subTest(condition=condition), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                manifest, origins, _, kwargs = self.packet_inputs(root)
+                if condition == "capture":
+                    self.packet_case.files["captures/source.json"] = raw({"kind": "changed-documentation"})
+                else:
+                    self.packet_case.coverage["expected_keys"].pop()
+                changed_asset = self.packet_case.archive()
+                actual_pin = digest(changed_asset.read_bytes())
+                manifest["asset"].update(sha256=actual_pin, bytes=changed_asset.stat().st_size)
+                self.rewrite_packet_manifest(kwargs, manifest, origins)
+                kwargs["asset_sha256"] = actual_pin
+                with mock.patch.object(sampler, "select") as selection:
+                    diagnostic = "capture is missing or hash-mismatched" if condition == "capture" else "native qualification blocked"
+                    with self.assertRaisesRegex(ValueError, diagnostic):
+                        sampler.build_packet(**kwargs)
+                    selection.assert_not_called()
+                self.assertFalse((root / "packet").exists())
+
+    def test_packet_refuses_missing_rows_member_with_correct_explicit_pin(self):
+        self.add_row("TRIAL")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, origins, _, kwargs = self.packet_inputs(root)
+            files = {self.native.COVERAGE_MEMBER: raw(self.packet_case.coverage), **self.packet_case.files}
+            tar_path = root / "missing-rows.tar"
+            with tarfile.open(tar_path, "w") as archive:
+                for name, payload in files.items():
+                    member = tarfile.TarInfo(name)
+                    member.size = len(payload)
+                    archive.addfile(member, io.BytesIO(payload))
+            compressed = subprocess.run(["zstd", "--quiet", "--stdout", str(tar_path)], capture_output=True, check=True)
+            missing = root / "missing-rows.tar.zst"
+            missing.write_bytes(compressed.stdout)
+            actual_pin = digest(compressed.stdout)
+            manifest["asset"].update(name=missing.name, sha256=actual_pin, bytes=len(compressed.stdout))
+            self.rewrite_packet_manifest(kwargs, manifest, origins)
+            kwargs.update(asset_path=missing, asset_sha256=actual_pin)
+            with mock.patch.object(sampler, "select") as selection:
+                with self.assertRaisesRegex(ValueError, "asset requires compact/rows.json"):
+                    sampler.build_packet(**kwargs)
+                selection.assert_not_called()
+            self.assertFalse((root / "packet").exists())
+
+    def test_packet_validates_explicit_pin_format_and_manifest_asset_object(self):
+        self.add_row("TRIAL")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, origins, _, kwargs = self.packet_inputs(root)
+            for invalid in ("A" * 64, "g" * 64, "a" * 63, "a" * 65, "", 1, []):
+                with self.subTest(explicit_pin=invalid), mock.patch.object(sampler, "select") as selection:
+                    with self.assertRaisesRegex(ValueError, "Asset pin must be a full lowercase SHA256"):
+                        sampler.build_packet(**kwargs, asset_sha256=invalid)
+                    selection.assert_not_called()
+            for invalid in (None, [], "not-an-object", 1):
+                changed = copy.deepcopy(manifest)
+                changed["asset"] = invalid
+                self.rewrite_packet_manifest(kwargs, changed, origins)
+                with self.subTest(asset=invalid), mock.patch.object(sampler, "select") as selection:
+                    with self.assertRaisesRegex(ValueError, "Manifest asset must be an object"):
+                        sampler.build_packet(**kwargs)
+                    selection.assert_not_called()
+            self.assertFalse((root / "packet").exists())
+
+    def test_native_cli_asset_wiring_and_clean_failures(self):
+        self.add_row("TRIAL")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, origins, _, kwargs = self.packet_inputs(root)
+            arguments = ["--profile", sampler.PROFILE, "--manifest", str(kwargs["manifest_path"]),
+                "--manifest-sha256", kwargs["manifest_sha256"], "--origin-map", str(kwargs["origin_map_path"]),
+                "--origin-map-sha256", kwargs["origin_map_sha256"], "--protocol-sha256", self.protocol_sha,
+                "--r3-generator", str(self.r3_path.resolve()), "--head", "f" * 40,
+                "--output-root", str(root), "--output", "cli-packet"]
+            missing = subprocess.run([sys.executable, str(TOOL), *arguments], capture_output=True, text=True)
+            self.assertEqual(missing.returncode, 2)
+            self.assertIn("Missing --asset", missing.stderr)
+            self.assertNotIn("Traceback", missing.stderr)
+            run = subprocess.run([sys.executable, str(TOOL), *arguments, "--asset", str(kwargs["asset_path"]),
+                "--asset-sha256", manifest["asset"]["sha256"]], capture_output=True, text=True)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            self.assertEqual(json.loads(run.stdout)["reads"], "NOT_RUN")
+            summary = json.loads((root / "cli-packet/manifest.json").read_bytes())
+            self.assertEqual(summary["asset_sha256"], manifest["asset"]["sha256"])
+            self.assertTrue(summary["asset_rows_verification"]["native_qualification"]["byte_exact"])
+            changed = copy.deepcopy(manifest)
+            changed["asset"] = []
+            self.rewrite_packet_manifest(kwargs, changed, origins)
+            malformed = subprocess.run([sys.executable, str(TOOL), *arguments[:3],
+                str(kwargs["manifest_path"]), "--manifest-sha256", kwargs["manifest_sha256"],
+                "--origin-map", str(kwargs["origin_map_path"]), "--origin-map-sha256", kwargs["origin_map_sha256"],
+                "--protocol-sha256", self.protocol_sha, "--r3-generator", str(self.r3_path.resolve()),
+                "--head", "f" * 40, "--output-root", str(root), "--output", "malformed",
+                "--asset", str(kwargs["asset_path"])], capture_output=True, text=True)
+            self.assertEqual(malformed.returncode, 2)
+            self.assertIn("Manifest asset must be an object", malformed.stderr)
+            self.assertNotIn("Traceback", malformed.stderr)
+
+    def test_preparation_modes_reject_asset_flags(self):
+        for mode in ("--draw-proof", "--derive-origin-map"):
+            for flag, value in (("--asset", "not-read.tar.zst"), ("--asset-sha256", "a" * 64)):
+                with self.subTest(mode=mode, flag=flag):
+                    error = io.StringIO()
+                    with redirect_stderr(error), self.assertRaises(SystemExit) as exited:
+                        sampler.main(["--profile", sampler.PROFILE, mode, flag, value])
+                    self.assertEqual(exited.exception.code, 2)
+                    self.assertIn("Asset flags apply only to production packet mode", error.getvalue())
+
+
+if __name__ == "__main__":
+    unittest.main()
