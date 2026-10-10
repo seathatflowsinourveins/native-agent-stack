@@ -22,8 +22,14 @@ against it.
 | `tavily` | Tavily API key. Until 2026-09-29 it lived only in the kernel keyring; its first file write comes from that copy through the create-only chain in [Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29) | optional | `<store>/tavily.env` | `TAVILY_API_KEY` |
 | `anthropic-api` | Anthropic Claude Console API key for local tools without an identity provider | optional | `<store>/anthropic-api.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-2` | Anthropic Claude API key, second key (additional credit; fast-mode trial) | optional | `<store>/anthropic-api-2.env` | `ANTHROPIC_API_KEY` |
-| `anthropic-api-3` | Anthropic Claude API key, third key (additional credit; direct use only) | optional | `<store>/anthropic-api-3.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-3` | Anthropic Claude API key, third key (CI Claude review) | optional | `<store>/anthropic-api-3.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-4` | Anthropic Claude API key, fourth key (additional credit; direct use only) | optional | `<store>/anthropic-api-4.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-5` | Anthropic Claude API key, fifth key (additional credit; direct use only) | optional | `<store>/anthropic-api-5.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-6` | Anthropic Claude API key, sixth key (additional credit; direct use only) | optional | `<store>/anthropic-api-6.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-7` | Anthropic Claude API key, seventh key (additional credit; direct use only) | optional | `<store>/anthropic-api-7.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-8` | Anthropic Claude API key, eighth key (additional credit; direct use only) | optional | `<store>/anthropic-api-8.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-9` | Anthropic Claude API key, ninth key (additional credit; direct use only) | optional | `<store>/anthropic-api-9.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-10` | Anthropic Claude API key, tenth key (additional credit; direct use only) | optional | `<store>/anthropic-api-10.env` | `ANTHROPIC_API_KEY` |
 | `grafana-admin` | Local Grafana admin account and secret key | generated locally | `~/.config/ecosystem-observability/ecosystem-grafana.env` | `GF_SECURITY_*` |
 | `nativestack-generation-key` | Host service key | generated locally | `~/.config/nativestack/generation.key` | none |
 | `openhands-session` | OpenHands agent-server session key for one runtime-worker attempt ([decision](decisions/2026-09-28-openhands-resolver-isolation.md)) | generated locally, per attempt; deleted after the attempt's containers are confirmed removed | `~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/<run-id>-<arm>.server.env`, plus the `.headers` file beside it | none on the host; `OH_SESSION_API_KEYS_0` exists only inside the agent-server container (Docker `--env-file`) |
@@ -59,6 +65,13 @@ this inventory change. Batches and other provider features require their
 own direct-client verification. See the
 [additional-keys decision](decisions/2026-10-09-anthropic-api-additional-keys.md).
 
+`anthropic-api-5` to `anthropic-api-10` add six more optional stores on the
+owner's direction (2026-10-10, relayed by the command center), with the same
+variable, runner, hidden-prompt and workspace handling. Slot purposes, the
+failover order, the CI secret and the health check are in
+[Key practice (2026-10-10)](#key-practice-2026-10-10); see the
+[key-slots decision](decisions/2026-10-10-anthropic-key-slots-and-practice.md).
+
 `sec-contact` may also declare the public `EDGAR_RATE_LIMIT_PER_SEC` setting as
 a positive integer, for example `5`, before launching an EdgarTools command.
 The [template](examples/sec-contact.env.example) leaves this opt-in line commented;
@@ -82,6 +95,115 @@ name only. `HF_TOKEN_PATH` holds a path, not a secret, but it stays unset
 too: it moves the Hugging Face token files away from where the checker, the
 guard and the deny rules look. The checker lists it by name under
 `native store path overrides`.
+
+## Key practice (2026-10-10)
+
+The owner (2026-10-10, relayed by the command center) asked for an Anthropic
+key practice that agents can follow natively, that keeps every key out of
+public repositories, and that prepares the ground for later work. The command
+center finalized the practice below on 2026-10-10; this section is its
+repository copy. The
+[key-slots decision](decisions/2026-10-10-anthropic-key-slots-and-practice.md)
+records the evidence and the alternatives.
+
+| Slot | Organization id prefix | Purpose |
+| --- | --- | --- |
+| `anthropic-api-3` | `cd36eeda` | CI Claude review (the main-only `claude-review` environment secret) |
+| `anthropic-api-4` | `72e62741` | Quality-critical work and the north star's multi-model QA; the default when work uses a single key |
+| `anthropic-api-5` | `e02c4dee` | Additional credit; next in line after `anthropic-api-4` |
+| `anthropic-api`, `anthropic-api-2` | `9b5bb5b0`, `e0da7458` | Spares |
+| `anthropic-api-6` to `anthropic-api-10` | none stored | The next keys, filled in slot order |
+
+A prefix is the first eight characters of the id of the organization that a
+slot's key belongs to. The prefixes are the command center's reading of
+2026-10-10 at 14:14Z with its own health script, which injects each key per
+command and never prints one; this change did not measure them. The same reading found every stored
+key to be a regular API key of a separate individual account. Account names
+and credit balances are not recorded here.
+
+1. **Scope.** The Claude API serves work that needs its quality and the
+   north star's multi-model QA; routine work stays on the subscription and
+   the GPT pool (the owner, 2026-10-10, relayed by the command center).
+2. **One purpose per slot.** Each key has its own slot and each slot one
+   purpose, declared in the
+   [credential inventory](../adoption/credential-inventory.json). New slots
+   come by pull request.
+3. **Adding or rotating.** `tools/credentials/open_credential_terminal.sh <slot>`
+   opens a window with hidden input
+   ([Adding or rotating a key](#adding-or-rotating-a-key-without-pasting-it-anywhere)).
+   A key never passes through a chat, an agent, a command line or shell
+   history. The window prints the checkout's commit and refuses uncommitted
+   credential code.
+4. **Using.** `python3 tools/credentials/credential_run.py <slot> -- <command>`
+   injects the key into one command and masks it in that command's output
+   ([Using a key](#using-a-key)). Never export a key: `ANTHROPIC_API_KEY`
+   stays unset in Claude Code sessions, where a set key can move a session
+   from subscription sign-in to API billing.
+5. **CI.** A key reaches GitHub only as an environment secret of an
+   environment restricted to `main`. Under the owner's ruling of 2026-10-10
+   (PR #968), the `claude-review` environment, whose deployment branch
+   policy is `main`, holds the CI key from `anthropic-api-3`. The command
+   center sets it from the slot by running `gh secret set` with
+   `--env claude-review` under `credential_run.py`, with the value on gh's
+   standard input and never in argv; the installed gh 2.102.0 help says
+   `--body` "reads from standard input if not specified". Never put a key in
+   a repository-level secret of a public repository. At this change's base
+   no workflow in `.github/workflows/` has a `pull_request_target` or
+   `workflow_run` trigger; the command center reports secret scanning and
+   push protection on for the public repository.
+6. **Health.** `python3 tools/credentials/anthropic_key_health.py` (with
+   `--slot <id>` for one slot, `--json` for a machine-readable report)
+   reports per slot whether a key is stored, the status of `GET /v1/models`
+   with what it says about the key (valid, invalid, forbidden, rate limited,
+   server error or unreachable), the status of `GET /v1/organizations/me`,
+   and the first eight characters of the `anthropic-organization-id`
+   response header. Neither request uses tokens. The key reaches only the
+   probe's environment, through `credential_run.py`, and the request headers
+   go on the probe's standard input; the report never holds a key, an
+   organization name or a response body. It exits 0 when every stored slot
+   is valid, 1 otherwise, and 2 on a usage error. Run it after any add or
+   rotation, and daily; the command center adds a timer separately.
+7. **Tracking.** According to the command center, the api-actions lane's
+   ledger records each charge per key and workload in dollars; per-call
+   token counts with cache reads and writes are being added, to give per-key
+   cache hit rates. An account's credit balance shows in that account's
+   Console. There are no admin
+   keys: every slot's account is an individual account (the command center's
+   reading), and Anthropic's
+   [Admin API](https://docs.anthropic.com/en/api/administration-api) and
+   [Usage and Cost API](https://docs.anthropic.com/en/api/usage-cost-api)
+   pages both state "The Admin API is unavailable for individual accounts."
+   (read 2026-10-10). Converting an account to an organization would enable
+   it; that is the owner's choice and is not needed now.
+8. **Rotation.** Create the new key in that account's Console, run the
+   terminal for the slot and type `replace`, set the CI environment secret
+   again when the slot backs CI, run the health check, then delete the old
+   key in the Console.
+9. **Spend control.** Each account's Console holds a spend limit per
+   workspace (an owner action). The CI review also caps itself at $55 a day
+   (the command center's record; that cap is not in the workflows at this
+   change's base).
+10. **Fill-first failover** (the owner, 2026-10-10, relayed by the command
+    center). Keys are not pooled; each spends its own account's credit.
+    Quality work uses one key until Anthropic reports that key's credit
+    exhausted, or answers 401 for a revoked key, and then moves to the next
+    in a fixed order: `anthropic-api-4`, `anthropic-api-5`, `anthropic-api`,
+    `anthropic-api-2`, then `anthropic-api-6` to `anthropic-api-10` as they
+    are stored. `anthropic-api-3` stays dedicated to CI and is never in that
+    order. Never round-robin. Anthropic's
+    [prompt-caching page](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
+    ("Cache storage and sharing", read 2026-10-10) states "Caches are
+    isolated between organizations. Different organizations never share
+    caches, even if they use identical prompts." The stored slots belong to
+    five different organizations (the distinct prefixes above), so
+    alternating between them makes each account write and hold its own copy
+    of a cached prefix, while filling one account first keeps one cache
+    warm. The same page also isolates caches per workspace within an
+    organization on the Claude API. Each switch is to be a ledger row and a
+    command-center alert; the launcher that implements this is an
+    api-actions follow-up outside this change.
+11. **Next key.** Add a key by opening the terminal for the next empty slot,
+    `anthropic-api-6` first.
 
 <a id="using-a-key"></a>
 
