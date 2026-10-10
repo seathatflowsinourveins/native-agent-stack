@@ -1937,6 +1937,273 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         normalized = " ".join(text.split())
         self.assertEqual(normalized.count(self.TRADING_CORRECTION), 1)
 
+    # docs/decisions/2026-10-10-layer15-nautilus-adjustment-claim.md: the Layer 1.5 candidate list said "NautilusTrader's
+    # data catalog and adjustment handling". The selected release, NautilusTrader 2.0.0rc5 (catalogs/us-equities/
+    # runtime-target.json, engine.requested_version), and rc6 declare no equity corporate-action or price-adjustment
+    # type in their public stubs, in crates/model/src/enums.rs at their tag commits, or in their documentation. The
+    # wheels were scanned. The paragraph is pinned by the facts it must state, in any wording, and not by its sentence:
+    # layer_15_drift() lists what a paragraph fails to say, and the controls below run it on edited copies.
+    LAYER_15_RECORD = "docs/decisions/2026-10-10-layer15-nautilus-adjustment-claim.md"
+    LAYER_15_CATALOG = "NautilusTrader's data catalog"
+    # The negative clause: a negation, then the two terms in order, inside one parenthetical (no ";" or ")" between).
+    LAYER_15_NEGATIVE = re.compile(
+        r"\b(?:no|not|neither|nor|without)\b[^;)]{0,40}?equity corporate[- ]action[^;)]{0,40}?price[- ]adjustment",
+        re.IGNORECASE,
+    )
+    # The current form of the catalog candidate, used only to build the sample paragraphs of the controls.
+    LAYER_15_CLAUSE = (
+        "NautilusTrader's data catalog (storage and query: 2.0.0rc5, the selected release, and rc6 declare no equity "
+        "corporate-action or price-adjustment type; `" + LAYER_15_RECORD + "`)"
+    )
+    LAYER_15_OTHER_CANDIDATES = ("EdgarTools' CIK and ticker maps", "alpaca-py's corporate-actions endpoint",
+                                 "Lean's map and factor files", "an available vendor feed")
+    # wheel, bytes, sha256 (as PyPI publishes it), commit of the release tag in nautechsystems/nautilus_trader
+    LAYER_15_RELEASES = (
+        ("nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl", "69,963,442",
+         "eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebe", "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"),
+        ("nautilus_trader-2.0.0rc6-cp312-cp312-manylinux_2_34_x86_64.whl", "69,828,675",
+         "9b4002a7bf5e6399c51073039b740ccf3ca7a1e2584ff72c7d479f03eaa9658d", "7b766f8825b2539c5b2ac1375e9d97b41c509edb"),
+    )
+    # Every adjustment-named declaration the scan found in both releases, and the catalog class it also read.
+    LAYER_15_DECLARED = ("ContinuousFutureAdjustmentType", "PositionAdjustmentType", "PositionAdjusted",
+                         "AccountAdjustmentOutcome", "GreeksConvention", "PRICE_ADJUSTED", "IbHistoricalWhatToShow",
+                         "ADJUSTED_LAST", "IbTickType", "IB_DIVIDENDS", "ParquetDataCatalog")
+
+    def layer_15_paragraph(self):
+        text = (ROOT / "blueprints/us-equities/AGENTS.md").read_text(encoding="utf-8")
+        start = text.index('Desk data-integrity glue ("Layer 1.5")')
+        return " ".join(text[start:text.index("\n\n", start)].split())
+
+    def layer_15_engine(self):
+        return json.loads((ROOT / "catalogs/us-equities/runtime-target.json").read_text(encoding="utf-8"))["engine"]
+
+    def layer_15_drift(self, paragraph, selected="2.0.0rc5"):
+        """What the paragraph fails to state about NautilusTrader's data catalog, by fact and not by wording."""
+        if self.LAYER_15_CATALOG not in paragraph:
+            return ["the NautilusTrader data-catalog candidate is not named"]
+        start, depth, end = paragraph.index(self.LAYER_15_CATALOG), 0, len(paragraph)
+        for position in range(start, len(paragraph)):  # the candidate runs to the next comma outside parentheses
+            if paragraph[position] == "(":
+                depth += 1
+            elif paragraph[position] == ")":
+                depth -= 1
+            elif paragraph[position] == "," and depth == 0:
+                end = position
+                break
+        clause, problems = paragraph[start:end], []
+        negative = self.LAYER_15_NEGATIVE.search(clause)
+        if negative is None:
+            problems.append("no clause says the releases declare no equity corporate-action or price-adjustment type")
+        rest = clause if negative is None else clause[:negative.start()] + clause[negative.end():]
+        rest = rest.replace(self.LAYER_15_RECORD, "")  # the record's own file name says "adjustment"
+        if "adjust" in rest.lower() or "adjustment handling" in paragraph.lower():
+            problems.append("the catalog candidate is described as supplying adjustment")
+        short = "rc" + selected.rsplit("rc", 1)[1]
+        if short not in clause or "selected" not in clause.lower() or re.search(r"rc6\W{1,3}(?:the\s+)?selected", clause):
+            problems.append(f"the clause does not say that {short} is the selected release")
+        if "rc6" not in clause:
+            problems.append("the clause does not say that rc6 was checked")
+        if self.LAYER_15_RECORD not in paragraph:
+            problems.append("the paragraph does not point at the decision record")
+        problems += [f"the candidate {name!r} is not listed" for name in self.LAYER_15_OTHER_CANDIDATES
+                     if name not in paragraph]
+        return problems
+
+    def layer_15_sample(self, clause, candidates=None):
+        listed = list(self.LAYER_15_OTHER_CANDIDATES if candidates is None else candidates)
+        names = [clause, *listed[:-1], "and " + listed[-1]]
+        return ('Desk data-integrity glue ("Layer 1.5"): foundation layers stay free of custom code. Candidates include '
+                + ", ".join(names) + ". Build the glue from cited SOTA references.")
+
+    def test_layer_15_candidates_do_not_claim_nautilus_adjustment_handling(self):
+        problems = self.layer_15_drift(self.layer_15_paragraph(), self.layer_15_engine()["requested_version"])
+        self.assertEqual(problems, [])
+
+    def test_layer_15_guard_accepts_the_current_form_and_meaning_preserving_rewordings(self):
+        record = self.LAYER_15_RECORD
+        forms = {
+            "the current form": self.LAYER_15_CLAUSE,
+            "slash for 'and'": self.LAYER_15_CLAUSE.replace("storage and query:", "storage/query:"),
+            "neither and nor": f"NautilusTrader's data catalog (storage and query only; neither 2.0.0rc5, the selected "
+                               f"release, nor rc6 declares an equity corporate-action or a price-adjustment type; see "
+                               f"`{record}`)",
+            "spaces for hyphens": f"NautilusTrader's data catalog (storage and query; 2.0.0rc5, the selected release, "
+                                  f"and rc6 do not declare any equity corporate action or price adjustment type: "
+                                  f"`{record}`)",
+        }
+        for name, form in forms.items():
+            with self.subTest(wording=name):
+                self.assertEqual(self.layer_15_drift(self.layer_15_sample(form)), [])
+
+    def test_layer_15_guard_rejects_the_old_claim_and_each_lost_fact(self):
+        clause, record = self.LAYER_15_CLAUSE, self.LAYER_15_RECORD
+        negative = "declare no equity corporate-action or price-adjustment type"
+        forms = {
+            "the earlier claim": "NautilusTrader's data catalog and adjustment handling",
+            "the earlier claim beside the new clause": clause.replace("data catalog", "data catalog and adjustment handling"),
+            "no negative clause": clause.replace(" " + negative, ""),
+            "a reversed negative clause": clause.replace("declare no equity", "declare an equity"),
+            "a reversed clause in the plural": clause.replace(negative, "declare equity corporate-action and "
+                                                                      "price-adjustment types"),
+            "only one of the two terms negated": clause.replace(" or price-adjustment type", " type"),
+            "no pointer to the record": clause.replace("; `" + record + "`", ""),
+            "rc5 not called the selected release": clause.replace(", the selected release,", ""),
+            "another release named": clause.replace("2.0.0rc5", "2.0.0rc4"),
+            "rc6 not mentioned": clause.replace(" and rc6 declare", " declares"),
+            "rc6 called the selected release": clause.replace("2.0.0rc5, the selected release, and rc6 declare",
+                                                              "2.0.0rc5 and rc6, the selected release, declare"),
+            "the catalog renamed": clause.replace("data catalog", "catalog"),
+            "adjustment claimed in other words": clause + " that adjusts prices for splits",
+        }
+        for name, form in forms.items():
+            with self.subTest(change=name):
+                self.assertNotEqual(form, clause)
+                self.assertNotEqual(self.layer_15_drift(self.layer_15_sample(form)), [])
+        for candidate in self.LAYER_15_OTHER_CANDIDATES:
+            kept = [other for other in self.LAYER_15_OTHER_CANDIDATES if other != candidate]
+            with self.subTest(dropped=candidate):
+                self.assertNotEqual(self.layer_15_drift(self.layer_15_sample(clause, kept)), [])
+        with self.subTest(change="the earlier claim as a separate candidate"):
+            claimed = [*self.LAYER_15_OTHER_CANDIDATES, "NautilusTrader's adjustment handling"]
+            self.assertNotEqual(self.layer_15_drift(self.layer_15_sample(clause, claimed)), [])
+
+    def test_layer_15_record_pins_the_scanned_releases_and_the_declared_adjustment_types(self):
+        record = ROOT / self.LAYER_15_RECORD
+        self.assertTrue(record.is_file(), "the Layer 1.5 sentence points at this record")
+        text = " ".join(record.read_text(encoding="utf-8").split())
+        for release in self.LAYER_15_RELEASES:
+            for fact in release:
+                with self.subTest(release=release[0], fact=fact):
+                    self.assertIn(fact, text)
+        for name in self.LAYER_15_DECLARED:
+            with self.subTest(declaration=name):
+                self.assertIn(name, text)
+        engine = self.layer_15_engine()  # the repository's own pin of the selected release
+        self.assertEqual(engine["requested_version"], "2.0.0rc5")
+        self.assertEqual(engine["source_commit"], self.LAYER_15_RELEASES[0][3])
+
+    def test_layer_15_record_names_the_catalog_custom_writer_as_the_stubs_declare_it(self):
+        """Both persistence stubs declare `write_custom_data` (nautilus_trader/persistence/__init__.pyi:218 at rc5,
+        :309 at rc6); the record once said `write_custom`, which neither release has."""
+        text = " ".join((ROOT / self.LAYER_15_RECORD).read_text(encoding="utf-8").split())
+        self.assertIn("`write_custom_data`", text)
+        self.assertIsNone(re.search(r"`write_custom`", text))
+
+    LAYER_15_LOCK = "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+    LAYER_15_TIME = re.compile(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.\d+)?Z")
+
+    def layer_15_wheel_table(self, record_text):
+        """The record's wheel table as {wheel file name: {header cell: value}}, read by its header cells."""
+        lines = [line.strip() for line in record_text.splitlines()]
+        starts = [index for index, line in enumerate(lines) if line.startswith("| Release | Wheel |")]
+        if len(starts) != 1:
+            raise ValueError("the record needs exactly one wheel table, headed 'Release | Wheel | ...'")
+        header = [cell.strip() for cell in lines[starts[0]].strip("|").split("|")]
+        missing = [column for column in ("Wheel", "Bytes", "sha256", "Wheel uploaded") if column not in header]
+        if missing:
+            raise ValueError(f"the wheel table has no {missing} column")
+        table = {}
+        for line in lines[starts[0] + 2:]:  # the line under the header is the alignment row
+            if not line.startswith("|"):
+                break
+            row = dict(zip(header, [cell.strip() for cell in line.strip("|").split("|")]))
+            table[row["Wheel"].strip("`")] = row
+        return table
+
+    def layer_15_to_the_second(self, value):
+        found = self.LAYER_15_TIME.fullmatch(value.strip())
+        if found is None:
+            raise ValueError(f"not an RFC 3339 UTC time: {value!r}")
+        return found.group(1) + "Z"
+
+    def layer_15_upload_drift(self, record_text, lock_text):
+        """What is wrong with the record's wheel upload times: against the lock (rc5) and against the sdist times."""
+        rc5, rc6 = self.LAYER_15_RELEASES[0][0], self.LAYER_15_RELEASES[1][0]
+        try:
+            table = self.layer_15_wheel_table(record_text)
+            if sorted(table) != sorted([rc5, rc6]):
+                return [f"the wheel table lists {sorted(table)}, not the two wheels"]
+            packages = [package for package in tomllib.loads(lock_text)["package"] if package["name"] == "nautilus-trader"]
+            if len(packages) != 1:
+                return [f"the lock must hold one nautilus-trader package, it holds {len(packages)}"]
+            entries = [entry for entry in packages[0].get("wheels", []) if entry["url"].rsplit("/", 1)[-1] == rc5]
+            if len(entries) != 1:
+                return [f"the lock must hold exactly one entry for {rc5}, it holds {len(entries)}"]
+            locked, row, problems = entries[0], table[rc5], []
+            if self.layer_15_to_the_second(row["Wheel uploaded"]) != self.layer_15_to_the_second(locked["upload-time"]):
+                problems.append("the rc5 wheel upload time is not the lock's, to the second")
+            if row["sha256"].strip("`") != locked["hash"].removeprefix("sha256:"):
+                problems.append("the rc5 sha256 is not the lock's")
+            if row["Bytes"] != f"{locked['size']:,}":
+                problems.append("the rc5 size is not the lock's")
+            labelled = re.findall(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ) \((rc[56])\)", record_text)
+            if sorted(label for _, label in labelled) != ["rc5", "rc6"]:
+                return problems + ["the record must give each sdist time once, as '<time> (rc5)' and '<time> (rc6)'"]
+            stated = {label: self.layer_15_to_the_second(when) for when, label in labelled}
+            if stated["rc5"] != self.layer_15_to_the_second(packages[0]["sdist"]["upload-time"]):
+                problems.append("the rc5 sdist time is not the lock's, to the second")
+            for wheel, label in ((rc5, "rc5"), (rc6, "rc6")):
+                # fixed-width UTC strings: lexicographic order is chronological order
+                if not self.layer_15_to_the_second(table[wheel]["Wheel uploaded"]) < stated[label]:
+                    problems.append(f"the {label} wheel time is not earlier than its sdist time")
+            return problems
+        except ValueError as problem:
+            return [str(problem)]
+
+    def test_layer_15_record_wheel_upload_times_match_the_lock_and_precede_the_sdists(self):
+        """The record's "Wheel uploaded" cells are the wheels' upload times, not their source distributions'.
+
+        The first version of the record put each release's sdist time (the later file of the release: 2026-09-15T06:13:57Z
+        and 2026-10-05T02:59:49Z) in the wheel column; PyPI's per-file upload_time for the wheels is 2026-09-15T06:08:05Z
+        and 2026-10-05T02:57:21Z. Two checks that would have caught it:
+
+        1. The rc5 row equals the entry that this repository's own uv.lock holds for that wheel file name: its
+           upload-time cut to the second, its size and its sha256; and the rc5 sdist time the record states is the
+           lock's sdist upload-time.
+        2. The record states each release's sdist upload time once, as "<time> (rc5)" and "<time> (rc6)", and each wheel
+           time is strictly earlier than its sdist time.
+
+        The lock pins nautilus-trader==2.0.0rc5 only, so the rc6 times have no second source in this repository: check 2
+        rejects a wheel time that is its sdist time or later, and their exact seconds are held by the record alone.
+
+        The controls below run the same checks on edited copies, so neither check can be weakened unseen.
+        """
+        record = (ROOT / self.LAYER_15_RECORD).read_text(encoding="utf-8")
+        lock = (ROOT / self.LAYER_15_LOCK).read_text(encoding="utf-8")
+        self.assertEqual(self.layer_15_upload_drift(record, lock), [])
+
+        def edited(text, old, new):
+            self.assertEqual(text.count(old), 1, f"the control's anchor {old!r} is not unique")
+            return text.replace(old, new)
+
+        controls = {
+            "the rc5 cell holds its sdist time": edited(record, "| 2026-09-15T06:08:05Z |", "| 2026-09-15T06:13:57Z |"),
+            "the rc5 cell is one second off the lock": edited(record, "| 2026-09-15T06:08:05Z |", "| 2026-09-15T06:08:06Z |"),
+            "the rc6 cell holds its sdist time": edited(record, "| 2026-10-05T02:57:21Z |", "| 2026-10-05T02:59:49Z |"),
+            "the rc6 cell is later than its sdist time": edited(record, "| 2026-10-05T02:57:21Z |", "| 2026-10-05T02:59:50Z |"),
+            "the column is named Uploaded again": edited(record, "| Wheel uploaded |", "| Uploaded |"),
+            "an sdist time is not labelled rc6": edited(record, "2026-10-05T02:59:49Z (rc6)", "2026-10-05T02:59:49Z (rc7)"),
+            "the rc5 size is changed": edited(record, "| 69,963,442 |", "| 69,963,443 |"),
+            "the rc5 sha256 is changed": edited(
+                record, "`eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebe` |",
+                "`eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebf` |"),
+            "the rc5 sdist time is one second off the lock": edited(record, "2026-09-15T06:13:57Z (rc5)",
+                                                                   "2026-09-15T06:13:58Z (rc5)"),
+        }
+        for name, text in controls.items():
+            with self.subTest(change=name):
+                self.assertNotEqual(self.layer_15_upload_drift(text, lock), [])
+        relocked = edited(lock, 'upload-time = "2026-09-15T06:08:05.461Z"', 'upload-time = "2026-09-15T06:08:06.461Z"')
+        with self.subTest(change="the lock's rc5 wheel time changes"):
+            self.assertNotEqual(self.layer_15_upload_drift(record, relocked), [])
+        resdisted = edited(lock, 'upload-time = "2026-09-15T06:13:57.781Z"', 'upload-time = "2026-09-15T06:13:58.781Z"')
+        with self.subTest(change="the lock's rc5 sdist time changes"):
+            self.assertNotEqual(self.layer_15_upload_drift(record, resdisted), [])
+        unlisted = edited(lock, "nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl\"",
+                          "nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_65.whl\"")
+        with self.subTest(change="the lock holds no entry for the rc5 wheel"):
+            self.assertNotEqual(self.layer_15_upload_drift(record, unlisted), [])
+
     def test_root_review_rules_flag_unsourced_fixes_and_missing_regressions(self):
         text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("## Code Review Rules\n", text)
