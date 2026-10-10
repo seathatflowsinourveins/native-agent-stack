@@ -1,5 +1,7 @@
 """Offline Claude usage contracts: synthetic streams, ledger values and real exposition."""
 import importlib
+import contextlib
+import io
 import json
 import os
 from pathlib import Path
@@ -7,6 +9,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 PROMTOOL = os.environ.get("CLAUDE_USAGE_PROMTOOL") or shutil.which("promtool")
 
@@ -72,7 +75,54 @@ class ClaudeUsageMetricsTests(unittest.TestCase):
         self.export([event("rejected")])
         for window in ("five_hour", "seven_day"):
             self.assertEqual(1.0, self.value("claude_max_utilization_ratio", window=window))
+            self.assertEqual(1, self.value("claude_max_rejection_assumed", window=window))
         self.assertFalse(self.samples("claude_max_reset_timestamp_seconds"))
+
+    def test_unscoped_rejection_preserves_a_confirmed_allowed_window(self):
+        self.export([event(rateLimitType="seven_day", utilization=.25), event("rejected")])
+        self.assertEqual(.25, self.value("claude_max_utilization_ratio", window="seven_day"))
+        self.assertEqual(0, self.value("claude_max_rejection_assumed", window="seven_day"))
+        self.assertEqual(1, self.value("claude_max_rejection_assumed", window="five_hour"))
+        self.export([event("rejected", unifiedWindows={"seven_day": {"utilization": .2}})])
+        self.assertEqual(.2, self.value("claude_max_utilization_ratio", window="seven_day"))
+
+    def test_expired_reset_clears_exhaustion_without_inventing_recovered_zero(self):
+        self.export([event("rejected", rateLimitType="five_hour", resetsAt=2100)])
+        self.metrics.collect({"acct-1": self.capture}, self.ledger, self.state, self.output, now=2200)
+        self.assertFalse(self.samples("claude_max_utilization_ratio", window="five_hour"))
+        self.assertFalse(self.samples("claude_max_reset_timestamp_seconds", window="five_hour"))
+        self.assertEqual(0, self.value("claude_max_window_present", window="five_hour"))
+        self.export([event(rateLimitType="five_hour", utilization=.1)], captured_at=2210, now=2220)
+        self.assertEqual(.1, self.value("claude_max_utilization_ratio", window="five_hour"))
+
+    def test_allowed_recovery_without_numeric_utilization_clears_previous_rejection(self):
+        self.export([event("rejected", rateLimitType="five_hour")])
+        self.export([event(rateLimitType="five_hour")], captured_at=2010, now=2020)
+        self.assertFalse(self.samples("claude_max_utilization_ratio", window="five_hour"))
+        self.assertEqual(0, self.value("claude_max_window_present", window="five_hour"))
+
+    def test_failed_and_never_observed_account_inventory_and_age_stay_visible(self):
+        self.export([event("rejected", rateLimitType="five_hour")])
+        self.capture.unlink()
+        self.metrics.collect({"acct-1": self.capture, "acct-2": self.root / "absent"},
+                             self.ledger, self.state, self.output, now=4000)
+        self.assertEqual(0, self.value("claude_max_capture_success", account="acct-1"))
+        self.assertGreater(self.value("claude_max_input_errors", account="acct-1"), 0)
+        for account in ("acct-1", "acct-2"):
+            for window in ("five_hour", "seven_day"):
+                self.assertEqual(1, self.value("claude_max_account_present", account=account, window=window))
+        self.assertEqual(1990, self.value("claude_max_capture_timestamp_seconds", account="acct-1"))
+        self.assertEqual(0, self.value("claude_max_capture_timestamp_seconds", account="acct-2"))
+
+    def test_main_success_and_bounded_invalid_account_error(self):
+        self.export([event("rejected")])
+        args = ["collector", "--capture", f"acct-1={self.capture}", "--ledger", str(self.ledger),
+                "--state", str(self.state), "--output", str(self.output)]
+        for entry, expected in ((args, 0), ([*args[:2], "private-fixture@example.invalid=data", *args[3:]], 1)):
+            stdout, stderr = io.StringIO(), io.StringIO()
+            with patch("sys.argv", entry), contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                self.assertEqual(expected, self.metrics.main())
+            self.assertNotIn("example.invalid", stdout.getvalue() + stderr.getvalue())
 
     def test_scoped_rejected_unified_window_does_not_overwrite_other_window(self):
         self.export([event("rejected", rateLimitType="five_hour", unifiedWindows={
@@ -244,8 +294,42 @@ class ClaudeUsageDashboardTests(unittest.TestCase):
         self.assertIn("reservations", spend["description"])
         self.assertEqual("percentunit", spend["fieldConfig"]["defaults"]["unit"])
 
+    def test_daily_full_suite_installs_the_hashed_ci_pin_before_tests(self):
+        import yaml
+        root = Path(__file__).resolve().parents[1]
+        steps = yaml.safe_load((root / ".github/workflows/catalog-freshness.yml").read_text())["jobs"]["freshness"]["steps"]
+        installer = next(i for i, step in enumerate(steps) if "requirements-ci.txt" in step.get("run", ""))
+        test = next(i for i, step in enumerate(steps) if step["name"] == "Run project test suite")
+        self.assertLess(installer, test)
+        self.assertIn("--require-hashes", steps[installer]["run"])
+        self.assertIn("--only-binary=:all:", steps[installer]["run"])
+
+    def test_account_status_age_and_errors_panels_retain_inventory_and_label_assumptions(self):
+        panel = next(p for p in self.board["panels"] if p["title"] == "Claude Max · account status")
+        expression = panel["targets"][0]["expr"]
+        for name in ("claude_max_account_present", "claude_max_capture_success", "claude_max_rejection_assumed",
+                     "claude_max_input_errors", "claude_max_capture_timestamp_seconds"):
+            self.assertIn(name, expression)
+        mappings = panel["fieldConfig"]["defaults"]["mappings"][0]["options"]
+        self.assertEqual({"UNKNOWN", "MEASURED", "ASSUMED 100%", "STALE"}, {v["text"] for v in mappings.values()})
+        age = next(p for p in self.board["panels"] if p["title"] == "Claude Max · capture age")
+        self.assertIn("claude_max_account_present", age["targets"][0]["expr"])
+        errors = next(p for p in self.board["panels"] if p["title"] == "Claude usage · input errors")
+        self.assertIn("claude_usage_input_errors", errors["targets"][0]["expr"])
+
+    def test_reset_time_uses_utc_and_runtime_route_is_hash_locked(self):
+        self.assertEqual("utc", self.board["timezone"])
+        root = Path(__file__).resolve().parents[1]
+        runtime = (root / "observability/claude-usage/requirements.txt").read_text()
+        self.assertIn("prometheus-client==0.26.0", runtime)
+        self.assertIn("--hash=sha256:fa93d06737aa02bacd05794768508bb97d2fbee28cb3bca04eaae92f0ca953d6", runtime)
+        installer = (root / "observability/claude-usage/install-runtime.sh").read_text()
+        self.assertIn("--require-hashes", installer)
+        self.assertNotIn("uv run --script", (root / "docs/claude-usage-observability.md").read_text())
+
     @unittest.skipUnless(PROMTOOL, "native query integration needs promtool (or CLAUDE_USAGE_PROMTOOL)")
     def test_native_dashboard_queries_return_exhausted_one_and_hide_stale_data(self):
+        import copy
         import yaml
         panels = {p["title"]: p for p in self.board["panels"]}
         labels = 'job="node-exporter",instance="loopback"'
@@ -255,14 +339,23 @@ class ClaudeUsageDashboardTests(unittest.TestCase):
 
         inputs = [series("claude_usage_collection_timestamp_seconds", 1900),
                   series("claude_usage_ledger_success", 1)]
-        for account, stamp in (("acct-1", 1900), ("acct-2", 1)):
+        for account, stamp in (("acct-1", 1900), ("acct-2", 1), ("acct-3", 1900), ("acct-4", 1900)):
             fields = f',account="{account}",window="five_hour"'
             inputs.extend([series("claude_max_utilization_ratio", 1, fields),
                            series("claude_max_observed_timestamp_seconds", stamp, fields),
-                           series("claude_max_reset_timestamp_seconds", 2500, fields),
+                           series("claude_max_rejection_assumed", int(account == "acct-4"), fields),
+                           series("claude_max_reset_timestamp_seconds", 2500 if account != "acct-2" else 8000, fields),
                            series("claude_max_reset_observed_timestamp_seconds", stamp, fields)])
+            inputs.extend([series("claude_max_capture_timestamp_seconds", stamp, f',account="{account}"'),
+                           series("claude_max_capture_success", int(account != "acct-3"), f',account="{account}"'),
+                           series("claude_max_input_errors", int(account == "acct-3"), f',account="{account}"')])
+            for window in ("five_hour", "seven_day"):
+                fields = f',account="{account}",window="{window}"'
+                inputs.extend([series("claude_max_account_present", 1, fields),
+                               series("claude_max_window_present", int(window == "five_hour" or account == "acct-1"), fields)])
         fields = ',account="acct-1",window="seven_day"'
         inputs.extend([series("claude_max_utilization_ratio", .25, fields),
+                       series("claude_max_rejection_assumed", 0, fields),
                        series("claude_max_observed_timestamp_seconds", 1900, fields)])
         inputs.extend([series("claude_api_spend_usd", 200, ',key="key-1"'),
                        series("claude_api_edge_usd", 200, ',key="key-1"')])
@@ -270,14 +363,43 @@ class ClaudeUsageDashboardTests(unittest.TestCase):
         for title, expected in (
             ("Claude Max · five_hour", [{"labels": '{account="acct-1"}', "value": 1.0}]),
             ("Claude Max · seven_day", [{"labels": '{account="acct-1"}', "value": .25}]),
-            ("Claude Max · reset time", [{"labels": '{account="acct-1",window="five_hour"}', "value": 2500000}]),
+            ("Claude Max · reset time", [{"labels": f'{{account="{a}",window="five_hour"}}', "value": 2500000}
+                                        for a in ("acct-1", "acct-4")]),
             ("Anthropic API · $200 edge", [{"labels": '{key="key-1"}', "value": 1.0}]),
         ):
             expression = panels[title]["targets"][0]["expr"]
             cases.extend([{"expr": expression, "eval_time": "33m", "exp_samples": expected},
                           {"expr": expression, "eval_time": "65m", "exp_samples": []}])
+        cases.append({"expr": panels["Claude Max · five_hour"]["targets"][1]["expr"], "eval_time": "33m",
+                      "exp_samples": [{"labels": '{account="acct-4"}', "value": 1}]})
+        status = panels["Claude Max · account status"]["targets"][0]["expr"]
+        for timestamp, statuses in (("33m", {"acct-1": (1, 1), "acct-2": (3, 0), "acct-3": (0, 0), "acct-4": (2, 0)}),
+                                    ("65m", {"acct-1": (0, 3), "acct-2": (3, 0), "acct-3": (0, 0), "acct-4": (0, 0)})):
+            cases.append({"expr": status, "eval_time": timestamp, "exp_samples": [
+                {"labels": f'{{account="{a}",window="{w}"}}', "value": value}
+                for a, values in statuses.items() for w, value in zip(("five_hour", "seven_day"), values)]})
+        recovery = copy.deepcopy(inputs)
+        for item in recovery:
+            name = item["series"]
+            if name.startswith("claude_usage_collection_timestamp_seconds") or (
+                    'account="acct-1"' in name and name.startswith("claude_max_capture_timestamp_seconds")):
+                item["values"] = "1900+0x49 3000+0x15"
+            elif 'account="acct-1"' in name and 'window="five_hour"' in name:
+                if name.startswith("claude_max_observed_timestamp_seconds"):
+                    item["values"] = "1900+0x49 3000+0x15"
+                elif name.startswith("claude_max_utilization_ratio"):
+                    item["values"] = "1+0x49 0.1+0x15"
+                elif name.startswith("claude_max_reset_timestamp_seconds"):
+                    item["values"] = "2500+0x49 stale"
+        recovery_cases = [{"expr": panels["Claude Max · five_hour"]["targets"][0]["expr"],
+                           "eval_time": "51m", "exp_samples": [{"labels": '{account="acct-1"}', "value": .1}]},
+                          {"expr": status, "eval_time": "51m", "exp_samples": [
+                              {"labels": f'{{account="{a}",window="{w}"}}', "value": value}
+                              for a, values in {"acct-1": (1, 1), "acct-2": (3, 0), "acct-3": (0, 0), "acct-4": (0, 0)}.items()
+                              for w, value in zip(("five_hour", "seven_day"), values)]}]
         document = {"rule_files": [], "evaluation_interval": "1m",
-                    "tests": [{"interval": "1m", "input_series": inputs, "promql_expr_test": cases}]}
+                    "tests": [{"interval": "1m", "input_series": inputs, "promql_expr_test": cases},
+                              {"interval": "1m", "input_series": recovery, "promql_expr_test": recovery_cases}]}
         with tempfile.TemporaryDirectory() as directory:
             fixture = Path(directory) / "usage.test.yml"
             fixture.write_text(yaml.safe_dump(document))

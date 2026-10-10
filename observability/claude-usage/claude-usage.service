@@ -1,0 +1,12 @@
+[Unit]
+Description=Fenced Claude usage sampler and textfile publication
+Documentation=https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/claude-usage-observability.md
+ConditionPathExists=%h/.config/native-agent-stack/claude-usage/accounts.json
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=yes
+TimeoutStartSec=26min
+Environment=PATH=%h/.local/bin:%h/.local/share/mise/shims:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/.local/share/native-agent-stack/claude-usage-runtime/bin/python %h/.local/share/native-agent-stack/claude-usage-runtime/claude_usage_sampler.py --accounts-file %h/.config/native-agent-stack/claude-usage/accounts.json --ledger %h/.local/state/native-agent-stack/coordination/api-actions-20261008/api-actions-ledger.jsonl --state %h/.local/state/native-agent-stack/claude-usage/sampler.json --output %h/.local/state/native-agent-stack/claude-usage/textfiles/claude-usage.prom --working-directory %t/claude-usage-probe

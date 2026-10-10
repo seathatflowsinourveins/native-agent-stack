@@ -1,0 +1,10 @@
+[
+  {
+    "identity_file": "/path/to/private-nonsecret-identifiers/account-a.txt",
+    "config_dir": "/path/to/cc-owned-authenticated-runtime/account-a"
+  },
+  {
+    "identity_file": "/path/to/private-nonsecret-identifiers/account-b.txt",
+    "config_dir": "/path/to/cc-owned-authenticated-runtime/account-b"
+  }
+]

@@ -77,17 +77,28 @@ def claude_usage_panels(base):
         stamp = f'claude_max_observed_timestamp_seconds{selector}'
         expression = (f'max by (account) (claude_max_utilization_ratio{selector}'
                       f' and on(job,instance,account,window) ({stamp} > time() - 1800)'
-                      f' and on(job,instance,account,window) ({stamp} <= time()){collection_gate})')
-        chart(f'Claude Max · {window}', [('{{account}}', expression)],
+                      f' and on(job,instance,account,window) ({stamp} <= time())'
+                      ' and on(job,instance,account) (claude_max_capture_success == 1)'
+                      ' and on(job,instance,account) (claude_max_input_errors == 0)'
+                      f' unless on(job,instance,account,window) (claude_max_reset_timestamp_seconds{selector} <= time())'
+                      f'{collection_gate})')
+        marker = f'max by(account) (claude_max_rejection_assumed{selector})'
+        chart(f'Claude Max · {window}', [
+              ('{{account}} · measured', f'({expression}) and on(account) ({marker} == 0)'),
+              ('{{account}} · assumed 100%', f'({expression}) and on(account) ({marker} == 1)')],
               'Native rate_limit_event utilization (fraction), collected by the CC at most every 15 minutes. '
               'Rejected/exhausted limits show 100%; rejection without a supported scope conservatively shows '
-              '100% for both windows. Missing utilization stays UNKNOWN; transitions do not refresh absent '
+              '100% only for windows without confirmed allowed observations, marked assumed. '
+              'Missing utilization stays UNKNOWN; transitions do not refresh absent '
               'fields. Observations older than 30 minutes are hidden. This is Max headroom, separate from '
               'request token counts and API-equivalent cost.', 'bargauge', 'percentunit', x, 1, 12, 8)
     reset_stamp = 'claude_max_reset_observed_timestamp_seconds'
     reset_expr = ('max by (account,window) (claude_max_reset_timestamp_seconds'
                   f' and on(job,instance,account,window) ({reset_stamp} > time() - 1800)'
-                  f' and on(job,instance,account,window) ({reset_stamp} <= time()){collection_gate}) * 1000')
+                  f' and on(job,instance,account,window) ({reset_stamp} <= time())'
+                  ' and on(job,instance,account) (claude_max_capture_success == 1)'
+                  ' and on(job,instance,account) (claude_max_input_errors == 0)'
+                  f'{collection_gate}) * 1000')
     chart('Claude Max · reset time', [('{{account}} · {{window}}', reset_expr)],
           'Native resetsAt seconds converted to Grafana milliseconds. No reset is inferred for a rejection '
           'or missing field. Reset observations expire after 30 minutes.', 'stat', 'dateTimeAsIso', 0, 9, 12, 6)
@@ -125,10 +136,56 @@ def claude_usage_panels(base):
           'Legacy rows without a key alias remain unattributed until the CC supplies the producer’s confirmed '
           'legacy alias. This amount is excluded from per-key bars, not silently lost.',
           'stat', 'currencyUSD', 12, 23, 12, 5)
+    # Keep account inventory visible even after an observation disappears from
+    # the fraction bars. The 7d window matches this host's Prometheus retention.
+    def last(metric, groups='account,window'):
+        return f'max by ({groups}) (last_over_time({metric}[7d]))'
+
+    inventory = last('claude_max_account_present')
+    present = last('claude_max_window_present')
+    observed = last('claude_max_observed_timestamp_seconds')
+    assumed = last('claude_max_rejection_assumed')
+    success = last('claude_max_capture_success', 'account')
+    input_errors = last('claude_max_input_errors', 'account')
+    capture_time = last('claude_max_capture_timestamp_seconds', 'account')
+    collected_time = 'max(last_over_time(claude_usage_collection_timestamp_seconds[7d]))'
+    source_ok = f'({success} == 1) and on(account) ({input_errors} == 0)'
+    known = f'({present} == 1) and on(account) ({source_ok})'
+    fresh = (f'({known}) and on(account,window) ({observed} > time() - 1800)'
+             f' and on(account) ({capture_time} > time() - 1800)'
+             f' and on() ({collected_time} > time() - 1800)')
+    reset_deadline = last('claude_max_reset_timestamp_seconds')
+    expired = f'({reset_deadline} <= time()) and on(account,window) ({reset_deadline} > {observed})'
+    not_expired = f'({known}) unless on(account,window) ({expired})'
+    fresh = f'({fresh}) and on(account,window) ({not_expired})'
+    measured = f'({fresh}) and on(account,window) ({assumed} == 0)'
+    inferred = f'2 * (({fresh}) and on(account,window) ({assumed} == 1))'
+    stale = (f'3 * (({not_expired}) unless on(account,window) ({fresh}))')
+    status = f'({measured}) or on(account,window) ({inferred}) or on(account,window) ({stale}) or on(account,window) (0 * {inventory})'
+    status_panel = chart('Claude Max · account status', [('{{account}} · {{window}}', status)],
+          'Every configured account/window remains visible: UNKNOWN for failed, never observed or reset '
+          'expired data; STALE when the source or observation is older than 30 minutes; MEASURED for a '
+          'fresh numeric observation; ASSUMED 100% for an unscoped rejection without confirmed window '
+          'utilization. Status uses capture success, per-account errors and independent timestamps. '
+          'Inventory remains visible for the 7-day retention window if the sampler stops.',
+          'stat', 'none', 0, 28, 12, 7)
+    status_panel['fieldConfig']['defaults']['mappings'] = [{'type': 'value', 'options': {
+        '0': {'text': 'UNKNOWN', 'color': 'gray'}, '1': {'text': 'MEASURED', 'color': 'green'},
+        '2': {'text': 'ASSUMED 100%', 'color': 'orange'}, '3': {'text': 'STALE', 'color': 'red'}}}]
+    age = f'(time() - ({capture_time} > 0)) or on(account) (-1 * max by(account) ({inventory}))'
+    age_panel = chart('Claude Max · capture age', [('{{account}}', age)],
+          'Age of the last capture, including failed and stale accounts. UNKNOWN means no capture has '
+          'ever been recorded; a new failed attempt does not refresh the age.',
+          'stat', 'dtdurations', 12, 28, 12, 7)
+    age_panel['fieldConfig']['defaults']['mappings'] = [{'type': 'value', 'options': {'-1': {'text': 'UNKNOWN', 'color': 'gray'}}}]
+    chart('Claude usage · input errors', [('{{source}}', 'max by(source) (last_over_time(claude_usage_input_errors[7d]))')],
+          'Bounded capture and ledger input error counts, without raw error text. Per-account capture '
+          'failures produce UNKNOWN in account status; ledger errors suppress partial spend totals.',
+          'stat', 'short', 0, 35, 24, 5)
     # An expanded Grafana row extends until the next row. Bound this new section.
-    row('Native records and telemetry', 28)
+    row('Native records and telemetry', 40)
     for existing in panels[anchor + 1:]:
-        existing['gridPos']['y'] += 29
+        existing['gridPos']['y'] += 41
     panels[anchor + 1:anchor + 1] = added
 
 
@@ -461,4 +518,5 @@ def dashboard():
         'The existing metrics/spans export guard preserves these dimensions. Deployment '
         'and received-event coverage remain the CC host read-back.', 'ops', PROMETHEUS)
     claude_usage_panels(base)
+    base['timezone'] = 'utc'
     return base

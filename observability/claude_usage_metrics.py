@@ -1,8 +1,4 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.12"
-# dependencies = ["prometheus-client==0.26.0"]
-# ///
+#!/usr/bin/env python3
 """Publish CC-recorded Claude limits and API ledger amounts to a node_exporter textfile.
 
 This adapter only reads explicitly named data files. It never launches a model,
@@ -103,7 +99,23 @@ marks both as exhausted; `assumed` distinguishes this from measured utilization.
             updates.setdefault(scope, {}).update({k: info[k] for k in ("utilization", "resetsAt") if k in info})
         rejected = info["status"] == "rejected"
         unknown_scope = rejected and scope not in WINDOWS
-        forced = WINDOWS if unknown_scope else ((scope,) if rejected else ())
+        # An unnamed rejection is evidence of a block, not of both windows being
+        # full. Preserve a positively observed allowed window, including a child
+        # window in this event, and mark only otherwise unknown windows assumed.
+        def allowed(window):
+            child = updates.get(window, {})
+            if child.get("status") in ("allowed", "allowed_warning"):
+                return True
+            if child.get("status") == "rejected":
+                return False
+            value = number(child.get("utilization"))
+            if value is not None and value < 1:
+                return True
+            old = result.get(window, {})
+            return (old.get("utilization", 1) < 1 and not old.get("assumed", 0)
+                    and (not old.get("reset") or old["reset"] > observed_at))
+
+        forced = tuple(w for w in WINDOWS if not allowed(w)) if unknown_scope else ((scope,) if rejected else ())
         for window in forced:
             updates.setdefault(window, {})
         for window, update in updates.items():
@@ -119,9 +131,16 @@ marks both as exhausted; `assumed` distinguishes this from measured utilization.
                 errors += 1
             if exhausted:
                 utilization = 1.0
+            elif utilization is None and current.get("utilization") == 1 and (
+                    info["status"] in ("allowed", "allowed_warning")
+                    or local_status in ("allowed", "allowed_warning") and "status" in update):
+                # A recovered named window without a numeric observation is
+                # unknown, not the previous rejection and not an invented zero.
+                current.pop("utilization", None)
+                current.pop("assumed", None)
             if utilization is not None and observed_at >= current.get("observed_at", 0):
                 current.update(utilization=min(utilization, 1.0), observed_at=observed_at,
-                               assumed=int(unknown_scope))
+                               assumed=int(unknown_scope and window in forced))
             reset = number(update.get("resetsAt"))
             if "resetsAt" in update and update["resetsAt"] is not None and (reset is None or reset == 0):
                 errors += 1
@@ -207,7 +226,11 @@ def load_state(path):
         if any(not KEY_HASH.fullmatch(k) or not isinstance(v, str) or not KEY_INDEX.fullmatch(v)
                for k, v in indexes.items()) or len(set(indexes.values())) != len(indexes):
             raise InputError("invalid usage state")
-        clean = {"version": 1, "windows": {}, "key_indexes": indexes}
+        clean = {"version": 1, "windows": {}, "key_indexes": indexes, "captures": {}}
+        for account, stamp in raw.get("captures", {}).items():
+            if not ACCOUNT.fullmatch(account) or number(stamp) is None:
+                raise InputError("invalid usage state")
+            clean["captures"][account] = stamp
         for account, observations in windows.items():
             if not ACCOUNT.fullmatch(account) or not isinstance(observations, dict):
                 raise InputError("invalid usage state")
@@ -243,7 +266,8 @@ def save_state(path, state):
             temporary.unlink(missing_ok=True)
 
 
-def collect(captures, ledger_path, state_path, output_path, *, now=None, legacy_key_alias=None):
+def collect(captures, ledger_path, state_path, output_path, *, now=None, legacy_key_alias=None,
+            capture_outcomes=None):
     """Read a complete snapshot, retain numeric state, publish native atomic exposition."""
     if not captures or any(not isinstance(a, str) or not ACCOUNT.fullmatch(a) for a in captures):
         raise InputError("accounts must be opaque acct-N indexes")
@@ -273,28 +297,51 @@ def collect(captures, ledger_path, state_path, output_path, *, now=None, legacy_
         assumed = gauge("claude_max_rejection_assumed", "One when an unscoped rejection conservatively exhausts both windows.", ("account", "window"))
         capture_at = gauge("claude_max_capture_timestamp_seconds", "Recorded capture mtime as Unix seconds.", ("account",))
         capture_success = gauge("claude_max_capture_success", "One when a valid native rate limit event was read.", ("account",))
+        account_present = gauge("claude_max_account_present", "Configured opaque account/window inventory, even without observations.", ("account", "window"))
+        window_present = gauge("claude_max_window_present", "One when this window has a numeric observation that has not passed its reset.", ("account", "window"))
+        account_errors = gauge("claude_max_input_errors", "Bounded capture or sampler error count for this opaque account.", ("account",))
         input_errors = gauge("claude_usage_input_errors", "Bounded input error count in this collection.", ("source",))
         errors = 0
         for account, path in captures.items():
             success = 0
+            failures = 0
             previous = state["windows"].get(account, {})
             try:
                 text, stamp = read_data(Path(path), 2 * 1024 * 1024)
                 if stamp <= 0 or stamp > now:
                     raise InputError("invalid capture time")
                 previous, failures, seen = parse_capture(text, stamp, previous)
-                errors += failures
                 success = int(seen > 0)
-                capture_at.labels(account).set(stamp)
+                stamp = max(stamp, state.setdefault("captures", {}).get(account, 0))
+                state["captures"][account] = stamp
             except (OSError, InputError):
-                errors += 1
+                failures += 1
+            if capture_outcomes is not None and not capture_outcomes.get(account, False):
+                success = 0
+                failures += 1
+            # A reset is a deadline, not evidence of zero usage. Invalidate the
+            # older observation and do not resurrect it by replaying the capture.
+            for values in previous.values():
+                if values.get("reset", now + 1) <= now:
+                    if values.get("observed_at", 0) < values["reset"]:
+                        values.pop("utilization", None)
+                        values.pop("assumed", None)
+                    values.pop("reset", None)
+                    values.pop("reset_observed_at", None)
+            errors += failures
             state["windows"][account] = previous
+            capture_at.labels(account).set(state.setdefault("captures", {}).get(account, 0))
             capture_success.labels(account).set(success)
+            account_errors.labels(account).set(failures)
+            for window in WINDOWS:
+                account_present.labels(account, window).set(1)
+                window_present.labels(account, window).set(int("utilization" in previous.get(window, {})))
             for window, values in previous.items():
                 if "utilization" in values:
                     utilization.labels(account, window).set(values["utilization"])
-                    observed.labels(account, window).set(values["observed_at"])
                     assumed.labels(account, window).set(values.get("assumed", 0))
+                if "observed_at" in values:
+                    observed.labels(account, window).set(values["observed_at"])
                 if "reset" in values:
                     reset.labels(account, window).set(values["reset"])
                     reset_observed.labels(account, window).set(values["reset_observed_at"])

@@ -4976,8 +4976,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "c7cbfee447c2e5c2a71d9db5f56bba3af7084f197e084aeecc8e17456d38bfad",
-      "bytes": 15304
+      "sha256": "5da181e47745a64736846452f96a1bf5b3bf5896ece7af5ce66d9a83465bc5b3",
+      "bytes": 15413
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4996,8 +4996,8 @@
     },
     {
       "path": ".github/requirements-ci.txt",
-      "sha256": "db9813b3554955f8b87dc28b8d7a697e0d5132bf5e7d1d096ac7cc5287e2585a",
-      "bytes": 740
+      "sha256": "0187727fe9e739c33cb27df5e35b3ddf85dd0a736f51ce80e94dc5568fd89e97",
+      "bytes": 660
     },
     {
       "path": ".github/requirements-validation.txt",
@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "673dbb816767e67d002b6dcdf866053c8408a7a47203683650af8d9f3be4b23a",
-      "bytes": 26872
+      "sha256": "a14d8db2e433c25020d80a0ebeabfa4914f63f5c40ffb3c4dc1083c8066e0b54",
+      "bytes": 27157
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
@@ -17552,8 +17552,8 @@
     },
     {
       "path": "docs/claude-usage-observability.md",
-      "sha256": "a86d34bb1c5e0fd5558b4ff7ef7d67337479ac722e3ece857dcee6ad67194af6",
-      "bytes": 9771
+      "sha256": "8d827ebe75ed928566fabbc2ee10c0b1689a0f8a8b35dee29d09b16f4d26192a",
+      "bytes": 14062
     },
     {
       "path": "docs/codex-credential-store-research-20261009.md",
@@ -18417,8 +18417,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-claude-usage-observability.md",
-      "sha256": "8d9ab603b2b029e764380bf4c8931d2f4839600d02fae4a3cc1b52ba9c6900eb",
-      "bytes": 8613
+      "sha256": "5aeca52e0a80a9b54595363e45315a61772ded0e8611ea89bd5f4f763fb154af",
+      "bytes": 13476
     },
     {
       "path": "docs/direct-results.md",
@@ -41792,8 +41792,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-lanes.json",
-      "sha256": "7e6f292c4f5972e9e809733e6513db3b0c2f98c46d30d1561e97ac46d46b2057",
-      "bytes": 98933
+      "sha256": "474d03439416bbc0b908c5908a1af968b014d84c501048b6104b6123e4139e6e",
+      "bytes": 112213
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-native-foundation-data.json",
@@ -58876,9 +58876,49 @@
       "bytes": 1825
     },
     {
+      "path": "observability/claude-usage/accounts.json.example",
+      "sha256": "01582f3917242b5b74d75ad4e89e02513ab43a60a5370d57d0a6c8520bfd0aba",
+      "bytes": 315
+    },
+    {
+      "path": "observability/claude-usage/claude-usage-node-exporter.service",
+      "sha256": "47d1eadf425f9e0dcf609cf59f2c51fa981044494f300eabf4d10f072055d053",
+      "bytes": 635
+    },
+    {
+      "path": "observability/claude-usage/claude-usage.service",
+      "sha256": "51de4e7b6f32b656156ae416cf0dbd98ca4b812b1ee8acd39cb895be28fc8cc3",
+      "bytes": 962
+    },
+    {
+      "path": "observability/claude-usage/claude-usage.timer",
+      "sha256": "2fe3779ee2561205a5d71b5ba37c87ee44d8bd04b240794b6585d8e4c9bbcc17",
+      "bytes": 204
+    },
+    {
+      "path": "observability/claude-usage/install-runtime.sh",
+      "sha256": "1ca92265263899c3badba87bf1a2e3368eb58ff5b8aebdb73e0ea34515678488",
+      "bytes": 881
+    },
+    {
+      "path": "observability/claude-usage/prometheus-scrape.yaml",
+      "sha256": "3598f8ad859729316212b733d68f5bf2b6d90b84bf2b553a47fc5155fbb6caba",
+      "bytes": 273
+    },
+    {
+      "path": "observability/claude-usage/requirements.txt",
+      "sha256": "8efd965707aa93b2328d9cbb2b48b3f2843407e84b188e753d47d89643cb6f19",
+      "bytes": 261
+    },
+    {
       "path": "observability/claude_usage_metrics.py",
-      "sha256": "39be998d800d3c36b49b250d0ebc57e40178ec1e03f17e7fb5b2e0965479bb5c",
-      "bytes": 17429
+      "sha256": "844e87da640e79fcf4f875a67da5e0c794619a111cbed77ec85f8a88241e7b34",
+      "bytes": 20644
+    },
+    {
+      "path": "observability/claude_usage_sampler.py",
+      "sha256": "af7cc28abf3e07db662ac109b5771fa1f2eec5baef530258c9f4d5cab4901d55",
+      "bytes": 11426
     },
     {
       "path": "observability/collector/README.md",
@@ -58992,8 +59032,8 @@
     },
     {
       "path": "observability/lanes_dashboard.py",
-      "sha256": "5596e3b843711ddd3db76b80c54e9ab12629efba169703536a8136e2636f42fc",
-      "bytes": 32420
+      "sha256": "4e7dae5b3c81138e05201f9f80aff1970446452c270072c5b54bbef4903f00e3",
+      "bytes": 36878
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -59852,8 +59892,13 @@
     },
     {
       "path": "tests/test_claude_usage_metrics.py",
-      "sha256": "a3b81a26c5bdfe07e5b6366a1a799b55596ea5a02947edd5055f65d8f6529fa4",
-      "bytes": 18178
+      "sha256": "be65156722a7efc5c4fe8f6a1b974b88577a8d41fb5dd920b24096986fb0da75",
+      "bytes": 27471
+    },
+    {
+      "path": "tests/test_claude_usage_sampler.py",
+      "sha256": "c8bf5bd396c8cde08c5b356341347ca8e1b0a9ddf85b9a7276e202e1db62e10c",
+      "bytes": 13104
     },
     {
       "path": "tests/test_codex_agents.py",

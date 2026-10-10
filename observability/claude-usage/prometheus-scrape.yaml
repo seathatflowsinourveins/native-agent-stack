@@ -1,0 +1,8 @@
+# CC merges this job into the existing Prometheus config after landing.
+# This file alone does not install or start anything.
+scrape_configs:
+  - job_name: claude-usage
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    static_configs:
+      - targets: [127.0.0.1:29101]

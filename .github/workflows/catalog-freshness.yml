@@ -55,6 +55,11 @@ jobs:
       - name: Install the hash-locked session calendar
         run: |
           python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-calendar.txt
+      - name: Install checksum-locked CI dependencies for the full suite
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes --index-url https://pypi.org/simple
+          -r .github/requirements-ci.txt
       - name: Install checksum-locked native validation dependencies
         run: >-
           python3 -m pip install --disable-pip-version-check --no-input

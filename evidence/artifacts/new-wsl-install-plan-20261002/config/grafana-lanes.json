@@ -12,7 +12,7 @@
     }
   ],
   "editable": false,
-  "timezone": "browser",
+  "timezone": "utc",
   "refresh": "30s",
   "time": {
     "from": "now-1h",
@@ -653,7 +653,7 @@
         "w": 12,
         "h": 8
       },
-      "description": "Native rate_limit_event utilization (fraction), collected by the CC at most every 15 minutes. Rejected/exhausted limits show 100%; rejection without a supported scope conservatively shows 100% for both windows. Missing utilization stays UNKNOWN; transitions do not refresh absent fields. Observations older than 30 minutes are hidden. This is Max headroom, separate from request token counts and API-equivalent cost.",
+      "description": "Native rate_limit_event utilization (fraction), collected by the CC at most every 15 minutes. Rejected/exhausted limits show 100%; rejection without a supported scope conservatively shows 100% only for windows without confirmed allowed observations, marked assumed. Missing utilization stays UNKNOWN; transitions do not refresh absent fields. Observations older than 30 minutes are hidden. This is Max headroom, separate from request token counts and API-equivalent cost.",
       "links": [
         {
           "title": "GPT pool in OmniRoute",
@@ -664,8 +664,20 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (account) (claude_max_utilization_ratio{window=\"five_hour\"} and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"five_hour\"} > time() - 1800) and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"five_hour\"} <= time()) and on(job, instance) (claude_usage_collection_timestamp_seconds > time() - 1800))",
-          "legendFormat": "{{account}}",
+          "expr": "(max by (account) (claude_max_utilization_ratio{window=\"five_hour\"} and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"five_hour\"} > time() - 1800) and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"five_hour\"} <= time()) and on(job,instance,account) (claude_max_capture_success == 1) and on(job,instance,account) (claude_max_input_errors == 0) unless on(job,instance,account,window) (claude_max_reset_timestamp_seconds{window=\"five_hour\"} <= time()) and on(job, instance) (claude_usage_collection_timestamp_seconds > time() - 1800))) and on(account) (max by(account) (claude_max_rejection_assumed{window=\"five_hour\"}) == 0)",
+          "legendFormat": "{{account}} \u00b7 measured",
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "(max by (account) (claude_max_utilization_ratio{window=\"five_hour\"} and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"five_hour\"} > time() - 1800) and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"five_hour\"} <= time()) and on(job,instance,account) (claude_max_capture_success == 1) and on(job,instance,account) (claude_max_input_errors == 0) unless on(job,instance,account,window) (claude_max_reset_timestamp_seconds{window=\"five_hour\"} <= time()) and on(job, instance) (claude_usage_collection_timestamp_seconds > time() - 1800))) and on(account) (max by(account) (claude_max_rejection_assumed{window=\"five_hour\"}) == 1)",
+          "legendFormat": "{{account}} \u00b7 assumed 100%",
           "instant": true,
           "range": false,
           "format": "time_series",
@@ -732,7 +744,7 @@
         "w": 12,
         "h": 8
       },
-      "description": "Native rate_limit_event utilization (fraction), collected by the CC at most every 15 minutes. Rejected/exhausted limits show 100%; rejection without a supported scope conservatively shows 100% for both windows. Missing utilization stays UNKNOWN; transitions do not refresh absent fields. Observations older than 30 minutes are hidden. This is Max headroom, separate from request token counts and API-equivalent cost.",
+      "description": "Native rate_limit_event utilization (fraction), collected by the CC at most every 15 minutes. Rejected/exhausted limits show 100%; rejection without a supported scope conservatively shows 100% only for windows without confirmed allowed observations, marked assumed. Missing utilization stays UNKNOWN; transitions do not refresh absent fields. Observations older than 30 minutes are hidden. This is Max headroom, separate from request token counts and API-equivalent cost.",
       "links": [
         {
           "title": "GPT pool in OmniRoute",
@@ -743,8 +755,20 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (account) (claude_max_utilization_ratio{window=\"seven_day\"} and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"seven_day\"} > time() - 1800) and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"seven_day\"} <= time()) and on(job, instance) (claude_usage_collection_timestamp_seconds > time() - 1800))",
-          "legendFormat": "{{account}}",
+          "expr": "(max by (account) (claude_max_utilization_ratio{window=\"seven_day\"} and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"seven_day\"} > time() - 1800) and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"seven_day\"} <= time()) and on(job,instance,account) (claude_max_capture_success == 1) and on(job,instance,account) (claude_max_input_errors == 0) unless on(job,instance,account,window) (claude_max_reset_timestamp_seconds{window=\"seven_day\"} <= time()) and on(job, instance) (claude_usage_collection_timestamp_seconds > time() - 1800))) and on(account) (max by(account) (claude_max_rejection_assumed{window=\"seven_day\"}) == 0)",
+          "legendFormat": "{{account}} \u00b7 measured",
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "(max by (account) (claude_max_utilization_ratio{window=\"seven_day\"} and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"seven_day\"} > time() - 1800) and on(job,instance,account,window) (claude_max_observed_timestamp_seconds{window=\"seven_day\"} <= time()) and on(job,instance,account) (claude_max_capture_success == 1) and on(job,instance,account) (claude_max_input_errors == 0) unless on(job,instance,account,window) (claude_max_reset_timestamp_seconds{window=\"seven_day\"} <= time()) and on(job, instance) (claude_usage_collection_timestamp_seconds > time() - 1800))) and on(account) (max by(account) (claude_max_rejection_assumed{window=\"seven_day\"}) == 1)",
+          "legendFormat": "{{account}} \u00b7 assumed 100%",
           "instant": true,
           "range": false,
           "format": "time_series",
@@ -822,7 +846,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (account,window) (claude_max_reset_timestamp_seconds and on(job,instance,account,window) (claude_max_reset_observed_timestamp_seconds > time() - 1800) and on(job,instance,account,window) (claude_max_reset_observed_timestamp_seconds <= time()) and on(job, instance) (claude_usage_collection_timestamp_seconds > time() - 1800)) * 1000",
+          "expr": "max by (account,window) (claude_max_reset_timestamp_seconds and on(job,instance,account,window) (claude_max_reset_observed_timestamp_seconds > time() - 1800) and on(job,instance,account,window) (claude_max_reset_observed_timestamp_seconds <= time()) and on(job,instance,account) (claude_max_capture_success == 1) and on(job,instance,account) (claude_max_input_errors == 0) and on(job, instance) (claude_usage_collection_timestamp_seconds > time() - 1800)) * 1000",
           "legendFormat": "{{account}} \u00b7 {{window}}",
           "instant": true,
           "range": false,
@@ -1186,13 +1210,218 @@
     },
     {
       "id": 36,
+      "title": "Claude Max \u00b7 account status",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 100,
+        "w": 12,
+        "h": 7
+      },
+      "description": "Every configured account/window remains visible: UNKNOWN for failed, never observed or reset expired data; STALE when the source or observation is older than 30 minutes; MEASURED for a fresh numeric observation; ASSUMED 100% for an unscoped rejection without confirmed window utilization. Status uses capture success, per-account errors and independent timestamps. Inventory remains visible for the 7-day retention window if the sampler stops.",
+      "links": [
+        {
+          "title": "GPT pool in OmniRoute",
+          "url": "http://127.0.0.1:21128/dashboard/analytics",
+          "targetBlank": true
+        }
+      ],
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(((((max by (account,window) (last_over_time(claude_max_window_present[7d])) == 1) and on(account) ((max by (account) (last_over_time(claude_max_capture_success[7d])) == 1) and on(account) (max by (account) (last_over_time(claude_max_input_errors[7d])) == 0))) and on(account,window) (max by (account,window) (last_over_time(claude_max_observed_timestamp_seconds[7d])) > time() - 1800) and on(account) (max by (account) (last_over_time(claude_max_capture_timestamp_seconds[7d])) > time() - 1800) and on() (max(last_over_time(claude_usage_collection_timestamp_seconds[7d])) > time() - 1800)) and on(account,window) (((max by (account,window) (last_over_time(claude_max_window_present[7d])) == 1) and on(account) ((max by (account) (last_over_time(claude_max_capture_success[7d])) == 1) and on(account) (max by (account) (last_over_time(claude_max_input_errors[7d])) == 0))) unless on(account,window) ((max by (account,window) (last_over_time(claude_max_reset_timestamp_seconds[7d])) <= time()) and on(account,window) (max by (account,window) (last_over_time(claude_max_reset_timestamp_seconds[7d])) > max by (account,window) (last_over_time(claude_max_observed_timestamp_seconds[7d])))))) and on(account,window) (max by (account,window) (last_over_time(claude_max_rejection_assumed[7d])) == 0)) or on(account,window) (2 * (((((max by (account,window) (last_over_time(claude_max_window_present[7d])) == 1) and on(account) ((max by (account) (last_over_time(claude_max_capture_success[7d])) == 1) and on(account) (max by (account) (last_over_time(claude_max_input_errors[7d])) == 0))) and on(account,window) (max by (account,window) (last_over_time(claude_max_observed_timestamp_seconds[7d])) > time() - 1800) and on(account) (max by (account) (last_over_time(claude_max_capture_timestamp_seconds[7d])) > time() - 1800) and on() (max(last_over_time(claude_usage_collection_timestamp_seconds[7d])) > time() - 1800)) and on(account,window) (((max by (account,window) (last_over_time(claude_max_window_present[7d])) == 1) and on(account) ((max by (account) (last_over_time(claude_max_capture_success[7d])) == 1) and on(account) (max by (account) (last_over_time(claude_max_input_errors[7d])) == 0))) unless on(account,window) ((max by (account,window) (last_over_time(claude_max_reset_timestamp_seconds[7d])) <= time()) and on(account,window) (max by (account,window) (last_over_time(claude_max_reset_timestamp_seconds[7d])) > max by (account,window) (last_over_time(claude_max_observed_timestamp_seconds[7d])))))) and on(account,window) (max by (account,window) (last_over_time(claude_max_rejection_assumed[7d])) == 1))) or on(account,window) (3 * ((((max by (account,window) (last_over_time(claude_max_window_present[7d])) == 1) and on(account) ((max by (account) (last_over_time(claude_max_capture_success[7d])) == 1) and on(account) (max by (account) (last_over_time(claude_max_input_errors[7d])) == 0))) unless on(account,window) ((max by (account,window) (last_over_time(claude_max_reset_timestamp_seconds[7d])) <= time()) and on(account,window) (max by (account,window) (last_over_time(claude_max_reset_timestamp_seconds[7d])) > max by (account,window) (last_over_time(claude_max_observed_timestamp_seconds[7d]))))) unless on(account,window) ((((max by (account,window) (last_over_time(claude_max_window_present[7d])) == 1) and on(account) ((max by (account) (last_over_time(claude_max_capture_success[7d])) == 1) and on(account) (max by (account) (last_over_time(claude_max_input_errors[7d])) == 0))) and on(account,window) (max by (account,window) (last_over_time(claude_max_observed_timestamp_seconds[7d])) > time() - 1800) and on(account) (max by (account) (last_over_time(claude_max_capture_timestamp_seconds[7d])) > time() - 1800) and on() (max(last_over_time(claude_usage_collection_timestamp_seconds[7d])) > time() - 1800)) and on(account,window) (((max by (account,window) (last_over_time(claude_max_window_present[7d])) == 1) and on(account) ((max by (account) (last_over_time(claude_max_capture_success[7d])) == 1) and on(account) (max by (account) (last_over_time(claude_max_input_errors[7d])) == 0))) unless on(account,window) ((max by (account,window) (last_over_time(claude_max_reset_timestamp_seconds[7d])) <= time()) and on(account,window) (max by (account,window) (last_over_time(claude_max_reset_timestamp_seconds[7d])) > max by (account,window) (last_over_time(claude_max_observed_timestamp_seconds[7d])))))))) or on(account,window) (0 * max by (account,window) (last_over_time(claude_max_account_present[7d])))",
+          "legendFormat": "{{account}} \u00b7 {{window}}",
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "noValue": "UNKNOWN",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "UNKNOWN",
+                  "color": "gray"
+                },
+                "1": {
+                  "text": "MEASURED",
+                  "color": "green"
+                },
+                "2": {
+                  "text": "ASSUMED 100%",
+                  "color": "orange"
+                },
+                "3": {
+                  "text": "STALE",
+                  "color": "red"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": true,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "displayMode": "basic",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 37,
+      "title": "Claude Max \u00b7 capture age",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 100,
+        "w": 12,
+        "h": 7
+      },
+      "description": "Age of the last capture, including failed and stale accounts. UNKNOWN means no capture has ever been recorded; a new failed attempt does not refresh the age.",
+      "links": [
+        {
+          "title": "GPT pool in OmniRoute",
+          "url": "http://127.0.0.1:21128/dashboard/analytics",
+          "targetBlank": true
+        }
+      ],
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(time() - (max by (account) (last_over_time(claude_max_capture_timestamp_seconds[7d])) > 0)) or on(account) (-1 * max by(account) (max by (account,window) (last_over_time(claude_max_account_present[7d]))))",
+          "legendFormat": "{{account}}",
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurations",
+          "noValue": "UNKNOWN",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "UNKNOWN",
+                  "color": "gray"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": true,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "displayMode": "basic",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 38,
+      "title": "Claude usage \u00b7 input errors",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 107,
+        "w": 24,
+        "h": 5
+      },
+      "description": "Bounded capture and ledger input error counts, without raw error text. Per-account capture failures produce UNKNOWN in account status; ledger errors suppress partial spend totals.",
+      "links": [
+        {
+          "title": "GPT pool in OmniRoute",
+          "url": "http://127.0.0.1:21128/dashboard/analytics",
+          "targetBlank": true
+        }
+      ],
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by(source) (last_over_time(claude_usage_input_errors[7d]))",
+          "legendFormat": "{{source}}",
+          "instant": true,
+          "range": false,
+          "format": "time_series",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": true,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "displayMode": "basic",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 39,
       "type": "row",
       "title": "Native records and telemetry",
       "collapsed": false,
       "panels": [],
       "gridPos": {
         "x": 0,
-        "y": 100,
+        "y": 112,
         "w": 24,
         "h": 1
       }
@@ -1207,7 +1436,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 101,
+        "y": 113,
         "w": 24,
         "h": 9
       },
@@ -1269,7 +1498,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 110,
+        "y": 122,
         "w": 24,
         "h": 9
       },
@@ -1331,7 +1560,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 119,
+        "y": 131,
         "w": 24,
         "h": 9
       },
@@ -1393,7 +1622,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 128,
+        "y": 140,
         "w": 24,
         "h": 9
       },
@@ -1445,7 +1674,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 137,
+        "y": 149,
         "w": 24,
         "h": 9
       },
@@ -1497,7 +1726,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 146,
+        "y": 158,
         "w": 24,
         "h": 9
       },
@@ -1549,7 +1778,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 155,
+        "y": 167,
         "w": 24,
         "h": 9
       },
@@ -1601,7 +1830,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 164,
+        "y": 176,
         "w": 24,
         "h": 9
       },
@@ -1653,7 +1882,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 173,
+        "y": 185,
         "w": 24,
         "h": 9
       },
@@ -1705,7 +1934,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 182,
+        "y": 194,
         "w": 24,
         "h": 9
       },
@@ -1732,7 +1961,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 191,
+        "y": 203,
         "w": 24,
         "h": 9
       },
@@ -1811,7 +2040,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 200,
+        "y": 212,
         "w": 24,
         "h": 9
       },
@@ -2208,7 +2437,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 209,
+        "y": 221,
         "w": 24,
         "h": 9
       },
@@ -2269,7 +2498,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 218,
+        "y": 230,
         "w": 24,
         "h": 9
       },
@@ -2334,7 +2563,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 227,
+        "y": 239,
         "w": 24,
         "h": 9
       },
@@ -2387,7 +2616,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 236,
+        "y": 248,
         "w": 24,
         "h": 9
       },
@@ -2440,7 +2669,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 245,
+        "y": 257,
         "w": 24,
         "h": 9
       },
@@ -2493,7 +2722,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 254,
+        "y": 266,
         "w": 24,
         "h": 9
       },

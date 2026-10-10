@@ -1,0 +1,15 @@
+[Unit]
+Description=Loopback node_exporter textfile endpoint for Claude usage
+Documentation=https://github.com/prometheus/node_exporter/blob/6044da783597cc3b57aef7580ddcdcff58a4ee99/README.md#textfile-collector
+
+[Service]
+Type=simple
+NoNewPrivileges=yes
+UMask=0077
+ExecStartPre=/usr/bin/mkdir -p %h/.local/state/native-agent-stack/claude-usage/textfiles
+ExecStart=%h/.local/bin/node_exporter --web.listen-address=127.0.0.1:29101 --collector.disable-defaults --collector.textfile --collector.textfile.directory=%h/.local/state/native-agent-stack/claude-usage/textfiles
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=default.target

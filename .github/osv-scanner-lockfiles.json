@@ -212,6 +212,10 @@
     {
       "path": "blueprints/native-skill-practice/p1/requirements-scoring.lock",
       "parser": "requirements.txt"
+    },
+    {
+      "path": "observability/claude-usage/requirements.txt",
+      "parser": "requirements.txt"
     }
   ],
   "covered_by_lockfile": [

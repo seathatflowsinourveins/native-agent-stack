@@ -1,0 +1,11 @@
+[Unit]
+Description=Collect Claude usage at most every 15 minutes
+
+[Timer]
+OnCalendar=*-*-* *:00,15,30,45:00 UTC
+AccuracySec=1s
+Persistent=false
+Unit=claude-usage.service
+
+[Install]
+WantedBy=timers.target
