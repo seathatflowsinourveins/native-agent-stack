@@ -5761,8 +5761,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "40ef24b2098d73381484a5e13ae8f092100267d6cc70050edf8901a59e1e3a08",
-      "bytes": 32181
+      "sha256": "051a6e5ea99ee018c13ee7ba283b4f2dad3e4ccb4d22b498720e6210ecfe902e",
+      "bytes": 32323
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -10392,8 +10392,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
-      "sha256": "905e26b9169fd8997344849a312d10709a7519759a23b76262bb85b4dbd9effc",
-      "bytes": 13989
+      "sha256": "4a1cbba4fae315d1ad2f9febbce4fffbafb59c1e92d3507ffdf78a4f7cbcf139",
+      "bytes": 14131
     },
     {
       "path": "blueprints/native-skill-practice/cases.json",
@@ -60752,8 +60752,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "f378ce83d70ccb1827ad58e5642c15a363a4430eaddaf48f343a85472fa82855",
-      "bytes": 249927
+      "sha256": "90bb8755398c7c9dc3535b61add22cbabf560f49438d76cc32882945f10f6e3e",
+      "bytes": 251264
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -61197,13 +61197,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "34cda0de60388ff139f55bec45f875ca6f104471913120d540c072f9b3f05c01",
-      "bytes": 54151
+      "sha256": "12694aee763e059292b657e5f6f18f5438d3f481582ae47df79a5911b2662df9",
+      "bytes": 54697
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "f917b6f004b35de2084ad560d787866bbda2fb0dccb7ea5005c698e72a4d69d0",
-      "bytes": 149247
+      "sha256": "979d75af5502585bef98b5c44a9e0e68f9e7a7385aacd824752889087f6bcaed",
+      "bytes": 149475
     },
     {
       "path": "tools/sota-convergence/README.md",

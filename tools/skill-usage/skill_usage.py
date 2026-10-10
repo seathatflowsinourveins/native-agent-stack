@@ -5,8 +5,8 @@ Claude side reads native `/skill-doctor` (its table is the only per-skill invoke
 Claude Code exposes; see the README for why OTel, a custom hook, agentsview and ccusage cannot
 answer this):
 
-    claude -p "/skill-doctor" --output-format json --permission-mode dontAsk --tools "" --strict-mcp-config \\
-        --max-turns 1 --max-budget-usd 0.05 > /path/outside/checkout/skill-doctor.json
+    claude -p /skill-doctor --output-format json --permission-mode dontAsk --permission-prompts none \\
+        --tools '' --strict-mcp-config --max-turns 1 --max-budget-usd 0.05 > /path/outside/checkout/skill-doctor.json
     python3 tools/skill-usage/skill_usage.py --claude-skill-doctor /path/outside/checkout/skill-doctor.json \\
         --codex-root ~/.codex/sessions --out /path/outside/checkout/report.json
 
@@ -196,12 +196,15 @@ def parse_claude_output(raw: str) -> dict:
             "total_cost_usd": total_cost_usd, "num_turns": num_turns}
 
 
-# /skill-doctor is a local command (0 turns, $0), so these fences change nothing while the client recognises it. They
-# keep a prompt the client does not recognise from reaching a model with tools under the host's inherited
-# bypassPermissions or from spending: no tools, no MCP servers, deny anything not pre-approved, one turn, a budget cap
-# (the headless default of the Claude Code native practice record of 2026-10-09, slot headless-sdk).
+# /skill-doctor is a local command (0 turns, $0), so these fences change nothing while the client recognises it:
+# measured 2026-10-10 on Claude Code 2.1.295, the same table (sha256-identical) at $0 and 0 turns with and without them.
+# If a client stopped recognising it, they would keep the prompt from reaching a model with tools or MCP servers under
+# the host's inherited bypassPermissions and cap what the run spends (untested: no such client exists). Each fence is a
+# documented 2.1.295 flag (`claude --help`): no tools, no MCP servers, deny anything not pre-approved without prompting
+# (the repository's rule PERM-03, docs/harness-rules-convergence-20260922.md), one turn, a budget cap.
 SKILL_DOCTOR_ARGV = ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
-                     "--tools", "", "--strict-mcp-config", "--max-turns", "1", "--max-budget-usd", "0.05"]
+                     "--permission-prompts", "none", "--tools", "", "--strict-mcp-config", "--max-turns", "1",
+                     "--max-budget-usd", "0.05"]
 
 
 def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run) -> dict:
@@ -2232,9 +2235,8 @@ def main(argv=None) -> int:
                                      "'result' text), or a plain-text /skill-doctor table, from "
                                      "this file")
     claude_source.add_argument("--run-skill-doctor", action="store_true",
-                                help="Run SKILL_DOCTOR_ARGV, 'claude -p \"/skill-doctor\" --output-format json' with the headless fences, now "
-                                     "(stdin from /dev/null); refused unless total_cost_usd == 0 "
-                                     "and num_turns == 0")
+                                help=f"Run '{shlex.join(SKILL_DOCTOR_ARGV)}' now (stdin from /dev/null); refused "
+                                     "unless total_cost_usd == 0 and num_turns == 0")
     parser.add_argument("--claude-timeout", type=int, default=30, metavar="SECONDS",
                          help="Timeout for --run-skill-doctor (default: 30)")
     parser.add_argument("--codex-root", action="append", default=[], type=Path, metavar="DIR",

@@ -9,6 +9,7 @@ import io
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -199,15 +200,36 @@ class RunSkillDoctor(unittest.TestCase):
             return subprocess.CompletedProcess(argv, 0, "[]", "")
 
         S.run_skill_doctor(timeout=17, runner=fake_runner)
-        # An independent literal: the headless fences deny what is not pre-approved, offer no tools and no MCP
-        # servers, allow one turn and cap the spend.
+        # An independent literal: the headless fences deny what is not pre-approved without prompting (rule PERM-03,
+        # docs/harness-rules-convergence-20260922.md), offer no tools and no MCP servers, allow one turn and cap the spend.
         self.assertEqual(captured["argv"], ["claude", "-p", "/skill-doctor", "--output-format", "json",
-                                            "--permission-mode", "dontAsk", "--tools", "", "--strict-mcp-config",
-                                            "--max-turns", "1", "--max-budget-usd", "0.05"])
+                                            "--permission-mode", "dontAsk", "--permission-prompts", "none",
+                                            "--tools", "", "--strict-mcp-config", "--max-turns", "1",
+                                            "--max-budget-usd", "0.05"])
         self.assertIs(captured["kwargs"]["stdin"], subprocess.DEVNULL)
         self.assertEqual(captured["kwargs"]["timeout"], 17)
         self.assertTrue(captured["kwargs"]["text"])
         self.assertTrue(captured["kwargs"]["capture_output"])
+
+    def test_every_documented_copy_of_the_command_matches_the_argv(self):
+        # The command is copied by hand into the module docstring, the --run-skill-doctor help and the operator
+        # docs; each copy must equal the argv that runs, so a fence change cannot leave a stale copy behind.
+        command = shlex.join(S.SKILL_DOCTOR_ARGV)
+
+        def flat(text):
+            return " ".join(text.replace("\\\n", " ").split())
+
+        copies = {"module docstring": S.__doc__}
+        for relative in ("tools/skill-usage/README.md", "adoption/update.md", "blueprints/native-skill-practice/README.md"):
+            copies[relative] = (ROOT / relative).read_text(encoding="utf-8")
+        for name, text in copies.items():
+            with self.subTest(copy=name):
+                self.assertIn(command, flat(text))
+        # argparse wraps help text at hyphens ("--max- budget-usd"), so the help copy is compared without whitespace.
+        help_out = io.StringIO()
+        with contextlib.redirect_stdout(help_out), self.assertRaises(SystemExit):
+            S.main(["--help"])
+        self.assertIn("".join(command.split()), "".join(help_out.getvalue().split()))
 
     def test_uses_the_sample_fixture_stdout(self):
         sample = (FIXTURES / "skill-doctor-sample.json").read_text()

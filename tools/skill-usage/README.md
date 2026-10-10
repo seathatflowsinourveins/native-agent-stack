@@ -45,14 +45,20 @@ Claude side — capture the table once (no cost, no tool calls: it is a syntheti
 review it, then point the report at the file:
 
 ```sh
-claude -p "/skill-doctor" --output-format json > /path/outside/checkout/skill-doctor.json
+claude -p /skill-doctor --output-format json --permission-mode dontAsk --permission-prompts none \
+  --tools '' --strict-mcp-config --max-turns 1 --max-budget-usd 0.05 > /path/outside/checkout/skill-doctor.json
 python3 tools/skill-usage/skill_usage.py \
   --claude-skill-doctor /path/outside/checkout/skill-doctor.json \
   --codex-root ~/.codex/sessions \
   --out /path/outside/checkout/skill-invoke-rate.json
 ```
 
-Or let the tool run it directly. It runs exactly `claude -p "/skill-doctor" --output-format json`
+The flags are headless fences: they change nothing while the client recognises `/skill-doctor` (the same table at
+$0 and 0 turns, measured on Claude Code 2.1.295), and they keep a prompt the client does not recognise from reaching a
+model with tools or MCP servers, deny anything not pre-approved without prompting (rule PERM-03 in
+`docs/harness-rules-convergence-20260922.md`), allow one turn and cap the spend.
+
+Or let the tool run it directly. It runs exactly the command above (`SKILL_DOCTOR_ARGV` in `skill_usage.py`)
 with stdin from `/dev/null` and a timeout, and refuses to use the result unless the run reports
 `total_cost_usd == 0` and `num_turns == 0` (both are recorded either way) — the documented shape of
 that native command; anything else means the captured text did not come from that code path:
