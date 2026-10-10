@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "status": "draft-only; CC reviews and applies at a planned restart",
+  "status": "review drafts; CC host application recorded, repository landing pending",
   "unit_of_memory": "GiB (2^30 bytes); WSL GB and systemd G both use base 1024",
-  "activation": "CC-only planned restart; no draft apply/inverse command has been run",
+  "activation": "CC-only host application; the CC records the 2026-10-10T05:09:55Z boot and retained 104GB. No apply/inverse or boot command was run by this lane.",
   "rollback_scope": "Persistent file/link state is restored exactly. Existing runtime-only values are untouched now; across a restart their baseline defaults are not inferred. This inverse does not invent future defaults.",
   "time_zone_decision": {
     "selected": "keep America/New_York guest and useWindowsTimezone=true; UTC for pages refresh, America/New_York for Git maintenance and local backup/prune; retain WSL VM-init chronyd PHC0 on ::1:323 and distro observe-only -x monitor on 127.0.0.1:3323; leave expired WU watch out of the apply set",

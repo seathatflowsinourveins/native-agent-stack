@@ -160,5 +160,163 @@
       "matches_recorded_base": true
     }
   ],
-  "scope": "Read-only post-restart endpoint and timer-base capture; not memory/boot/workload acceptance. Original pre-application time.json remains unchanged."
+  "scope": "Original read-only endpoint/base capture remains intact. Follow-up records current memory.high/MemoryHigh and explicit IPv4/IPv6 queries, with separately attributed CC boot receipts; not an independent two-boot or workload acceptance run. Original pre-application time.json remains unchanged.",
+  "follow_up_memory_and_endpoint_verification": {
+    "start_utc": "2026-10-10T06:23:25Z",
+    "end_utc": "2026-10-10T06:23:25Z",
+    "evidence_class": "native_proven",
+    "commands": [
+      {
+        "command": [
+          "chronyc",
+          "-h",
+          "127.0.0.1",
+          "-p",
+          "323",
+          "tracking"
+        ],
+        "start_utc": "2026-10-10T06:23:25Z",
+        "end_utc": "2026-10-10T06:23:25Z",
+        "exit_code": 1,
+        "stdout": "506 Cannot talk to daemon\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "chronyc",
+          "-h",
+          "::1",
+          "-p",
+          "323",
+          "tracking"
+        ],
+        "start_utc": "2026-10-10T06:23:25Z",
+        "end_utc": "2026-10-10T06:23:25Z",
+        "exit_code": 0,
+        "stdout": "Reference ID    : 50484330 (PHC0)\nStratum         : 1\nRef time (UTC)  : Sat Oct 10 06:23:18 2026\nSystem time     : 0.000000018 seconds slow of NTP time\nLast offset     : +0.000170424 seconds\nRMS offset      : 0.000108647 seconds\nFrequency       : 52.540 ppm slow\nResidual freq   : +15.761 ppm\nSkew            : 8.328 ppm\nRoot delay      : 0.000000001 seconds\nRoot dispersion : 0.000233579 seconds\nUpdate interval : 8.0 seconds\nLeap status     : Normal\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "systemctl",
+          "show",
+          "user-1000.slice",
+          "-p",
+          "MemoryMax",
+          "-p",
+          "MemoryHigh",
+          "-p",
+          "ControlGroup",
+          "-p",
+          "DropInPaths"
+        ],
+        "start_utc": "2026-10-10T06:23:25Z",
+        "end_utc": "2026-10-10T06:23:25Z",
+        "exit_code": 0,
+        "stdout": "DropInPaths=/usr/lib/systemd/system/user-.slice.d/10-defaults.conf /run/systemd/system.control/user-1000.slice.d/50-MemoryHigh.conf /etc/systemd/system/user-1000.slice.d/60-native-stack-memory.conf\nControlGroup=/user.slice/user-1000.slice\nMemoryHigh=infinity\nMemoryMax=68719476736\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "cat",
+          "/sys/fs/cgroup/user.slice/user-1000.slice/memory.max"
+        ],
+        "start_utc": "2026-10-10T06:23:25Z",
+        "end_utc": "2026-10-10T06:23:25Z",
+        "exit_code": 0,
+        "stdout": "68719476736\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "cat",
+          "/sys/fs/cgroup/user.slice/user-1000.slice/memory.high"
+        ],
+        "start_utc": "2026-10-10T06:23:25Z",
+        "end_utc": "2026-10-10T06:23:25Z",
+        "exit_code": 0,
+        "stdout": "max\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "cat",
+          "/sys/fs/cgroup/non-systemd/memory.max"
+        ],
+        "start_utc": "2026-10-10T06:23:25Z",
+        "end_utc": "2026-10-10T06:23:25Z",
+        "exit_code": 0,
+        "stdout": "42949672960\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "cat",
+          "/sys/fs/cgroup/non-systemd/memory.high"
+        ],
+        "start_utc": "2026-10-10T06:23:25Z",
+        "end_utc": "2026-10-10T06:23:25Z",
+        "exit_code": 0,
+        "stdout": "max\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "systemctl",
+          "show",
+          "native-stack-non-systemd-memory.service",
+          "-p",
+          "Result",
+          "-p",
+          "UnitFileState",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "ExecMainStartTimestamp"
+        ],
+        "start_utc": "2026-10-10T06:23:25Z",
+        "end_utc": "2026-10-10T06:23:25Z",
+        "exit_code": 0,
+        "stdout": "ActiveState=active\nSubState=exited\nUnitFileState=enabled\nResult=success\nExecMainStartTimestamp=Sat 2026-10-10 01:09:58 EDT\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "sysctl",
+          "-n",
+          "vm.swappiness"
+        ],
+        "start_utc": "2026-10-10T06:23:25Z",
+        "end_utc": "2026-10-10T06:23:25Z",
+        "exit_code": 0,
+        "stdout": "10\n",
+        "stderr": ""
+      }
+    ],
+    "cc_record_sources": [
+      {
+        "record": "coordination/command-center/host-changes-20261009/wsl-persistence-955-applied-20261010.md",
+        "sha256": "81ebc7c398a9a2224946c1efd8243591871cadb622bead613e34281d6e3d4d58",
+        "read_class": "CC record read by this lane; no application command executed by this lane"
+      },
+      {
+        "record": "coordination/command-center/host-changes-20261009/boot-memory-caps-retired-20261010.md",
+        "sha256": "268724a4fde1b42fe6b67dfbf2b9e7db62b124fd0f6bf574c1b08fbba5edd83b",
+        "read_class": "CC record read by this lane; no application command executed by this lane"
+      },
+      {
+        "record": "coordination/command-center/research-cc-role-20261008/pr955-claude-micro-056c6984.md",
+        "sha256": "33083ea3a60179a7cc6826f930c721600ef460871b3dc4046d618946ba667e31",
+        "read_class": "CC record read by this lane; no application command executed by this lane"
+      }
+    ],
+    "cc_application_attribution": {
+      "boot_time_utc": "2026-10-10T05:09:55Z",
+      "memory_high_conflict": "The CC records a boot unit applying slice MemoryHigh=33G and non-systemd memory.high=26G at 05:10:02Z, reset and unit disabled at 05:13:04Z. This lane did not execute those writes.",
+      "windows_memory_choice": "The CC retained 104GB; the optional 96GB key edit was skipped after the host/guest-capacity trade-off decision.",
+      "limits": "Current read-backs plus a CC-attributed boot record are not an independent two-boot persistence or workload acceptance run."
+    }
+  }
 }

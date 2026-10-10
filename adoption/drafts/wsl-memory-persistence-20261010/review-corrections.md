@@ -46,3 +46,26 @@ no graph completeness claim is made. Protected trading work and host apply
 remain outside this correction. Full repository validation and the redacted
 PR-range gitleaks result are recorded in the final PR/coordination handoff
 after the final candidate is checked, avoiding a self-referential receipt.
+
+## CC micro P3 corrections
+
+The CC's 06:15:55Z micro accepts both prior P2 fixes and requests the following
+record corrections. Its SHA-256 is
+`33083ea3a60179a7cc6826f930c721600ef460871b3dc4046d618946ba667e31`.
+
+| Finding | Correction / evidence |
+| --- | --- |
+| P3-a live set-property versus file precedence | Restrict 60-over-50 precedence to configuration reload/boot. Pinned systemctl.xml:663–680 explicitly applies live properties immediately. CC records the 05:10:02Z 33G/26G override and 05:13:04Z reset; fresh 06:23:25Z manager/kernel high and max read-backs agree with the drafts. |
+| P3-b completed boot and skipped Windows option | Attribute the 05:09:55Z boot to the CC and say it was not run by this lane. Fresh service read-back shows start at 05:09:58Z and Result=success/enabled. Cite the CC application/reset records and retained 104GB choice; 96GB remains unapplied. |
+| P3-c missing IPv4 probe receipt | Replace the uncaptured pre-restart sentence with fresh paired commands: 127.0.0.1:323 returns 506/exit 1, while ::1:323 succeeds with PHC0. Both complete receipts are retained. |
+
+The ninth draft test compares manager/kernel limits with the configured
+policy and requires both transport outcomes in the follow-up receipt.
+Removing the new receipt block in a temporary fixture makes this evidence
+check fail. CC application metadata stays separately attributed; none of
+these reads or tests runs a host setting or boot command.
+
+The repository-wide jCodeMunch cap is assigned to overlap-token/nevo in a
+separate measured PR that lands first. The earlier consolidation proposal
+is superseded and stays unapplied. This lane prepares one P3 forward commit
+on 056c6984, then waits for the co-op's landing-rebase cue before any push.

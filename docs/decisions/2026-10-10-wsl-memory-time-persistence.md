@@ -1,6 +1,10 @@
 # WSL memory and time persistence — 2026-10-10
 
-Status: proposed for CC review and planned-restart application. Drafts are in
+Status: the CC applied the Linux memory and six timer-zone drafts at the
+05:09:55Z boot; this lane has not run a host application or boot test.
+The CC retained 104GB and skipped the optional 96GB key edit. Repository
+corrections await review and landing after the separate indexing-cap PR.
+Drafts are in
 [adoption/drafts/wsl-memory-persistence-20261010](../../adoption/drafts/wsl-memory-persistence-20261010/README.md).
 The per-claim pinned [source register](../../adoption/drafts/wsl-memory-persistence-20261010/sources.md)
 is part of this decision. Numeric policy values come from the CC; upstream
@@ -77,7 +81,7 @@ it. Lowering to 96GB can force guest-wide reclaim before either sibling
 ceiling is reached, even when each is below its own limit. The CC and user
 own that policy trade-off; no workload success is inferred from the draft.
 
-**Recommend the 96GB key-only option for the CC's planned restart.** The
+**Pre-restart recommendation: the 96GB key-only option.** The
 current private Chrome demand leaves only about 4.3 GiB nominal room for
 other Windows consumers at a fully used 104 GiB cap, compared with about
 12.3 GiB at 96. The price is 8 GiB less guest capacity, with possible guest
@@ -88,13 +92,26 @@ shows unacceptable failure at 96 while a representative Windows workload
 has enough headroom at 104. Capture those measurements at the CC's
 application turn; do not gate or throttle work waiting for them.
 
+The CC's application retained memory=104GB and did not apply the 96GB option
+after the host/guest-capacity trade-off decision. The arithmetic above records
+the dated alternatives; it is not an instruction to change the current host.
+[CC application record](../../adoption/drafts/wsl-memory-persistence-20261010/sources.md#cc-application-records).
+
 Persist the requested Linux values through a systemd slice drop-in, native
 boot oneshot and sysctl.d file. The WSL-created leaf needs per-distro
 reapplication. The asynchronous boot.command route was considered and
 rejected because its code does not order memory-controller activation;
 the native oneshot explicitly requests MemoryAccounting and verifies the
 write. [Pinned boot/controller sources](../../adoption/drafts/wsl-memory-persistence-20261010/sources.md#memory-and-boot).
-The boot application is source-reviewed, not yet native-proven.
+The CC's application and corrective-reset receipts record a native boot at
+05:09:55Z and a reset at 05:13:04Z. This lane did not run that boot. Fresh
+06:23:25Z reads show the oneshot enabled with Result=success (start 05:09:58Z),
+slice MemoryMax=68719476736 and MemoryHigh=infinity, kernel slice high=max,
+non-systemd max=42949672960 and high=max, and swappiness=10. These are current
+read-backs plus a separately attributed CC boot record; a second-distro-start
+persistence run and 96GB workload performance remain unmeasured here.
+[CC records](../../adoption/drafts/wsl-memory-persistence-20261010/sources.md#cc-application-records);
+[follow-up receipt](../../adoption/drafts/wsl-memory-persistence-20261010/measurements/time-post-restart.json).
 
 ## Clock synchronization and timezone decision
 
@@ -135,9 +152,10 @@ a distro PHC refclock. PHC0 alone is a reference label; the source supplies
 the implementation, while the explicit endpoint captures supply selection.
 Microsoft's Hyper-V/Azure stable-link example remains supporting context,
 not a configuration to transplant. Explicit hosts/ports bypass chronyc's
-default Unix-socket/network fallback. Earlier pre-restart IPv4 :323 probes
-failed with 506/exit 1; IPv6 succeeded, so those failures did not establish
-an absent VM daemon. Timezone changes are independent of synchronization.
+default Unix-socket/network fallback. The retained 06:23:25Z IPv4 :323 tracking
+probe returns 506/exit 1 while the explicit IPv6 ::1:323 probe succeeds with
+PHC0. These paired receipts show that a failed transport query does not
+establish an absent VM daemon. Timezone changes are independent of synchronization.
 [Microsoft, chrony and WSL primary references](../../adoption/drafts/wsl-memory-persistence-20261010/sources.md#time-and-calendar).
 
 | Zone option | Measured dependencies and DST effect | Trade-off / inverse |
@@ -198,11 +216,15 @@ Git 2.53.0 regenerates daily/hourly/weekly timers with a random minute on
 any such change. The post-restart read observes all seven historical base
 hashes unchanged, six draft targets present and the WU-watch target absent.
 It does not authorize overwriting present files. Future slice policy changes
-edit the `60-` drop-in because it overrides later `50-` set-property files.
+edit the `60-` drop-in because its settings win over `50-` files at reload or
+boot. A later set-property call on an active unit still changes its live
+limits immediately. The CC's 05:10:02Z boot-unit write of MemoryHigh=33G
+and 05:13:04Z corrective reset are a recorded example; read both MemoryHigh
+and the two kernel memory.high files after any such change.
 The README also specifies the Windows pre-edit hash/byte backup and
 encoding/BOM/CRLF-preserving memory-line-only diff procedure.
 
-The eight parsing/fixture/native-parser checks are local integration; the
+The nine parsing/fixture/native-parser checks are local integration; the
 current-state and calendar captures are native read-only observations.
 The new tests distinguish both chrony endpoints and reject a coordinated
 `:35` plan/drop-in mutation against a recorded `:34` base, plus corrupt

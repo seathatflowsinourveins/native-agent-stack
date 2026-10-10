@@ -32,6 +32,45 @@ def ini(path):
 
 
 class DraftTests(unittest.TestCase):
+    def test_followup_receipts_bind_memory_limits_and_transport_results(self):
+        capture = json.loads((ROOT / "measurements/time-post-restart.json").read_text())
+        followup = capture["follow_up_memory_and_endpoint_verification"]
+        rows = followup["commands"]
+
+        def one(command):
+            matches = [r for r in rows if r["command"] == command]
+            self.assertEqual(len(matches), 1, command)
+            self.assertRegex(matches[0]["start_utc"], r"Z$")
+            self.assertRegex(matches[0]["end_utc"], r"Z$")
+            return matches[0]
+
+        shown = one(["systemctl", "show", "user-1000.slice", "-p", "MemoryMax",
+                     "-p", "MemoryHigh", "-p", "ControlGroup", "-p", "DropInPaths"])
+        self.assertEqual(shown["exit_code"], 0)
+        properties = dict(line.split("=", 1) for line in shown["stdout"].splitlines())
+        draft = ini(ROOT / "systemd/user-1000.slice.d/60-native-stack-memory.conf")
+        self.assertEqual(properties["MemoryHigh"], draft["Slice"]["MemoryHigh"])
+        self.assertEqual(properties["MemoryMax"], str(64 * 1024 ** 3))
+        for path, expected in (
+                ("/sys/fs/cgroup/user.slice/user-1000.slice/memory.max", str(64 * 1024 ** 3)),
+                ("/sys/fs/cgroup/user.slice/user-1000.slice/memory.high", "max"),
+                ("/sys/fs/cgroup/non-systemd/memory.max", str(40 * 1024 ** 3)),
+                ("/sys/fs/cgroup/non-systemd/memory.high", "max")):
+            read = one(["cat", path])
+            self.assertEqual(read["exit_code"], 0)
+            self.assertEqual(read["stdout"].strip(), expected)
+        # Retain both a failed address and a successful VM query; the failed
+        # transport cannot serve as evidence that the daemon is absent.
+        ipv4 = one(["chronyc", "-h", "127.0.0.1", "-p", "323", "tracking"])
+        ipv6 = one(["chronyc", "-h", "::1", "-p", "323", "tracking"])
+        self.assertEqual(ipv4["exit_code"], 1)
+        self.assertIn("506 Cannot talk to daemon", ipv4["stdout"])
+        self.assertEqual(ipv6["exit_code"], 0)
+        self.assertIn("PHC0", ipv6["stdout"])
+        for record in followup["cc_record_sources"]:
+            self.assertRegex(record["sha256"], r"^[0-9a-f]{64}$")
+            self.assertTrue(record["record"].startswith("coordination/command-center/"))
+
     def test_capture_separates_vm_clock_and_distro_monitor(self):
         endpoints = {
             ("::1", "323"): "wsl-vm-init",

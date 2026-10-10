@@ -62,8 +62,12 @@ of using this historical precondition. The inverse restores the complete backup.
 
 Future slice policy changes edit the installed `60-native-stack-memory.conf`.
 Its filename sorts after the `50-*.conf` files written by
-`systemctl set-property`, so those writes cannot override the persisted
-MemoryMax/MemoryHigh values ([systemd precedence](sources.md#memory-and-boot)).
+`systemctl set-property`, so the 60- values win when systemd reloads unit
+configuration or loads it at boot. A later set-property call on an active unit
+changes the live limits immediately; filename order does not prevent that
+runtime change. The CC recorded this at 05:10:02Z when an older boot unit
+set MemoryHigh=33G, then disabled that unit and reset both memory.high values
+at 05:13:04Z ([precedence and immediate application](sources.md#memory-and-boot)).
 
 ## Per-line citations and boot behavior
 
@@ -85,11 +89,32 @@ ExecStart; kernel controller activation supplies the pre-existing child's
 daemon, process migration or inferred `non-systemd.slice` is introduced.
 Sources: [installed-release WSL, systemd and kernel](sources.md#memory-and-boot).
 
-A native boot of these drafts has **not** been run. The service's enablement
-does not establish a measured zero-window guarantee before every external
-WSL payload can allocate. The CC's restart acceptance checks the loaded
-drop-in, oneshot success and cap readback on two distro starts; it also checks
-`vm.swappiness`, the Windows memory key, timezone and effective timer expressions.
+A native boot has **not been run by this lane**. The CC's receipts record the
+05:09:55Z boot that loaded these drafts; the oneshot's fresh read-back reports
+success and a 05:09:58Z start. The CC retained memory=104GB and skipped the
+optional 96GB key edit after the host/guest-capacity trade-off decision.
+[The application and corrective-reset receipts](sources.md#cc-application-records)
+are attributed to the CC. This does not establish a measured zero-window
+guarantee before every external WSL payload can allocate or an independent
+two-distro-start persistence run by this lane.
+
+After boot, reload or any later runtime property change, read both the manager
+properties and kernel files. Expected slice values are MemoryMax=68719476736,
+MemoryHigh=infinity, memory.max=68719476736 and memory.high=max. Expected
+non-systemd values are memory.max=42949672960 and memory.high=max.
+
+```sh
+systemctl show user-1000.slice -p MemoryMax -p MemoryHigh -p DropInPaths
+cat /sys/fs/cgroup/user.slice/user-1000.slice/memory.max
+cat /sys/fs/cgroup/user.slice/user-1000.slice/memory.high
+cat /sys/fs/cgroup/non-systemd/memory.max
+cat /sys/fs/cgroup/non-systemd/memory.high
+systemctl show native-stack-non-systemd-memory.service -p Result -p UnitFileState
+```
+
+The 06:23:25Z read-only receipt confirms both high values, both maxima,
+enabled/successful oneshot and swappiness=10. Remaining CC acceptance checks
+include a second distro start, the Windows key, timezone and effective timers.
 Clock acceptance has two distinct checks: `chronyc -h ::1 -p 323 tracking`
 and `sources` for WSL's VM-init PHC0, then `chronyc -h 127.0.0.1 -p 3323
 tracking` and `sources` for the distro's observe-only `-x` network monitor.
@@ -108,7 +133,7 @@ python3 adoption/drafts/wsl-memory-persistence-20261010/test_drafts.py
 python3 scripts/validate.py
 ```
 
-The eight small tests parse the slice, service, sysctl and Windows fragments,
+The nine small tests parse the slice, service, sysctl and Windows fragments,
 check all per-line citations and both memory/time inverse preconditions, and
 verify six timer resets against the recorded base expressions and byte hashes.
 Mutations coordinate plan/drop-in `:35` against the recorded `:34`, corrupt
@@ -118,6 +143,8 @@ query alongside a successful monitor query. Tests also exercise the helper
 only against a temporary regular file (including missing-path refusal) and
 run installed `systemd-analyze verify` on temporary unit fixtures. No test
 executes the real ExecStart or a host apply/inverse command.
+The follow-up receipt check compares manager and kernel memory limits and
+requires a retained IPv4 :323 failure alongside successful IPv6 PHC0 tracking.
 
 [measurements/memory.json](measurements/memory.json) and
 [measurements/time.json](measurements/time.json) retain UTC command intervals,
@@ -140,8 +167,10 @@ inactive/disabled WU watch; these are pre-application observations.
 separately retains both chrony reads, observed `-x` process flags, unchanged
 base hashes, six present drop-ins and an absent WU-watch drop-in. Target
 absence in the original receipt is historical; reapplying drafts must respect
-the current files. This receipt does not establish memory/boot/workload
-acceptance. No live state is changed by reading these properties.
+the current files. Its later follow-up binds MemoryHigh and both kernel high
+read-backs, plus the paired IPv4 failure/IPv6 success, and cites the CC's
+native boot/reset records. An independent two-boot or workload acceptance
+run by this lane remains unmeasured. No live state is changed by these reads.
 The [scoped time audit](local-time-audit.md) lists each classified file:line;
 its JSON retains commands and exact origin/main revisions. No host receipt
 or platform-status file is changed.

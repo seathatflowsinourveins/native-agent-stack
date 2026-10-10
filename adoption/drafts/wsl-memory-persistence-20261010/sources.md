@@ -20,8 +20,12 @@ units, placement and behavior.
   [lexicographic precedence, :233–239](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L233);
   [set-property drop-in writer, src/core/unit.c:4735–4740](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/src/core/unit.c#L4735)
   writes priority 50, so the persisted `60-native-stack-memory.conf` sorts
-  later. Future policy edits must update the 60- file rather than rely on
-  later set-property calls to override it;
+  later when configuration is reloaded or loaded at boot. Future persistent
+  policy edits update the 60- file.
+  [Immediate runtime application, systemctl.xml:663–680](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemctl.xml#L663)
+  states that set-property changes supported live properties immediately;
+  filename order does not prevent that live change before a reload. The CC
+  boot-unit/reset record below supplies the host observation;
   [enablement links, :181–200](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L181);
   [slice section, systemd.slice.xml:54](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.slice.xml#L54);
   [oneshot and RemainAfterExit, systemd.service.xml:209](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.service.xml#L209);
@@ -165,6 +169,30 @@ units, placement and behavior.
   [autoinstall-reference.rst:1335](https://github.com/canonical/subiquity/blob/ccf0196a90b99f01f431927826f65172871a0bda/doc/reference/autoinstall-reference.rst#L1335)
   gives Etc/UTC as the default-behavior timezone example.
 
+## CC application records
+
+These are dated first-party host records, not upstream dependency pins or
+applications by this lane. Paths are relative to the coordination root. Full
+SHA-256 bindings are retained in time-post-restart.json under
+follow_up_memory_and_endpoint_verification.cc_record_sources.
+
+- `coordination/command-center/host-changes-20261009/wsl-persistence-955-applied-20261010.md`,
+  SHA-256 `81ebc7c398a9a2224946c1efd8243591871cadb622bead613e34281d6e3d4d58`:
+  CC installation/boot read-backs; the optional Windows 96GB key edit was skipped.
+- `coordination/command-center/host-changes-20261009/boot-memory-caps-retired-20261010.md`,
+  SHA-256 `268724a4fde1b42fe6b67dfbf2b9e7db62b124fd0f6bf574c1b08fbba5edd83b`:
+  the older boot unit applied live slice MemoryHigh=33G and non-systemd
+  memory.high=26G at 05:10:02Z; the CC disabled it and reset both at 05:13:04Z.
+- `coordination/command-center/research-cc-role-20261008/pr955-claude-micro-056c6984.md`,
+  SHA-256 `33083ea3a60179a7cc6826f930c721600ef460871b3dc4046d618946ba667e31`:
+  CC micro and live-host read at 06:05Z confirm agreement after the reset.
+
+The fresh 06:23:25Z command receipts separately reproduce manager/kernel high
+and max values, service Result/enablement and both IPv4/IPv6 :323 queries.
+The service start read-back is 05:09:58Z; the CC's reported boot is 05:09:55Z.
+This does not prove an independent two-boot persistence run or 96GB workload
+acceptance by this lane.
+
 ## Selected source byte hashes
 
 | Source at pin above | SHA-256 |
@@ -188,3 +216,4 @@ units, placement and behavior.
 | chrony doc/chronyc.adoc | d3b0a7dd93fb8bfaf0e0945b49833e955a33f79b5bed35b5861ebb00bc2ff4dc |
 | Git builtin/gc.c | 9b33422c7d0c5948a470db5a340992816aedf04dabaf0da6d57e3b004471d775 |
 | systemd src/core/unit.c | d4970d32aac859429911a41e7642ca90c1d31f46073b18c9a5f8860cc9f683ee |
+| systemd man/systemctl.xml | f9dcfcb2a94b87124767d92622133cdeb058348f79438816f056978d7125399c |
