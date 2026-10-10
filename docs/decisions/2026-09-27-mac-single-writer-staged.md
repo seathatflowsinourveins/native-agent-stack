@@ -1,6 +1,6 @@
 # Decision: native-agent-stack becomes the Mac's single writer, in two stages (2026-09-27)
 
-**Decided by:** the user, on 2026-09-27, answering the workstation coordinator session. The question was "Which repo should own the Mac's global setup?", and the user chose the staged option: native-agent-stack becomes the single writer. For the memory layer, the user added: "https://github.com/rohitg00/agentmemory/blob/main/README.md or https://github.com/vectorize-io/hindsight or more sota repos form stared, researchcovnergenc eand awesome list convergence should supreceed it?". This change is on branch `claude/mac-single-writer-staged-20260927`, based on `origin/main@6e53809e`.
+**Decided by:** the owner on 2026-09-27, answering the workstation coordinator's question about which repository should own the Mac's global setup and choosing the staged option: native-agent-stack becomes its single writer. The owner also asked whether [rohitg00/agentmemory at `2d38dafe`](https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md), [vectorize-io/hindsight at `f8950b0c`](https://github.com/vectorize-io/hindsight/blob/f8950b0c07d9e34c76493dba802bb309f0ce60fd/README.md), or repositories found through stars, research-convergence and awesome lists should supersede the memory selection. [Native cross-session messaging](https://code.claude.com/docs/en/cross-session-messaging) supplies coordination within that ownership assignment. Branch `claude/mac-single-writer-staged-20260927`, based on `origin/main@6e53809e`.
 
 **Scope:** this record, and step 0 of the macOS section of [`docs/next-host-stages.md`](../next-host-stages.md). Lane: `lane:foundation`.
 - It does not change [`adoption/host-roles.json`](../../adoption/host-roles.json). The Mac's `model-hosting` role waits for the #379 measurements.
@@ -9,8 +9,8 @@
 
 ## Context
 
-- On 2026-09-24 the user made agent-ecosystem's foundation-lane setup session the single writer of the Mac's global state and shared foundation services ([agent-ecosystem#28](https://github.com/seathatflowsinourveins/agent-ecosystem/issues/28)). This repository recorded that rule in two places:
-  - [`foundation-alignment.json`](../../evidence/artifacts/host-upgrade-20260924/foundation-alignment.json), in its `scope` and open item 1: "Do not also load adoption/bootstrap-macos.sh's launchd agents";
+- On 2026-09-24 the owner assigned agent-ecosystem's foundation-lane setup session sole ownership of the Mac's global state and shared foundation services ([agent-ecosystem#28](https://github.com/seathatflowsinourveins/agent-ecosystem/issues/28)). Existing writer ownership appears in two places:
+  - [`foundation-alignment.json`](../../evidence/artifacts/host-upgrade-20260924/foundation-alignment.json), whose `scope` and open item 1 keep this repository's duplicate launchd bootstrap inactive;
   - `docs/next-host-stages.md` step 0.
 - As a result, this repository's Claude and Codex client layer has never run on a Mac:
   - the stack agents, guard hooks and MCP servers (`tools/adoption/install_claude_profile.py`);

@@ -135,8 +135,9 @@ WRITE_GRANTS = {
     "claude-pr-review.yml:review": ["id-token: write"],
     # Federation needs id-token (EXEMPTIONS, id-token-write); the reports go to the job summary, not to the PR.
     "claude-pr-toolkit-review.yml:review": ["id-token: write"],
-    # Federation needs id-token (EXEMPTIONS, id-token-write); the result is one issue.
-    "harness-audit.yml:audit": ["id-token: write", "issues: write"],
+    # Federation needs id-token (EXEMPTIONS, id-token-write). The report goes to the job summary from a model-free
+    # step, so the job holds no other write scope (docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md).
+    "harness-audit.yml:audit": ["id-token: write"],
     "publish-catalog.yml:publish": ["id-token: write", "attestations: write"],
     "publish-catalog.yml:release": ["contents: write"],
     "saturation-tracking.yml:issue": ["issues: write"],

@@ -1,8 +1,8 @@
 # Roadmap record: the ecosystem's next moves, current architecture, recorded targets and gaps (2026-09-28)
 
-**Status:** a dated roadmap. It **decides nothing new and changes no authority.** Every owner, gate and user decision below is quoted from an existing record, a PR or a peer's own statement. Moves become work only when their owner takes them.
+**Status:** a dated roadmap. It **decides nothing new and changes no authority.** Ownership, gates and decisions are historical observations from the cited records, PRs and peer reports; upstream documentary support and actual acceptance remain separate. Moves become work only when their owner takes them.
 
-**Requested by:** the user, on 2026-09-28: "what is the next moves for our ecosystem evolve? grand roadmap, current architecture, and the sota convergenced one, gaps".
+**Requested by:** the owner on 2026-09-28, for a roadmap of the ecosystem's next moves, current architecture, SOTA convergence and gaps. [Claude Code's research and validation workflow](https://code.claude.com/docs/en/best-practices) informs the research practice; the dated request supplies its scope.
 
 **Snapshot:**
 - origin/main `83229e24`, read at about 22:00Z on 2026-09-28;
@@ -22,7 +22,7 @@ Recheck drift before acting on any line here. Known drift at publication: #425 (
   - Owner acceptances came back from peers over SendMessage after the run.
   - The run's journal and `child-usage.mjs` output are session-local and are not retained in this repository. Every claim below rests on its cited repository path, PR or command, not on the run itself.
 - **Evidence classes** follow `docs/acceptance-evidence-policy.md`: LA = live acceptance, IC = our integration check, UT = unchanged upstream tests, SR = source review.
-- **Deliberately not done: no live landscape sweep.** On 2026-09-27 the user held the full 32-layer sweep until Gate A and Gate B pass, so upstream currency here is as recorded. The latest sweep is `catalogs/sota-convergence/manifest-20260926.json`.
+- **Deliberately not done: no live landscape sweep.** On 2026-09-27 the owner held the full 32-layer sweep until Gate A and Gate B pass, so upstream currency here is as recorded. The latest sweep is `catalogs/sota-convergence/manifest-20260926.json`.
 
 ## Verdict
 
@@ -103,7 +103,7 @@ There are four critical paths:
    - Main records only the file credential route (`docs/secret-storage.md`).
 2. **PAPER-215.** Issue #215 is open: one sparse required quote freezes `AlpacaPaperTransport`, which stops exits and recovery. Whether it reproduces on the current `transport.py` is unverified.
 3. **PAPER-ENGINE.** The Alpaca paper gates bind older engine hashes (`catalogs/us-equities/gates-20260922.json:219`), and #362 (ledger schema v2) is unmerged.
-4. **GATE-A.** #381 is frozen but not executed. #432's full Residuals list is unbuilt (README:875-879), and W has no dates. The recorded owner (`native-agent-stack-a9`, `docs/decisions/2026-09-28-delegated-decisions.md`) was not live on 2026-09-28 evening, and `native-agent-stack-10` is auditing the area.
+4. **GATE-A.** #381 is frozen but not executed. #432's full Residuals list is unbuilt (README:875-879), and W has no dates. The recorded owner is `native-agent-stack-a9`: `docs/decisions/2026-09-28-delegated-decisions.md:26` assigns Gate A to its coordinator, identified at `evidence/artifacts/delegated-decisions-20260928/coordination.md:3`. That session was not live on 2026-09-28 evening, and `native-agent-stack-10` is auditing the area.
 5. **RES-COVERAGE.** The mover set covers 498 of 594 events (83.8%), against the 95% bar (#463). No asof re-collection exists.
 6. **RES-PIT.** `catalyst.py` parses no 8-K Item and has no historical ticker→CIK map, and its availability rule makes every historical filing ineligible (`blueprints/us-equities/mover-v3/README.md:198,559`); `pit-news-filings` is not established (`catalogs/us-equities/gates-20260922.json:153-168`).
 7. **RES-EDGE.** No rule has an edge. The Mover v3 freeze (#360) waits on its cross-family pre-outcome review.
@@ -301,15 +301,15 @@ Decision rights stay as recorded:
 
 ### 2026-09-29, main `cf3fb72e`
 
-- **Gate A owner.** `native-agent-stack-2d` takes Gate A (#381) as F-NOW-1 and F-NOW-2, from 2026-09-29. Its message says this was "on the user's direct instruction". It is quoted as the peer stated it and not independently verified. This fills the "Gate A owner" cells above.
-  - `docs/decisions/2026-09-28-delegated-decisions.md` still records `native-agent-stack-a9`, which was not live; this update does not edit that record.
-  - The same peer relays the user's order: stage the 32-layer wave and prove the token stack end to end first, then run the full waves. It stages Phase C only after the E2E work is moving.
+- **Gate A owner.** `native-agent-stack-2d` reports taking Gate A (#381) as F-NOW-1 and F-NOW-2 from 2026-09-29 on the owner's direct instruction. This is the peer's reported custody change, not independently verified. This fills the "Gate A owner" cells above.
+  - `docs/decisions/2026-09-28-delegated-decisions.md:26` still assigns Gate A to its coordinator, `native-agent-stack-a9` (`evidence/artifacts/delegated-decisions-20260928/coordination.md:3`), which was not live; this update does not edit that record.
+  - The same peer relays the owner's order: stage the 32-layer wave and prove the token stack end to end first, then run the full waves. It stages Phase C only after the E2E work is moving; this is reported sequencing, not a completed measurement.
 - **F-2W-3 is done.** #471 merged as `cf3fb72e`. `lane_packets --manifest-newcomers` now carries the 23 candidates that were refuted only by a missing vote. That review was one GPT-6 round, with both findings repaired.
 - **Paper accounts: measured, not user-gated.** Two Alpaca paper pairs are held in the kernel keyring (`scripts/kernel_keyring.py`). A read-only check through the keyring wrapper at 2026-09-29T00:3xZ returned HTTP 200 on both accounts, with 0 positions, 0 open orders, status `ACTIVE` and `trading_blocked` false. Both `paper-ext-20260928-chain4` and `incentive-monitor-20260928` were inactive by then (the monitor's result was `success`). Several items in "User-only actions" above change as a result:
   - The credential route is the keyring. What remains is the `docs/secret-storage.md` amendment, which is work, not a user action.
   - The incentive study needs one of the two accounts assigned to it (item 2 above). That is an assignment decision for the trading lane, not a new account.
-  - The ladder ruling (item 3) and the Gate B criterion (item 5) are owner decisions made with evidence under the user's delegation (`2026-09-28-delegated-decisions.md:3`), and recorded.
-  - The 32-layer wave (item 9) waits only on Gate A and Gate B, per the user's order relayed above.
+  - The ladder ruling (item 3) and the Gate B criterion (item 5) are recorded here as delegated decisions by the item owner, made with evidence under the owner's 2026-09-28 delegation (`2026-09-28-delegated-decisions.md:3`). The later route-settlement update preserves the competing custody reading.
+  - The 32-layer wave (item 9) waits only on Gate A and Gate B, per the owner's order relayed above.
   - Still the user's: the IBKR Gateway 2FA sign-in; Apple Container consent on the Mac (whose role is under discussion); purchases and off-host key custody; and the Mac account from trial C, which only a Mac session can check.
 - **The trading lane is still unowned.** `native-agent-stack-2d`, `native-agent-stack-d8` and `native-agent-stack-79` each said they hold no trading lane, so P-NOW-1, P-NOW-2 and P-NOW-3 have no owner. With both paper units inactive, #362's merge condition ("no active paper unit") is met. #362 still needs its Claude re-check and five body corrections.
 - **Post-merge corrections** from the skills-trial and integrity owner are in the #469 comment [5880981981](https://github.com/seathatflowsinourveins/native-agent-stack/pull/469#issuecomment-5880981981). They cover the actionlint swap (under F-LT-1), the betterleaks contract, M5b and M5c on Gates A and B, and F-2W-4 owned by the foundation coordinator.
@@ -326,7 +326,7 @@ Decision rights stay as recorded:
   - B: regular hours on account 1, 10:00 ET;
   - C: after-hours on account 2, 16:00 ET;
   - the incentive monitor on account 2 from 03:55 ET.
-  Caps are 150 requests and 130 submits per minute, and any HTTP 429 stops a series. Receipts follow each series. This updates P-NOW-2, P-NOW-3 and P-WK-1 above. The paper keys are 0600 env files since 2026-09-29, the user's "store with env so no key is loss" (inventory entry via #481).
+  Caps are 150 requests and 130 submits per minute, and any HTTP 429 stops a series. Receipts follow each series. This updates P-NOW-2, P-NOW-3 and P-WK-1 above. The paper keys are 0600 env files since 2026-09-29 under the owner's direction to retain them in durable environment files (inventory entry via #481); the [Linux keyrings contract](https://man7.org/linux/man-pages/man7/keyrings.7.html) distinguishes kernel transport from a durable key-of-record store.
 - **R-NOW-1 (asof re-collection), #485.** The primary estimand E1 has not run; its three frozen private inputs live on another host. The secondary estimand E2 ran: 594 of 594 events pass on as-of data, and ticker reuse explains none of them. A repair round is paused on Claude capacity.
 - **The foundation half of F-LT-1 is authorized but deferred for capacity; it has not started.** Per `native-agent-stack-76`, the user lifted the landscape-sweep hold for the 20 foundation layers on 2026-09-29. That session stopped its one-layer smoke and holds the heavy stages until the Claude weekly reset (2026-09-30 18:00Z; 74-75% as peer 2d reported). It also holds the GPT-6 lane until a credit or the Codex weekly reset (2026-10-04 00:35Z; 94%). Preparation on `16f3c7fe`, staged and ready:
   - the ledger check passes;
@@ -340,8 +340,8 @@ Decision rights stay as recorded:
 ### 2026-10-03, main `9b0b8d6d`
 
 - **F-WK-2 is retired.** #488 closes after the route-settlement record merges; its draft head and review remain preserved for any successor comparison.
-- **The route is settled by the user's direction, unmeasured.** The landscape sweep and cross-family research and review use OmniRoute; the native Codex defaults remain as recorded.
-- **Item 5 needs no confirmation.** The user already directed the route (`2026-09-27-omniroute-account-pool.md:304-305`). Who confirms the criterion is read two ways: the 2026-09-29 update records it as an owner decision under the delegation (line 311), while the status line (line 3), item 5 itself (line 252) and `2026-09-28-delegated-decisions.md:5-8` support keeping it user-only, as #488's draft noted ([PREREGISTRATION.md L9–13](https://github.com/seathatflowsinourveins/native-agent-stack/blob/caea04f28d7dcd5d428155cf1a24b28423cba1ce/blueprints/gate-b-gpt6-route/PREREGISTRATION.md#L9)). The route is user-directed under either reading, and the user can take this back.
+- **The route is settled by the owner's direction, unmeasured.** The landscape sweep and cross-family research and review use OmniRoute; the native Codex defaults remain as recorded. The [official Codex configuration contract](https://developers.openai.com/codex/config-reference/) supports explicit provider routing, not authority or a measured route comparison.
+- **Item 5 needs no confirmation.** The owner already directed the route (`2026-09-27-omniroute-account-pool.md:304-305`). Who confirms the criterion is read two ways: the 2026-09-29 update records it as a delegated decision by the item owner under the owner's 2026-09-28 delegation (line 311), while the status line (line 3), item 5 itself (line 252) and `2026-09-28-delegated-decisions.md:5-8` support keeping it user-only, as #488's draft noted ([PREREGISTRATION.md L9–13](https://github.com/seathatflowsinourveins/native-agent-stack/blob/caea04f28d7dcd5d428155cf1a24b28423cba1ce/blueprints/gate-b-gpt6-route/PREREGISTRATION.md#L9)). The route is owner-directed under either reading, and they can take this back.
 - See [the route settlement](2026-10-03-sweep-gpt6-route-settlement.md) for the sources, preserved design, independent M5 prerequisites and overturn conditions.
 
 ### 2026-10-03, later, main `9b0b8d6d`
@@ -354,7 +354,7 @@ Decision rights stay as recorded:
   (`2026-09-30-omniroute-rebuild.md:30-32`). The apply-after-R02 order was broken in fact no later than the 2026-09-30
   rebuild, which records the affinity patch `045aa81f3` on 20128 (`2026-09-30-omniroute-rebuild.md:54-55`). PR #425's
   records, on main since 2026-09-28T22:57:18Z, already label `045aa81f3` as 20128's build
-  (`2026-09-28-openhands-resolver-isolation.md:281`). That label comes from a source read, not an observed version
+  (`f6e5a0384c97ac40fcc21a260217257b15b333c4:docs/decisions/2026-09-28-openhands-resolver-isolation.md:281`; current locator `:756`). That label comes from a source read, not an observed version
   read, and read as the running build it conflicts with the rebuild record
   (`2026-09-30-omniroute-rebuild.md:30-31,135-136`). The sources do not settle whether either break came earlier, and
   this update neither asserts nor rules out an earlier date. No explicit user release is on record, and this update

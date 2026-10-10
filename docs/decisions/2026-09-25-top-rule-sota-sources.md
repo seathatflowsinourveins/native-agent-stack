@@ -1,7 +1,7 @@
 # Decision: top rule, never self-write without a SOTA source, enforced by a required PR check (2026-09-25)
 
-**Decided by:** the user, in agent-lab session agent-lab-ea on 2026-09-25. The record is agent-lab's
-`docs/tasks/2026-09-24-sota-mover-strategies.md`, sections "Top rule adopted" and "Upstream-first correction". The
+**Decided by:** the owner, in agent-lab session agent-lab-ea on 2026-09-25. The record is agent-lab's
+`docs/tasks/2026-09-24-sota-mover-strategies.md`, sections "Top rule adopted" and "Upstream-first correction"; [Claude's explore/plan guidance](https://code.claude.com/docs/en/best-practices) informs research, not that authority. The
 same rule lands in agent-lab through PR #71. This change is on branch `claude/top-rule-sota-sources-20260925`,
 based on `origin/main@0074a0c3`.
 
@@ -15,9 +15,9 @@ based on `origin/main@0074a0c3`.
 
 ## Decision
 
-The rule, in the user's words (verbatim): "NEVER SELF WRITTEN EVER AGAIN WITHOUT SOTA REPOS, EVERY LAYERS NEED TO
-MANIFEST FORM SOTA REPOS AND REFERENCES, INSTALL DIRECTLY OR REFERENCING, ALL ACTION NEED SOTA REFERENCES BACKED, IF
-ONE LINE REMAIN FOR OUR AGENT.MD RULES ETC IS THIS RULE". As the first line of the instruction files:
+The owner's September 25 decision requires every layer, component and action to have a maintained SOTA
+repository or published reference: install directly, or build only from a cited reference implementation.
+They made this the first rule in the instruction files; a missing source requires stopping and reporting. This record's decided wording follows:
 
 > **Top rule: never self-write without a SOTA source.** Every layer, component and action comes from a maintained
 > SOTA repository or published reference: install it directly, or build only from a cited reference implementation,
@@ -25,9 +25,9 @@ ONE LINE REMAIN FOR OUR AGENT.MD RULES ETC IS THIS RULE". As the first line of t
 > instead of writing one.
 
 The `sota-sources` job fails a pull request whose description has no non-empty "SOTA sources" section (`##` or
-`###`). It reads the description from the `pull_request` payload through the official `actions/github-script`,
-pinned to v9.0.0 at commit `3a2844b7e9c422d3c10d287c895573f7108da1b3`. No description text reaches a shell, and
-the job needs no permission beyond `contents: read`.
+`###`). It reads the description from the `pull_request` payload through [actions/github-script v9.0.0 at `3a2844b7`](https://github.com/actions/github-script/blob/3a2844b7e9c422d3c10d287c895573f7108da1b3/README.md),
+pinned to commit `3a2844b7e9c422d3c10d287c895573f7108da1b3`. No description text reaches a shell, and
+the job needs only `contents: read`. [GitHub rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets) make it merge-blocking; citation presence establishes no source merit, freshness or native acceptance.
 
 ## Evidence
 

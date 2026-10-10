@@ -89,7 +89,7 @@ update below: the accepted profile is one arm and the Gate A E2E decides. Schedu
 `comparison_required` on the program record's call (PR #573, decision 1): its selected Dagu 2.16.6 failed the
 preregistered SIGKILL case.
 
-**The merit rule (the user, 2026-10-01).** The user's instruction, verbatim: "make sure evl only on the reps quality itself,such as: if hindsight repo itself is better , then don't shape  the next wsl architecture into the legacy baises of our own".
+**Selection by repository quality (the owner's instruction, 2026-10-01).** The owner required evaluating repositories on their own quality without inherited host biases; compare upstream evidence on the same frozen dataset and scorer, following [Inspect's task contract](https://inspect.aisi.org.uk/tasks.html). An installed incumbent or a host integration hold establishes no comparative merit.
 The winners column of this edition was defined as the selection of record at its pin of record. That is the source
 host's bookkeeping: what the catalogs select and what this host's stack pins or installs. It is not a merit result,
 and the column is labelled as the source host's selection of record. A layer's winner on the new distribution is
@@ -106,9 +106,9 @@ agentmemory's arm D2 scored recall_all@5 0.821 against 0.570 for ai-memory with 
 reranker off (arm C3); ai-memory's production arm with the LLM reranker (C4) and agentmemory's shipped-hook arm
 (D2h) have not run, the arms' captures and embedders differ, and the ai-memory build was a 2.5 pre-release.
 Also: the verdict winners that had been listed as alternatives for lacking a
-stack pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow) are winners of their layers, in the trading
-lane owner's words; token efficiency reads `comparison_required` with the lean base as an arm of equal standing,
-in the Gate A owner's words; and the runtime-worker candidates without a repository pin are candidates, not
+stack pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow) are the trading lane owner's reported verdict winners, with qualification still open;
+the Gate A owner's open comparison keeps token efficiency `comparison_required`, with the lean base as an arm of equal standing;
+and the runtime-worker candidates without a repository pin are candidates, not
 exclusions. The Codex lane's second-family reviews select different component sets in 20 of the 32 layers; under
 this rule that difference is resolved by the repositories' results in the re-record pass, with the recorded
 selection as one arm and not as the default.

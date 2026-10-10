@@ -10,11 +10,11 @@ is the routing record for Codex models; the release, client-gate and gateway-eff
 
 ## Decision
 
-The user selected GPT-6.1 Sol/Ultra for routine Codex coordination and
-GPT-6.1 Sol/Max for primary workers. Select GPT-6 Astra/Ultra (proactive
+The owner selected GPT-6.1 Sol/Ultra for routine Codex coordination and
+GPT-6.1 Sol/Max for primary workers, using the [0.159.2 model catalog](https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/models-manager/models.json). Select GPT-6 Astra/Ultra (proactive
 delegation with the model's `xhigh` reasoning, see below) when a complex workflow
-needs Astra to coordinate it, the user's 2026-09-30 selection ("astra ultra when
-tasks needed suitable for complex workflow"), and GPT-6 Astra/Max, the highest
+needs Astra to coordinate it, as the owner selected on 2026-09-30; the [native Ultra policy](https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/core/src/session/multi_agents.rs) supplies its mechanism.
+Use GPT-6 Astra/Max, the highest
 reasoning effort, for a single consequential judgment: conflicting primary
 evidence, consequential architecture decisions, complex changes across systems,
 or a failure unresolved after one bounded Sol repair. Explicit task
@@ -31,7 +31,7 @@ through the same native interface.
 
 Keep Claude's Opus judgment, Ultracode, interactive `--effort max`, saved
 `xhigh` fallback and unset global effort environment override. Keep the
-user-selected Fable advisor default and use Opus 5.5 advising where appropriate;
+owner-selected Fable advisor default and use Opus 5.5 advising where appropriate;
 activation and usage-credit consent remain native. This decision changes
 neither authentication nor permission policy.
 

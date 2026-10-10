@@ -1,7 +1,7 @@
 # Decision: resolve the 2026-09-27 prompt audit by cross-family convergence (2026-09-27)
 
-**Decided by:** the user's request of 2026-09-27 ("please resolute with convergence practice, gpt6 runtime workers sota
-harnesses in your end"), which followed a `/claude-api prompt-audit` run at `c8362c02`. One coordinator session
+**Decided by:** the owner's request of 2026-09-27 to resolve the prompt audit through converged practice, including GPT-6 runtime workers and SOTA harnesses,
+following a `/claude-api prompt-audit` run at `c8362c02`; [OpenAI's prompting reference at `6dc6324f`](https://github.com/openai/openai-cookbook/blob/6dc6324fb9ed780b32b787f23fad336e9f1eff15/examples/gpt-5/gpt-5_prompting_guide.ipynb) supplies a method reference. One coordinator session
 carried it out under an approved plan. The judgment packet was frozen at `origin/main@55fc8d17`. The edits were
 verified on `b26add90` and then rebased onto later `main` commits for merge. The inputs, returns, controls and usage
 are retained in
@@ -215,7 +215,7 @@ included.
 
 ## Limitations and residuals
 
-- **X9 is applied; its interactive half is the user's.** Rounds 1 and 2 split. Round 3's comparison and blind
+- **X9 is applied; its interactive half remains with the owner and unmeasured.** Rounds 1 and 2 split. Round 3's comparison and blind
   judgment chose the GPT-6 lane's text unanimously (round-3 addendum). The comparison ran headless only, and an
   interactive run, which only the user can make, is its overturn condition. The two texts were:
   - GPT-6 lane, now `CLAUDE.md:3-8`:
@@ -272,7 +272,7 @@ included.
 
 ## Addendum (2026-09-28): X9's second round
 
-After round 1 split on X9, the user asked to "proceed with research convergence". The method above provides one
+After round 1 split on X9, the owner requested continued research convergence on 2026-09-28; the follow-up repeated the frozen-packet comparison with the [pinned OpenAI prompting reference](https://github.com/openai/openai-cookbook/blob/6dc6324fb9ed780b32b787f23fad336e9f1eff15/examples/gpt-5/gpt-5_prompting_guide.ipynb). The method above provides one
 adjudication round, so this second round goes beyond it. It keeps the same rule: a text is applied only when all four
 judgments choose it. The evidence is in
 [`evidence/artifacts/prompt-audit-20260927/x9-round2/`](../../evidence/artifacts/prompt-audit-20260927/x9-round2/).
@@ -410,11 +410,11 @@ sessions, on two cases:
 
 ## Addendum (2026-09-28): round 3
 
-The user's direction of 2026-09-28 started a third round: "please resolute cleanly with the sota repos
-convergence,resolute all in your end and state the jobs that only beable to run by end,decide with your evidances and
-sota repos evidances convergence". The round ran the comparison that the second round named for X9. It also took up
-X5 again, with a new item, S1. For X5, this direction and the user's own user-level file supersede the plan's rule
-that X5 is not edited; that file's top rule changed on 2026-09-28. X8 stays with the user. The evidence is in
+The owner's 2026-09-28 direction started a third round to resolve the outstanding work through repository and executed evidence,
+while reporting the work only the owner could perform; the [pinned OpenAI prompting reference](https://github.com/openai/openai-cookbook/blob/6dc6324fb9ed780b32b787f23fad336e9f1eff15/examples/gpt-5/gpt-5_prompting_guide.ipynb) and [native explore/verify workflow](https://code.claude.com/docs/en/best-practices) supply method sources.
+It ran the X9 comparison named by round 2 and revisited X5 with new item S1. For X5, that direction and the owner's user-level file
+superseded the plan's no-edit rule for the scoped text; the carrier remains a configuration input,
+not a source of upstream truth. Its top rule changed on 2026-09-28; X8 permission text stays with the owner. Evidence is in
 [`x9-round3/`](../../evidence/artifacts/prompt-audit-20260927/x9-round3/) and
 [`lane-a/`](../../evidence/artifacts/prompt-audit-20260927/lane-a/).
 
