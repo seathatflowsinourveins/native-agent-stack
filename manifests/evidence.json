@@ -17552,8 +17552,8 @@
     },
     {
       "path": "docs/claude-usage-observability.md",
-      "sha256": "8d827ebe75ed928566fabbc2ee10c0b1689a0f8a8b35dee29d09b16f4d26192a",
-      "bytes": 14062
+      "sha256": "50d9cbec43269ef9a8d30bea2b44d55b0b78c3d98686174b7c446680f75e4c17",
+      "bytes": 14188
     },
     {
       "path": "docs/codex-credential-store-research-20261009.md",
@@ -18417,8 +18417,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-claude-usage-observability.md",
-      "sha256": "5aeca52e0a80a9b54595363e45315a61772ded0e8611ea89bd5f4f763fb154af",
-      "bytes": 13476
+      "sha256": "32b69800063a3b4617443773b1042464a51537e99dbbdf95a96cff99adbc1e20",
+      "bytes": 16132
     },
     {
       "path": "docs/direct-results.md",
@@ -58917,8 +58917,8 @@
     },
     {
       "path": "observability/claude_usage_sampler.py",
-      "sha256": "af7cc28abf3e07db662ac109b5771fa1f2eec5baef530258c9f4d5cab4901d55",
-      "bytes": 11426
+      "sha256": "74a7d75bd140c3ef64da5e8f385b577132d6d6d189cb5140e3fad9a449aee249",
+      "bytes": 11507
     },
     {
       "path": "observability/collector/README.md",
@@ -59897,8 +59897,8 @@
     },
     {
       "path": "tests/test_claude_usage_sampler.py",
-      "sha256": "c8bf5bd396c8cde08c5b356341347ca8e1b0a9ddf85b9a7276e202e1db62e10c",
-      "bytes": 13104
+      "sha256": "793cc956557f282a1b33caef3140bcc6b9d58049182e9e7bc4f9e40ebf0490cf",
+      "bytes": 14093
     },
     {
       "path": "tests/test_codex_agents.py",

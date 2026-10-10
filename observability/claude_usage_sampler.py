@@ -186,8 +186,9 @@ def sample(accounts_file, ledger, state, output, workdir, *, now=None, timeout=M
             account = entry["index"]
             capture = data / f"{account}.jsonl"
             # Persist before launch so a crash, timeout, clock rollback or retry
-            # cannot consume a second request inside the 900-second window.
-            if not entry["attempted_at"] or attempted_at >= entry["attempted_at"] + INTERVAL:
+            # cannot consume a second request in the same UTC calendar slot.
+            # Timer jitter must not suppress the next slot's probe.
+            if not entry["attempted_at"] or attempted_at // INTERVAL > entry["attempted_at"] // INTERVAL:
                 check_fence(workdir)
                 entry.update(attempted_at=attempted_at, success=0)
                 save_state(state, saved)

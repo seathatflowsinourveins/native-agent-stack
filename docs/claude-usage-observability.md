@@ -83,13 +83,15 @@ stderr is discarded and only numeric/status event fields are retained from
 stdout. The 180-second timeout and native session-persistence suppression
 bound each probe. Lanes never run this command against a real client/account.
 
-Run at most once per account per 900 seconds, with a single CC-owned scheduler
-and an attempt-time guard shared across retries. A 15-minute calendar such as
+Run at most once per account per UTC 15-minute calendar slot, with a single
+CC-owned scheduler and an attempt-slot guard shared across retries. A calendar such as
 `*-*-* *:00,15,30,45:00 UTC`, without catch-up or immediate retries, is shipped.
 An exclusive persistent lock covers identity-index assignment, attempts and
 collection. Actual launch time is saved durably before each account's probe,
 so a crash, timeout, restarted invocation, overlapping timer or clock rollback
-cannot bypass the 900-second guard. A pass supports at most eight accounts.
+cannot bypass the same-slot guard. Adjacent slots may launch less than 900
+seconds apart when timer latency varies; `2000.2` then `2900.1` must both probe.
+A pass supports at most eight accounts.
 Valid rejection events are retained even when the native client exits nonzero.
 Failed attempts export failure metrics without raw output. Captures are
 atomically replaced with their actual observation mtime; replayed old data

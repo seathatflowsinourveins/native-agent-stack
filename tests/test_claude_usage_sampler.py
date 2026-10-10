@@ -89,12 +89,22 @@ class ClaudeUsageSamplerTests(unittest.TestCase):
     def test_cadence_guard_survives_retry_restart_and_failed_client(self):
         self.stub(fail=True)
         self.run_once(2000)
-        self.run_once(2899)
+        self.run_once(2699.9)
         self.assertEqual(1, len(self.calls.read_text().splitlines()))
         self.assertIn('claude_max_capture_success{account="acct-1"} 0.0', self.output.read_text())
-        self.run_once(2900)
+        self.run_once(2700)
+        self.run_once(2700.1)
+        self.run_once(2699.9)
         self.assertEqual(2, len(self.calls.read_text().splitlines()))
         self.assertIn('claude_max_account_present{account="acct-1",window="seven_day"} 1.0', self.output.read_text())
+
+    def test_calendar_cadence_probes_successive_slots_despite_timer_jitter(self):
+        self.run_once(2000.2)
+        self.run_once(2900.1)
+        self.assertEqual(2, len(self.calls.read_text().splitlines()))
+        capture_at = next(float(line.rsplit(" ", 1)[1]) for line in self.output.read_text().splitlines()
+                          if line.startswith('claude_max_capture_timestamp_seconds{account="acct-1"} '))
+        self.assertAlmostEqual(2900.1, capture_at, places=6)
 
     def test_local_settings_fence_and_symlink_refuse_before_client_launch(self):
         settings = self.workdir / ".claude/settings.local.json"
@@ -227,8 +237,14 @@ class ClaudeUsageDeploymentTests(unittest.TestCase):
                 unit = root / name
                 unit.write_text((ROOT / "observability/claude-usage" / name).read_text().replace("%h", str(root)).replace("%t", str(root)))
                 units.append(str(unit))
-            result = subprocess.run(["systemd-analyze", "--user", "--man=no", "verify", *units],
-                                    capture_output=True, text=True, timeout=30)
+            # Hosted runners may have neither a user session nor a runtime directory.
+            user_runtime = root / "runtime"
+            user_runtime.mkdir(mode=0o700)
+            with patch.dict(os.environ, {"PATH": os.defpath, "HOME": str(root)}, clear=True):
+                result = subprocess.run(["systemd-analyze", "--user", "--man=no", "verify", *units],
+                                        env={"PATH": os.defpath, "HOME": str(root),
+                                             "XDG_RUNTIME_DIR": str(user_runtime)},
+                                        capture_output=True, text=True, timeout=30)
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertFalse((root / "sampler.json").exists())
 

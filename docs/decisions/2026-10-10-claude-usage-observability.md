@@ -17,7 +17,7 @@ Deployment and live event coverage remain the CC's read-back after landing.
 | [anthropics/claude-code v2.1.296](https://github.com/anthropics/claude-code/tree/2301018b1f61073c501a8e7a4813ef48c239163b), `2301018b1f61073c501a8e7a4813ef48c239163b`; [official headless docs](https://code.claude.com/docs/en/headless) and installed `--help` | Print/stream-json interface, no tools, dontAsk, local setting sources and one turn; version/help read only, no probe |
 | [grafana/grafana v13.2.3](https://github.com/grafana/grafana/blob/6193dc03311b631b9727b560d24369e683dc396e/docs/sources/visualizations/panels-visualizations/visualizations/bar-gauge/index.md), `6193dc03311b631b9727b560d24369e683dc396e`; `packages/grafana-data/src/valueFormats/categories.ts` and `dateTimeFormatters.ts` | Native bar gauge, `percentunit` fraction scale, explicit 0..1 range, millisecond datetime formatting |
 | [prometheus/prometheus v3.15.0](https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/docs/configuration/unit_testing_rules.md), `5241a27fe3c6983549fccc32f6e65917408c63cd`, native `promtool test rules` | Execute the actual generated panel expressions against synthetic series; prove rejected utilization is 1.0 and stale values disappear |
-| [systemd/systemd v260.1](https://github.com/systemd/systemd/blob/c0a5a2516d28601fb3afc1a77d7b42fcfe38fced/man/systemd.timer.xml), `c0a5a2516d28601fb3afc1a77d7b42fcfe38fced`, timer and exec manuals | UTC calendar, no persistent catch-up, bounded oneshot, private file mask; native unit verification against fixture executables |
+| [systemd/systemd v260.1](https://github.com/systemd/systemd/blob/c0a5a2516d28601fb3afc1a77d7b42fcfe38fced/man/systemd.timer.xml), `c0a5a2516d28601fb3afc1a77d7b42fcfe38fced`, timer and exec manuals; measured installed [v259.5](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.timer.xml), `b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a` | UTC calendar, no persistent catch-up, bounded oneshot, private file mask; native fixture-unit verification measured on 259.5, with a private XDG runtime directory |
 | [python/cpython v3.13.16](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/hashlib.py), `cbc944f4bc59639a444dd971c737788ba2283a91`, hashlib and subprocess modules | Standard one-way SHA-256, locked persistent index/attempt state and bounded subprocess API |
 | [pypa/pip 26.1.2](https://github.com/pypa/pip/blob/31d7d168953668aad85154d6121879d07fbeac27/docs/html/topics/secure-installs.md), `31d7d168953668aad85154d6121879d07fbeac27`, secure installs | Native hash-enforced binary-wheel dependency installation shared by runtime and CI |
 
@@ -117,8 +117,9 @@ and scrape files. It leaves validate-macos and the external #913 pin unchanged.
 The sampler reads only explicit non-secret identity files; it never opens real
 credentials, settings or account caches. SHA-256 identifiers and numeric attempt
 state supply persistent acct-N indexes. A cadence lock and pre-launch durable
-attempt timestamp prevent a second launch inside 900 seconds, including after
-failure or restart. The probe directory and every ancestor must lack local
+attempt timestamp prevent a second launch in the same UTC 15-minute calendar
+slot, including after failure or restart. Timer jitter does not suppress the
+next slot. The probe directory and every ancestor must lack local
 settings; native stderr and arbitrary stdout are discarded. Every lane test
 uses a stub executable and fixture identities. Installation, live sampling,
 provisioning, ready state and landing remain CC-owned.
@@ -149,3 +150,36 @@ components, 11,311 hashed files, 4 profiles and 239 receipts. Actionlint kjanat
 and loopback scrape config passed their native validators. Direct unit
 verification correctly reports the deployment executables absent before
 installation; fixture-executable verification exits 0 without starting units.
+
+## CC micro corrections: cadence and hosted-runner verification
+
+The UTC timer's start latency can vary between firings. Comparing elapsed time
+against 900 seconds wrongly skipped the next slot when it began slightly
+earlier relative to the previous scheduled firing. Compare the current and
+persisted attempt timestamps using `t // 900`, with a strict increase. The
+lock and pre-launch persistence still suppress same-slot retries, failed
+attempt retries, overlaps and clock rollback. Existing state timestamps keep
+their format. The exact `2000.2` then `2900.1` stub regression failed with one
+probe before the change and passes with two afterward; the second capture's
+timestamp is checked with tolerance for filesystem mtime precision.
+
+Keep native `systemd-analyze --user verify` for the shipped user units, supplying
+a private temporary `XDG_RUNTIME_DIR` and fixture home. The regression clears
+the parent environment to model a hosted runner without a user runtime. It
+failed before the fix with `Failed to lookup RuntimeDirectory path` and passes
+afterward on installed systemd 259.5. Verification starts no units.
+
+Primary references are systemd v259.5 at
+`b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a`:
+[calendar and accuracy semantics](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.timer.xml),
+[user-scope verification](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/src/analyze/analyze-verify.c),
+and [runtime-directory lookup](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/src/libsystemd/sd-path/sd-path.c)
+(`SD_PATH_USER_RUNTIME` reads `XDG_RUNTIME_DIR`). Python's
+[floor-division contract](https://docs.python.org/3.14/reference/expressions.html#binary-arithmetic-operations)
+defines the slot operation; the matching [CPython v3.14.7 source](https://github.com/python/cpython/blob/823f0323ee6ec1402088b73bce1a38473cac36dc/Doc/reference/expressions.rst)
+is pinned at `823f0323ee6ec1402088b73bce1a38473cac36dc`.
+The micro's regressions run with the hash-locked
+prometheus-client 0.26.0 in an isolated Python 3.14.7 test environment; the
+earlier Python 3.13.16 and systemd v260.1 source references are not claims about
+this test runtime. All sampling remains through stubs and invented identities;
+the CC owns real installation, sampling and landing.
