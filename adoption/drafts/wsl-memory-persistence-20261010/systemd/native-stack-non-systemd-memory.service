@@ -1,0 +1,20 @@
+# Source: https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203
+[Unit]
+# Source: systemd.unit(5), Description= (systemd v259.5)
+Description=Apply the reviewed 40 GiB cap to the WSL non-systemd cgroup
+
+# Source: systemd.service(5), Options / [Service] (systemd v259.5)
+[Service]
+# Source: https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.service.xml#L209
+Type=oneshot
+# Source: https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.resource-control.xml#L63
+MemoryAccounting=yes
+# Source: https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.service.xml#L390 ; https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L2280 ; https://github.com/microsoft/WSL2-Linux-Kernel/blob/14794180686c2fb6307fbe359c359bec765249f3/Documentation/admin-guide/cgroup-v2.rst#L1381 ; POSIX.1-2024 sh, echo, read, test utilities
+ExecStart=/bin/sh -ec 'test -w /sys/fs/cgroup/non-systemd/memory.max; echo 42949672960 > /sys/fs/cgroup/non-systemd/memory.max; read -r cap < /sys/fs/cgroup/non-systemd/memory.max; test "$$cap" = 42949672960'
+# Source: https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.service.xml#L209
+RemainAfterExit=yes
+
+# Source: https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L181
+[Install]
+# Source: systemd.unit(5), [Install] / WantedBy= (systemd v259.5)
+WantedBy=multi-user.target

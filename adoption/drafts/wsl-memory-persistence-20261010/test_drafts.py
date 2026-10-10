@@ -1,0 +1,277 @@
+#!/usr/bin/env python3
+"""Parse reviewed drafts and their inverses; never apply a host setting."""
+import configparser
+import contextlib
+import hashlib
+import io
+import json
+import os
+from pathlib import Path
+import runpy
+import shlex
+import shutil
+import subprocess
+import tempfile
+import unittest
+from unittest import mock
+
+ROOT = Path(__file__).resolve().parent
+PLAN = json.loads((ROOT / "change-plan.json").read_text())
+
+
+def active_lines(path):
+    return [line.strip() for line in path.read_text().splitlines()
+            if line.strip() and not line.lstrip().startswith(("#", ";"))]
+
+
+def ini(path):
+    parser = configparser.ConfigParser(interpolation=None)
+    parser.optionxform = str
+    parser.read(path)
+    return parser
+
+
+class DraftTests(unittest.TestCase):
+    def test_followup_receipts_bind_memory_limits_and_transport_results(self):
+        capture = json.loads((ROOT / "measurements/time-post-restart.json").read_text())
+        followup = capture["follow_up_memory_and_endpoint_verification"]
+        rows = followup["commands"]
+
+        def one(command):
+            matches = [r for r in rows if r["command"] == command]
+            self.assertEqual(len(matches), 1, command)
+            self.assertRegex(matches[0]["start_utc"], r"Z$")
+            self.assertRegex(matches[0]["end_utc"], r"Z$")
+            return matches[0]
+
+        shown = one(["systemctl", "show", "user-1000.slice", "-p", "MemoryMax",
+                     "-p", "MemoryHigh", "-p", "ControlGroup", "-p", "DropInPaths"])
+        self.assertEqual(shown["exit_code"], 0)
+        properties = dict(line.split("=", 1) for line in shown["stdout"].splitlines())
+        draft = ini(ROOT / "systemd/user-1000.slice.d/60-native-stack-memory.conf")
+        self.assertEqual(properties["MemoryHigh"], draft["Slice"]["MemoryHigh"])
+        self.assertEqual(properties["MemoryMax"], str(64 * 1024 ** 3))
+        for path, expected in (
+                ("/sys/fs/cgroup/user.slice/user-1000.slice/memory.max", str(64 * 1024 ** 3)),
+                ("/sys/fs/cgroup/user.slice/user-1000.slice/memory.high", "max"),
+                ("/sys/fs/cgroup/non-systemd/memory.max", str(40 * 1024 ** 3)),
+                ("/sys/fs/cgroup/non-systemd/memory.high", "max")):
+            read = one(["cat", path])
+            self.assertEqual(read["exit_code"], 0)
+            self.assertEqual(read["stdout"].strip(), expected)
+        # Retain both a failed address and a successful VM query; the failed
+        # transport cannot serve as evidence that the daemon is absent.
+        ipv4 = one(["chronyc", "-h", "127.0.0.1", "-p", "323", "tracking"])
+        ipv6 = one(["chronyc", "-h", "::1", "-p", "323", "tracking"])
+        self.assertEqual(ipv4["exit_code"], 1)
+        self.assertIn("506 Cannot talk to daemon", ipv4["stdout"])
+        self.assertEqual(ipv6["exit_code"], 0)
+        self.assertIn("PHC0", ipv6["stdout"])
+        for record in followup["cc_record_sources"]:
+            self.assertRegex(record["sha256"], r"^[0-9a-f]{64}$")
+            self.assertTrue(record["record"].startswith("coordination/command-center/"))
+
+    def test_capture_separates_vm_clock_and_distro_monitor(self):
+        endpoints = {
+            ("::1", "323"): "wsl-vm-init",
+            ("127.0.0.1", "3323"): "distro-observe-only",
+        }
+        expected = {("chronyc", "-h", host, "-p", port, query)
+                    for host, port in endpoints for query in ("tracking", "sources")}
+        for fail_vm in (False, True):
+            with self.subTest(fail_vm=fail_vm):
+                def respond(argv, **kwargs):
+                    if argv[0] != "chronyc":
+                        return subprocess.CompletedProcess(argv, 0, "fixture\n", "")
+                    vm = "323" in argv or "-p" not in argv
+                    if vm and fail_vm:
+                        return subprocess.CompletedProcess(argv, 1, "506 Cannot talk to daemon\n", "")
+                    if argv[-1] == "tracking":
+                        output = "Reference ID : 50484330 (PHC0)\n" if vm else "Reference ID : 01020304 (nts.monitor.test)\n"
+                    else:
+                        output = "#* PHC0\n" if vm else "^* nts.monitor.test\n"
+                    return subprocess.CompletedProcess(argv, 0, output, "")
+
+                output = io.StringIO()
+                # Mock commands and file probes: no daemon or host config is read.
+                with mock.patch("subprocess.run", side_effect=respond), \
+                     mock.patch("subprocess.check_output", return_value="2026-10-10T00:00:00Z\n"), \
+                     mock.patch.object(Path, "glob", return_value=[]), \
+                     mock.patch.object(Path, "is_file", return_value=False), \
+                     contextlib.redirect_stdout(output):
+                    runpy.run_path(str(ROOT / "capture_time_readonly.py"), run_name="__main__")
+                receipt = json.loads(output.getvalue().removeprefix("DATA="))
+                queries = [r for r in receipt["commands"] if r["command"][0] == "chronyc"]
+                self.assertEqual({tuple(r["command"]) for r in queries}, expected)
+                self.assertEqual(len(queries), 4)
+                for item in queries:
+                    host, port = item["command"][2], item["command"][4]
+                    self.assertEqual(item["daemon_role"], endpoints[(host, port)])
+                    self.assertEqual(item["exit_code"], 1 if port == "323" and fail_vm else 0)
+                    if port == "323":
+                        self.assertIn("506 Cannot talk" if fail_vm else "PHC0", item["stdout"])
+                    else:
+                        self.assertIn("nts.monitor.test", item["stdout"])
+
+    def test_slice_and_sysctl_values(self):
+        dropin = ini(ROOT / "systemd/user-1000.slice.d/60-native-stack-memory.conf")
+        self.assertEqual(dict(dropin["Slice"]), {"MemoryMax": "64G", "MemoryHigh": "infinity"})
+        lines = active_lines(ROOT / "sysctl.d/90-native-stack-swappiness.conf")
+        self.assertEqual(len(lines), 1)
+        key, value = (part.strip() for part in lines[0].split("=", 1))
+        self.assertEqual((key, int(value)), ("vm.swappiness", 10))
+
+    def test_every_effective_configuration_line_has_a_citation(self):
+        paths = [ROOT / c["draft"] for c in PLAN["changes"]]
+        paths.append(ROOT / "windows/wslconfig-104GB.inverse.fragment.ini")
+        for path in paths:
+            previous = ""
+            for line in path.read_text().splitlines():
+                if line.strip() and not line.lstrip().startswith(("#", ";")):
+                    with self.subTest(file=path.name, line=line):
+                        self.assertTrue(previous.startswith("# Source: "))
+                        self.assertRegex(previous, r"/blob/[0-9a-f]{40}/.+#L[0-9]+|systemd\.[a-z-]+\([57]\).+v259\.5")
+                        self.assertNotIn("#", line, "inline comments change INI values")
+                previous = line.strip()
+
+    def test_oneshot_is_boot_enabled_and_fail_closed(self):
+        service = ini(ROOT / "systemd/native-stack-non-systemd-memory.service")
+        self.assertEqual(service["Service"]["Type"], "oneshot")
+        self.assertEqual(service["Service"]["MemoryAccounting"], "yes")
+        self.assertEqual(service["Service"]["RemainAfterExit"], "yes")
+        self.assertEqual(service["Install"]["WantedBy"], "multi-user.target")
+        argv = shlex.split(service["Service"]["ExecStart"])
+        self.assertEqual(argv[:2], ["/bin/sh", "-ec"])
+        self.assertIn('test "$$cap" = 42949672960', argv[2])
+        self.assertNotIn("sleep", argv[2])
+        # A regular temporary file substitutes for cgroupfs. systemd's documented
+        # $$ escape becomes $ before sh receives this argument. No host path runs.
+        with tempfile.TemporaryDirectory() as directory:
+            fake = Path(directory) / "memory.max"
+            fake.write_text("max\n")
+            command = argv[2].replace("/sys/fs/cgroup/non-systemd/memory.max",
+                                     shlex.quote(str(fake))).replace("$$", "$")
+            success = subprocess.run(["/bin/sh", "-ec", command], capture_output=True)
+            self.assertEqual(success.returncode, 0, success.stderr)
+            self.assertEqual(fake.read_text(), "42949672960\n")
+            fake.unlink()
+            refused = subprocess.run(["/bin/sh", "-ec", command], capture_output=True)
+            self.assertNotEqual(refused.returncode, 0)
+            self.assertFalse(fake.exists(), "missing cgroup must fail before creating a file")
+
+    def test_timer_resets_preserve_all_original_expressions(self):
+        original = json.loads((ROOT / "measurements/time.json").read_text())["timer_files"]
+        timers = [c for c in PLAN["changes"] if c["id"].startswith("zone-")]
+        self.assertEqual(len(timers), 6)
+        for change in timers:
+            before = next(t for t in original if t["draft_target"] == change["target"])
+            native = [
+                line.strip() for line in before["text"].splitlines()
+                if line.strip() and not line.lstrip().startswith(("#", ";"))]
+            self.assertEqual([line.partition("=")[2] for line in native
+                              if line.startswith("OnCalendar=")],
+                             [change["original_calendar"]], "base calendar differs from plan")
+            self.assertEqual(hashlib.sha256(before["text"].encode("utf-8")).hexdigest(),
+                             before["sha256"], "recorded base bytes differ from hash")
+            self.assertEqual(before["sha256"], change["base_unit_sha256"],
+                             "base hash differs from plan")
+            # Empty OnCalendar resets monotonic settings too. Refuse losing any.
+            self.assertFalse(any(line.startswith(("OnBootSec=", "OnStartupSec=",
+                              "OnUnitActiveSec=", "OnUnitInactiveSec=",
+                              "OnActiveSec=")) for line in native))
+            self.assertEqual(active_lines(ROOT / change["draft"]),
+                             ["[Timer]", "OnCalendar=", "OnCalendar=" + change["new_calendar"]])
+            self.assertEqual(change["new_calendar"],
+                             change["original_calendar"] + " " + change["calendar_zone"])
+            expected = "UTC" if "native-agent-pages-refresh" in change["id"] else "America/New_York"
+            self.assertEqual(change["calendar_zone"], expected)
+
+    def test_timer_mutations_are_rejected(self):
+        for mutation, error in (("coordinated calendar", "base calendar"),
+                                ("plan hash", "base hash"),
+                                ("recorded hash", "recorded base bytes")):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as directory:
+                fixture = Path(directory) / "drafts"
+                shutil.copytree(ROOT, fixture)
+                plan = json.loads((fixture / "change-plan.json").read_text())
+                change = next(c for c in plan["changes"]
+                              if c["id"] == "zone-git-maintenance@hourly.timer")
+                if mutation == "coordinated calendar":
+                    change["original_calendar"] = change["original_calendar"].replace(":34:", ":35:")
+                    change["new_calendar"] = change["new_calendar"].replace(":34:", ":35:")
+                    dropin = fixture / change["draft"]
+                    dropin.write_text(dropin.read_text().replace(":34:", ":35:"))
+                elif mutation == "plan hash":
+                    change["base_unit_sha256"] = "0" * 64
+                else:
+                    path = fixture / "measurements/time.json"
+                    receipt = json.loads(path.read_text())
+                    before = next(t for t in receipt["timer_files"]
+                                  if t["draft_target"] == change["target"])
+                    before["sha256"] = "0" * 64
+                    path.write_text(json.dumps(receipt))
+                # Run the normal acceptance check against corrupted fixtures.
+                with mock.patch.dict(globals(), ROOT=fixture, PLAN=plan):
+                    with self.assertRaisesRegex(AssertionError, error):
+                        self.test_timer_resets_preserve_all_original_expressions()
+
+    def test_exact_inverse_and_absent_target_preconditions(self):
+        memory = json.loads((ROOT / "measurements/memory.json").read_text())
+        time = json.loads((ROOT / "measurements/time.json").read_text())
+        self.assertTrue(all(v == "absent" for v in memory["new_targets"].values()))
+        self.assertTrue(all(t["draft_target_precondition"] == "absent"
+                            for t in time["timer_files"]))
+        for change in PLAN["changes"]:
+            inverse = change["inverse"]
+            if change["id"] == "wsl-vm-96GiB-option":
+                self.assertEqual(inverse["operation"], "restore-original-bytes-from-CC-backup")
+                self.assertEqual(inverse["sha256"], memory["windows"]["data"]["file_sha256"])
+                self.assertEqual(inverse["sha256"], change["before"]["sha256"])
+                self.assertEqual(ini(ROOT / change["draft"])["wsl2"]["memory"], "96GB")
+                self.assertEqual(ini(ROOT / inverse["fragment"])["wsl2"]["memory"], "104GB")
+            else:
+                self.assertEqual(change["before"], "absent")
+                if change["id"].startswith("zone-"):
+                    before = next(t for t in time["timer_files"]
+                                  if t["draft_target"] == change["target"])
+                    self.assertEqual(before["draft_target_precondition"], "absent")
+                self.assertEqual(inverse["target"], change["target"])
+                self.assertTrue(inverse["operation"].startswith("remove-only-new-file"))
+                if "enable_link" in change:
+                    self.assertEqual(change["enable_link_before"], "absent")
+                    self.assertEqual(inverse["enable_link"], change["enable_link"])
+        self.assertIn("no guest zone, chrony, shell TZ or clock-hook edit",
+                      PLAN["time_zone_decision"]["inverse"])
+
+    @unittest.skipUnless(shutil.which("systemd-analyze"), "systemd parser unavailable")
+    def test_native_systemd_parser_without_activation(self):
+        # Assemble only temporary fixtures: real drafts + the recorded timer bases.
+        # The parser loads these files; it does not start any service or timer.
+        originals = json.loads((ROOT / "measurements/time.json").read_text())["timer_files"]
+        with tempfile.TemporaryDirectory() as directory:
+            temporary = Path(directory)
+            slice_file = temporary / "user-1000.slice"
+            slice_file.write_text((ROOT / "systemd/user-1000.slice.d/60-native-stack-memory.conf").read_text())
+            service_file = temporary / "native-stack-non-systemd-memory.service"
+            shutil.copyfile(ROOT / "systemd/native-stack-non-systemd-memory.service", service_file)
+            units = [slice_file, service_file]
+            for change in [c for c in PLAN["changes"] if c["id"].startswith("zone-")]:
+                name = change["id"].removeprefix("zone-")
+                before = next(t for t in originals if t["draft_target"] == change["target"])
+                timer = temporary / name
+                timer.write_text(before["text"])
+                dropin = temporary / (name + ".d")
+                dropin.mkdir()
+                shutil.copyfile(ROOT / change["draft"], dropin / "90-native-stack-explicit-zone.conf")
+                paired = temporary / (name.removesuffix(".timer") + ".service")
+                paired.write_text("[Service]\nType=oneshot\nExecStart=/usr/bin/true\n")
+                units.append(timer)
+            env = os.environ.copy()
+            env["SYSTEMD_UNIT_PATH"] = str(temporary) + ":"
+            result = subprocess.run(["systemd-analyze", "--man=no", "verify",
+                                     *map(str, units)], env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

@@ -1,0 +1,119 @@
+{
+  "evidence_class": "native_proven",
+  "mutations": [],
+  "commands": [
+    {
+      "command": [
+        "chronyc",
+        "tracking"
+      ],
+      "start_utc": "2026-10-10T02:35:15Z",
+      "end_utc": "2026-10-10T02:35:15Z",
+      "exit_code": 0,
+      "stdout": "Reference ID    : 50484330 (PHC0)\nStratum         : 1\nRef time (UTC)  : Sat Oct 10 02:35:08 2026\nSystem time     : 0.000005116 seconds fast of NTP time\nLast offset     : +0.000007179 seconds\nRMS offset      : 0.000035039 seconds\nFrequency       : 56.821 ppm slow\nResidual freq   : +0.023 ppm\nSkew            : 1.821 ppm\nRoot delay      : 0.000000001 seconds\nRoot dispersion : 0.000043276 seconds\nUpdate interval : 8.0 seconds\nLeap status     : Normal\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "chronyc",
+        "sources"
+      ],
+      "start_utc": "2026-10-10T02:35:15Z",
+      "end_utc": "2026-10-10T02:35:15Z",
+      "exit_code": 0,
+      "stdout": "MS Name/IP address         Stratum Poll Reach LastRx Last sample               \n===============================================================================\n#* PHC0                          0   3   377     7    +14us[  +21us] +/-   12us\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "chronyd",
+        "--version"
+      ],
+      "start_utc": "2026-10-10T02:35:15Z",
+      "end_utc": "2026-10-10T02:35:15Z",
+      "exit_code": 0,
+      "stdout": "chronyd (chrony) version 4.8 (+CMDMON +REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +NTS +SECHASH +IPV6 -DEBUG)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "timedatectl",
+        "show"
+      ],
+      "start_utc": "2026-10-10T02:35:15Z",
+      "end_utc": "2026-10-10T02:35:15Z",
+      "exit_code": 0,
+      "stdout": "Timezone=America/New_York\nLocalRTC=no\nCanNTP=yes\nNTP=yes\nNTPSynchronized=yes\nTimeUSec=Fri 2026-10-09 22:35:15 EDT\nRTCTimeUSec=Fri 2026-10-09 22:35:15 EDT\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "list-timers",
+        "--all",
+        "--no-pager"
+      ],
+      "start_utc": "2026-10-10T02:35:15Z",
+      "end_utc": "2026-10-10T02:35:15Z",
+      "exit_code": 0,
+      "stdout": "NEXT                                 LEFT LAST                              PASSED UNIT                                  ACTIVATES\n-                                       - -                                      - clock-change-check.timer              clock-change-check.service\nFri 2026-10-09 22:35:41 EDT           25s Fri 2026-10-09 22:35:11 EDT       4s ago native-wsl-distro-metrics.timer       native-wsl-distro-metrics.service\nFri 2026-10-09 22:35:41 EDT           26s Fri 2026-10-09 22:35:11 EDT       4s ago ns2604-research-progress.timer        ns2604-research-progress.service\nFri 2026-10-09 22:35:46 EDT           30s Fri 2026-10-09 22:33:46 EDT 1min 29s ago disk-headroom-guard.timer             disk-headroom-guard.service\nFri 2026-10-09 22:36:00 EDT           44s Fri 2026-10-09 22:35:00 EDT      15s ago clock-offset-check.timer              clock-offset-check.service\nFri 2026-10-09 22:38:46 EDT      3min 30s Fri 2026-10-09 22:33:46 EDT 1min 29s ago secret-guard-canary.timer             secret-guard-canary.service\nFri 2026-10-09 22:40:00 EDT      4min 44s Fri 2026-10-09 22:30:00 EDT     5min ago native-agent-pages-refresh.timer      native-agent-pages-refresh.service\nFri 2026-10-09 23:34:00 EDT         58min Fri 2026-10-09 22:34:00 EDT 1min 15s ago git-maintenance@hourly.timer          git-maintenance@hourly.service\nSat 2026-10-10 00:34:00 EDT      1h 58min Fri 2026-10-09 00:34:00 EDT            - git-maintenance@daily.timer           git-maintenance@daily.service\nSat 2026-10-10 03:30:00 EDT      4h 54min Fri 2026-10-09 03:30:00 EDT            - restic-backup-nativestack2604.timer   restic-backup-nativestack2604.service\nSat 2026-10-10 10:30:29 EDT           11h Fri 2026-10-09 10:30:29 EDT      12h ago launchpadlib-cache-clean.timer        launchpadlib-cache-clean.service\nSun 2026-10-11 04:00:00 EDT      1 day 5h Thu 2026-10-08 00:18:35 EDT            - restic-prune-nativestack2604.timer    restic-prune-nativestack2604.service\nMon 2026-10-12 00:34:00 EDT        2 days Thu 2026-10-08 14:32:42 EDT            - git-maintenance@weekly.timer          git-maintenance@weekly.service\nFri 2026-10-16 10:33:32 EDT        6 days Fri 2026-10-09 10:33:32 EDT      12h ago ubuntu-insights-upload.timer          ubuntu-insights-upload.service\nSun 2026-11-08 20:00:29 EST 4 weeks 1 day Fri 2026-10-09 10:30:29 EDT      12h ago ubuntu-insights-collect.timer         ubuntu-insights-collect.service\n-                                       - -                                      - paper-ext-20261006.timer              paper-ext-20261006.service\n-                                       - -                                      - paper-n2-ctl-20261008.timer           paper-n2-ctl-20261008.service\n-                                       - -                                      - paper-n2-gate-decision-20261009.timer paper-n2-gate-decision-20261009.service\n-                                       - -                                      - paper-n2-gate-go-20261009.timer       paper-n2-gate-go-20261009.service\n-                                       - -                                      - paper-n2-open-20261008.timer          paper-n2-open-20261008.service\n-                                       - -                                      - paper-n2-open-20261009.timer          paper-n2-open-20261009.service\n-                                       - -                                      - paper-n2-wake-20261009.timer          paper-n2-wake-20261009.service\n-                                       - -                                      - paper-pre-20261006.timer              paper-pre-20261006.service\n-                                       - -                                      - paper-recover-a2-gate-20261006.timer  paper-recover-a2-gate-20261006.service\n\n24 timers listed.\n",
+      "stderr": "",
+      "environment_override": {
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      }
+    }
+  ],
+  "timer_files": [
+    {
+      "file": "~/.config/systemd/user/git-maintenance@daily.timer",
+      "sha256": "3a2b271ea190f09b33a6ba0e3f027173d23ebdfbbcdad36b3bfcde2720437db4",
+      "text": "# This file was created and is maintained by Git.\n# Any edits made in this file might be replaced in the future\n# by a Git command.\n\n[Unit]\nDescription=Optimize Git repositories data\n\n[Timer]\nOnCalendar=Tue..Sun *-*-* 0:34:00\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n",
+      "draft_target": "~/.config/systemd/user/git-maintenance@daily.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "absent"
+    },
+    {
+      "file": "~/.config/systemd/user/git-maintenance@hourly.timer",
+      "sha256": "f57c12651a519774d0dd3acdb80a9ceb457c41080009bf4695a07b1f5f18d1a9",
+      "text": "# This file was created and is maintained by Git.\n# Any edits made in this file might be replaced in the future\n# by a Git command.\n\n[Unit]\nDescription=Optimize Git repositories data\n\n[Timer]\nOnCalendar=*-*-* 1..23:34:00\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n",
+      "draft_target": "~/.config/systemd/user/git-maintenance@hourly.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "absent"
+    },
+    {
+      "file": "~/.config/systemd/user/git-maintenance@weekly.timer",
+      "sha256": "234a3f95377cec91b75cef23e48c8058ded5815c82b67376bab88f58e2238a4b",
+      "text": "# This file was created and is maintained by Git.\n# Any edits made in this file might be replaced in the future\n# by a Git command.\n\n[Unit]\nDescription=Optimize Git repositories data\n\n[Timer]\nOnCalendar=Mon 0:34:00\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n",
+      "draft_target": "~/.config/systemd/user/git-maintenance@weekly.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "absent"
+    },
+    {
+      "file": "~/.config/systemd/user/native-agent-pages-refresh.timer",
+      "sha256": "0ca42829f4b7d8c420782de7419c7eb5ba57cc1a9350b59726bc03afb7d670b2",
+      "text": "[Unit]\nDescription=Refresh local source views every ten minutes\n\n[Timer]\nOnCalendar=*-*-* *:00/10:00\nAccuracySec=1s\nPersistent=false\nUnit=native-agent-pages-refresh.service\n\n[Install]\nWantedBy=timers.target\n",
+      "draft_target": "~/.config/systemd/user/native-agent-pages-refresh.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "absent"
+    },
+    {
+      "file": "~/.config/systemd/user/restic-backup-nativestack2604.timer",
+      "sha256": "03b8ead43c508fa22f4a79a1ee4669b4a856724fb4eb2cacb7869e8b783415da",
+      "text": "[Unit]\nDescription=Daily 03:30 local restic backup of NativeStack2604 to E:\n\n[Timer]\nOnCalendar=*-*-* 03:30:00\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n",
+      "draft_target": "~/.config/systemd/user/restic-backup-nativestack2604.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "absent"
+    },
+    {
+      "file": "~/.config/systemd/user/restic-prune-nativestack2604.timer",
+      "sha256": "40912d9651b581d01c0c5c15edac4c9c5f397e85da025656dcc09bff5097345c",
+      "text": "[Unit]\nDescription=Weekly Sunday 04:00 local restic forget and prune of NativeStack2604\n\n[Timer]\nOnCalendar=Sun *-*-* 04:00:00\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n",
+      "draft_target": "~/.config/systemd/user/restic-prune-nativestack2604.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "absent"
+    },
+    {
+      "file": "~/.config/systemd/user/wu-watch-20261006.timer",
+      "sha256": "cc59e9ca742cf48a09f848245b49a51d8933e17c69e767249f32b61ffb336994",
+      "text": "[Unit]\nDescription=Windows Update restart watch at :05 and :35 until 2026-10-07T01:00Z (the service disables this timer at the end)\n\n[Timer]\nOnCalendar=*-*-* *:05,35:00\nAccuracySec=30s\nPersistent=false\n\n[Install]\nWantedBy=timers.target\n",
+      "draft_target": "~/.config/systemd/user/wu-watch-20261006.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "absent"
+    }
+  ],
+  "chrony_config_selected": []
+}

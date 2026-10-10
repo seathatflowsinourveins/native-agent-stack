@@ -1,0 +1,125 @@
+{
+  "evidence_class": "native_proven",
+  "path_convention": "Host home paths masked as ~",
+  "commands": [
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "git-maintenance@daily.timer",
+        "--property=FragmentPath,DropInPaths,TimersCalendar,TimersMonotonic,ActiveState,UnitFileState"
+      ],
+      "environment_override": {
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      },
+      "start_utc": "2026-10-10T02:55:03Z",
+      "end_utc": "2026-10-10T02:55:03Z",
+      "exit_code": 0,
+      "stdout": "ActiveState=active\nFragmentPath=~/.config/systemd/user/git-maintenance@daily.timer\nDropInPaths=\nUnitFileState=enabled\nTimersCalendar={ OnCalendar=Tue..Sun *-*-* 00:34:00 ; next_elapse=Sat 2026-10-10 00:34:00 EDT }\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "git-maintenance@hourly.timer",
+        "--property=FragmentPath,DropInPaths,TimersCalendar,TimersMonotonic,ActiveState,UnitFileState"
+      ],
+      "environment_override": {
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      },
+      "start_utc": "2026-10-10T02:55:03Z",
+      "end_utc": "2026-10-10T02:55:03Z",
+      "exit_code": 0,
+      "stdout": "ActiveState=active\nFragmentPath=~/.config/systemd/user/git-maintenance@hourly.timer\nDropInPaths=\nUnitFileState=enabled\nTimersCalendar={ OnCalendar=*-*-* 01..23:34:00 ; next_elapse=Fri 2026-10-09 23:34:00 EDT }\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "git-maintenance@weekly.timer",
+        "--property=FragmentPath,DropInPaths,TimersCalendar,TimersMonotonic,ActiveState,UnitFileState"
+      ],
+      "environment_override": {
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      },
+      "start_utc": "2026-10-10T02:55:03Z",
+      "end_utc": "2026-10-10T02:55:03Z",
+      "exit_code": 0,
+      "stdout": "ActiveState=active\nFragmentPath=~/.config/systemd/user/git-maintenance@weekly.timer\nDropInPaths=\nUnitFileState=enabled\nTimersCalendar={ OnCalendar=Mon *-*-* 00:34:00 ; next_elapse=Mon 2026-10-12 00:34:00 EDT }\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "native-agent-pages-refresh.timer",
+        "--property=FragmentPath,DropInPaths,TimersCalendar,TimersMonotonic,ActiveState,UnitFileState"
+      ],
+      "environment_override": {
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      },
+      "start_utc": "2026-10-10T02:55:03Z",
+      "end_utc": "2026-10-10T02:55:03Z",
+      "exit_code": 0,
+      "stdout": "ActiveState=active\nFragmentPath=~/.config/systemd/user/native-agent-pages-refresh.timer\nDropInPaths=\nUnitFileState=enabled\nTimersCalendar={ OnCalendar=*-*-* *:00/10:00 ; next_elapse=Fri 2026-10-09 23:00:00 EDT }\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "restic-backup-nativestack2604.timer",
+        "--property=FragmentPath,DropInPaths,TimersCalendar,TimersMonotonic,ActiveState,UnitFileState"
+      ],
+      "environment_override": {
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      },
+      "start_utc": "2026-10-10T02:55:03Z",
+      "end_utc": "2026-10-10T02:55:03Z",
+      "exit_code": 0,
+      "stdout": "ActiveState=active\nFragmentPath=~/.config/systemd/user/restic-backup-nativestack2604.timer\nDropInPaths=\nUnitFileState=enabled\nTimersCalendar={ OnCalendar=*-*-* 03:30:00 ; next_elapse=Sat 2026-10-10 03:30:00 EDT }\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "restic-prune-nativestack2604.timer",
+        "--property=FragmentPath,DropInPaths,TimersCalendar,TimersMonotonic,ActiveState,UnitFileState"
+      ],
+      "environment_override": {
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      },
+      "start_utc": "2026-10-10T02:55:03Z",
+      "end_utc": "2026-10-10T02:55:03Z",
+      "exit_code": 0,
+      "stdout": "ActiveState=active\nFragmentPath=~/.config/systemd/user/restic-prune-nativestack2604.timer\nDropInPaths=\nUnitFileState=enabled\nTimersCalendar={ OnCalendar=Sun *-*-* 04:00:00 ; next_elapse=Sun 2026-10-11 04:00:00 EDT }\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "wu-watch-20261006.timer",
+        "--property=FragmentPath,DropInPaths,TimersCalendar,TimersMonotonic,ActiveState,UnitFileState"
+      ],
+      "environment_override": {
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      },
+      "start_utc": "2026-10-10T02:55:03Z",
+      "end_utc": "2026-10-10T02:55:03Z",
+      "exit_code": 0,
+      "stdout": "ActiveState=inactive\nFragmentPath=~/.config/systemd/user/wu-watch-20261006.timer\nDropInPaths=\nUnitFileState=disabled\nTimersCalendar={ OnCalendar=*-*-* *:05,35:00 ; next_elapse=(null) }\n",
+      "stderr": ""
+    }
+  ]
+}

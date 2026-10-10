@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "status": "review drafts; CC host application recorded, repository landing pending",
+  "unit_of_memory": "GiB (2^30 bytes); WSL GB and systemd G both use base 1024",
+  "activation": "CC-only host application; the CC records the 2026-10-10T05:09:55Z boot and retained 104GB. No apply/inverse or boot command was run by this lane.",
+  "rollback_scope": "Persistent file/link state is restored exactly. Existing runtime-only values are untouched now; across a restart their baseline defaults are not inferred. This inverse does not invent future defaults.",
+  "time_zone_decision": {
+    "selected": "keep America/New_York guest and useWindowsTimezone=true; UTC for pages refresh, America/New_York for Git maintenance and local backup/prune; retain WSL VM-init chronyd PHC0 on ::1:323 and distro observe-only -x monitor on 127.0.0.1:3323; leave expired WU watch out of the apply set",
+    "inverse": "no guest zone, chrony, shell TZ or clock-hook edit; remove only six new timer drop-ins"
+  },
+  "changes": [
+    {
+      "id": "user-slice",
+      "draft": "systemd/user-1000.slice.d/60-native-stack-memory.conf",
+      "target": "/etc/systemd/system/user-1000.slice.d/60-native-stack-memory.conf",
+      "before": "absent",
+      "inverse": {
+        "operation": "remove-only-new-file",
+        "target": "/etc/systemd/system/user-1000.slice.d/60-native-stack-memory.conf"
+      },
+      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203"
+    },
+    {
+      "id": "non-systemd-cap",
+      "draft": "systemd/native-stack-non-systemd-memory.service",
+      "target": "/etc/systemd/system/native-stack-non-systemd-memory.service",
+      "before": "absent",
+      "enable_link": "/etc/systemd/system/multi-user.target.wants/native-stack-non-systemd-memory.service",
+      "enable_link_before": "absent",
+      "inverse": {
+        "operation": "remove-only-new-file-and-enable-link",
+        "target": "/etc/systemd/system/native-stack-non-systemd-memory.service",
+        "enable_link": "/etc/systemd/system/multi-user.target.wants/native-stack-non-systemd-memory.service"
+      },
+      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L184"
+    },
+    {
+      "id": "swappiness",
+      "draft": "sysctl.d/90-native-stack-swappiness.conf",
+      "target": "/etc/sysctl.d/90-native-stack-swappiness.conf",
+      "before": "absent",
+      "inverse": {
+        "operation": "remove-only-new-file",
+        "target": "/etc/sysctl.d/90-native-stack-swappiness.conf"
+      },
+      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/sysctl.d.xml#L45"
+    },
+    {
+      "id": "wsl-vm-96GiB-option",
+      "draft": "windows/wslconfig-96GB.fragment.ini",
+      "target": "C:\\Users\\<PROFILE>\\.wslconfig",
+      "before": {
+        "sha256": "2de9d6a9196acc54ddda90590e55228f9aa4dba2afdfd48a308ca47dfcb87a67",
+        "memory": "104GB"
+      },
+      "inverse": {
+        "operation": "restore-original-bytes-from-CC-backup",
+        "sha256": "2de9d6a9196acc54ddda90590e55228f9aa4dba2afdfd48a308ca47dfcb87a67",
+        "memory": "104GB",
+        "fragment": "windows/wslconfig-104GB.inverse.fragment.ini"
+      },
+      "source": "https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/windows/common/WslCoreConfig.cpp#L309"
+    },
+    {
+      "id": "zone-git-maintenance@daily.timer",
+      "draft": "user-systemd/git-maintenance@daily.timer.d/90-native-stack-explicit-zone.conf",
+      "target": "~/.config/systemd/user/git-maintenance@daily.timer.d/90-native-stack-explicit-zone.conf",
+      "before": "absent",
+      "base_unit_sha256": "3a2b271ea190f09b33a6ba0e3f027173d23ebdfbbcdad36b3bfcde2720437db4",
+      "original_calendar": "Tue..Sun *-*-* 0:34:00",
+      "inverse": {
+        "operation": "remove-only-new-file",
+        "target": "~/.config/systemd/user/git-maintenance@daily.timer.d/90-native-stack-explicit-zone.conf"
+      },
+      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203",
+      "activate_if": "currently active only; do not enable expired/disabled timers",
+      "calendar_zone": "America/New_York",
+      "new_calendar": "Tue..Sun *-*-* 0:34:00 America/New_York"
+    },
+    {
+      "id": "zone-git-maintenance@hourly.timer",
+      "draft": "user-systemd/git-maintenance@hourly.timer.d/90-native-stack-explicit-zone.conf",
+      "target": "~/.config/systemd/user/git-maintenance@hourly.timer.d/90-native-stack-explicit-zone.conf",
+      "before": "absent",
+      "base_unit_sha256": "f57c12651a519774d0dd3acdb80a9ceb457c41080009bf4695a07b1f5f18d1a9",
+      "original_calendar": "*-*-* 1..23:34:00",
+      "inverse": {
+        "operation": "remove-only-new-file",
+        "target": "~/.config/systemd/user/git-maintenance@hourly.timer.d/90-native-stack-explicit-zone.conf"
+      },
+      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203",
+      "activate_if": "currently active only; do not enable expired/disabled timers",
+      "calendar_zone": "America/New_York",
+      "new_calendar": "*-*-* 1..23:34:00 America/New_York"
+    },
+    {
+      "id": "zone-git-maintenance@weekly.timer",
+      "draft": "user-systemd/git-maintenance@weekly.timer.d/90-native-stack-explicit-zone.conf",
+      "target": "~/.config/systemd/user/git-maintenance@weekly.timer.d/90-native-stack-explicit-zone.conf",
+      "before": "absent",
+      "base_unit_sha256": "234a3f95377cec91b75cef23e48c8058ded5815c82b67376bab88f58e2238a4b",
+      "original_calendar": "Mon 0:34:00",
+      "inverse": {
+        "operation": "remove-only-new-file",
+        "target": "~/.config/systemd/user/git-maintenance@weekly.timer.d/90-native-stack-explicit-zone.conf"
+      },
+      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203",
+      "activate_if": "currently active only; do not enable expired/disabled timers",
+      "calendar_zone": "America/New_York",
+      "new_calendar": "Mon 0:34:00 America/New_York"
+    },
+    {
+      "id": "zone-native-agent-pages-refresh.timer",
+      "draft": "user-systemd/native-agent-pages-refresh.timer.d/90-native-stack-explicit-zone.conf",
+      "target": "~/.config/systemd/user/native-agent-pages-refresh.timer.d/90-native-stack-explicit-zone.conf",
+      "before": "absent",
+      "base_unit_sha256": "0ca42829f4b7d8c420782de7419c7eb5ba57cc1a9350b59726bc03afb7d670b2",
+      "original_calendar": "*-*-* *:00/10:00",
+      "inverse": {
+        "operation": "remove-only-new-file",
+        "target": "~/.config/systemd/user/native-agent-pages-refresh.timer.d/90-native-stack-explicit-zone.conf"
+      },
+      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203",
+      "activate_if": "currently active only; do not enable expired/disabled timers",
+      "calendar_zone": "UTC",
+      "new_calendar": "*-*-* *:00/10:00 UTC"
+    },
+    {
+      "id": "zone-restic-backup-nativestack2604.timer",
+      "draft": "user-systemd/restic-backup-nativestack2604.timer.d/90-native-stack-explicit-zone.conf",
+      "target": "~/.config/systemd/user/restic-backup-nativestack2604.timer.d/90-native-stack-explicit-zone.conf",
+      "before": "absent",
+      "base_unit_sha256": "03b8ead43c508fa22f4a79a1ee4669b4a856724fb4eb2cacb7869e8b783415da",
+      "original_calendar": "*-*-* 03:30:00",
+      "inverse": {
+        "operation": "remove-only-new-file",
+        "target": "~/.config/systemd/user/restic-backup-nativestack2604.timer.d/90-native-stack-explicit-zone.conf"
+      },
+      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203",
+      "activate_if": "currently active only; do not enable expired/disabled timers",
+      "calendar_zone": "America/New_York",
+      "new_calendar": "*-*-* 03:30:00 America/New_York"
+    },
+    {
+      "id": "zone-restic-prune-nativestack2604.timer",
+      "draft": "user-systemd/restic-prune-nativestack2604.timer.d/90-native-stack-explicit-zone.conf",
+      "target": "~/.config/systemd/user/restic-prune-nativestack2604.timer.d/90-native-stack-explicit-zone.conf",
+      "before": "absent",
+      "base_unit_sha256": "40912d9651b581d01c0c5c15edac4c9c5f397e85da025656dcc09bff5097345c",
+      "original_calendar": "Sun *-*-* 04:00:00",
+      "inverse": {
+        "operation": "remove-only-new-file",
+        "target": "~/.config/systemd/user/restic-prune-nativestack2604.timer.d/90-native-stack-explicit-zone.conf"
+      },
+      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203",
+      "activate_if": "currently active only; do not enable expired/disabled timers",
+      "calendar_zone": "America/New_York",
+      "new_calendar": "Sun *-*-* 04:00:00 America/New_York"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "mutations": "worktree draft files and temporary parser/helper fixtures only; no host setting or live timer changed",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "adoption/drafts/wsl-memory-persistence-20261010/test_drafts.py"
+      ],
+      "start_utc": "2026-10-10T02:50:06Z",
+      "end_utc": "2026-10-10T02:50:06Z",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "test_every_effective_configuration_line_has_a_citation (__main__.DraftTests.test_every_effective_configuration_line_has_a_citation) ... ok\ntest_exact_inverse_and_absent_target_preconditions (__main__.DraftTests.test_exact_inverse_and_absent_target_preconditions) ... ok\ntest_native_systemd_parser_without_activation (__main__.DraftTests.test_native_systemd_parser_without_activation) ... ok\ntest_oneshot_is_boot_enabled_and_fail_closed (__main__.DraftTests.test_oneshot_is_boot_enabled_and_fail_closed) ... ok\ntest_slice_and_sysctl_values (__main__.DraftTests.test_slice_and_sysctl_values) ... ok\ntest_timer_resets_preserve_all_original_expressions (__main__.DraftTests.test_timer_resets_preserve_all_original_expressions) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.083s\n\nOK\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "2f2f136960fad3d8cfbc817c86fbf9a0f8eda152c29708232768c53e98ff6230"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start_utc": "2026-10-10T02:50:06Z",
+      "end_utc": "2026-10-10T02:50:06Z",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "start_utc": "2026-10-10T02:50:05Z",
+      "end_utc": "2026-10-10T02:51:18Z",
+      "exit_code": 1,
+      "stdout": "Publication validation failed:\nadoption/drafts/wsl-memory-persistence-20261010/capture_time_readonly.py: contains possible personal home path\nadoption/drafts/wsl-memory-persistence-20261010/local-time-audit.json: contains possible personal home path\n",
+      "disposition": "Publication hygiene caught literal Linux home paths in the capture script and audit metadata. Use Path.home() and published ~ aliases; rerun the native validator normally."
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "start_utc": "2026-10-10T02:52:16Z",
+      "end_utc": "2026-10-10T02:53:12Z",
+      "exit_code": 0,
+      "stdout": "{\"components\": 70, \"hashed_files\": 11298, \"profiles\": 4, \"receipts\": 239, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "scope": "Integrity and scope checks only; no live provider or GPU execution."
+    },
+    {
+      "command": ["git", "diff", "--cached", "--check"],
+      "exit_code": 2,
+      "output_summary": "All 27 new files had an extra blank line at EOF from draft creation.",
+      "disposition": "Removed only the trailing empty line in each file; staged again. Command timing was not captured."
+    },
+    {
+      "command": ["git", "diff", "--cached", "--check"],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "scope": "All 27 staged additions after whitespace correction; command timing was not captured."
+    }
+  ],
+  "review_correction_checks": {
+    "regression_receipt": "measurements/regression-checks.json",
+    "p3_followup": {
+      "scope": "Temporary evidence fixture and normal draft suite; no live host mutation. Published outputs mask home/fixture prefixes before hashing.",
+      "checks": [
+        {
+          "phase": "red: original receipt lacks follow-up evidence block",
+          "command": [
+            "python3",
+            "test_drafts.py",
+            "DraftTests.test_followup_receipts_bind_memory_limits_and_transport_results"
+          ],
+          "start_utc": "2026-10-10T06:28:23Z",
+          "end_utc": "2026-10-10T06:28:23Z",
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "test_followup_receipts_bind_memory_limits_and_transport_results (__main__.DraftTests.test_followup_receipts_bind_memory_limits_and_transport_results) ... ERROR\n\n======================================================================\nERROR: test_followup_receipts_bind_memory_limits_and_transport_results (__main__.DraftTests.test_followup_receipts_bind_memory_limits_and_transport_results)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<temporary-fixture>/test_drafts.py\", line 37, in test_followup_receipts_bind_memory_limits_and_transport_results\n    followup = capture[\"follow_up_memory_and_endpoint_verification\"]\n               ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nKeyError: 'follow_up_memory_and_endpoint_verification'\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (errors=1)\n",
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "118f67a78e25232dc82fd902c1fe42b0e7621834f170b868e308f1272c4f8d05"
+        },
+        {
+          "phase": "green: all nine draft checks",
+          "command": [
+            "python3",
+            "adoption/drafts/wsl-memory-persistence-20261010/test_drafts.py"
+          ],
+          "start_utc": "2026-10-10T06:28:23Z",
+          "end_utc": "2026-10-10T06:28:24Z",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "test_capture_separates_vm_clock_and_distro_monitor (__main__.DraftTests.test_capture_separates_vm_clock_and_distro_monitor) ... ok\ntest_every_effective_configuration_line_has_a_citation (__main__.DraftTests.test_every_effective_configuration_line_has_a_citation) ... ok\ntest_exact_inverse_and_absent_target_preconditions (__main__.DraftTests.test_exact_inverse_and_absent_target_preconditions) ... ok\ntest_followup_receipts_bind_memory_limits_and_transport_results (__main__.DraftTests.test_followup_receipts_bind_memory_limits_and_transport_results) ... ok\ntest_native_systemd_parser_without_activation (__main__.DraftTests.test_native_systemd_parser_without_activation) ... ok\ntest_oneshot_is_boot_enabled_and_fail_closed (__main__.DraftTests.test_oneshot_is_boot_enabled_and_fail_closed) ... ok\ntest_slice_and_sysctl_values (__main__.DraftTests.test_slice_and_sysctl_values) ... ok\ntest_timer_mutations_are_rejected (__main__.DraftTests.test_timer_mutations_are_rejected) ... ok\ntest_timer_resets_preserve_all_original_expressions (__main__.DraftTests.test_timer_resets_preserve_all_original_expressions) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 0.098s\n\nOK\n",
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "3709e58e68a3face6f03132f46a12c62df1b3cc3681163ef20bc12e0fe2cc925"
+        }
+      ]
+    },
+    "post_restart_read_receipt": "measurements/time-post-restart.json",
+    "full_validation_attempt": {
+      "command": ["python3", "scripts/validate.py"],
+      "start_utc": "2026-10-10T05:29:29Z",
+      "end_utc": "2026-10-10T05:30:36Z",
+      "exit_code": 1,
+      "stdout": "Publication validation failed:\nadoption/drafts/wsl-memory-persistence-20261010/user-systemd/wu-watch-20261006.timer.d/90-native-stack-explicit-zone.conf: file missing\n",
+      "disposition": "The removed WU-watch draft still appeared in the Git index before staging its deletion. Stage only explicit correction paths, then rerun the full validator normally. Final result is recorded in PR/coordination after checking the final candidate."
+    }
+  },
+  "earlier_orchestration_attempt": {
+    "status": "ctx_execute exceeded 30000ms; no per-command result was returned",
+    "exit_code": null,
+    "disposition": "No validator process remained. Required validator rerun normally with an exec session; failed publication-hygiene result and successful correction are retained above."
+  },
+  "native_boot": "Not run by this lane. CC application/reset records bind the 05:09:55Z boot; fresh 06:23:25Z follow-up reads confirm both manager/kernel high and max values and oneshot Result success. Independent two-boot persistence and 96GB workload acceptance are not established here; 96GB was skipped by the CC.",
+  "ci_scope": "Full repository CI not rerun locally. The earlier shard-6-red note was stale: CC's 2026-10-10T03:52Z read reported all 35 checks green/skipped; the lane's 05:19Z GitHub read of the prior draft head found 28 success and 8 skipped, zero failures. These dated reads do not establish corrected-head CI or memory/workload acceptance.",
+  "gitleaks": "Post-commit PR-range scan recorded in PR/coordination, not a self-referential commit receipt."
+}
