@@ -1,0 +1,147 @@
+{
+  "evidence_class": "native_proven",
+  "mutations": [],
+  "linux": [
+    {
+      "command": [
+        "systemctl",
+        "show",
+        "user-1000.slice",
+        "--property=MemoryMax,MemoryHigh,EffectiveMemoryMax,EffectiveMemoryHigh,ControlGroup,FragmentPath,DropInPaths"
+      ],
+      "start_utc": "2026-10-10T02:31:25Z",
+      "end_utc": "2026-10-10T02:31:25Z",
+      "exit_code": 0,
+      "stdout": "FragmentPath=\nDropInPaths=/usr/lib/systemd/system/user-.slice.d/10-defaults.conf /run/systemd/system.control/user-1000.slice.d/50-MemoryHigh.conf /run/systemd/system.control/user-1000.slice.d/50-MemoryMax.conf\nControlGroup=/user.slice/user-1000.slice\nEffectiveMemoryMax=68719476736\nEffectiveMemoryHigh=109695287296\nMemoryHigh=infinity\nMemoryMax=68719476736\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "sysctl",
+        "vm.swappiness"
+      ],
+      "start_utc": "2026-10-10T02:31:25Z",
+      "end_utc": "2026-10-10T02:31:25Z",
+      "exit_code": 0,
+      "stdout": "vm.swappiness = 10\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--version"
+      ],
+      "start_utc": "2026-10-10T02:31:25Z",
+      "end_utc": "2026-10-10T02:31:25Z",
+      "exit_code": 0,
+      "stdout": "systemd 259 (259.5-0ubuntu3.4)\n+PAM +AUDIT +SELINUX +APPARMOR +IMA +IPE +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF -XKBCOMMON -UTMP +SYSVINIT +LIBARCHIVE\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uname",
+        "-r"
+      ],
+      "start_utc": "2026-10-10T02:31:25Z",
+      "end_utc": "2026-10-10T02:31:25Z",
+      "exit_code": 0,
+      "stdout": "6.18.40.1-microsoft-standard-WSL2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/mnt/c/Windows/System32/wsl.exe",
+        "--version"
+      ],
+      "start_utc": "2026-10-10T02:31:25Z",
+      "end_utc": "2026-10-10T02:31:25Z",
+      "exit_code": 0,
+      "stdout": "WSL version: 3.0.1.0\r\nKernel version: 6.18.40.1-1\r\nWSLg version: 1.0.79\r\nMSRDC version: 1.2.7214\r\nDirect3D version: 1.611.1-81528511\r\nDXCore version: 10.0.26100.1-240331-1435.ge-release\r\nWindows version: 10.0.26200.9168\r\n",
+      "stderr": ""
+    }
+  ],
+  "cgroups": {
+    "observed_at_utc": "2026-10-10T02:31:25Z",
+    "values": {
+      "memory.max": "max",
+      "memory.high": "max",
+      "memory.current": "60089716736",
+      "non-systemd/memory.max": "42949672960",
+      "non-systemd/memory.high": "max",
+      "non-systemd/memory.current": "23914737664",
+      "user.slice/memory.max": "max",
+      "user.slice/memory.high": "max",
+      "user.slice/memory.current": "35987529728",
+      "user.slice/user-1000.slice/memory.max": "68719476736",
+      "user.slice/user-1000.slice/memory.high": "max",
+      "user.slice/user-1000.slice/memory.current": "35985575936"
+    }
+  },
+  "wsl_conf_selected": {
+    "boot.systemd": "true",
+    "time.useWindowsTimezone": "true"
+  },
+  "sysctl_etc_declarations": [],
+  "new_targets": {
+    "/etc/systemd/system/user-1000.slice.d/60-native-stack-memory.conf": "absent",
+    "/etc/systemd/system/native-stack-non-systemd-memory.service": "absent",
+    "/etc/systemd/system/multi-user.target.wants/native-stack-non-systemd-memory.service": "absent",
+    "/etc/sysctl.d/90-native-stack-swappiness.conf": "absent"
+  },
+  "windows": {
+    "command": [
+      "powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "read-only CIM/Get-Process and masked .wslconfig capture (capture_memory_readonly.py)"
+    ],
+    "start_utc": "2026-10-10T02:31:25Z",
+    "end_utc": "2026-10-10T02:31:28Z",
+    "exit_code": 0,
+    "stderr": "",
+    "data": {
+      "path": "C:\\Users\\<PROFILE>\\.wslconfig",
+      "file_sha256": "2de9d6a9196acc54ddda90590e55228f9aa4dba2afdfd48a308ca47dfcb87a67",
+      "active_ini": [
+        "[wsl2]",
+        "networkingMode=mirrored",
+        "memory=104GB",
+        "processors=64",
+        "swap=32GB",
+        "swapFile=Z:\\\\wsl-swap\\\\swap.vhdx",
+        "crashDumpFolder=Z:\\\\WSL\\\\crash-dumps",
+        "maxCrashDumpCount=2",
+        "vmIdleTimeout=-1",
+        "guiApplications=false",
+        "[experimental]",
+        "autoMemoryReclaim=dropCache",
+        "[general]",
+        "distributionInstallPath=Z:\\\\WSL",
+        "instanceIdleTimeout=-1"
+      ],
+      "total_physical_bytes": 137270288384,
+      "total_visible_kib": 134053016,
+      "available_bytes": 15419977728,
+      "committed_bytes": 219609870336,
+      "commit_limit_bytes": 228518133760,
+      "chrome_process_count": 222,
+      "chrome_working_set_sum_bytes": 27267678208,
+      "chrome_private_commit_sum_bytes": 44545335296,
+      "chrome_perf_instances": 223,
+      "chrome_private_working_set_sum_bytes": 20978061312,
+      "vmmemWSL_process_count": 1,
+      "vmmemWSL_working_set_sum_bytes": 61561454592
+    }
+  },
+  "wsl_conf_observation": {
+    "command": "read selected /etc/wsl.conf fields and SHA-256; read refclock lines only within /etc/chrony*",
+    "observed_at_utc": "2026-10-10T02:39:02Z",
+    "wsl_conf_sha256": "099c29647e386534b01f3292b08099201eb9873a22eb7a2e4137937ab8ef1f0d",
+    "wsl_conf_selected": {
+      "boot.systemd": "true",
+      "time.useWindowsTimezone": "true"
+    },
+    "refclock_lines": []
+  }
+}

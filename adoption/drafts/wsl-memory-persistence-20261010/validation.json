@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "mutations": "worktree draft files and temporary parser/helper fixtures only; no host setting or live timer changed",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "adoption/drafts/wsl-memory-persistence-20261010/test_drafts.py"
+      ],
+      "start_utc": "2026-10-10T02:50:06Z",
+      "end_utc": "2026-10-10T02:50:06Z",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "test_every_effective_configuration_line_has_a_citation (__main__.DraftTests.test_every_effective_configuration_line_has_a_citation) ... ok\ntest_exact_inverse_and_absent_target_preconditions (__main__.DraftTests.test_exact_inverse_and_absent_target_preconditions) ... ok\ntest_native_systemd_parser_without_activation (__main__.DraftTests.test_native_systemd_parser_without_activation) ... ok\ntest_oneshot_is_boot_enabled_and_fail_closed (__main__.DraftTests.test_oneshot_is_boot_enabled_and_fail_closed) ... ok\ntest_slice_and_sysctl_values (__main__.DraftTests.test_slice_and_sysctl_values) ... ok\ntest_timer_resets_preserve_all_original_expressions (__main__.DraftTests.test_timer_resets_preserve_all_original_expressions) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.083s\n\nOK\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "2f2f136960fad3d8cfbc817c86fbf9a0f8eda152c29708232768c53e98ff6230"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start_utc": "2026-10-10T02:50:06Z",
+      "end_utc": "2026-10-10T02:50:06Z",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "start_utc": "2026-10-10T02:50:05Z",
+      "end_utc": "2026-10-10T02:51:18Z",
+      "exit_code": 1,
+      "stdout": "Publication validation failed:\nadoption/drafts/wsl-memory-persistence-20261010/capture_time_readonly.py: contains possible personal home path\nadoption/drafts/wsl-memory-persistence-20261010/local-time-audit.json: contains possible personal home path\n",
+      "disposition": "Publication hygiene caught literal Linux home paths in the capture script and audit metadata. Use Path.home() and published ~ aliases; rerun the native validator normally."
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "start_utc": "2026-10-10T02:52:16Z",
+      "end_utc": "2026-10-10T02:53:12Z",
+      "exit_code": 0,
+      "stdout": "{\"components\": 70, \"hashed_files\": 11298, \"profiles\": 4, \"receipts\": 239, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "scope": "Integrity and scope checks only; no live provider or GPU execution."
+    },
+    {
+      "command": ["git", "diff", "--cached", "--check"],
+      "exit_code": 2,
+      "output_summary": "All 27 new files had an extra blank line at EOF from draft creation.",
+      "disposition": "Removed only the trailing empty line in each file; staged again. Command timing was not captured."
+    },
+    {
+      "command": ["git", "diff", "--cached", "--check"],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "scope": "All 27 staged additions after whitespace correction; command timing was not captured."
+    }
+  ],
+  "earlier_orchestration_attempt": {
+    "status": "ctx_execute exceeded 30000ms; no per-command result was returned",
+    "exit_code": null,
+    "disposition": "No validator process remained. Required validator rerun normally with an exec session; failed publication-hygiene result and successful correction are retained above."
+  },
+  "native_boot": "not run; CC applies at planned restart",
+  "ci_scope": "Full repository CI not rerun. CC reports main shard-6 red from #913 pin until navi's repair; unrelated to these drafts.",
+  "gitleaks": "Post-commit PR-range scan recorded in PR/coordination, not a self-referential commit receipt."
+}

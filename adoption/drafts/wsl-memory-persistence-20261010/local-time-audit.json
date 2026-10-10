@@ -1,0 +1,1406 @@
+{
+  "observed_at_utc": "2026-10-10T02:33:27Z",
+  "roots": [
+    {
+      "root": "nas",
+      "revision": "15d82bcc8871206476dc8c4c7bf45d347e74b2b7",
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-I",
+        "-E",
+        "datetime(\\.datetime)?\\.(now|today|utcnow|fromtimestamp)|date\\.today|time\\.(localtime|strftime)|\\.astimezone\\(\\)|OnCalendar=|(^|[[:space:]$(;|])(/usr/bin/|/bin/)?date([[:space:]]|$)",
+        "origin/main",
+        "--",
+        "*.py",
+        "*.sh",
+        "*.bash",
+        "*.service",
+        "*.timer",
+        "scripts/*",
+        "bin/*",
+        "tools/*"
+      ],
+      "exit_code": 0
+    },
+    {
+      "root": "uet",
+      "revision": "ff659ab6a8ded697c4aa1bb9af7e99315899c081",
+      "command": [
+        "git",
+        "grep",
+        "-n",
+        "-I",
+        "-E",
+        "datetime(\\.datetime)?\\.(now|today|utcnow|fromtimestamp)|date\\.today|time\\.(localtime|strftime)|\\.astimezone\\(\\)|OnCalendar=|(^|[[:space:]$(;|])(/usr/bin/|/bin/)?date([[:space:]]|$)",
+        "origin/main",
+        "--",
+        "*.py",
+        "*.sh",
+        "*.bash",
+        "*.service",
+        "*.timer",
+        "scripts/*",
+        "bin/*",
+        "tools/*"
+      ],
+      "exit_code": 0
+    },
+    {
+      "root": "cc-tools",
+      "path": "~/.local/state/native-agent-stack/coordination/command-center/cc-tools",
+      "command": [
+        "rg",
+        "-n",
+        "--no-heading",
+        "--glob",
+        "!*.log",
+        "--glob",
+        "!*.json",
+        "--glob",
+        "!*.md",
+        "datetime(\\.datetime)?\\.(now|today|utcnow|fromtimestamp)|date\\.today|time\\.(localtime|strftime)|\\.astimezone\\(\\)|OnCalendar=|(^|[[:space:]$(;|])(/usr/bin/|/bin/)?date([[:space:]]|$)",
+        "~/.local/state/native-agent-stack/coordination/command-center/cc-tools"
+      ],
+      "exit_code": 0
+    },
+    {
+      "root": "local-bin",
+      "path": "~/.local/bin",
+      "command": [
+        "rg",
+        "-n",
+        "--no-heading",
+        "--glob",
+        "!*.log",
+        "--glob",
+        "!*.json",
+        "--glob",
+        "!*.md",
+        "datetime(\\.datetime)?\\.(now|today|utcnow|fromtimestamp)|date\\.today|time\\.(localtime|strftime)|\\.astimezone\\(\\)|OnCalendar=|(^|[[:space:]$(;|])(/usr/bin/|/bin/)?date([[:space:]]|$)",
+        "~/.local/bin"
+      ],
+      "exit_code": 0
+    },
+    {
+      "root": "user-units",
+      "path": "~/.config/systemd/user",
+      "command": [
+        "rg",
+        "-n",
+        "--no-heading",
+        "--glob",
+        "!*.log",
+        "--glob",
+        "!*.json",
+        "--glob",
+        "!*.md",
+        "datetime(\\.datetime)?\\.(now|today|utcnow|fromtimestamp)|date\\.today|time\\.(localtime|strftime)|\\.astimezone\\(\\)|OnCalendar=|(^|[[:space:]$(;|])(/usr/bin/|/bin/)?date([[:space:]]|$)",
+        "~/.config/systemd/user"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "method": "git grep origin/main on two repos; rg within three named local roots; AST classified Python direct datetime/date/time calls; source candidates manually reviewed; not whole-program alias analysis",
+  "hits": [
+    {
+      "root": "cc-tools",
+      "file": "tools-window/rehearsal-claude-20261006-rev3/relaunch-e2e-harness.sh",
+      "line": 67,
+      "expression": "printf 't0=$(date +%%s)\\n'",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/rehearsal-claude-20261006-rev3/relaunch-e2e-harness.sh",
+      "line": 71,
+      "expression": "printf 'if [ $(( $(date +%%s) - t0 )) -lt 30 ]; then exec bash -l %s; fi\\n' \"$RUN/relaunch-cc-plain.sh\"",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/rehearsal-claude-20261006-rev3b/relaunch-e2e-harness.sh",
+      "line": 73,
+      "expression": "printf 't0=$(date +%%s)\\n'",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/rehearsal-claude-20261006-rev3b/relaunch-e2e-harness.sh",
+      "line": 77,
+      "expression": "printf 'if [ $(( $(date +%%s) - t0 )) -lt 30 ]; then exec bash -l %s; fi\\n' \"$RUN/relaunch-cc-plain.sh\"",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/run-claude-20261006T2119Z/relaunch-cc.sh",
+      "line": 3,
+      "expression": "t0=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/run-claude-20261006T2119Z/relaunch-cc.sh",
+      "line": 7,
+      "expression": "if [ $(( $(date +%s) - t0 )) -lt 30 ]; then exec bash -l ~/.local/state/native-agent-stack/coordination/command-center/cc-tools/tools-window/run-claude-20261006T2119Z/relaunch-cc-plain.sh; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/e2e-20261006T203012Z/harness.sh",
+      "line": 67,
+      "expression": "printf 't0=$(date +%%s)\\n'",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/e2e-20261006T203012Z/harness.sh",
+      "line": 71,
+      "expression": "printf 'if [ $(( $(date +%%s) - t0 )) -lt 30 ]; then exec bash -l %s; fi\\n' \"$RUN/relaunch-cc-plain.sh\"",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/e2e-20261006T203012Z/rerun-rev3b/harness.sh",
+      "line": 73,
+      "expression": "printf 't0=$(date +%%s)\\n'",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/e2e-20261006T203012Z/rerun-rev3b/harness.sh",
+      "line": 77,
+      "expression": "printf 'if [ $(( $(date +%%s) - t0 )) -lt 30 ]; then exec bash -l %s; fi\\n' \"$RUN/relaunch-cc-plain.sh\"",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/e2e-20261006T203012Z/rerun-rev3b/run/relaunch-cc.sh",
+      "line": 3,
+      "expression": "t0=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/e2e-20261006T203012Z/rerun-rev3b/run/relaunch-cc.sh",
+      "line": 7,
+      "expression": "if [ $(( $(date +%s) - t0 )) -lt 30 ]; then exec bash -l ~/.local/state/native-agent-stack/coordination/command-center/cc-tools/tools-window/selftest-relaunch/e2e-20261006T203012Z/rerun-rev3b/run/relaunch-cc-plain.sh; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/e2e-20261006T203012Z/run/relaunch-cc.sh",
+      "line": 3,
+      "expression": "t0=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/e2e-20261006T203012Z/run/relaunch-cc.sh",
+      "line": 7,
+      "expression": "if [ $(( $(date +%s) - t0 )) -lt 30 ]; then exec bash -l ~/.local/state/native-agent-stack/coordination/command-center/cc-tools/tools-window/selftest-relaunch/e2e-20261006T203012Z/run/relaunch-cc-plain.sh; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/slot-test.sh",
+      "line": 8,
+      "expression": "if [ -n \"${SLOT_OVERRIDE_ROW:-}\" ]; then echo $(( $(date +%s) + 3600 )); return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/selftest-relaunch/slot-test.sh",
+      "line": 13,
+      "expression": "in_slot && echo \"in_slot: yes\" || echo \"in_slot: no\"; d=$(slot_end); echo \"deadline in $(( d - $(date +%s) )) s\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev1.sh",
+      "line": 196,
+      "expression": "if [ $(( DEADLINE - $(date +%s) )) -lt 2700 ]; then OUTCOME=\"less than 45 minutes left in the slot; nothing changed\"; log \"STOP: $OUTCOME\"; rec margin 4 \"$OUTCOME\"; exit 4; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev1.sh",
+      "line": 204,
+      "expression": "if [ $(( $(date +%s) + t )) -gt \"$DEADLINE\" ]; then rec \"$id\" -1 \"would cross the slot end\"; log \"STOP $id: would cross the slot end\"; FAILED=$id; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev2.sh",
+      "line": 252,
+      "expression": "if [ $(( DEADLINE - $(date +%s) )) -lt 2700 ]; then OUTCOME=\"less than 45 minutes left in the slot; nothing changed\"; log \"STOP: $OUTCOME\"; rec margin 4 \"$OUTCOME\"; exit 4; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev2.sh",
+      "line": 260,
+      "expression": "if [ $(( $(date +%s) + t )) -gt \"$DEADLINE\" ]; then rec \"$id\" -1 \"would cross the slot end\"; log \"STOP $id: would cross the slot end\"; STOPPED=$id; FAILED=$id; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev3.sh",
+      "line": 210,
+      "expression": "printf 't0=$(date +%%s)\\n'",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev3.sh",
+      "line": 214,
+      "expression": "printf 'if [ $(( $(date +%%s) - t0 )) -lt 30 ]; then exec bash -l %s; fi\\n' \"$RUN/relaunch-cc-plain.sh\"",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev3.sh",
+      "line": 288,
+      "expression": "if [ $(( DEADLINE - $(date +%s) )) -lt 2700 ]; then OUTCOME=\"less than 45 minutes left in the slot; nothing changed\"; log \"STOP: $OUTCOME\"; rec margin 4 \"$OUTCOME\"; exit 4; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev3.sh",
+      "line": 297,
+      "expression": "if [ $(( $(date +%s) + t )) -gt \"$DEADLINE\" ]; then rec \"$id\" -1 \"would cross the slot end\"; log \"STOP $id: would cross the slot end\"; STOPPED=$id; FAILED=$id; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev3b.sh",
+      "line": 218,
+      "expression": "printf 't0=$(date +%%s)\\n'",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev3b.sh",
+      "line": 222,
+      "expression": "printf 'if [ $(( $(date +%%s) - t0 )) -lt 30 ]; then exec bash -l %s; fi\\n' \"$RUN/relaunch-cc-plain.sh\"",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev3b.sh",
+      "line": 297,
+      "expression": "if [ $(( DEADLINE - $(date +%s) )) -lt 2700 ]; then OUTCOME=\"less than 45 minutes left in the slot; nothing changed\"; log \"STOP: $OUTCOME\"; rec margin 4 \"$OUTCOME\"; exit 4; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.rev3b.sh",
+      "line": 306,
+      "expression": "if [ $(( $(date +%s) + t )) -gt \"$DEADLINE\" ]; then rec \"$id\" -1 \"would cross the slot end\"; log \"STOP $id: would cross the slot end\"; STOPPED=$id; FAILED=$id; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.sh",
+      "line": 83,
+      "expression": "if [ -n \"${SLOT_OVERRIDE_ROW:-}\" ]; then echo $(( $(date +%s) + 3600 )); return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.sh",
+      "line": 221,
+      "expression": "printf 't0=$(date +%%s)\\n'",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.sh",
+      "line": 225,
+      "expression": "printf 'if [ $(( $(date +%%s) - t0 )) -lt 30 ]; then exec bash -l %s; fi\\n' \"$RUN/relaunch-cc-plain.sh\"",
+      "severity": "zone-independent-epoch",
+      "reason": "generated date +%s command; %% escapes printf, epoch is zone-independent"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.sh",
+      "line": 300,
+      "expression": "if [ $(( DEADLINE - $(date +%s) )) -lt 2700 ]; then OUTCOME=\"less than 45 minutes left in the slot; nothing changed\"; log \"STOP: $OUTCOME\"; rec margin 4 \"$OUTCOME\"; exit 4; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-claude.sh",
+      "line": 309,
+      "expression": "if [ $(( $(date +%s) + t )) -gt \"$DEADLINE\" ]; then rec \"$id\" -1 \"would cross the slot end\"; log \"STOP $id: would cross the slot end\"; STOPPED=$id; FAILED=$id; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-codex-r2.sh",
+      "line": 114,
+      "expression": "if [ $(( DEADLINE - $(date +%s) )) -lt 2100 ]; then OUTCOME=\"less than 35 minutes left in the slot; nothing changed\"; log \"STOP: $OUTCOME\"; rec margin 4 \"$OUTCOME\"; exit 4; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-codex-r2.sh",
+      "line": 122,
+      "expression": "if [ $(( $(date +%s) + t )) -gt \"$DEADLINE\" ]; then rec \"$id\" -1 \"would cross the slot end\"; log \"STOP $id: would cross the slot end\"; FAILED=$id; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-codex-r3resume.sh",
+      "line": 119,
+      "expression": "if [ $(( DEADLINE - $(date +%s) )) -lt 2100 ]; then OUTCOME=\"less than 35 minutes left in the slot; nothing changed\"; log \"STOP: $OUTCOME\"; rec margin 4 \"$OUTCOME\"; exit 4; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-codex-r3resume.sh",
+      "line": 127,
+      "expression": "if [ $(( $(date +%s) + t )) -gt \"$DEADLINE\" ]; then rec \"$id\" -1 \"would cross the slot end\"; log \"STOP $id: would cross the slot end\"; FAILED=$id; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-codex.sh",
+      "line": 114,
+      "expression": "if [ $(( DEADLINE - $(date +%s) )) -lt 2100 ]; then OUTCOME=\"less than 35 minutes left in the slot; nothing changed\"; log \"STOP: $OUTCOME\"; rec margin 4 \"$OUTCOME\"; exit 4; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window-codex.sh",
+      "line": 122,
+      "expression": "if [ $(( $(date +%s) + t )) -gt \"$DEADLINE\" ]; then rec \"$id\" -1 \"would cross the slot end\"; log \"STOP $id: would cross the slot end\"; FAILED=$id; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window.sh",
+      "line": 155,
+      "expression": "if [ $(( DEADLINE - $(date +%s) )) -lt 2700 ]; then OUTCOME=\"less than 45 minutes left in the slot; nothing changed\"; log \"STOP: $OUTCOME\"; rec margin 4 \"$OUTCOME\"; exit 4; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "cc-tools",
+      "file": "tools-window/tools-window.sh",
+      "line": 163,
+      "expression": "if [ $(( $(date +%s) + t )) -gt \"$DEADLINE\" ]; then rec \"$id\" -1 \"would cross the slot end\"; log \"STOP $id: would cross the slot end\"; FAILED=$id; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "adoption/templates/systemd/codex-broker-reaper.timer",
+      "line": 16,
+      "expression": "hourly",
+      "severity": "machine-schedule",
+      "reason": "calendar uses guest local zone"
+    },
+    {
+      "root": "nas",
+      "file": "adoption/templates/systemd/stack-currency.timer",
+      "line": 14,
+      "expression": "daily",
+      "severity": "machine-schedule",
+      "reason": "calendar uses guest local zone"
+    },
+    {
+      "root": "nas",
+      "file": "adoption/templates/systemd/token-report-refresh.service",
+      "line": 142,
+      "expression": "ExecCondition=/bin/sh -c 'case \"$$(/bin/date +%%u%%H)\" in 60[5-8]|70[5-8]) exit 1;; esac'",
+      "severity": "machine-control",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "adoption/templates/systemd/token-report-refresh.timer",
+      "line": 20,
+      "expression": "*-*-* 03,10,16,22:15:00",
+      "severity": "machine-schedule",
+      "reason": "calendar uses guest local zone"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
+      "line": 162,
+      "expression": "WINDOW_START=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
+      "line": 219,
+      "expression": "MONITOR_STOPPED_MS=$(date +%s%3N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
+      "line": 356,
+      "expression": "printf '%s,%s,%s\\n' \"$(date +%s%3N)\" \"$used\" \"$free\" >>\"$dir/memory.csv\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
+      "line": 431,
+      "expression": "t0=$(date +%s%3N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
+      "line": 450,
+      "expression": "ARM_COLD=$(($(date +%s%3N) - t0))",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
+      "line": 459,
+      "expression": "run_child timeout --kill-after=10 $((deadline - $(date +%s) + 120)) python3 \"$EVAL\" \"${eval_args[@]}\" || rc=$?",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
+      "line": 507,
+      "expression": "budget=$((WINDOW_END - RESTORE_RESERVE_SECONDS - $(date +%s)))",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-resolution-20260922/upstream-currency-sweep/currency_sweep.py",
+      "line": 53,
+      "expression": "datetime.datetime.utcnow()",
+      "severity": "explicit-UTC-naive",
+      "reason": "naive UTC (zone-independent, not local)"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager.sh",
+      "line": 104,
+      "expression": "local t0=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager.sh",
+      "line": 105,
+      "expression": "while [ $(( $(date +%s) - t0 )) -lt 180 ]; do",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager.sh",
+      "line": 106,
+      "expression": "if [ \"$(lines)\" -gt \"$2\" ]; then say \"PHASE $1: fired after $(( $(date +%s) - t0 )) s (marker lines $(lines))\"; return 0; fi",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager.sh",
+      "line": 114,
+      "expression": "kill -TERM $MGR; local t0=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager.sh",
+      "line": 115,
+      "expression": "while kill -0 $MGR 2>/dev/null && [ $(( $(date +%s) - t0 )) -lt 30 ]; do sleep 0.5; done",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_codex_author.sh",
+      "line": 15,
+      "expression": "R=$?; E=$(date +%s%N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_g0_g4_g7.sh",
+      "line": 17,
+      "expression": "local s e; s=$(date +%s%N); \"${@:2}\"; local r=$?; e=$(date +%s%N); echo $(( (e - s) / 1000000 )) > \"$OUT/$1.wall_ms\"; return $r",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_review_call.sh",
+      "line": 34,
+      "expression": "wait $CP; R=$?; E=$(date +%s%N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/dagu_common.py",
+      "line": 163,
+      "expression": "__import__('datetime').datetime.now().astimezone()",
+      "severity": "machine-record",
+      "reason": "aware local offset conversion; instant is preserved, serialized zone/offset changes"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/incident_observe.sh",
+      "line": 5,
+      "expression": "echo \"== date\"; date -Iseconds",
+      "severity": "machine-record",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/incident_observe.sh",
+      "line": 28,
+      "expression": "echo \"== end\"; date -Iseconds",
+      "severity": "machine-record",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/probe_controls.py",
+      "line": 53,
+      "expression": "__import__('datetime').datetime.now().astimezone()",
+      "severity": "machine-record",
+      "reason": "aware local offset conversion; instant is preserved, serialized zone/offset changes"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/real_scheduled_recovery.py",
+      "line": 65,
+      "expression": "datetime.now().astimezone()",
+      "severity": "machine-record",
+      "reason": "aware local offset conversion; instant is preserved, serialized zone/offset changes"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/real_scheduled_recovery.py",
+      "line": 65,
+      "expression": "datetime.now()",
+      "severity": "machine-record",
+      "reason": "naive local datetime.now()"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/r1b_default_embedding.sh",
+      "line": 18,
+      "expression": "t0=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/r1b_default_embedding.sh",
+      "line": 25,
+      "expression": "(( $(date +%s) - t0 > 600 )) && { echo \"fetch wait timed out at 600 s\" >> \"$OUT\"; break; }; sleep 2; done",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/r1b_default_embedding.sh",
+      "line": 26,
+      "expression": "printf '\\n### models dir after fetch wait (%s s)\\n' \"$(( $(date +%s) - t0 ))\" >> \"$OUT\"; ls -la \"$G/data/models/all-MiniLM-L6-v2\" >> \"$OUT\"; du -sh \"$G/data/models\" >> \"$OUT\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/run_arm.sh",
+      "line": 13,
+      "expression": "RC=$?; t1=$(date +%s.%N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/arb_rerun.sh",
+      "line": 39,
+      "expression": "s=$(date +%s.%N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/arb_rerun.sh",
+      "line": 46,
+      "expression": "echo \"$ranker exit=$? wall=$(echo \"$(date +%s.%N) - $s\" | bc)\" >> \"$OUT/exit-codes.txt\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh",
+      "line": 102,
+      "expression": "--data-urlencode \"start=$(( $(date +%s) - 3600 ))000000000\" --data-urlencode \"limit=100\"; }",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh",
+      "line": 140,
+      "expression": "--data-urlencode \"start=$(( $(date +%s) - 3600 ))000000000\" --data-urlencode \"limit=100\" > \"$R/logs/loki-restored.json\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh",
+      "line": 157,
+      "expression": "--data-urlencode \"start=$(( $(date +%s) - 3600 ))000000000\" --data-urlencode \"limit=1000\" > \"$R/logs/loki-$1.json\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh",
+      "line": 19,
+      "expression": "local label=$1; shift; local t0=$(date +%s) rc i",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh",
+      "line": 24,
+      "expression": "echo \"$label exit=$rc seconds=$(( $(date +%s) - t0 ))\" | tee -a \"$LOG\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+      "line": 14,
+      "expression": "local t0=$(date +%s) rc i",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+      "line": 20,
+      "expression": "echo \"$label exit=$rc seconds=$(( $(date +%s) - t0 ))\" | tee -a \"$OUT/exits.log\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+      "line": 63,
+      "expression": "t0=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+      "line": 70,
+      "expression": "echo \"oversized-head-index exit=$rc seconds=$(( $(date +%s) - t0 ))\" | tee -a \"$OUT/exits.log\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh",
+      "line": 18,
+      "expression": "run() { local label=$1; shift; local t0=$(date +%s); \"$@\"; local rc=$?; echo \"$label exit=$rc seconds=$(( $(date +%s) - t0 ))\" | tee -a \"$LOG\"; }",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh",
+      "line": 15,
+      "expression": "run() { local label=$1; shift; local t0=$(date +%s); \"$@\"; local rc=$?; echo \"$label exit=$rc seconds=$(( $(date +%s) - t0 ))\" | tee -a \"$LOG\"; }",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/embed_cache_proxy.py",
+      "line": 32,
+      "expression": "time.strftime('%Y-%m-%dT%H:%M:%S')",
+      "severity": "machine-record",
+      "reason": "implicit localtime in strftime"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/embed_cache_proxy.py",
+      "line": 130,
+      "expression": "time.strftime('%Y-%m-%dT%H:%M:%S')",
+      "severity": "machine-record",
+      "reason": "implicit localtime in strftime"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/mac-drivers/run_c3_resume.sh",
+      "line": 8,
+      "expression": "log() { print -r -- \"$(date +%H:%M:%S) $*\"; }",
+      "severity": "display-only",
+      "reason": "console progress timestamp; deployment on this WSL host not measured"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/mac-drivers/run_d3.sh",
+      "line": 9,
+      "expression": "echo \"$(date +%H:%M:%S) D2 finished; slot smoke test\"",
+      "severity": "display-only",
+      "reason": "console progress timestamp; deployment on this WSL host not measured"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/mac-drivers/run_d3.sh",
+      "line": 21,
+      "expression": "echo \"$(date +%H:%M:%S) smoke passed; starting D3\"",
+      "severity": "display-only",
+      "reason": "console progress timestamp; deployment on this WSL host not measured"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/mac-drivers/run_d3.sh",
+      "line": 23,
+      "expression": "echo \"$(date +%H:%M:%S) D3 finished\"",
+      "severity": "display-only",
+      "reason": "console progress timestamp; deployment on this WSL host not measured"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/mac-drivers/run_queue.sh",
+      "line": 12,
+      "expression": "log() { print -r -- \"$(date +%H:%M:%S) $*\"; }",
+      "severity": "display-only",
+      "reason": "console progress timestamp; deployment on this WSL host not measured"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/embed_server_st.py",
+      "line": 400,
+      "expression": "time.strftime('%Y-%m-%dT%H:%M:%S')",
+      "severity": "machine-record",
+      "reason": "implicit localtime in strftime"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/gguf_embed_front.py",
+      "line": 220,
+      "expression": "time.strftime('%Y-%m-%dT%H:%M:%S')",
+      "severity": "machine-record",
+      "reason": "implicit localtime in strftime"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/lme_harness.py",
+      "line": 779,
+      "expression": "datetime.now().astimezone()",
+      "severity": "machine-record",
+      "reason": "aware local offset conversion; instant is preserved, serialized zone/offset changes"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/lme_harness.py",
+      "line": 779,
+      "expression": "datetime.now()",
+      "severity": "machine-record",
+      "reason": "naive local datetime.now()"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/run_velanext.sh",
+      "line": 85,
+      "expression": "log() { printf '%s %s\\n' \"$(date +%H:%M:%S)\" \"$*\" | tee -a \"$LOGS/run.log\" >&2; }",
+      "severity": "machine-record",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/run_velanext.sh",
+      "line": 174,
+      "expression": "echo \"pid $$ stage $CMD since $(date -Is)\" > \"$LOGS/pids/gpu.holder\"",
+      "severity": "machine-record",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/run_velanext.sh",
+      "line": 200,
+      "expression": "\"$used\" \"$util\" \"$(date -Is)\" > \"$LOGS/gates/gpu-baseline.json\"",
+      "severity": "machine-record",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/run_velanext.sh",
+      "line": 237,
+      "expression": "printf '# segment %s\\n' \"$(date -Is)\" >> \"$LOGS/gpu-$1.log\"",
+      "severity": "machine-record",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/run_velanext.sh",
+      "line": 248,
+      "expression": "printf '# segment %s\\n' \"$(date -Is)\" >> \"$LOGS/load-$1.log\"",
+      "severity": "machine-record",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/run_velanext.sh",
+      "line": 250,
+      "expression": "nohup bash -c 'while :; do printf \"%s %s %s\\n\" \"$(date -Is)\" \"$(cut -d\" \" -f1-3 /proc/loadavg)\" \\",
+      "severity": "machine-record",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/run_velanext.sh",
+      "line": 296,
+      "expression": "report=\"$LOGS/gates/st-$(slug \"$repo\")-cuda-$(date +%Y%m%dT%H%M%S).json\"",
+      "severity": "machine-record",
+      "reason": "date command without -u or explicit TZ"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/run_velanext.sh",
+      "line": 402,
+      "expression": "since=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/memory-stack/longmemeval/v4/setup_velanext.sh",
+      "line": 35,
+      "expression": "log() { printf '%s %s\\n' \"$(date +%H:%M:%S)\" \"$*\"; }",
+      "severity": "display-only",
+      "reason": "console setup log timestamp"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/trials-20260926/colpali/local-integration/recorder-colpali_use_dryrun.sh",
+      "line": 6,
+      "expression": "T0=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/trials-20260926/colpali/local-integration/recorder-colpali_use_dryrun.sh",
+      "line": 9,
+      "expression": "T1=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/trials-20260926/colpali/local-integration/recorder-colpali_use_dryrun.sh",
+      "line": 13,
+      "expression": "T2=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-faults-20260924.py",
+      "line": 24,
+      "expression": "datetime.now().astimezone()",
+      "severity": "machine-record",
+      "reason": "aware local offset conversion; instant is preserved, serialized zone/offset changes"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-faults-20260924.py",
+      "line": 24,
+      "expression": "datetime.now()",
+      "severity": "machine-record",
+      "reason": "naive local datetime.now()"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/ladder-1x-20260924a-needs-attention/observe_ladder_trial.py",
+      "line": 63,
+      "expression": "datetime.now().astimezone()",
+      "severity": "machine-record",
+      "reason": "aware local offset conversion; instant is preserved, serialized zone/offset changes"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/ladder-1x-20260924a-needs-attention/observe_ladder_trial.py",
+      "line": 63,
+      "expression": "datetime.now()",
+      "severity": "machine-record",
+      "reason": "naive local datetime.now()"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/order-throughput/evidence/observe-capacity-20260924.py",
+      "line": 24,
+      "expression": "datetime.now().astimezone()",
+      "severity": "machine-record",
+      "reason": "aware local offset conversion; instant is preserved, serialized zone/offset changes"
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/order-throughput/evidence/observe-capacity-20260924.py",
+      "line": 24,
+      "expression": "datetime.now()",
+      "severity": "machine-record",
+      "reason": "naive local datetime.now()"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/actionlint-successor-parity-20260927/parity_driver.sh",
+      "line": 35,
+      "expression": "start=$(date +%s%N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/actionlint-successor-parity-20260927/parity_driver.sh",
+      "line": 39,
+      "expression": "end=$(date +%s%N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/adoption-status-truth-20260926/host-scripts/host_scripts_fixture.sh",
+      "line": 127,
+      "expression": "for tool in git jq python3 sha256sum cmp readlink cat sed grep date dirname cut wc ls find mkdir chmod cp rm env bash; do",
+      "severity": "not-a-time-call",
+      "reason": "literal tool-name list, not a date execution"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/adoption-status-truth-20260926/review-2/as-reviewed/host_scripts_fixture.sh",
+      "line": 110,
+      "expression": "for tool in git jq python3 sha256sum cmp readlink cat sed grep date dirname cut wc ls find mkdir chmod cp rm env bash; do",
+      "severity": "not-a-time-call",
+      "reason": "literal tool-name list, not a date execution"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/betterleaks-parity-20260927/harness/final_checks.sh",
+      "line": 17,
+      "expression": "s=$(date +%s)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/betterleaks-parity-20260927/harness/final_checks.sh",
+      "line": 20,
+      "expression": "echo \"$m rc=$rc $(grep -E '^Ran ' \"$L/$m.txt\") $(tail -n 1 \"$L/$m.txt\") ($(( $(date +%s) - s ))s)\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/betterleaks-parity-20260927/harness/run_bl_git2.sh",
+      "line": 23,
+      "expression": "rc=$?; e=$(date +%s.%N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/betterleaks-parity-20260927/harness/run_repair_scans.sh",
+      "line": 31,
+      "expression": "rc=$?; e=$(date +%s.%N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/betterleaks-parity-20260927/harness/run_scans.sh",
+      "line": 36,
+      "expression": "e=$(date +%s.%N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/prompt-audit-20260927/x9-round2/run_arm.sh",
+      "line": 14,
+      "expression": "start=$(date +%s%3N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/prompt-audit-20260927/x9-round2/run_arm.sh",
+      "line": 18,
+      "expression": "python3 \"$X/summarize.py\" \"$arm\" \"$out\" \"$rc\" \"$(( $(date +%s%3N) - start ))\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/prompt-audit-20260927/x9-round3/probe_r3.sh",
+      "line": 31,
+      "expression": "start=$(date +%s%3N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/prompt-audit-20260927/x9-round3/probe_r3.sh",
+      "line": 37,
+      "expression": "python3 \"$X/summarize_r3.py\" \"$arm\" \"$out\" \"$rc\" \"$(( $(date +%s%3N) - start ))\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/prompt-audit-20260927/x9-round3/run_arm_r3.sh",
+      "line": 30,
+      "expression": "start=$(date +%s%3N)",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/prompt-audit-20260927/x9-round3/run_arm_r3.sh",
+      "line": 36,
+      "expression": "python3 \"$X/summarize_r3.py\" \"$arm\" \"$out\" \"$rc\" \"$(( $(date +%s%3N) - start ))\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/sota-refresh-20260926/prometheus/gate_rehearsal.py",
+      "line": 55,
+      "expression": "time.strftime('%H:%M:%S')",
+      "severity": "machine-record",
+      "reason": "implicit localtime in strftime"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/sota-refresh-20260926/prometheus/switch_gated.py",
+      "line": 285,
+      "expression": "time.localtime(restart_at - 1)",
+      "severity": "machine-record",
+      "reason": "local timezone conversion"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/sota-refresh-20260926/prometheus/switch.py",
+      "line": 130,
+      "expression": "time.localtime(restart_at - 1)",
+      "severity": "machine-record",
+      "reason": "local timezone conversion"
+    },
+    {
+      "root": "nas",
+      "file": "evidence/artifacts/tool-invoke-rates-20260926/scratch-replay/replay-test.sh",
+      "line": 50,
+      "expression": "TASK=\"u6-replay-$(cat /proc/sys/kernel/random/uuid 2>/dev/null || uuidgen 2>/dev/null || date +%s%N)\"",
+      "severity": "zone-independent-epoch",
+      "reason": "epoch-only; zone-independent output"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_osv_lockfile_coverage.py",
+      "line": 303,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_osv_lockfile_coverage.py",
+      "line": 321,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_osv_lockfile_coverage.py",
+      "line": 472,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_osv_lockfile_coverage.py",
+      "line": 473,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_osv_lockfile_coverage.py",
+      "line": 592,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_osv_lockfile_coverage.py",
+      "line": 660,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_osv_lockfile_coverage.py",
+      "line": 736,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_osv_lockfile_coverage.py",
+      "line": 1007,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_osv_lockfile_coverage.py",
+      "line": 1016,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "nas",
+      "file": "tests/test_workflow_hardening.py",
+      "line": 796,
+      "expression": "date.today()",
+      "severity": "synthetic/test",
+      "reason": "local calendar date/time"
+    },
+    {
+      "root": "uet",
+      "file": ".agents/skills/backtest-expert/scripts/evaluate_backtest.py",
+      "line": 373,
+      "expression": "datetime.now()",
+      "severity": "display-only",
+      "reason": "Generated label in Markdown report; no zone in label"
+    },
+    {
+      "root": "uet",
+      "file": ".agents/skills/backtest-expert/scripts/evaluate_backtest.py",
+      "line": 424,
+      "expression": "datetime.now()",
+      "severity": "machine-record",
+      "reason": "JSON/Markdown output filename stem uses local clock without offset"
+    },
+    {
+      "root": "uet",
+      "file": ".claude/skills/backtest-expert/scripts/evaluate_backtest.py",
+      "line": 373,
+      "expression": "datetime.now()",
+      "severity": "display-only",
+      "reason": "Generated label in Markdown report; no zone in label"
+    },
+    {
+      "root": "uet",
+      "file": ".claude/skills/backtest-expert/scripts/evaluate_backtest.py",
+      "line": 424,
+      "expression": "datetime.now()",
+      "severity": "machine-record",
+      "reason": "JSON/Markdown output filename stem uses local clock without offset"
+    },
+    {
+      "root": "user-units",
+      "file": "git-maintenance@daily.timer",
+      "line": 9,
+      "expression": "Tue..Sun *-*-* 0:34:00",
+      "severity": "machine-schedule",
+      "reason": "calendar uses guest local zone"
+    },
+    {
+      "root": "user-units",
+      "file": "git-maintenance@hourly.timer",
+      "line": 9,
+      "expression": "*-*-* 1..23:34:00",
+      "severity": "machine-schedule",
+      "reason": "calendar uses guest local zone"
+    },
+    {
+      "root": "user-units",
+      "file": "git-maintenance@weekly.timer",
+      "line": 9,
+      "expression": "Mon 0:34:00",
+      "severity": "machine-schedule",
+      "reason": "calendar uses guest local zone"
+    },
+    {
+      "root": "user-units",
+      "file": "native-agent-pages-refresh.timer",
+      "line": 5,
+      "expression": "*-*-* *:00/10:00",
+      "severity": "machine-schedule",
+      "reason": "explicit named-file read catches symlink omitted by rg default; implicit guest zone"
+    },
+    {
+      "root": "user-units",
+      "file": "restic-backup-nativestack2604.timer",
+      "line": 5,
+      "expression": "*-*-* 03:30:00",
+      "severity": "machine-schedule",
+      "reason": "calendar uses guest local zone"
+    },
+    {
+      "root": "user-units",
+      "file": "restic-prune-nativestack2604.timer",
+      "line": 5,
+      "expression": "Sun *-*-* 04:00:00",
+      "severity": "machine-schedule",
+      "reason": "calendar uses guest local zone"
+    },
+    {
+      "root": "user-units",
+      "file": "wu-watch-20261006.timer",
+      "line": 5,
+      "expression": "*-*-* *:05,35:00",
+      "severity": "machine-schedule",
+      "reason": "calendar uses guest local zone"
+    }
+  ],
+  "explicit_tz_candidates": [
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/run-trial.sh",
+      "line": 13,
+      "reason": "explicit TZ in command or file; inspect scope",
+      "excerpt": "echo \"scan start $(TZ=America/New_York date '+%H:%M:%S') ET\""
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/run-trial.sh",
+      "line": 17,
+      "reason": "explicit TZ in command or file; inspect scope",
+      "excerpt": "echo \"scan rc=$rc end $(TZ=America/New_York date '+%H:%M:%S') ET\""
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/run-trial.sh",
+      "line": 27,
+      "reason": "explicit TZ in command or file; inspect scope",
+      "excerpt": "echo \"paper start $(TZ=America/New_York date '+%H:%M:%S') ET\""
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/run-trial.sh",
+      "line": 32,
+      "reason": "explicit TZ in command or file; inspect scope",
+      "excerpt": "echo \"paper rc=$rc end $(TZ=America/New_York date '+%H:%M:%S') ET\""
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-c/run-trial.sh",
+      "line": 13,
+      "reason": "explicit TZ in command or file; inspect scope",
+      "excerpt": "echo \"scan start $(TZ=America/New_York date '+%H:%M:%S') ET\""
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-c/run-trial.sh",
+      "line": 17,
+      "reason": "explicit TZ in command or file; inspect scope",
+      "excerpt": "echo \"scan rc=$rc end $(TZ=America/New_York date '+%H:%M:%S') ET\""
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-c/run-trial.sh",
+      "line": 27,
+      "reason": "explicit TZ in command or file; inspect scope",
+      "excerpt": "echo \"paper start $(TZ=America/New_York date '+%H:%M:%S') ET\""
+    },
+    {
+      "root": "nas",
+      "file": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-c/run-trial.sh",
+      "line": 32,
+      "reason": "explicit TZ in command or file; inspect scope",
+      "excerpt": "echo \"paper rc=$rc end $(TZ=America/New_York date '+%H:%M:%S') ET\""
+    },
+    {
+      "root": "local-bin",
+      "file": "cc-clock-context",
+      "line": 10,
+      "reason": "explicit TZ in command or file; inspect scope",
+      "excerpt": "ny=$(TZ=America/New_York /usr/bin/date '+%a %Y-%m-%d %H:%M:%S %Z')"
+    }
+  ],
+  "review_notes": [
+    "Prose/HTML and tool-name-list grep matches are not date calls.",
+    "Generated date +%%s strings produce date +%s and are zone-independent epoch checks.",
+    "Python chained now().astimezone() is aware after conversion; the source-local formatting dependency is recorded without claiming it loses the instant.",
+    "This is a bounded static audit of direct forms, not whole-program dynamic or alias tracing. Vendor timer files outside the named roots and shell startup files were not read.",
+    "~/.local/bin/cc-clock-context:9 uses date -u; :10 uses TZ=America/New_York for display. Other local-bin time candidates are explicitly zoned. No unzoned local-bin call was found by the bounded search.",
+    "The native-agent-pages-refresh.timer symlink is read only through its explicitly named user-unit path; no target directory was crawled."
+  ],
+  "path_convention": "~ aliases the runtime user's home. Host home paths in command metadata and snippets are masked for publication; expanduser before reproducing commands. Repository file:line paths and revision SHAs are unchanged."
+}
