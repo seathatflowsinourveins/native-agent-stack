@@ -1,107 +1,142 @@
 {
  "schema_version": 1,
- "generated_utc": "2026-10-04T15:03:10Z",
+ "generated_utc": "2026-10-10T00:10:55Z",
  "generator": "python3 scripts/upstream_surface_watch.py --network --write-baseline",
  "description": "Names-only snapshot of the user-switchable surface of Claude Code and Codex at the versions below: sorted names per kind, the codex:feature stages that stage_changed compares, the per-source counts of claude:setting (the union of sdk.d.ts and settings-reference.md) that the 80% floor compares, and per fetched artifact its URL, version, fetch time, sha256 and size, never its content. docs/upstream-surface-watch.md.",
  "versions": {
-  "claude_code": "2.1.289",
+  "claude_code": "2.1.296",
   "claude_code_channel": "latest",
-  "claude_agent_sdk": "0.3.289",
-  "claude_agent_sdk_claude_code_version": "2.1.289",
-  "codex": "rust-v0.160.0",
-  "codex_binary": "codex-cli 0.159.3"
+  "claude_agent_sdk": "0.3.296",
+  "claude_agent_sdk_claude_code_version": "2.1.296",
+  "codex": "rust-v0.162.1",
+  "codex_binary": "codex-cli 0.162.1"
  },
  "counts": {
-  "claude:setting": 183,
+  "claude:setting": 184,
   "claude:hook": 33,
-  "claude:env": 407,
+  "claude:env": 417,
   "claude:mod": 6,
-  "codex:config": 1034,
-  "codex:feature": 152
+  "codex:config": 1057,
+  "codex:feature": 167
  },
  "source_counts": {
   "claude:setting": {
-   "sdk.d.ts": 173,
+   "sdk.d.ts": 174,
    "settings-reference.md": 171
   }
  },
  "sources": {
   "claude-agent-sdk-types": {
-   "url": "https://unpkg.com/@anthropic-ai/claude-agent-sdk@0.3.289/sdk.d.ts",
-   "version": "0.3.289",
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "52d1c2c93ecb35a301044319f60e10d365f8e1ea0f1812054e1d4b4b2f183fb7",
-   "bytes": 529139
+   "url": "https://unpkg.com/@anthropic-ai/claude-agent-sdk@0.3.296/sdk.d.ts",
+   "version": "0.3.296",
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "fc2866dfe2c01468edb19b1d94f26156bfacecdf1e7f1452b276ed2f8cc0b08f",
+   "bytes": 538514
   },
   "claude-changelog": {
    "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
    "version": null,
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "c3b0831a2102d8d4800a2eb00c2a0d3095378d57d690e0ed1e8e3c386299f5e7",
-   "bytes": 904319
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "0383b383e05c30b7592c512ea3356104cbc3a799d028d36204033175ff256a51",
+   "bytes": 987162
+  },
+  "claude-doc-docs-index": {
+   "url": "https://code.claude.com/docs/llms.txt",
+   "version": "2.1.296",
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "5bbcf52ca6dd329b7ccdba2c4abea1223f66a66ebc65375e7369108a2738c006",
+   "bytes": 61615
+  },
+  "claude-doc-memory": {
+   "url": "https://code.claude.com/docs/en/memory",
+   "version": "2.1.296",
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "52c9ce2203d522ab02f6f5d9e6bede9998a9a71c9b2bf58fd237ca689e013161",
+   "bytes": 51556
+  },
+  "claude-doc-platform-release-notes": {
+   "url": "https://platform.claude.com/docs/en/release-notes/overview.md",
+   "version": "2.1.296",
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "e3071b255e401a312b7805759190c49d69b5dc04fddf7bb181c6d0034e3b1f09",
+   "bytes": 124726
+  },
+  "claude-doc-skills": {
+   "url": "https://code.claude.com/docs/en/skills",
+   "version": "2.1.296",
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "3a4428d15e821c576506d6a870844f8a9744cc69f85a63bd563e159b00eb0b11",
+   "bytes": 106661
   },
   "claude-env-vars-page": {
    "url": "https://code.claude.com/docs/en/env-vars.md",
    "version": null,
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "ee2df39dcb334d0aa15f67fcbfe38e74b904b6b5248ad5b6a7e821f9285239f6",
-   "bytes": 163901
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "7df98a600e2fda71818cea0031c0296bcc6960892da12572cd7cdf4c7d72c8f3",
+   "bytes": 168369
   },
   "claude-mods-overview-page": {
    "url": "https://code.claude.com/docs/en/plugins/mods/overview.md",
    "version": null,
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "c0eab8421cb53b3249152c7bd968f5d191cee127b2c5226356bca0c205c53384",
-   "bytes": 23225
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "fe5601eb58bd3be5cb06eb28fda9cbf09852ece268729d71b3cfffed882a2825",
+   "bytes": 23651
   },
   "claude-settings-reference-page": {
    "url": "https://code.claude.com/docs/en/settings-reference.md",
    "version": null,
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "b000e41a6312dfca4ab62aad62db3212eb43ecd61e2502ebda950e50311d0528",
-   "bytes": 418210
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "e7d592dc8ec3baaeaf3156e764f924874e491ffd9af911d5a743edbdafb8452f",
+   "bytes": 419994
   },
   "codex-config-schema": {
-   "url": "https://github.com/openai/codex/releases/download/rust-v0.160.0/config-schema.json",
-   "version": "rust-v0.160.0",
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "7ce31bde1ed6ef15c53a96ba460bb1d0fb7b99fd9ab719b567c94c474f62b023",
-   "bytes": 229468
+   "url": "https://github.com/openai/codex/releases/download/rust-v0.162.1/config-schema.json",
+   "version": "rust-v0.162.1",
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "7933a70506e753a6e98c16800d2a76770b2af2b7295491f8f0b8e713e952027e",
+   "bytes": 236751
+  },
+  "codex-doc-agents-md": {
+   "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md",
+   "version": "rust-v0.160.1",
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "9d1f87a2d1cb55b4782b95abe710692b35b9659789c2db31a22c7074a3383e8e",
+   "bytes": 9149
   },
   "codex-features-list": {
    "command": "codex features list",
-   "version": "codex-cli 0.159.3",
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "b11fdfa3000a4efdc8124041dadb446d584c0c34a42970b6eb26f78b5e622eda",
-   "bytes": 9980
+   "version": "codex-cli 0.162.1",
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "8095d5c2cf431c74c3634d12e304829509cd2cc4b1b17ea16ef6fba274a41e1e",
+   "bytes": 10965
   },
   "github-codex-latest-release": {
    "url": "https://api.github.com/repos/openai/codex/releases/latest",
    "version": null,
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "075fd161b7ee7f3bb35cef474fe4849e676ea667c9670cab2cb493f5943ee674",
-   "bytes": 305925
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "362e4a1206cbddf0a50c6f4a4b57a0411f1006f36f5e703176e25befbe324226",
+   "bytes": 299921
   },
   "npm-claude-agent-sdk-packument": {
    "url": "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk",
    "version": null,
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "ecedf9c05fd875692334d0d7b7a61223883944a8ee4910fdca89d61a8952b4fc",
-   "bytes": 1040827
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "63658e378335d16bf61d19cd1b3d0c3bc9c33092801a395230dce9d82cf0295a",
+   "bytes": 1069766
   },
   "npm-claude-code-dist-tags": {
    "url": "https://registry.npmjs.org/-/package/@anthropic-ai/claude-code/dist-tags",
    "version": null,
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "34156ba2276f4ed7cabc4988c9a99c51d3b8bed615506338880de755dd7cca85",
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "15929f4e719c40be25a600496323b4668cec4f5e9a64490d0baf458f79971e3d",
    "bytes": 56
   },
   "npm-codex-dist-tags": {
    "url": "https://registry.npmjs.org/-/package/@openai/codex/dist-tags",
    "version": null,
-   "fetched_utc": "2026-10-04T15:03:10Z",
-   "sha256": "a6ca7c2b66eaa3f9d0c5cc79fb98d744dcff05ef37e0010ee1f3ecdf8e3cda80",
-   "bytes": 1131
+   "fetched_utc": "2026-10-10T00:10:55Z",
+   "sha256": "f6513aeb48cd9dded7967dfe8e856fb60e7ff30f2ca8066eb5e93a46ba97a899",
+   "bytes": 3236
   }
  },
  "kinds": {
@@ -202,6 +237,7 @@
    "gcpAuthRefresh",
    "hooks",
    "httpHookAllowedEnvVars",
+   "idleCompaction",
    "includeCoAuthoredBy",
    "includeGitInstructions",
    "inputNeededNotifEnabled",
@@ -471,9 +507,11 @@
    "CLAUDE_CODE_DISABLE_WINDOWS_SHELL_LAUNCHER",
    "CLAUDE_CODE_DISABLE_WORKFLOWS",
    "CLAUDE_CODE_EFFORT_LEVEL",
+   "CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS",
    "CLAUDE_CODE_ENABLE_AUTO_MODE",
    "CLAUDE_CODE_ENABLE_AWAY_SUMMARY",
    "CLAUDE_CODE_ENABLE_BACKGROUND_PLUGIN_REFRESH",
+   "CLAUDE_CODE_ENABLE_CFC",
    "CLAUDE_CODE_ENABLE_FEEDBACK_SURVEY_FOR_OTEL",
    "CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING",
    "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY",
@@ -489,6 +527,7 @@
    "CLAUDE_CODE_FORCE_SESSION_PERSISTENCE",
    "CLAUDE_CODE_FORCE_STRIKETHROUGH",
    "CLAUDE_CODE_FORCE_SYNC_OUTPUT",
+   "CLAUDE_CODE_FORCE_TERMINAL_IMAGES",
    "CLAUDE_CODE_FORK_SUBAGENT",
    "CLAUDE_CODE_FORWARD_SUBAGENT_TEXT",
    "CLAUDE_CODE_GATEWAY_HINT_HEADERS",
@@ -498,6 +537,7 @@
    "CLAUDE_CODE_GLOB_NO_IGNORE",
    "CLAUDE_CODE_GLOB_TIMEOUT_SECONDS",
    "CLAUDE_CODE_GOAL_CHECKIN_MINUTES",
+   "CLAUDE_CODE_GZIP_REQUEST_BODIES",
    "CLAUDE_CODE_HIDE_CWD",
    "CLAUDE_CODE_IDE_HOST_OVERRIDE",
    "CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL",
@@ -532,10 +572,12 @@
    "CLAUDE_CODE_OTEL_FLUSH_TIMEOUT_MS",
    "CLAUDE_CODE_OTEL_HEADERS_HELPER_DEBOUNCE_MS",
    "CLAUDE_CODE_OTEL_SHUTDOWN_TIMEOUT_MS",
+   "CLAUDE_CODE_OVERLOADED_RETRY_BASE_DELAY_MS",
    "CLAUDE_CODE_PACKAGE_MANAGER_AUTO_UPDATE",
    "CLAUDE_CODE_PERFORCE_MODE",
    "CLAUDE_CODE_PLUGIN_CACHE_DIR",
    "CLAUDE_CODE_PLUGIN_DIRS",
+   "CLAUDE_CODE_PLUGIN_DIR_WATCH",
    "CLAUDE_CODE_PLUGIN_GIT_TIMEOUT_MS",
    "CLAUDE_CODE_PLUGIN_KEEP_MARKETPLACE_ON_FAILURE",
    "CLAUDE_CODE_PLUGIN_PREFER_HTTPS",
@@ -555,6 +597,7 @@
    "CLAUDE_CODE_RESUME_INTERRUPTED_TURN_MAX_AGE_MS",
    "CLAUDE_CODE_RESUME_PROMPT",
    "CLAUDE_CODE_RETRY_WATCHDOG",
+   "CLAUDE_CODE_RETRY_WATCHDOG_MAX_WAIT_MS",
    "CLAUDE_CODE_SAFE_MODE",
    "CLAUDE_CODE_SCRIPT_CAPS",
    "CLAUDE_CODE_SCROLL_SPEED",
@@ -604,6 +647,7 @@
    "CLAUDE_CODE_USE_VERTEX",
    "CLAUDE_CODE_WEBFETCH_CACHE_TTL_MS",
    "CLAUDE_CODE_WEBFETCH_DEADLINE_MS",
+   "CLAUDE_CODE_WEB_SEARCH_REFILLS_PER_HOUR",
    "CLAUDE_CODE_WORKER_CHECKIN_SCHEDULE",
    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS",
    "CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS",
@@ -681,6 +725,7 @@
    "MCP_SERVER_CONNECTION_BATCH_SIZE",
    "MCP_TIMEOUT",
    "MCP_TOOL_TIMEOUT",
+   "NODE_EXTRA_CA_CERTS",
    "NO_PROXY",
    "NPM_CONFIG_REGISTRY",
    "NPM_TOKEN",
@@ -732,7 +777,8 @@
    "VERTEX_REGION_CLAUDE_5_SONNET",
    "VERTEX_REGION_CLAUDE_FABLE_5",
    "VERTEX_REGION_CLAUDE_FABLE_5_1",
-   "VERTEX_REGION_CLAUDE_HAIKU_4_5"
+   "VERTEX_REGION_CLAUDE_HAIKU_4_5",
+   "VERTEX_REGION_CLAUDE_HAIKU_5_5"
   ],
   "claude:mod": [
    "cc-plugin-agents-md",
@@ -788,6 +834,7 @@
    "apps_mcp_product_sku",
    "audio",
    "audio.microphone",
+   "audio.microphone_channel",
    "audio.speaker",
    "auto_review",
    "auto_review.circuit_break_action",
@@ -827,6 +874,7 @@
    "computer_use.windows.exes[].binary_name",
    "computer_use.windows.exes[].product_name",
    "computer_use.windows.exes[].publisher_name",
+   "daybreak",
    "default_permissions",
    "desktop",
    "developer_instructions",
@@ -844,6 +892,7 @@
    "features",
    "features.agent_message_board",
    "features.analytics_plan_history",
+   "features.api_key_cyber_access_programs",
    "features.api_key_model_discovery",
    "features.apply_patch_freeform",
    "features.apply_patch_preserve_line_endings",
@@ -855,10 +904,12 @@
    "features.auth_elicitation",
    "features.background_paginated_rollout_migration",
    "features.bedrock_setup_wizard",
+   "features.browser_annotation_api",
    "features.browser_use",
    "features.browser_use_external",
    "features.browser_use_full_cdp_access",
    "features.chronicle",
+   "features.cli_daybreak",
    "features.code_mode",
    "features.code_mode.default_exec_yield_time_ms",
    "features.code_mode.direct_only_tool_namespaces",
@@ -872,7 +923,9 @@
    "features.code_mode_host.enabled",
    "features.code_mode_interrupt",
    "features.code_mode_only",
+   "features.code_mode_only_strict_3p_tools",
    "features.code_mode_prewarm",
+   "features.code_mode_tool_search",
    "features.codex_apps_mcp_2026_07_28",
    "features.codex_git_commit",
    "features.codex_hooks",
@@ -919,6 +972,8 @@
    "features.guardian_reuse_parent_compaction",
    "features.guardian_root_handoff_context",
    "features.guardianv2",
+   "features.guardianv2.async_classifier_conversation_token_limit",
+   "features.guardianv2.async_classifier_mode",
    "features.guardianv2.classifier_instructions",
    "features.guardianv2.enabled",
    "features.guardianv2.free_guardian",
@@ -942,6 +997,8 @@
    "features.guardianv2.transcript.max_tool_entry_tokens",
    "features.guardianv2.transcript.max_tool_transcript_tokens",
    "features.guardianv2.transcript.sources",
+   "features.guardianv2.transcript_mode",
+   "features.guardianv2_decisions_comparison",
    "features.hooks",
    "features.image_detail_original",
    "features.image_generation",
@@ -952,17 +1009,21 @@
    "features.in_app_dictation",
    "features.in_app_local_automation",
    "features.in_app_updates",
+   "features.in_app_voice",
+   "features.incremental_tools",
    "features.instant_interrupt",
    "features.item_ids",
    "features.js_repl",
    "features.js_repl_tools_only",
    "features.local_thread_store_compression",
    "features.local_thread_store_shared_compression",
+   "features.login_shell_package_path",
    "features.mcp_2026_07_28",
    "features.mcp_oauth_refresh_coordination",
    "features.memories",
    "features.memory_tool",
    "features.mentions_v2",
+   "features.model_catalog_in_context",
    "features.multi_agent",
    "features.multi_agent_mode",
    "features.multi_agent_v2",
@@ -974,6 +1035,10 @@
    "features.multi_agent_v2.max_concurrent_threads_per_session",
    "features.multi_agent_v2.max_wait_timeout_ms",
    "features.multi_agent_v2.message_board_in_memory",
+   "features.multi_agent_v2.message_board_remote",
+   "features.multi_agent_v2.message_board_remote.bearer_token",
+   "features.multi_agent_v2.message_board_remote.bearer_token_env_var",
+   "features.multi_agent_v2.message_board_remote.url",
    "features.multi_agent_v2.min_wait_timeout_ms",
    "features.multi_agent_v2.multi_agent_mode_hint_text",
    "features.multi_agent_v2.non_code_mode_only",
@@ -984,6 +1049,7 @@
    "features.multi_agent_v2.usage_hint_enabled",
    "features.multi_agent_v2.usage_hint_text",
    "features.multi_agent_v2.wait_agent_enabled",
+   "features.multi_agent_v2_dynamic_tools",
    "features.network_proxy",
    "features.network_proxy.allow_local_binding",
    "features.network_proxy.allow_upstream_proxy",
@@ -1057,6 +1123,7 @@
    "features.sleep_tool.enabled",
    "features.sleep_tool.mode",
    "features.sqlite",
+   "features.stable_environment_tools",
    "features.standalone_web_search",
    "features.steer",
    "features.step_model_switching",
@@ -1081,6 +1148,7 @@
    "features.tool_suggest",
    "features.transcript_v2",
    "features.tui_app_server",
+   "features.ultrafast_mode",
    "features.unavailable_dummy_tools",
    "features.unbounded_connection_retries",
    "features.undo",
@@ -1378,6 +1446,9 @@
    "model_providers.*.aws.profile",
    "model_providers.*.aws.region",
    "model_providers.*.base_url",
+   "model_providers.*.capabilities",
+   "model_providers.*.capabilities.external_web_access",
+   "model_providers.*.capabilities.remote_compaction",
    "model_providers.*.env_http_headers",
    "model_providers.*.env_key",
    "model_providers.*.env_key_instructions",
@@ -1494,12 +1565,6 @@
    "plugins.*.mcp_servers",
    "plugins.*.mcp_servers.*.default_tools_approval_mode",
    "plugins.*.mcp_servers.*.disabled_tools",
-   "plugins.*.mcp_servers.*.ema_auth",
-   "plugins.*.mcp_servers.*.ema_auth.authorization_server_issuer",
-   "plugins.*.mcp_servers.*.ema_auth.client_id",
-   "plugins.*.mcp_servers.*.ema_auth.resource",
-   "plugins.*.mcp_servers.*.ema_auth.scopes",
-   "plugins.*.mcp_servers.*.ema_auth.url",
    "plugins.*.mcp_servers.*.enabled",
    "plugins.*.mcp_servers.*.enabled_tools",
    "plugins.*.mcp_servers.*.tools",
@@ -1569,6 +1634,7 @@
    "tools.web_search.location.region",
    "tools.web_search.location.timezone",
    "tui",
+   "tui.agents_overview_grouping",
    "tui.alternate_screen",
    "tui.animations",
    "tui.auto_recap",
@@ -1586,6 +1652,7 @@
    "tui.keymap.agents",
    "tui.keymap.agents.archive",
    "tui.keymap.agents.delete",
+   "tui.keymap.agents.fork",
    "tui.keymap.agents.hide",
    "tui.keymap.agents.new_task",
    "tui.keymap.agents.new_worktree",
@@ -1594,6 +1661,7 @@
    "tui.keymap.agents.search",
    "tui.keymap.agents.stop",
    "tui.keymap.agents.toggle_grouping",
+   "tui.keymap.agents.toggle_pin",
    "tui.keymap.approval",
    "tui.keymap.approval.approve",
    "tui.keymap.approval.approve_for_prefix",
@@ -1750,6 +1818,7 @@
    "tui.keymap.vim_text_object.single_quote",
    "tui.keymap.vim_text_object.word",
    "tui.model_availability_nux",
+   "tui.mouse_scroll_speed",
    "tui.notification_condition",
    "tui.notification_method",
    "tui.notifications",
@@ -1781,6 +1850,7 @@
   "codex:feature": [
    "agent_message_board",
    "analytics_plan_history",
+   "api_key_cyber_access_programs",
    "api_key_model_discovery",
    "apply_patch_freeform",
    "apply_patch_preserve_line_endings",
@@ -1791,16 +1861,20 @@
    "auth_elicitation",
    "background_paginated_rollout_migration",
    "bedrock_setup_wizard",
+   "browser_annotation_api",
    "browser_use",
    "browser_use_external",
    "browser_use_full_cdp_access",
    "chronicle",
+   "cli_daybreak",
    "code_mode",
    "code_mode_buffered_exec",
    "code_mode_host",
    "code_mode_interrupt",
    "code_mode_only",
+   "code_mode_only_strict_3p_tools",
    "code_mode_prewarm",
+   "code_mode_tool_search",
    "codex_apps_mcp_2026_07_28",
    "codex_git_commit",
    "collaboration_modes",
@@ -1829,12 +1903,15 @@
    "fast_mode",
    "goals",
    "guardian_approval",
+   "guardian_conversation_history_tools",
    "guardian_enhanced_node_repl_transcripts",
    "guardian_ext",
    "guardian_node_repl_transcript_images",
    "guardian_reuse_parent_compaction",
+   "guardian_root_handoff_context",
    "guardianv2",
    "guardianv2.thread_context",
+   "guardianv2_decisions_comparison",
    "hooks",
    "image_detail_original",
    "image_generation",
@@ -1844,19 +1921,24 @@
    "in_app_dictation",
    "in_app_local_automation",
    "in_app_updates",
+   "in_app_voice",
+   "incremental_tools",
    "instant_interrupt",
    "item_ids",
    "js_repl",
    "js_repl_tools_only",
    "local_thread_store_compression",
    "local_thread_store_shared_compression",
+   "login_shell_package_path",
    "mcp_2026_07_28",
    "mcp_oauth_refresh_coordination",
    "memories",
    "mentions_v2",
+   "model_catalog_in_context",
    "multi_agent",
    "multi_agent_mode",
    "multi_agent_v2",
+   "multi_agent_v2_dynamic_tools",
    "network_proxy",
    "non_prefixed_mcp_tool_names",
    "nonfatal_clock_read_errors",
@@ -1899,6 +1981,7 @@
    "skip_host_skill_discovery",
    "sleep_tool",
    "sqlite",
+   "stable_environment_tools",
    "standalone_web_search",
    "steer",
    "step_model_switching",
@@ -1912,6 +1995,7 @@
    "tool_suggest",
    "transcript_v2",
    "tui_app_server",
+   "ultrafast_mode",
    "unavailable_dummy_tools",
    "unbounded_connection_retries",
    "undo",
@@ -1944,8 +2028,12 @@
     "experimental"
    ],
    [
+    "api_key_cyber_access_programs",
+    "stable"
+   ],
+   [
     "api_key_model_discovery",
-    "under development"
+    "stable"
    ],
    [
     "apply_patch_freeform",
@@ -1953,7 +2041,7 @@
    ],
    [
     "apply_patch_preserve_line_endings",
-    "under development"
+    "removed"
    ],
    [
     "apply_patch_streaming_events",
@@ -1984,6 +2072,10 @@
     "under development"
    ],
    [
+    "browser_annotation_api",
+    "stable"
+   ],
+   [
     "browser_use",
     "stable"
    ],
@@ -1997,6 +2089,10 @@
    ],
    [
     "chronicle",
+    "under development"
+   ],
+   [
+    "cli_daybreak",
     "under development"
    ],
    [
@@ -2020,7 +2116,15 @@
     "under development"
    ],
    [
+    "code_mode_only_strict_3p_tools",
+    "under development"
+   ],
+   [
     "code_mode_prewarm",
+    "under development"
+   ],
+   [
+    "code_mode_tool_search",
     "under development"
    ],
    [
@@ -2136,6 +2240,10 @@
     "stable"
    ],
    [
+    "guardian_conversation_history_tools",
+    "under development"
+   ],
+   [
     "guardian_enhanced_node_repl_transcripts",
     "under development"
    ],
@@ -2152,12 +2260,20 @@
     "stable"
    ],
    [
+    "guardian_root_handoff_context",
+    "under development"
+   ],
+   [
     "guardianv2",
     "under development"
    ],
    [
     "guardianv2.thread_context",
     "removed"
+   ],
+   [
+    "guardianv2_decisions_comparison",
+    "under development"
    ],
    [
     "hooks",
@@ -2196,6 +2312,14 @@
     "stable"
    ],
    [
+    "in_app_voice",
+    "stable"
+   ],
+   [
+    "incremental_tools",
+    "under development"
+   ],
+   [
     "instant_interrupt",
     "under development"
    ],
@@ -2220,6 +2344,10 @@
     "removed"
    ],
    [
+    "login_shell_package_path",
+    "experimental"
+   ],
+   [
     "mcp_2026_07_28",
     "under development"
    ],
@@ -2236,6 +2364,10 @@
     "stable"
    ],
    [
+    "model_catalog_in_context",
+    "under development"
+   ],
+   [
     "multi_agent",
     "stable"
    ],
@@ -2246,6 +2378,10 @@
    [
     "multi_agent_v2",
     "stable"
+   ],
+   [
+    "multi_agent_v2_dynamic_tools",
+    "under development"
    ],
    [
     "network_proxy",
@@ -2416,6 +2552,10 @@
     "removed"
    ],
    [
+    "stable_environment_tools",
+    "under development"
+   ],
+   [
     "standalone_web_search",
     "under development"
    ],
@@ -2466,6 +2606,10 @@
    [
     "tui_app_server",
     "removed"
+   ],
+   [
+    "ultrafast_mode",
+    "stable"
    ],
    [
     "unavailable_dummy_tools",
