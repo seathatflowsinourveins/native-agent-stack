@@ -45,9 +45,10 @@ A review:
 A diff over 250,000 bytes is refused before any debit: the status is `error`, the description names the size and asks
 for a paths-limited review, and the attempt is final.
 
-The review process is started as `credential_run.py <key> -- env … node <srt>/dist/cli.js --settings <run>/srt.json --
-bwrap … /opt/claude-review/claude -p …`. The runner reads the key store outside the sandbox and passes the key in the
-environment, never in argv. srt (Anthropic's sandbox runtime, `@anthropic-ai/sandbox-runtime` 0.0.79) is the network
+The review process is started as `env … node <srt>/dist/cli.js --settings <run>/srt.json -- env … credential_run.py
+<key> -- bwrap … /opt/claude-review/claude -p …`. srt starts without the key. The runner, srt's command, reads the key
+store and passes the key in the environment of bwrap and the client only, never in argv, so srt's node process, shells
+and bridges never hold it. srt (Anthropic's sandbox runtime, `@anthropic-ai/sandbox-runtime` 0.0.79) is the network
 boundary: its own bubblewrap layer gives the run a network namespace with only `lo`, and its proxy on the host,
 reached through a bound unix socket, passes `api.anthropic.com` and refuses everything else. srt gets a private
 directory per run under `$XDG_RUNTIME_DIR/claude-review-worker/` (its settings, TMPDIR, HOME and an empty working

@@ -16,8 +16,9 @@ rows (settled actuals plus open debits of this workload).
 
 Each review runs in a dedicated detached worktree of origin/main, refreshed every run, with the head exported as data
 into pr-head/ (git archive, links dropped) and the diff in a separate input directory. A diff over 250,000 bytes is
-refused before any debit. The reviewing process is started as credential_run.py <key> -> bwrap -> claude -p: the
-runner reads the key store outside the sandbox and the key reaches claude only through its environment, never argv.
+refused before any debit. The reviewing process is started as srt -> credential_run.py <key> -> bwrap -> claude -p:
+srt (Anthropic's sandbox runtime, the network boundary: the API host only) starts without the key, the runner inside
+it reads the key store, and the key reaches claude only through its environment, never argv.
 The sandbox has no home directory, no gh login and no credential store: only /usr, /etc, the main worktree and the
 input directory (read-only), a temporary CLAUDE_CONFIG_DIR (writable) and the pinned binary. No CLAUDE.md memory is
 loaded (CLAUDE_CODE_DISABLE_CLAUDE_MDS=1). A trading head (by repository or by changed path) gets the owner's
@@ -747,8 +748,9 @@ def net_base(env: dict) -> Path:
 
 
 class SandboxLauncher:
-    """credential_run.py (outside, reads the key store) -> srt (the network boundary) -> bwrap -> claude. The key
-    travels in the environment only."""
+    """srt (the network boundary, started without the key) -> credential_run.py (reads the key store) -> bwrap ->
+    claude. The key travels in the environment only, and only from the runner down: srt's node process, its shells
+    and its socat bridges are started before the key exists in any process of the chain."""
 
     main_view = SANDBOX_MAIN
     input_view = SANDBOX_INPUT
@@ -764,15 +766,20 @@ class SandboxLauncher:
         self.extra_unset, self.flags, self.config_files = tuple(extra_unset), flags, dict(config_files or {})
         self.boundary = boundary
 
-    def command(self, key: str, plan, net: Path | None = None) -> list:
+    def command(self, key: str, plan, net: Path | None = None, home: str = "") -> list:
+        runner = [self.python, "-I", "-S", str(self.credential_run), key, "--"]
         # The inner bwrap keeps srt's network namespace (no --unshare-net of its own): that namespace has only lo and
         # srt's bridge to its filtering proxy, and a second one would cut the proxy off.
-        outer = self.boundary.prefix(net) if self.boundary is not None and net is not None else []
-        return [self.python, "-I", "-S", str(self.credential_run), key, "--", *outer,
-                *sandbox_argv(self.bwrap, plan.main_dir, plan.input_dir, plan.config_dir, self.claude_bin,
-                              extra_ro_binds=self.extra_ro_binds, extra_env=self.extra_env,
-                              extra_unset=self.extra_unset),
-                SANDBOX_CLAUDE, *(self.flags if self.flags is not None else claude_flags(SANDBOX_INPUT))]
+        inner = [*sandbox_argv(self.bwrap, plan.main_dir, plan.input_dir, plan.config_dir, self.claude_bin,
+                               extra_ro_binds=self.extra_ro_binds, extra_env=self.extra_env,
+                               extra_unset=self.extra_unset),
+                 SANDBOX_CLAUDE, *(self.flags if self.flags is not None else claude_flags(SANDBOX_INPUT))]
+        if self.boundary is None or net is None:
+            return [*runner, *inner]
+        # srt runs its command through a shell with its own environment (src/cli.ts:545-548 at the pin), so the
+        # runner, which injects the key, is that command: the runner gets back the home it finds the key store under.
+        return [*self.boundary.prefix(net), "/usr/bin/env", "-u", "TMPDIR", f"HOME={home}", "PATH=/usr/bin:/bin",
+                *runner, *inner]
 
     def run(self, key: str, plan, prompt: str, stream_path: Path, stderr_path: Path, timeout: int,
             env: dict) -> Launch:
@@ -781,8 +788,9 @@ class SandboxLauncher:
         if self.boundary is None:
             return run_process(self.command(key, plan), runner_environment(env), prompt, stream_path, stderr_path,
                                timeout)
+        start = runner_environment(env)
         with self.boundary.run_dir(plan.config_dir) as net:
-            return run_process(self.command(key, plan, net), runner_environment(env), prompt, stream_path,
+            return run_process(self.command(key, plan, net, start.get("HOME", "")), start, prompt, stream_path,
                                stderr_path, timeout, cwd=net / "cwd")
 
 
@@ -1329,6 +1337,8 @@ class Ledger:
                 if if_open:
                     return False
                 raise LedgerError(f"{ref} has no open debit; a request is settled once")
+            if held.get("workload") != WORKLOAD:
+                raise LedgerError(f"{ref} is a {held.get('workload')} debit, not this worker's")
             if fields.pop("unknown", False):
                 reserved = held.get("max_usd")
                 fields = {"actual_usd": reserved if is_amount(reserved) else COST_BOUND_USD, "outcome": "unknown",
@@ -1589,7 +1599,7 @@ class Worker:
             try:
                 self.recover()
                 heads = self.list_heads(summary)
-                self.publish_pending(heads)
+                self.publish_pending()
                 room, spent = self.ledger.room(self.clock())
                 summary["spent_today_usd"] = spent
                 if not room:
@@ -2114,10 +2124,14 @@ class Worker:
     def publish(self, repo: Repo, pr: int, sha: str, record: dict, attempt: dict) -> None:
         """Posts the stored result while the reviewed sha is the open head, read just before each POST. Each side
         effect is saved as it happens; a POST whose outcome is unknown (sending, or failed) is first looked up on
-        GitHub, so a retry never posts it twice. A head that moved marks what is unsent superseded; one that moved
-        while posting gets a superseded line on the comment already posted."""
+        GitHub, so a retry never posts it twice. A head that moved marks what is unsent superseded, and leaves work that
+        settle_superseded() carries to its end on this tick or a later one: the comment GitHub may hold is looked up by
+        its marker, and one that exists gets a superseded line."""
         post = attempt.get("post") or {}
         if not self.settings.post:
+            return
+        if (post.get("superseded") or {}).get("comment_marked") is False:
+            self.settle_superseded(repo, pr, sha, record, attempt)
             return
         report_dir = self.state / attempt["report_path"]
         label = f"{repo.name}#{pr}@{sha[:12]}"
@@ -2134,13 +2148,16 @@ class Worker:
                 return None
             if head == sha:
                 return True
-            post["superseded"] = {"stage": stage, "head": head, "at": iso(self.clock())}
-            for part in ("status", "comment"):
-                if post.get(part) in self.UNSENT:
-                    post[part] = "superseded"
+            # comment_marked False is open work, kept in the attempt marker until GitHub's side is settled.
+            post["superseded"] = {"stage": stage, "head": head, "at": iso(self.clock()), "comment_marked": False}
+            if post.get("status") in self.UNSENT:
+                post["status"] = "superseded"  # a status is bound to the reviewed commit, no longer the head
+            if post.get("comment") == "pending":
+                post["comment"] = "superseded"  # never sent; a sending or failed comment may be on GitHub
             save()
             self.log(f"{label}: superseded before {stage}: the head is now "
                      f"{head[:12] if head else 'closed'}; nothing more is posted for this review")
+            self.settle_superseded(repo, pr, sha, record, attempt)
             return False
 
         def send(part: str, posted_already, do_post) -> None:
@@ -2183,39 +2200,61 @@ class Worker:
                     post["comment_id"] = reply.get("id") if isinstance(reply, dict) else None
 
                 send("comment", found, create)
-        if post.get("status") == "posted" and "superseded" not in post and current("the end of posting") is False:
-            self.mark_superseded(repo, pr, sha, post, report_dir)
-            save()
+        if post.get("status") == "posted" and "superseded" not in post:
+            current("the end of posting")
 
-    def mark_superseded(self, repo: Repo, pr: int, sha: str, post: dict, report_dir: Path) -> None:
-        """The head moved while this review was posted: its comment says so. The status stays on the reviewed commit
-        only, which is no longer the head, so no current verdict is left."""
-        if post.get("comment") != "posted" or not is_count(post.get("comment_id")):
+    def settle_superseded(self, repo: Repo, pr: int, sha: str, record: dict, attempt: dict) -> None:
+        """The open work a head move left: a comment whose POST may have reached GitHub (sending, failed, or posted
+        without a known id) is looked up by its marker; a comment that exists gets the superseded line (PATCH, the
+        same body every time). comment_marked becomes True once the PATCH is confirmed, or "none" when GitHub holds
+        no comment of this review; an error leaves it False for the next tick. The status stays on the reviewed
+        commit, which is no longer the head, so no current verdict is left."""
+        post = attempt.get("post") or {}
+        superseded = post.get("superseded") or {}
+        if superseded.get("comment_marked") is not False:
             return
-        head = post["superseded"].get("head")
-        note = (f"**Superseded:** the pull request's head moved to `{head or 'a closed state'}` while this review "
-                f"was being posted. This verdict is for `{sha}` only.\n\n")
+        report_dir = self.state / attempt["report_path"]
         try:
-            body = (report_dir / "comment.md").read_text(encoding="utf-8")
-            self.gh.patch(f"repos/{repo.name}/issues/comments/{post['comment_id']}", {"body": note + body})
-            post["superseded"]["comment_marked"] = True
+            if post.get("comment") in ("sending", "failed") or (post.get("comment") == "posted"
+                                                                and not is_count(post.get("comment_id"))):
+                found = self.comment_on_github(repo, pr, comment_marker(repo, pr, sha, attempt["number"]))
+                if found is None:
+                    post["comment"] = "superseded"
+                else:
+                    post["comment"], post["comment_id"] = "posted", found
+            if post.get("comment") == "posted":
+                head = superseded.get("head")
+                note = (f"**Superseded:** the pull request's head moved to `{head or 'a closed state'}` while this "
+                        f"review was being posted. This verdict is for `{sha}` only.\n\n")
+                body = (report_dir / "comment.md").read_text(encoding="utf-8")
+                self.gh.patch(f"repos/{repo.name}/issues/comments/{post['comment_id']}", {"body": note + body})
+                superseded["comment_marked"] = True
+            else:
+                superseded["comment_marked"] = "none"
         except (ApiError, OSError, ValueError) as error:
-            post["superseded"]["comment_marked"] = False
-            self.log(f"{repo.name}#{pr}: the superseded line was not added to the comment ({error})")
+            self.log(f"{repo.name}#{pr}: the superseded comment is not settled yet ({error}); the next tick retries")
+        post["superseded"] = superseded
+        attempt["post"] = post
+        self.attempts.save(repo, record)
 
-    def publish_pending(self, heads: list) -> None:
-        """A result not posted yet (CLAUDE_REVIEW_POST was 0, a post failed, or a tick stopped mid-post) is posted
-        while its head is current; publish() reads the head again itself."""
+    def publish_pending(self) -> None:
+        """Open posting work from the stored attempts, whatever the listing shows now (a head that moved is no longer
+        listed): the latest attempt's unsent status or comment, posted while its head is current (publish() reads
+        it again), and any attempt's unsettled supersession."""
         if not self.settings.post:
             return
-        for candidate in heads:
-            record = self.attempts.load(candidate.repo, candidate.pr, candidate.sha)
-            if not record["attempts"]:
+        repos = {repo.name: repo for repo in self.repos}
+        for _, record in self.attempts.every_record():
+            if not isinstance(record, dict) or not record.get("attempts") or record.get("repo") not in repos:
                 continue
-            latest = record["attempts"][-1]
-            post = latest.get("post") or {}
-            if post.get("status") in self.UNSENT or post.get("comment") in self.UNSENT:
-                self.publish(candidate.repo, candidate.pr, candidate.sha, record, latest)
+            repo = repos[record["repo"]]
+            for index, attempt in enumerate(record["attempts"]):
+                post = attempt.get("post") or {}
+                unsettled = (post.get("superseded") or {}).get("comment_marked") is False
+                unsent = index == len(record["attempts"]) - 1 and (post.get("status") in self.UNSENT
+                                                                    or post.get("comment") in self.UNSENT)
+                if unsettled or unsent:
+                    self.publish(repo, record["pr"], record["head_sha"], record, attempt)
 
 
 # --------------------------------------------------------------------------- command line

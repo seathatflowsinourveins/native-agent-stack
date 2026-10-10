@@ -140,11 +140,25 @@ requests now. It reuses the repository's own fence: main at the working director
    `reports/<owner__repo>/pr<n>-<sha>/attempt<k>/`. The receipt holds the run id, keys, ledger refs, cost, client
    version, binary sha256, stop class, the trading flag and the upstream export.
 10. **Ledger:** rows are appended to `API_ACTIONS_LEDGER` under an exclusive `fcntl.flock` on `<ledger>.lock` around
-    each read-check-append, with the ledger file itself also flocked during the write. That is the api-actions
-    harness's own protocol (`_ledger_lock` and `_append` in its `common.py`, read on the host). A ref that already
-    exists is refused. A settle or void is appended only while the ref's latest row is its open debit, checked under
-    the same lock, as the harness's `_open_debit` does; the key and the unknown amount come from that debit. A second
-    close, or a close with no debit, is refused. The rows are:
+    each read-check-append, with the ledger file itself also flocked during the write. A ref that already exists is
+    refused. A settle or void is appended only while the ref's latest row is its open `CRW` debit, checked under the
+    same lock; the key and the unknown amount come from that debit. A second close, a close with no debit, or a close
+    of another workload's debit is refused.
+
+    The reference is the api-actions harness's `common.py`, which is not in git. It is pinned by content: sha256
+    `362cb74c3178a8715a28c97ae5e98dfefe044dfd68f5f09d00a85eb062e99a71`, with `_append` at line 221, `_ledger_lock` at
+    232, `_open_debit` at 257, `settle` at 295, `settle_unknown` at 302 and `void` at 314. A read-only copy of exactly
+    that file is kept in the coordination record at `readers/ledger-compat-20261010/common.py.pinned`. Measured on
+    2026-10-10 at 10:02Z against this commit's worker (`readers/ledger-compat-20261010/compat.json`; script
+    `ledger_compat.py`, sha256 `4be8f465…a115`), with that file and the worker sharing one temporary ledger:
+    - the harness settles a worker debit, and then the worker's settle and the harness's second settle are both refused;
+    - after the worker settles, the harness's `settle_unknown` and `void` are refused;
+    - both refuse a settle with no debit;
+    - worker recovery skips a ref the harness closed between the open-debit listing and the close;
+    - the harness's `totals` counts the worker's rows in the key's column, an unknown settle at the debit's 11.0.
+
+    The worker's unit tests simulate the other writer with the worker's own ledger; the compatibility run above is the
+    one against the reference. The rows are:
     - a debit (`max_usd` 11.0) before the run;
     - then a settle with `total_cost_usd`;
     - or a settle at the debit's `max_usd` with `outcome: unknown`, for a timeout, no result, no usable cost, an
@@ -358,8 +372,13 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
   ("Domain filtering happens at the host proxy level, not the sandbox boundary", `:1359-1362`), allowing only
   `allowedDomains` (`src/sandbox/sandbox-manager.ts:355-415`) and refusing a host process without its session token
   (407, `src/sandbox/http-proxy.ts:204,253-258,430,670`).
-- **The chain.** `credential_run.py <key> -- env HOME=… TMPDIR=… PATH=… node <srt>/dist/cli.js --settings <run>/srt.json
-  -- bwrap … claude`. The settings allow `api.anthropic.com` only and writes to the run's CLAUDE_CONFIG_DIR only; none of
+- **The chain.** `env HOME=… TMPDIR=… PATH=… node <srt>/dist/cli.js --settings <run>/srt.json -- env -u TMPDIR HOME=<home>
+  PATH=/usr/bin:/bin python3 -I -S credential_run.py <key> -- bwrap … claude`. srt starts without the key: it runs its
+  command through a shell with the environment it was given (`src/cli.ts:545-548` at the pin, `spawn(…, {shell: true})`),
+  and it starts its socat bridges the same way (`linux-sandbox-utils.ts:1385-1387,1431-1433`). The runner is that
+  command, inside srt's sandbox, so the key is injected after srt's node process, shells and bridges exist, into bwrap
+  and the client only. The runner still selects the inventory entry, masks the client's output and owns its process
+  group. The settings allow `api.anthropic.com` only and writes to the run's CLAUDE_CONFIG_DIR only; none of
   `tlsTerminate`, `mitmProxy`, `parentProxy`, `allowLocalBinding`, `credentials` or `enableWeakerNestedSandbox` is set.
   The inner bwrap keeps srt's namespace (a second `--unshare-net` would cut the proxy off) and stays the filesystem
   fence. Each run's srt directory (settings, TMPDIR, HOME, an empty working directory) is private, under
@@ -384,7 +403,10 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
   listener reached 0 times. With `example.com` added to the allowlist, the same check failed (its control). A native
   test (`RealBoundaryChainTest`, run when `CRW_TEST_SRT` and `CRW_TEST_NODE` are set) drives the real runner, srt and
   bwrap with a fake key: the client sees the key in its environment, `lo` only and the proxy variable, and the key is
-  masked in the output. `probes.py live` on api-4 through srt (receipt `readers/crw-probes/probes/20261010T060816Z`)
+  masked in the output. While the run lasts it reads every process environment of the user: the client holds the
+  key, and srt's node process, its shells and its socat bridges do not (they are seen running, without it). The same
+  test fails when the runner is put back outside srt: node (`MainThread`), `sh`, `bash` and three `socat` processes
+  then held the fake key (measured 2026-10-10 09:52Z). `probes.py live` on api-4 through srt (receipt `readers/crw-probes/probes/20261010T060816Z`)
   passed P1, P2, P6 and P11, `native_proven`; its three runs ended `end_turn` and cost $0.6252 in all (facts control
   $0.0683, facts fenced $0.0429, and the probe review $0.5139, which streamed for 204 s through the proxy).
 - **O4 measures the bwrap layer alone.** The offline O4 check (the API host reachable by DNS and TCP) runs the inner
@@ -396,7 +418,7 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 - IPv6: `api.anthropic.com` has an AAAA record; the proxy's choice of address family was not observed.
 - A later client version that needs another host would be refused by the allowlist (fail closed); not exercised.
 - srt 0.0.79 blocks `socket(AF_UNIX)` inside the sandbox with seccomp; no client feature the worker enables needs it.
-- A review longer than the probe review's 204 s, and a mid-stream proxy drop, were not measured.
+- A review longer than the probe reviews' 204 s and 261 s, and a mid-stream proxy drop, were not measured.
 - The live run used a real key of the current format; other key formats were not run.
 
 ## Command center decisions on #953 (2026-10-10 01:17Z)
@@ -415,12 +437,13 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 
 - **R1, same-user access to the key.** During a run the key sits in the environment of the sandboxed processes. Any
   host process of the same user can read it there, through `/proc/<pid>/environ`. `credential_run.py` declares same-user
-  processes out of scope, and this worker does not change that. Since the network boundary below, the key is also in
-  the environment of srt's node process and of the socat bridge srt starts on the host, for the length of the run:
-  more processes hold it, but the exposure is the same kind (same-user only). srt does nothing with it: with no
-  `credentials` block in its settings, its credential handling is off (`sandbox-config.ts:1142`,
-  `sandbox-manager.ts:447,463,475` at the pin), and with no `tlsTerminate` its proxy only tunnels, so it never sees a
-  request header or body.
+  processes out of scope, and this worker does not change that. The holders are the runner, the inner bwrap and the
+  client. srt's node process, its shells and its socat bridges start before the key exists and never hold it (the
+  chain order under the network boundary, measured). With no `credentials` block in its settings, srt's credential
+  handling is off (`sandbox-config.ts:1142`, `sandbox-manager.ts:447,463,475,1157-1169` at the pin), and with no
+  `tlsTerminate` its proxy only tunnels, so it never sees a request header or body. (The first srt chain, at
+  d784fe0e, injected the key before srt, so node, srt's shell and its bridges held it; the GPT read at d784fe0e
+  found that, and the order was changed.)
 - **R2, shared network: closed by the network boundary below.** Measured before it, on 2026-10-10 at 05:26Z with no
   key: from the shared namespace the open internet, the host's loopback services (port 8788 answered 200), the LAN and
   WSL interfaces and the host's abstract unix sockets were all reachable.
@@ -473,8 +496,13 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
     no longer the head). Each POST is saved as `sending` before it and `posted` after it. A retry of a `sending` or
     `failed` POST first looks on GitHub: the commit's latest `claude-review/local` status, and this attempt's comment,
     found by a hidden marker line (`<!-- claude-review/local <repo>#<n>@<sha> attempt <k> -->`), both by the same gh
-    login. A lost reply or a stopped tick therefore never posts twice. A result stored with `CLAUDE_REVIEW_POST=0`, or
-    whose post failed, is posted by a later tick under the same checks.
+    login. A lost reply or a stopped tick therefore never posts twice. A head move leaves open work in the attempt
+    marker (`comment_marked: false`) until GitHub's side is settled: a comment whose POST may have reached GitHub is
+    looked up by its marker even though its head moved, and a comment that exists gets the superseded line, retried on
+    later ticks until the PATCH is confirmed (`true`); `none` means GitHub holds no comment of that review. Each tick
+    finds open posting work from the stored attempt markers, not from the listed heads, since a moved head is no
+    longer listed. A result stored with `CLAUDE_REVIEW_POST=0`, or whose post failed, is posted by a later tick under
+    the same checks.
 15. The comment is sent only when the configuration and the API both say private.
     - Its only model text is the finding lines, shown inside one fenced code block. Every backtick in them becomes
       U+02CB (`ˋ`), so no run of backticks can close the fence. No image, link, raw HTML or `#N` reference in a finding
@@ -524,7 +552,7 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 
 ## Evidence class
 
-- The 80 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
+- The 85 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
   drives the real `credential_run.py` and bubblewrap with a fake key in a temporary store. It skips where bubblewrap
   cannot create a user namespace or the host pipes crash dumps, which is the case on GitHub-hosted runners. A second,
   `RealBoundaryChainTest`, adds srt to that chain; it also skips unless `CRW_TEST_SRT` and `CRW_TEST_NODE` name an
@@ -540,21 +568,44 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 
 ## Fixes after the GPT read at 4b8027b8 (2026-10-10)
 
-The GPT read of #953 at 4b8027b8 asked for changes with seven P2 findings. All seven are fixed in forward commits. For
-the first six, each guard has a test that fails on a weakened copy (12 weakened copies, all failing their tests):
+The GPT read of #953 at 4b8027b8 asked for changes with seven P2 findings, all fixed in forward commits:
 
 - **P2-1, a head that moves during publication:** decision 14.
 - **P2-2, a retry that posts twice:** decision 14.
+- **P2-3, no API-host-only network boundary:** the network boundary section (the command center's ruling); R2 is
+  closed.
 - **P2-4, a stream with no readable record:** class 7 and decision 9.
 - **P2-5, a close with no open debit:** run step 10 and decision 13.
 - **P2-6, L7 to L9 passing with their calls removed:** the Probes section.
 - **P2-7, the routing row quoted verbatim:** replaced by an attributed paraphrase.
 
-- **P2-3, no API-host-only network boundary:** the network boundary section (the command center's ruling); R2 is
-  closed and R1 records the wider set of processes holding the key.
+## Fixes after the GPT read at d784fe0e (2026-10-10)
 
-All of these rest on unit tests, the offline probes and the keyless boundary check; the one paid run for them is the
-live probe run through srt above ($0.6252).
+The GPT read of #953 at d784fe0e asked for changes with four P2 findings, fixed in one forward commit:
+
+- **Supersession was not durable.** An accepted comment whose reply was lost, followed by a head move, ended
+  `superseded` with no PATCH, and a failed superseding PATCH was never retried. The marker lookup and the PATCH are
+  now open work kept in the attempt marker until settled, found from the stored attempts on every tick (decision 14).
+- **The key reached srt's node process, shells and bridges.** srt now starts without the key and the runner runs
+  inside it (the chain under the network boundary; R1).
+- **The records correction had no regression test.** `RecordRuleTest` fails when a quotation of eight or more words,
+  straight, curly or block-quoted, comes back into the sections that carry the owner's or the command center's
+  direction, using synthetic text. Put back in a scratch copy, the 4b8027b8 form of the section fails it (script
+  `readers/crw-mutants-20261010/prior_record_check.py`); the current form passes.
+- **The ledger reference was not pinned.** It is now pinned by content, with line locators and a read-only copy, and
+  the worker was run against it (run step 10). A close of another workload's debit is now refused as well.
+
+**How the guards are tested.** The code guards of both rounds each have a test that fails on a weakened copy: 25
+weakened copies, all failing their named tests (script `readers/crw-mutants-20261010/mutants3.py`, run in a scratch
+copy of the tool and its tests). They cover the code fixes only. The records rule is covered by `RecordRuleTest` and
+the prior-form check above. The key order is covered by `RealBoundaryChainTest`, shown failing with the runner outside
+srt. The ledger reference is covered by the compatibility run, which is a measurement against the pinned file, not a
+unit test.
+
+These fixes rest on unit tests, the offline probes, the keyless boundary check and the native srt chain test. The
+network boundary has paid live probe runs through srt: $0.6252 at d784fe0e, and $0.7766 through the reordered
+chain (receipt `readers/crw-probes/probes/20261010T095638Z`, 20 of 20 PASS, `native_proven`; the probe review streamed
+for 261 s).
 
 ## SOTA sources
 

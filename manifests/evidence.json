@@ -18392,8 +18392,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
-      "sha256": "1db72df180c3ae7d472bf9d305ca8b9f9d9889424be132303aae9f2675973ca6",
-      "bytes": 49890
+      "sha256": "8e2353cf94fe9b0948b87195b4c0b420913be657ad7d358295e4fd21ea7a4ff1",
+      "bytes": 54627
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -59832,8 +59832,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "4580f7cad0222d4c84177894bafa495c3c7a305ae44704425d900deb27222f94",
-      "bytes": 109470
+      "sha256": "cfe815938518baeef0809c739cd6011a1f61ae7bddf68a1613e68b160f0fd6c0",
+      "bytes": 117151
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -60917,8 +60917,8 @@
     },
     {
       "path": "tools/claude-review-worker/README.md",
-      "sha256": "e52950f90f34b0720fcc41071798f6729d406ff3b9dc1e1defd1430b4ac4d838",
-      "bytes": 13530
+      "sha256": "c8105133c32b688a96dbe196434478597277df9c2ed06bc282feafff23bf9371",
+      "bytes": 13648
     },
     {
       "path": "tools/claude-review-worker/essential-paths.json",
@@ -60942,8 +60942,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "4ea8ba361bc6c7cecdabbe175f076fa6ba01c031c47d83fa1b043949db2ba151",
-      "bytes": 117253
+      "sha256": "018d365165a74bc168f17ade3820e884828bd57944362bc3c07f693499231832",
+      "bytes": 120285
     },
     {
       "path": "tools/credentials/canary_lane_consumer.sh",

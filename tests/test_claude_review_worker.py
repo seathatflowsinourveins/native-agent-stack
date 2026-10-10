@@ -14,10 +14,13 @@ import io
 import json
 import os
 import pwd
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import unittest
 from pathlib import Path
 
@@ -508,6 +511,12 @@ class LedgerTest(unittest.TestCase):
                 with self.assertRaises(crw.LedgerError):
                     close()
             self.assertFalse(ledger.settle_unknown("CRW:1", "skip", {}, now, if_open=True))
+            ledger.append({"kind": "debit", "ts": "2026-10-09T12:00:00Z", "key": "anthropic-api-4", "workload": "J8",
+                           "ref": "J8:other", "max_usd": 28.0})  # another workload's open debit
+            with self.assertRaises(crw.LedgerError):
+                ledger.settle("J8:other", 1.0, {}, now)
+            self.assertEqual(len(ledger.rows()), 3)
+            ledger.path.write_text("".join(json.dumps(r) + "\n" for r in ledger.rows()[:2]))
             self.assertEqual(len(ledger.rows()), 2)
             self.assertEqual(crw.Ledger.spend_on(ledger.rows(), "2026-10-09"), 3.2)
 
@@ -692,6 +701,54 @@ class ReviewRunTest(unittest.TestCase):
         h.worker([repo], post=True).tick()
         self.assertEqual(h.posts(), [])
         self.assertEqual(self.post_states(h, repo, sha)["status"], "superseded")
+
+    def test_a_comment_whose_reply_was_lost_then_whose_head_moved_is_found_and_marked_superseded(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.fixtures["accept_then_fail"] = ["repos/o/priv/issues/3/comments"]
+        h.queue([run_of(REPORT)])
+        h.worker([repo], post=True).tick()
+        self.assertEqual(self.post_states(h, repo, sha)["comment"], "failed")  # GitHub took it; the reply was lost
+        h.fixtures.update(accept_then_fail=[], heads={"o/priv#3": [self.MOVED]})
+        h.pulls("o/priv", [])  # the moved head is what the listing shows now, not the reviewed one
+        h.worker([repo], post=True).tick()
+        comments = h.remote()["comments"]["o/priv#3"]
+        self.assertEqual(len(comments), 1)
+        self.assertTrue(comments[0]["body"].startswith("**Superseded:**"))
+        post = self.post_states(h, repo, sha)
+        self.assertEqual((post["comment"], post["comment_id"], post["superseded"]["comment_marked"]),
+                         ("posted", comments[0]["id"], True))
+        self.assertEqual([p["path"] for p in h.posts()].count("repos/o/priv/issues/3/comments"), 1)
+
+    def test_a_superseding_patch_that_failed_is_retried_on_a_later_tick(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.fixtures.update(heads={"o/priv#3": [sha, sha, self.MOVED]}, fail=["repos/o/priv/issues/comments/2"])
+        h.queue([run_of(REPORT)])
+        h.worker([repo], post=True).tick()
+        self.assertIs(self.post_states(h, repo, sha)["superseded"]["comment_marked"], False)
+        h.fixtures["fail"] = []
+        h.pulls("o/priv", [])
+        h.worker([repo], post=True).tick()
+        patches = [c for c in h.gh_calls() if c["method"] == "PATCH"]
+        self.assertEqual(len(patches), 2)
+        self.assertTrue(h.remote()["comments"]["o/priv#3"][0]["body"].startswith("**Superseded:**"))
+        self.assertIs(self.post_states(h, repo, sha)["superseded"]["comment_marked"], True)
+        h.worker([repo], post=True).tick()
+        self.assertEqual(len([c for c in h.gh_calls() if c["method"] == "PATCH"]), 2)  # settled: no more PATCH
+
+    def test_a_comment_that_never_reached_github_is_closed_when_its_head_moves(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.fixtures["fail"] = ["repos/o/priv/issues/3/comments"]
+        h.queue([run_of(REPORT)])
+        h.worker([repo], post=True).tick()
+        h.fixtures.update(fail=[], heads={"o/priv#3": [self.MOVED]})
+        h.pulls("o/priv", [])
+        h.worker([repo], post=True).tick()
+        post = self.post_states(h, repo, sha)
+        self.assertEqual((post["comment"], post["superseded"]["comment_marked"]), ("superseded", "none"))
+        self.assertNotIn("o/priv#3", h.remote()["comments"])
 
     def test_a_comment_whose_reply_was_lost_is_found_not_posted_again(self):
         h = Harness(self)
@@ -1181,6 +1238,49 @@ class SanitizerTest(unittest.TestCase):
 # --------------------------------------------------------------------------- the invocation and the sandbox
 
 
+RECORD = TOOL.parents[1] / "docs" / "decisions" / "2026-10-09-claude-review-worker.md"
+# The sections of the record that carry the owner's or the command center's direction. The records rule: that direction
+# is paraphrased, dated and attributed, never quoted. Upstream documentation may be quoted elsewhere in the record.
+DIRECTION_SECTIONS = ("## Upstream alignment in every trading review", "## Command center decisions on #953")
+QUOTED = re.compile(r'"([^"\n]+)"|\u201c([^\u201d\n]+)\u201d|^>\s*(.+)$', re.MULTILINE)
+
+
+def record_section(text: str, heading: str) -> str:
+    start = text.index(heading)
+    following = text.find("\n## ", start + len(heading))
+    return text[start:following if following != -1 else len(text)]
+
+
+def quoted_directions(section: str, words: int = 8) -> list:
+    """Quoted or block-quoted spans of at least `words` words: a restored quotation, not a short term or API string."""
+    spans = [next(g for g in match.groups() if g) for match in QUOTED.finditer(section)]
+    return [span for span in spans if len(span.split()) >= words]
+
+
+class RecordRuleTest(unittest.TestCase):
+    def test_the_direction_sections_paraphrase_and_quote_no_direction(self):
+        text = RECORD.read_text(encoding="utf-8")
+        for heading in DIRECTION_SECTIONS:
+            with self.subTest(section=heading):
+                self.assertEqual(quoted_directions(record_section(text, heading)), [])
+        upstream = record_section(text, DIRECTION_SECTIONS[0])
+        self.assertIn("paraphrased here", upstream)
+        self.assertRegex(upstream, r"On 2026-10-10 at 00:15Z the command center")  # dated and attributed
+        self.assertIn("they asked", upstream)
+
+    def test_a_restored_quotation_in_any_form_is_caught(self):
+        # Synthetic direction text: the rule's shape, never anyone's words.
+        direction = "every alpha claim must cite a beta source at a gamma pin and flag each delta"
+        paraphrase = ("## Upstream alignment in every trading review\n\nOn 2026-01-01 at 00:00Z the lead asked "
+                      "that claims cite sources; paraphrased here.\n")
+        self.assertEqual(quoted_directions(paraphrase), [])
+        for restored in (f'row "Example row" (read on the host): "{direction}".',
+                         f"\u201c{direction}\u201d", f"> {direction}"):
+            with self.subTest(form=restored[:12]):
+                self.assertEqual(quoted_directions(paraphrase + restored + "\n"), [direction])
+        self.assertEqual(quoted_directions('the 400 "credit balance is too low" refusal'), [])  # an API string
+
+
 class InvocationTest(unittest.TestCase):
     def test_the_flags_fence_the_run(self):
         flags = crw.claude_flags(crw.SANDBOX_INPUT)
@@ -1265,12 +1365,14 @@ class InvocationTest(unittest.TestCase):
             plan = crw.Plan(None, 1, "a" * 40, Path("/s/main"), Path("/s/input"), base / "config")
             launcher = crw.SandboxLauncher(Path("/c/claude"), "/usr/bin/bwrap", boundary=boundary)
             with boundary.run_dir(plan.config_dir) as net:
-                argv = launcher.command("anthropic-api-4", plan, net)
-                self.assertEqual(argv[2:6], ["-S", str(crw.CREDENTIAL_RUN), "anthropic-api-4", "--"])
-                self.assertEqual(argv[6:15], ["/usr/bin/env", f"HOME={net / 'home'}", f"TMPDIR={net / 't'}",
-                                              f"PATH={base}:/usr/bin:/bin", str(base / "node"), str(boundary.cli),
-                                              "--settings", str(net / "srt.json"), "--"])
-                self.assertEqual(argv[15], "/usr/bin/bwrap")
+                argv = launcher.command("anthropic-api-4", plan, net, "/h")
+                # srt first, started without the key; the runner, which injects it, is srt's command.
+                self.assertEqual(argv[0:9], ["/usr/bin/env", f"HOME={net / 'home'}", f"TMPDIR={net / 't'}",
+                                             f"PATH={base}:/usr/bin:/bin", str(base / "node"), str(boundary.cli),
+                                             "--settings", str(net / "srt.json"), "--"])
+                self.assertEqual(argv[9:14], ["/usr/bin/env", "-u", "TMPDIR", "HOME=/h", "PATH=/usr/bin:/bin"])
+                self.assertEqual(argv[16:20], ["-S", str(crw.CREDENTIAL_RUN), "anthropic-api-4", "--"])
+                self.assertEqual(argv[20], "/usr/bin/bwrap")
                 # srt's namespace is the network fence; the inner bwrap keeps it, since its own would cut the proxy off.
                 self.assertNotIn("--unshare-net", argv)
                 self.assertNotIn("ANTHROPIC_API_KEY", " ".join(argv))
@@ -1805,6 +1907,7 @@ class RealBoundaryChainTest(unittest.TestCase):
         (store / "anthropic-api-3.env").chmod(0o600)
         stand_in = h.base / "stand-in-claude"
         stand_in.write_text(STAND_IN.replace("REAL_HOME", str(Path.home())).replace(
+            "prompt = sys.stdin.read()", "prompt = sys.stdin.read()\nimport time; time.sleep(4)").replace(
             '"switch": os.environ.get("CLAUDE_CODE_DISABLE_CLAUDE_MDS")}',
             '"switch": os.environ.get("CLAUDE_CODE_DISABLE_CLAUDE_MDS"), "proxy": bool(os.environ.get("HTTPS_PROXY")),'
             ' "interfaces": sorted(l.split(":")[0].strip() for l in open("/proc/net/dev").read().splitlines()[2:])}'))
@@ -1821,7 +1924,32 @@ class RealBoundaryChainTest(unittest.TestCase):
         candidate = worker.list_heads()[0]
         plan = worker.prepare(candidate)
         report_dir = h.state / "chain"
+        holders, keyless, done = {}, {}, threading.Event()
+
+        def scan():  # every process of this user whose environment holds the planted key, while the run lasts
+            while not done.is_set():
+                for proc in Path("/proc").iterdir():
+                    try:
+                        environ = (proc / "environ").read_bytes()
+                        comm = (proc / "comm").read_text().strip()
+                        cmdline = (proc / "cmdline").read_bytes()
+                    except OSError:
+                        continue
+                    (holders if planted.encode() in environ else keyless)[proc.name] = (comm, cmdline)
+                time.sleep(0.2)
+
+        watcher = threading.Thread(target=scan, daemon=True)
+        watcher.start()
         worker.run_keys(candidate, plan, "Review it.", report_dir, "crw-test", {})
+        done.set()
+        watcher.join(timeout=5)
+        cli = str(boundary.cli).encode()
+        srt_side = lambda comm, cmdline: comm in ("sh", "bash", "dash", "node", "MainThread", "socat") or cli in cmdline  # noqa: E731
+        self.assertTrue(any(comm == "claude" for comm, _ in holders.values()), holders)  # the client has it
+        self.assertEqual([comm for comm, cmdline in holders.values() if srt_side(comm, cmdline)], [])  # srt has not
+        srt = [pid for pid, (comm, cmdline) in keyless.items() if cli in cmdline]
+        self.assertTrue(srt)  # srt's node process ran, without the key
+        self.assertTrue(any(comm == "socat" for comm, _ in keyless.values()))  # and its bridges, without it
         raw = (report_dir / "stream-1.jsonl").read_text()
         self.assertNotIn(planted, raw)
         self.assertIn("[REDACTED:ANTHROPIC_API_KEY]", raw)
