@@ -85,7 +85,7 @@ class ScaffoldContentTests(unittest.TestCase):
         scaffold = (SCAFFOLD / "AGENTS.md").read_text(encoding="utf-8")
         block = top_rule_block(CODEX_AGENTS_TEMPLATE.read_text(encoding="utf-8"))
         for old, new in (("Research convergence first", "Research first"),
-                         ("record the correction.\n", "record the correction. \n")):
+                         ("measure first-hand.\n", "measure first-hand. \n")):
             with self.subTest(drift=new):
                 self.assertEqual(scaffold.count(old), 1)
                 self.assertNotEqual(top_rule_block(scaffold.replace(old, new)), block)
