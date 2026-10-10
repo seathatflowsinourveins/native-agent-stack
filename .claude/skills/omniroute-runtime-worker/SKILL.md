@@ -7,10 +7,8 @@ Read `examples/omniroute-codex-sdk/README.md` for invocation and lifecycle detai
 Use this project's `examples/omniroute-codex-sdk/worker.py` through Claude's native
 Bash tool. The primary route is `cx/gpt-6.1-sol-max`, with native Max effort.
 The coordinator retains its native Claude account and model route.
-Two shell startup failures occurred in the builder's nested Codex sandbox;
-the coordinator's separate non-nested read-only shell run succeeded with exit 0
-and output `13`. The builder's task also retained an MCP `Transport closed`
-failure; writing (`workspace-write`) dispatch is not yet qualified at 0.160.0.
+Writing (`workspace-write`) dispatch is not yet qualified at 0.160.0; the README
+and `docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md` hold the evidence.
 
 Give a writing worker its own worktree, bounded file ownership, an executable
 acceptance condition and the enhanced private Codex home described in
@@ -35,7 +33,8 @@ rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
   --prompt -
 ```
 
-Use the selected gateway's native Responses lane at loopback port 20128. Keep
+Use the selected gateway's native Responses lane at loopback port 21128, the
+worker's default. Keep
 the exact model route in the live catalog; the default Sol/max suffix requires
 an OmniRoute build carrying PR #15167. Requested effort does not establish
 gateway-forwarded effort or backend identity. Keep
