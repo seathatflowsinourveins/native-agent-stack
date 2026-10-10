@@ -1585,13 +1585,15 @@ class ThisCheckoutTests(unittest.TestCase):
         # catches a pathological slowdown on slower runners.
         with tempfile.TemporaryDirectory(dir=short_temp_base()) as temporary:
             state = Path(temporary) / "state"
-            catalog_time = datetime.fromisoformat(
-                json.loads((ROOT / "catalogs/foundation/latest-models.json").read_text())["generated_at"].replace("Z", "+00:00"))
+            home = Path(temporary) / "empty-home"
+            home.mkdir()
+            environment = {**os.environ, "HOME": str(home),
+                           "XDG_STATE_HOME": str(home / "state"), "XDG_CONFIG_HOME": str(home / "config"),
+                           "XDG_DATA_HOME": str(home / "data")}
             started = time.monotonic()
             result = subprocess.run([sys.executable, str(ROOT / "scripts/currency_due.py"), "--dry-run", "--json",
-                                      "--state-dir", str(state), "--now",
-                                      catalog_time.strftime("%Y-%m-%dT%H:%M:%SZ")], capture_output=True, text=True, timeout=600,
-                                    cwd=ROOT, stdin=subprocess.DEVNULL, check=False)
+                                      "--state-dir", str(state)], capture_output=True, text=True, timeout=600,
+                                    cwd=ROOT, stdin=subprocess.DEVNULL, check=False, env=environment)
             elapsed = time.monotonic() - started
             self.assertEqual(result.returncode, 0, result.stderr[-2000:])
             document = json.loads(result.stdout)

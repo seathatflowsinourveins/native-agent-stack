@@ -61,6 +61,15 @@ class ActiveModelCurrencyTests(unittest.TestCase):
         self.assertEqual(self.check()["status"], "current")
         self.assertEqual(self.cli("check")[0], 0)
 
+    def test_committed_catalog_snapshot_still_checks_after_the_old_expiry(self):
+        source = Path(mc.__file__).resolve().parents[1] / mc.MANIFEST
+        self.manifest.write_bytes(source.read_bytes())
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            code = mc.main(["check", "--root", str(self.root), "--now", "2026-10-11T00:00:00Z", "--json"])
+        self.assertEqual(code, 0, stdout.getvalue())
+        self.assertEqual(json.loads(stdout.getvalue())["status"], "current")
+
     def test_stale_active_default_fails_and_reports_only_model_values(self):
         sentinel = "private-fixture-value-must-never-be-printed"
         self.write("config.json", json.dumps({"api_key": sentinel, "model": "gpt-6-sol"}))
@@ -112,6 +121,132 @@ class ActiveModelCurrencyTests(unittest.TestCase):
     def test_python_cli_environment_and_mapping_defaults_are_checked(self):
         self.write("tools/run.py", 'import os\nMODEL = os.getenv("MODEL", "gpt-6-sol")\nparser.add_argument("--model", default="claude-opus-5")\nconfig = {"model": "gpt-6-sol"}\n')
         self.assertEqual(self.check()["stale_count"], 3)
+
+    def test_runtime_worker_argv_model_mutation_is_flagged(self):
+        root = Path(mc.__file__).resolve().parents[1]
+        name = "blueprints/us-equities/research-runtime/run_worker.py"
+        source = (root / name).read_text()
+        original = "'--model', 'claude-opus-5-5'"
+        self.assertIn(original, source)
+        self.write(name, source.replace(original, "'--model', 'claude-opus-5'", 1))
+        code, stdout, stderr = self.cli("check")
+        self.assertEqual((code, stderr), (1, ""))
+        self.assertTrue(any(item["model"] == "claude-opus-5" for item in json.loads(stdout)["findings"]))
+
+    def test_install_plan_json_command_model_mutation_is_flagged(self):
+        root = Path(mc.__file__).resolve().parents[1]
+        name = "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json"
+        document = json.loads((root / name).read_text())
+        def mutate(value):
+            if isinstance(value, dict):
+                for key, child in value.items():
+                    if key == "command" and isinstance(child, str) and "gpt-6.1-sol" in child and "-m " in child:
+                        value[key] = child.replace("gpt-6.1-sol", "gpt-6-sol", 1)
+                        return True
+                    if mutate(child):
+                        return True
+            elif isinstance(value, list):
+                return any(mutate(child) for child in value)
+            return False
+        self.assertTrue(mutate(document), "native install plan no longer contains the reviewed model command")
+        manifest = json.loads((root / mc.MANIFEST).read_text())
+        manifest["generated_at"] = NOW
+        self.manifest.write_text(json.dumps(manifest))
+        self.write(name, json.dumps(document, indent=2))
+        code, stdout, stderr = self.cli("check")
+        self.assertEqual((code, stderr), (1, ""))
+        self.assertTrue(any(item["model"] == "gpt-6-sol" for item in json.loads(stdout)["findings"]))
+
+    def test_new_python_argv_file_is_checked(self):
+        self.write("tools/new-worker.py", 'argv = ["claude", "--model", "claude-opus-5"]\n')
+        code, stdout, stderr = self.cli("check")
+        self.assertEqual((code, stderr), (1, ""))
+        self.assertEqual(json.loads(stdout)["stale_count"], 1)
+
+    def test_frozen_research_comparison_keeps_its_exact_model_commands(self):
+        name = "blueprints/us-equities/research-efficiency/experiment.py"
+        path = self.write(name, 'command = ["claude", "--model", "claude-opus-5"]\n')
+        before = path.read_bytes()
+        self.assertEqual(self.cli("check")[0], 0)
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_non_model_command_description_is_not_a_shell_parse_error(self):
+        self.write("config.json", json.dumps({"model": "gpt-6.1-sol", "command": "Run the owner's acceptance"}))
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_large_non_model_text_does_not_make_model_coverage_unknown(self):
+        self.write("large-source.md", "ordinary reference text\n" * (mc.MAX_BYTES // 10))
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_non_utf8_non_model_file_does_not_make_model_coverage_unknown(self):
+        (self.root / "unrelated.txt.py").write_bytes(b"unrelated binary marker\xff\xfe")
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_oversized_model_candidate_still_reports_a_coverage_gap(self):
+        self.write("oversized-model.py", 'MODEL = "gpt-6-sol"\n' + "# padding\n" * (mc.MAX_BYTES // 5))
+        self.assertEqual(self.cli("check")[0], 2)
+
+    def test_trailing_shell_comment_is_not_a_model_selector(self):
+        self.write("client.toml", 'MODEL = "gpt-6.1-sol" # earlier gpt-6-sol\n')
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_sentence_punctuation_is_not_part_of_the_documented_model(self):
+        self.write("docs/operator.md", "model: gpt-6.1-sol.\n")
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_trailing_javascript_comment_is_not_a_model_selector(self):
+        self.write("client.js", 'const MODEL = "gpt-6.1-sol"; // earlier gpt-6-sol\n')
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_quoted_runtime_model_with_a_period_is_still_invalid(self):
+        self.write("client.json", '{"model":"gpt-6.1-sol."}')
+        self.assertEqual(self.cli("check")[0], 1)
+
+    def test_repeated_json_model_values_have_distinct_source_locations(self):
+        self.write("clients.json", '{"first":{"model":"gpt-6-sol"},"second":{"model":"gpt-6-sol"}}')
+        code, stdout, _ = self.cli("check")
+        self.assertEqual(code, 1)
+        findings = json.loads(stdout)["findings"]
+        self.assertEqual(len(findings), 2)
+        self.assertEqual({item["json_pointer"] for item in findings}, {"/first/model", "/second/model"})
+
+    def test_json_locator_does_not_point_at_an_earlier_historical_value(self):
+        self.write("client.json", '{\n "history":{"model":"gpt-6-sol"},\n "model":"gpt-6-sol"\n}\n')
+        code, stdout, _ = self.cli("check")
+        self.assertEqual(code, 1)
+        finding, = json.loads(stdout)["findings"]
+        self.assertEqual(finding["line"], 3)
+        self.assertEqual(finding["json_pointer"], "/model")
+
+    def test_additional_claude_family_is_visible_in_active_selectors(self):
+        self.write("client.json", '{"model":"claude-mythos-5"}')
+        code, stdout, _ = self.cli("check")
+        self.assertEqual(code, 1)
+        self.assertEqual(json.loads(stdout)["findings"][0]["model"], "claude-mythos-5")
+
+    def test_claude_tool_names_are_not_model_generations(self):
+        self.write("docs/operator.md", "model: gpt-6.1-sol; use claude-agent-sdk-python and claude-collect.\n")
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_shell_line_continuation_does_not_make_the_check_incomplete(self):
+        self.write("launch.sh", 'codex exec --model gpt-6.1-sol \\\n  --sandbox read-only\n')
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_nonselector_prose_in_a_model_file_is_not_shell_syntax(self):
+        self.write("docs/operator.md", 'model: gpt-6.1-sol\nThe owner\'s model: its source is authoritative.\n')
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_adoption_guide_prose_does_not_require_shell_quotation(self):
+        self.write("adoption/bootstrap.md", "model: gpt-6.1-sol, the owner's current source choice.\n")
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_pinned_available_models_allowlist_is_checked(self):
+        self.write("client.json", '{"availableModels":["gpt-6-sol","gpt-6.1-sol"]}')
+        code, stdout, _ = self.cli("check")
+        self.assertEqual(code, 1)
+        finding, = json.loads(stdout)["findings"]
+        self.assertEqual(finding["model"], "gpt-6-sol")
+        self.assertEqual(finding["json_pointer"], "/availableModels/0")
 
     def test_shell_environment_default_and_model_flag_are_checked(self):
         self.write("tools/launch.sh", 'MODEL="gpt-6-sol"\ncodex exec --model gpt-6-sol\n')
@@ -213,6 +348,26 @@ class GenerateLatestModelsTests(unittest.TestCase):
         self.assertFalse(value["limits"]["codex_network_refresh_certified"])
         self.assertFalse(value["limits"]["gateway_created_is_release_date"])
 
+    def test_source_capture_times_are_not_invented_from_the_bundle_label(self):
+        codex = json.loads(self.codex.read_text())
+        codex["fetched_at"] = "2026-10-08T03:00:00Z"
+        self.codex.write_text(json.dumps(codex))
+        gateway = json.loads(self.gateway.read_text())
+        gateway["captured_at"] = "2026-10-09T04:00:00Z"
+        self.gateway.write_text(json.dumps(gateway))
+        value = self.generate()
+        sources = {source["name"]: source for source in value["sources"]}
+        self.assertEqual(sources["codex"]["observed_at"], "2026-10-08T03:00:00Z")
+        self.assertEqual(sources["omniroute"]["observed_at"], "2026-10-09T04:00:00Z")
+        self.assertIsNone(sources["claude"]["observed_at"])
+        self.assertEqual(value["recorded_at"], NOW)
+
+    def test_new_native_claude_family_is_not_silently_dropped(self):
+        data = json.loads(self.claude.read_text())
+        data["data"].append({"id": "claude-mythos-5-1", "lifecycle": "active"})
+        self.claude.write_text(json.dumps(data))
+        self.assertEqual(self.generate()["latest"]["claude-mythos"], "claude-mythos-5-1")
+
     def test_only_observed_native_routing_aliases_enter_manifest(self):
         data = json.loads(self.codex.read_text())
         data["models"].extend([{"slug": "gpt-reserve"}, {"slug": "gpt-reserve"}, {"slug": "codex-auto-review"}, {"slug": "unknown-router"}])
@@ -256,59 +411,78 @@ class CurrencyCollectorIntegrationTests(unittest.TestCase):
         from scripts import currency_due as cd
         fixture=Checkout(self);fixture.state.mkdir();fixture.due_file.write_text("retained-notice")
         fixture.set(cd.ACTIVE_MODELS[0], {"schema_version":1,"status":"unknown","stale_count":0,"findings":[],"errors":["catalog unavailable"]},code=2)
-        code,_,_=fixture.run();self.assertEqual(code,2);self.assertEqual(fixture.due_file.read_text(),"retained-notice")
+        code,stdout,stderr=fixture.run()
+        self.assertEqual((code,stderr),(0,""))
+        self.assertIn("model check incomplete", stdout)
+        self.assertEqual(fixture.due_file.read_text(),"retained-notice")
+
+    def test_unknown_models_do_not_suppress_known_counts_or_the_due_file(self):
+        from tests.test_currency_due import Checkout
+        from scripts import currency_due as cd
+        fixture = Checkout(self)
+        fixture.something_due()
+        fixture.set(cd.ACTIVE_MODELS[0], {"schema_version": 1, "status": "unknown", "stale_count": 0,
+                                        "findings": [], "errors": ["catalog observation expired"]}, code=2)
+        code, _, stderr = fixture.run()
+        self.assertEqual((code, stderr), (0, ""))
+        document = json.loads(fixture.due_file.read_text())
+        self.assertEqual(document["due"]["pins_behind"], 1)
+        self.assertEqual(document["details"][-1]["active_models"], "unknown")
+
+    def test_collector_survives_the_committed_catalogs_old_expiry(self):
+        from tests.test_currency_due import Checkout
+        from scripts import currency_due as cd
+        fixture = Checkout(self)
+        subprocess.run(["git", "init", "-q", str(fixture.root)], check=True, capture_output=True)
+        shutil.copyfile(mc.__file__, fixture.root / cd.ACTIVE_MODELS[0])
+        destination = fixture.root / mc.MANIFEST
+        destination.parent.mkdir(parents=True)
+        destination.write_bytes((Path(mc.__file__).resolve().parents[1] / mc.MANIFEST).read_bytes())
+        home = fixture.root.parent / "empty-home"
+        home.mkdir()
+        with mock.patch.dict(os.environ, {"HOME": str(home)}):
+            code, stdout, stderr = fixture.run("--dry-run", "--json", "--now", "2026-10-11T00:00:00Z")
+        self.assertEqual((code, stderr), (0, ""))
+        self.assertEqual(json.loads(stdout)["details"][-1]["active_models"], "current")
+        self.assertFalse(fixture.due_file.exists())
 
 
-class SessionStartHookTemplateTests(unittest.TestCase):
-    def template(self):
+class CheckoutIsolationTests(unittest.TestCase):
+    def test_checkout_smoke_test_ignores_callers_stale_host_agent(self):
+        from tests import test_currency_due as due_tests
+        fixture = due_tests.Checkout(self)
+        subprocess.run(["git", "init", "-q", str(fixture.root)], check=True, capture_output=True)
+        shutil.copyfile(mc.__file__, fixture.root / due_tests.cd.ACTIVE_MODELS[0])
+        manifest = fixture.root / mc.MANIFEST
+        manifest.parent.mkdir(parents=True)
+        manifest.write_text(json.dumps(catalog()))
+        home = fixture.root.parent / "caller-home"
+        agent = home / ".codex/agents/active.md"
+        agent.parent.mkdir(parents=True)
+        agent.write_text('model: gpt-6-sol\n')
+        result = unittest.TestResult()
+        case = due_tests.ThisCheckoutTests("test_the_real_checks_run_dry_and_write_nothing")
+        with mock.patch.object(due_tests, "ROOT", fixture.root), mock.patch.dict(os.environ, {"HOME": str(home)}):
+            case.run(result)
+        self.assertTrue(result.wasSuccessful(), result.failures + result.errors)
+
+
+class StartupPolicyTests(unittest.TestCase):
+    def test_full_model_audit_hook_and_user_patch_are_withdrawn(self):
         root = Path(mc.__file__).resolve().parents[1]
-        return json.loads((root / "adoption/templates/model-currency.hooks.template.json").read_text())
+        for name in ("model-currency.hooks.template.json", "model-currency.user-hooks.patch.json"):
+            with self.subTest(proposal=name):
+                self.assertFalse((root / "adoption/templates" / name).exists())
 
-    def test_cc_patch_appends_template_and_preserves_existing_client_settings(self):
+    def test_session_start_uses_the_precomputed_notice_without_a_model_scan(self):
         root = Path(mc.__file__).resolve().parents[1]
-        patch = json.loads((root / "adoption/templates/model-currency.user-hooks.patch.json").read_text())
-        self.assertEqual({target["path"] for target in patch["targets"]}, {"~/.codex/hooks.json", "~/.claude/settings.json"})
-        group = self.template()["hooks"]["SessionStart"][0]
-        for target in patch["targets"]:
-            with self.subTest(target=target["path"]):
-                before = {"model": "gpt-6.1-sol", "other_setting": [1, 2], "hooks": {
-                    "SessionStart": [{"hooks": [{"type": "command", "command": "existing-start"}]}],
-                    "PreToolUse": [{"hooks": [{"type": "command", "command": "existing-tool"}]}]}}
-                after = copy.deepcopy(before)
-                self.assertEqual(target["format"], "RFC6902")
-                self.assertEqual(target["patch"], [{"op": "add", "path": "/hooks/SessionStart/-", "value": group}])
-                after["hooks"]["SessionStart"].append(copy.deepcopy(group))
-                after["hooks"]["SessionStart"].pop()
-                self.assertEqual(after, before)
-
-    def test_shipped_hook_command_runs_offline_with_native_event_json(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            home = Path(temporary)
-            checkout = home / "code/native-agent-stack"
-            checkout.mkdir(parents=True)
-            subprocess.run(["git", "init", "-q", str(checkout)], check=True, capture_output=True)
-            script = checkout / "scripts/active_model_currency.py"
-            script.parent.mkdir()
-            shutil.copyfile(mc.__file__, script)
-            manifest = checkout / mc.MANIFEST
-            manifest.parent.mkdir(parents=True)
-            value = catalog()
-            value["generated_at"] = datetime.now(timezone.utc).isoformat()
-            for source in value["sources"]:
-                source["observed_at"] = value["generated_at"]
-            manifest.write_text(json.dumps(value))
-            (checkout / "client.toml").write_text('model = "gpt-6-sol"\n')
-            group = self.template()["hooks"]["SessionStart"][0]
-            self.assertEqual(group["matcher"], "startup|resume")
-            handler = group["hooks"][0]
-            self.assertEqual(handler["type"], "command")
-            result = subprocess.run(["bash", "-c", handler["command"]], env={**os.environ, "HOME": str(home)},
-                                    input=json.dumps({"hook_event_name": "SessionStart", "source": "startup"}),
-                                    capture_output=True, text=True, timeout=handler["timeout"])
-            self.assertEqual((result.returncode, result.stderr), (0, ""))
-            notice = json.loads(result.stdout)["hookSpecificOutput"]
-            self.assertEqual(notice["hookEventName"], "SessionStart")
-            self.assertIn("1 stale active selectors", notice["additionalContext"])
+        commands = []
+        for path in (root / "adoption/templates").glob("*.json"):
+            document = json.loads(path.read_text())
+            for group in document.get("hooks", {}).get("SessionStart", []):
+                commands.extend(handler.get("command", "") for handler in group.get("hooks", []))
+        self.assertTrue(any("currency-due-notice.py" in command for command in commands))
+        self.assertFalse(any("active_model_currency.py" in command for command in commands))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Write a one-line currency notice for the next session when a pin, receipt or layer is due.
 
-The daily user timer adoption/templates/systemd/stack-currency.timer runs this. It runs this checkout's own
+The proposed daily user timer adoption/templates/systemd/stack-currency.timer can run this after host adoption.
+It runs this checkout's own
 read-only checks as subprocesses, with the arguments their weekly workflows use, reads the host's own status, and
 aggregates five counts, and a sixth when the upstream-surface watch ran recently:
 
@@ -72,7 +73,8 @@ starts in when the file exists and nothing when it does not (docs/decisions/2026
   python3 scripts/currency_due.py --dry-run --json   # the due-file document; writes and removes nothing
   python3 scripts/currency_due.py --network          # also compare runtime-worker skill pins through gh api
 
-No network call unless --network is given. It exits 0 whether or not anything is due, and 2 on an internal error:
+No network call unless --network is given. It exits 1 for known stale model selectors, 0 for other known counts
+or coverage-only gaps, and 2 on an internal error in the required non-model checks:
 a check that fails, times out or prints something other than its JSON report (a field of the wrong type included),
 an unreadable saturation ledger or a failed write. An error leaves the state directory as it was.
 """
@@ -329,8 +331,12 @@ def collect(root: Path, now_text: str, network: bool, state: Path | None = None)
         except OSError:
             observed_before = True  # an inaccessible state directory cannot prove that the watch never ran
         surface = {"record": read_record(surface_dir / SURFACE_FILE), "observed_before": observed_before}
-    models = parse_report("active_model_currency.py", run_check(
-        root, ACTIVE_MODELS, ["check", "--root", str(root), "--host", "--json", "--now", now_text]))
+    try:
+        models = parse_report("active_model_currency.py", run_check(
+            root, ACTIVE_MODELS, ["check", "--root", str(root), "--host", "--json", "--now", now_text]))
+    except CheckError:
+        models = {"schema_version": 1, "status": "unknown", "stale_count": 0,
+                  "findings": [], "errors": ["active model check could not answer"]}
     return {"receipts": receipts, "layers": layers, "pins": pins, "skills": skills, "sweep_dates": sweep_dates(root),
             "host": host, "surface": surface, "active_models": models}
 
@@ -677,15 +683,17 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     model_count = 0
     model_coverage = {}
     if models is not None:
-        if not isinstance(models, dict) or models.get("status") not in {"current", "stale"}:
-            raise CheckError("active-model catalog or selector check is incomplete")
-        model_count = models.get("stale_count")
-        if (type(model_count) is not int or model_count < 0 or not isinstance(models.get("findings"), list)
-                or len(models["findings"]) != model_count or models.get("errors")
-                or (models["status"] == "current") != (model_count == 0)):
-            raise CheckError("active-model check returned an invalid report")
-        model_coverage = {"active_models": models["status"]}
-        details += [{"kind": "stale_model", **item} for item in models["findings"] if isinstance(item, dict)]
+        valid = (isinstance(models, dict) and models.get("status") in {"current", "stale", "unknown"}
+                 and type(models.get("stale_count")) is int and models["stale_count"] >= 0
+                 and isinstance(models.get("findings"), list) and len(models["findings"]) == models["stale_count"]
+                 and all(isinstance(item, dict) for item in models["findings"])
+                 and isinstance(models.get("errors"), list)
+                 and (models["status"] == "unknown" or not models["errors"]
+                      and (models["status"] == "current") == (models["stale_count"] == 0)))
+        model_coverage = {"active_models": models["status"] if valid else "unknown"}
+        if valid:
+            model_count = models["stale_count"]
+            details += [{"kind": "stale_model", **item} for item in models["findings"]]
 
     details.append({"kind": "coverage", "pins_unchecked": len(unchecked), "due_layers_total": due_total,
                     "sweep_cadence_days": cadence_days, "network": skills is not None,
@@ -701,8 +709,11 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     if due_file is None:  # a direct caller: the default state directory, as main() would resolve it
         due_file, from_xdg = default_state_dir() / DUE_FILE, os.path.isabs(os.environ.get("XDG_STATE_HOME") or "")
     gap = SURFACE_GAPS.get(surface_coverage.get("surface_watch"))
+    gaps = [gap] if gap else []
+    if model_coverage.get("active_models") == "unknown":
+        gaps.append("model check incomplete")
     line = summary_line(due, command, skills_complete is not False, due_file_pointers(due_file, from_xdg),
-                        (gap,) if gap else ())
+                        tuple(gaps))
     return {"generated_at": now_text, "root": str(root), "due": due, "summary_line": line,
             "details_command": command, "details": details}
 
@@ -712,7 +723,8 @@ def gaps_of(document: dict) -> list[str]:
     (SURFACE_GAPS); the coverage entry is always the last detail."""
     coverage = document["details"][-1]
     return ((["the skill check was incomplete"] if coverage.get("skills_complete") is False else [])
-            + ([SURFACE_GAPS[coverage["surface_watch"]]] if coverage.get("surface_watch") in SURFACE_GAPS else []))
+            + ([SURFACE_GAPS[coverage["surface_watch"]]] if coverage.get("surface_watch") in SURFACE_GAPS else [])
+            + (["model check incomplete"] if coverage.get("active_models") == "unknown" else []))
 
 
 def incomplete(document: dict) -> bool:

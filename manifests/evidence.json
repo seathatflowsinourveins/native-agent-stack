@@ -5670,16 +5670,6 @@
       "bytes": 601
     },
     {
-      "path": "adoption/templates/model-currency.hooks.template.json",
-      "sha256": "0daa1afcb47eb4fbebdd4e938e20488a69b00c29f2bffa79d4dc4fc70bcd30ed",
-      "bytes": 765
-    },
-    {
-      "path": "adoption/templates/model-currency.user-hooks.patch.json",
-      "sha256": "77f3db3cb3b2c9c46815aa9832acaf6f3200932c506098234f05f0ec360669c5",
-      "bytes": 1597
-    },
-    {
       "path": "adoption/templates/project.codex.config.template.toml",
       "sha256": "c449bf7f17f650d06e4e5a1e00a438c06331c32269dd1326f6c683627303c1ff",
       "bytes": 2953
@@ -5716,8 +5706,8 @@
     },
     {
       "path": "adoption/templates/systemd/stack-currency.service",
-      "sha256": "8f18dbeb150cb9eff24994472c8d8b4f5a0c4ff6b8ea23349dda593f7497137f",
-      "bytes": 4862
+      "sha256": "901d237607ab82063f02e63623b3506861cc277d3e3092dfd369d4e58642d270",
+      "bytes": 5183
     },
     {
       "path": "adoption/templates/systemd/token-report-refresh.service",
@@ -17042,8 +17032,8 @@
     },
     {
       "path": "catalogs/foundation/latest-models.json",
-      "sha256": "1d304d048a409e6b53ee682dacf8eadf0d832ce3b6aaddc7e30026a7d2dd01f2",
-      "bytes": 5790
+      "sha256": "3e6f01db4879e27564c07415535ffaa36869d09549daed7729cb362118a3d4f8",
+      "bytes": 6184
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -17617,8 +17607,8 @@
     },
     {
       "path": "docs/active-model-currency.md",
-      "sha256": "5b562ba152713754cbc751c74a280c648c40eb2bc4d68088970709f8d4681213",
-      "bytes": 7375
+      "sha256": "4aa84be021c8026362c2f40a461ee0c668f3bc77844037d494ce4e5f160a6f13",
+      "bytes": 9819
     },
     {
       "path": "docs/automation-upgrade-evidence.json",
@@ -18522,8 +18512,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-active-model-currency.md",
-      "sha256": "da8b2fb781574e1d42cf8a75a51eba072b9d65e78b24e96b53b3365834463fb3",
-      "bytes": 3428
+      "sha256": "06ea73c0241c3211f7c232f1b9f94412496fa9021ea604095c685008ea033327",
+      "bytes": 5253
     },
     {
       "path": "docs/decisions/2026-10-09-anthropic-api-additional-keys.md",
@@ -59517,8 +59507,8 @@
     },
     {
       "path": "scripts/active_model_currency.py",
-      "sha256": "bfb6170fa24063bf968370513c0f0f20c2fa322f64945942fdb71605f07efaf9",
-      "bytes": 24394
+      "sha256": "2131b6a6577a462d0d1906c459e1b8bb2def8ff25bedfc2db912fb7e11fed53d",
+      "bytes": 31373
     },
     {
       "path": "scripts/adoption_status.py",
@@ -59562,8 +59552,8 @@
     },
     {
       "path": "scripts/currency_due.py",
-      "sha256": "38f8d215ea1e95f71124f49f107c9ac9c64df754a290a4a2a2bce1d8cf9de375",
-      "bytes": 56273
+      "sha256": "318d831cc8fa4d69ef19354c736096ee8af2b7abcbbb60f9b9f0a00c5d23ea71",
+      "bytes": 56927
     },
     {
       "path": "scripts/env_freshness.py",
@@ -59937,8 +59927,8 @@
     },
     {
       "path": "tests/test_active_model_currency.py",
-      "sha256": "8f5131f791647fcf6d59d6849af5567b229eb464f5feeadc322544efbc08e2ec",
-      "bytes": 17805
+      "sha256": "346f47b4cbb3503cfd0481322d49bfbd4fddbc6caf19a1e00d8b3b1ce7440d23",
+      "bytes": 27021
     },
     {
       "path": "tests/test_active_recovery_plans.py",
@@ -60342,8 +60332,8 @@
     },
     {
       "path": "tests/test_currency_due.py",
-      "sha256": "f693964e65d9fdbc635a1af82444e8151187632d3541d7bd2c11edf425464611",
-      "bytes": 103801
+      "sha256": "9dfef5586100168146df86aed1c30063e8ba6507bef48f012fe9eea2f71c6a31",
+      "bytes": 103851
     },
     {
       "path": "tests/test_delisting_coverage.py",

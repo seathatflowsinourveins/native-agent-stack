@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -23,13 +24,13 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = "catalogs/foundation/latest-models.json"
 FAMILIES = ("gpt-sol", "gpt-astra", "gpt-luna", "claude-opus", "claude-sonnet", "claude-haiku", "claude-fable")
 GPT = re.compile(r"gpt-(\d+(?:\.\d+)*)-(sol|astra|luna)\Z")
-CLAUDE = re.compile(r"claude-(opus|sonnet|haiku|fable)-(\d+(?:-\d+)?)(?:-(\d{8}))?\Z")
-MODEL = re.compile(r"(?<![\w.-])(?:gpt-[0-9][\w.-]*|gpt-reserve|codex-auto-review|o[134](?:-mini)?|claude-(?:opus|sonnet|haiku|fable)-[\w.-]+|claude-[0-9][\w.-]+)(?:\[1m\])?(?![\w.-])")
+CLAUDE = re.compile(r"claude-([a-z][a-z0-9]*)-(\d+(?:-\d+)?)(?:-(\d{8}))?\Z")
+MODEL = re.compile(r"(?<![\w.-])(?:gpt-[0-9][\w.-]*|gpt-reserve|codex-auto-review|o[134](?:-mini)?|claude-(?:[a-z][a-z0-9]*-)?[0-9][\w.-]*)(?:\[1m\])?(?![\w.-])")
 EFFORT = re.compile(r"-(?:low|medium|high|xhigh|max|ultra)(?:-fast)?\Z")
 CLI_ALIASES = {"opus": "claude-opus", "sonnet": "claude-sonnet", "haiku": "claude-haiku", "fable": "claude-fable", "best": "claude-fable"}
 NATIVE_ROUTING_ALIASES = {"gpt-reserve", "codex-auto-review"}
 SELECTOR = re.compile(r"(?:^|_)(?:model|model_id|model_name|default_model|fallback_model|review_model|agent_model)$", re.I)
-KEY_EXCLUSIONS = {"supported_models", "available_models", "model_catalog_json", "model_pattern", "model_regex"}
+KEY_EXCLUSIONS = {"supported_models", "model_catalog_json", "model_pattern", "model_regex"}
 RECORD_KEYS = {"previous", "history", "historical", "examples", "landscape_check", "newer_candidates", "release_line"}
 RECORD_STATUSES = {"retired", "rejected", "superseded", "historical", "not_selected", "not-selected"}
 FROZEN_EXPERIMENTS = ("blueprints/convergence-practice/gpt6-family-tiering-20260926/", "blueprints/convergence-practice/native-recovery/", "blueprints/convergence-practice/native-worker/", "blueprints/convergence-practice/worker-recovery/")
@@ -37,6 +38,8 @@ RECORD_PARTS = {"tests", "fixtures", "node_modules", "vendor", ".git", ".venv", 
 TEXT_SUFFIXES = {"", ".py", ".js", ".cjs", ".mjs", ".ts", ".sh", ".bash", ".ps1", ".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".env", ".md", ".service"}
 MAX_BYTES = 2_000_000
 MAX_AGE = timedelta(hours=24)
+MODEL_FLAGS = {"--model", "--model-id", "-m"}
+COMMAND_KEYS = {"command", "commands", "argv", "args", "command_line", "exec_start"}
 
 
 class CurrencyError(ValueError):
@@ -63,8 +66,8 @@ def model_identity(identifier: str):
     return None
 
 
-def generate(codex: Path, omniroute: Path, claude: Path, observed_at: str) -> dict:
-    utc(observed_at)
+def generate(codex: Path, omniroute: Path, claude: Path, recorded_at: str) -> dict:
+    utc(recorded_at)
     inputs = {"codex": codex, "omniroute": omniroute, "claude": claude}
     documents = {name: json.loads(path.read_text()) for name, path in inputs.items()}
     native = documents["codex"].get("models")
@@ -85,9 +88,9 @@ def generate(codex: Path, omniroute: Path, claude: Path, observed_at: str) -> di
         identity = model_identity(identifier)
         if identity and identity[0].startswith("claude-") and row.get("lifecycle") == "active":
             candidates.setdefault(identity[0], []).append((identity[1], identifier))
-    if set(candidates) != set(FAMILIES):
+    if not set(FAMILIES) <= set(candidates):
         raise CurrencyError("the native catalogs do not cover all seven hosted families")
-    latest = {family: max(candidates[family])[1] for family in FAMILIES}
+    latest = {family: max(candidates[family])[1] for family in sorted(candidates)}
     aliases = {identifier: identifier for identifier in latest.values()}
     gateway_ids = {row.get("id") for row in gateway if isinstance(row, dict)}
     for identifier in gateway_ids:
@@ -105,9 +108,17 @@ def generate(codex: Path, omniroute: Path, claude: Path, observed_at: str) -> di
     sources = []
     for name, path in inputs.items():
         rows = native if name == "codex" else gateway if name == "omniroute" else anthropic
-        sources.append({"name": name, "observed_at": observed_at, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "rows": len(rows)})
+        document = documents[name]
+        timestamp_key = next((key for key in ("fetched_at", "captured_at", "observed_at") if key in document), None)
+        observed = document[timestamp_key] if timestamp_key else None
+        if observed is not None:
+            utc(observed)
+        sources.append({"name": name, "observed_at": observed,
+                        "timestamp_origin": timestamp_key or "not_attested_in_capture",
+                        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "rows": len(rows)})
     routing_aliases = sorted({row["slug"] for row in native if row.get("slug") in NATIVE_ROUTING_ALIASES})
-    return {"schema_version": 1, "generated_at": datetime.now(timezone.utc).isoformat(), "observed_at": observed_at,
+    return {"schema_version": 1, "catalog_kind": "versioned_snapshot",
+            "generated_at": datetime.now(timezone.utc).isoformat(), "recorded_at": recorded_at,
             "latest": latest, "aliases": dict(sorted(aliases.items())), "native_routing_aliases": routing_aliases,
             "sources": sources, "selection": "maximum stable generation per declared hosted family; native Codex for GPT, Anthropic active lines for Claude; gateway only supplies observed routing/effort aliases",
             "limits": {"codex_network_refresh_certified": False, "gateway_created_is_release_date": False, "inference_or_route_resolution_qualified": False},
@@ -118,13 +129,16 @@ def load_manifest(path: Path, now: datetime) -> dict:
     try:
         data = json.loads(path.read_text())
         if (not isinstance(data, dict) or data.get("schema_version") != 1
-                or not isinstance(data.get("latest"), dict) or set(data["latest"]) != set(FAMILIES)):
+                or not isinstance(data.get("latest"), dict) or not set(FAMILIES) <= set(data["latest"])):
             raise CurrencyError("latest-models manifest has an unsupported shape")
         if any(not isinstance(identifier, str) or not model_identity(identifier)
                or model_identity(identifier)[0] != family for family, identifier in data["latest"].items()):
             raise CurrencyError("latest-models manifest has an invalid family identity")
         age = now - utc(data["generated_at"])
-        if age > MAX_AGE or age < -timedelta(minutes=5):
+        snapshot = data.get("catalog_kind") == "versioned_snapshot"
+        if data.get("catalog_kind") not in {None, "versioned_snapshot", "live_observation"}:
+            raise CurrencyError("latest-models manifest has an unsupported catalog kind")
+        if (not snapshot and age > MAX_AGE) or age < -timedelta(minutes=5):
             raise CurrencyError("latest-models manifest needs a fresh native catalog observation")
         if (not isinstance(data.get("sources"), list) or len(data["sources"]) != 3
                 or not all(isinstance(row, dict) for row in data["sources"])
@@ -134,8 +148,10 @@ def load_manifest(path: Path, now: datetime) -> dict:
             if (type(row.get("rows")) is not int or row["rows"] <= 0
                     or not re.fullmatch(r"[a-f0-9]{64}", row.get("sha256", ""))):
                 raise CurrencyError("latest-models source observation is invalid")
+            if snapshot and row.get("observed_at") is None:
+                continue
             source_age = now - utc(row["observed_at"])
-            if source_age > MAX_AGE or source_age < -timedelta(minutes=5):
+            if (not snapshot and source_age > MAX_AGE) or source_age < -timedelta(minutes=5):
                 raise CurrencyError("latest-models source observation needs refreshing")
         if not isinstance(data["aliases"], dict) or any(v not in data["latest"].values() for v in data["aliases"].values()):
             raise CurrencyError("latest-model alias target is not a current family")
@@ -166,6 +182,12 @@ def exempt(path: str) -> str | None:
         return "frozen completed experiment and exact replay source"
     if path in {"blueprints/us-equities/convergence-review/README.md", "blueprints/us-equities/research-efficiency/README.md"}:
         return "dated review invocation or frozen comparison documentation"
+    if path in {"blueprints/us-equities/research-efficiency/experiment.py",
+                "blueprints/us-equities/research-efficiency/run_codex.py",
+                "blueprints/us-equities/research-efficiency/review.py",
+                "blueprints/us-equities/research-efficiency/plan.json",
+                "blueprints/us-equities/research-efficiency/native-receipt.json"}:
+        return "completed frozen research comparison and exact replay source; README documents its fixed commands"
     if re.match(r"test[-_].*\.(?:py|js|mjs|cjs|ts)$", Path(path).name):
         return "test source"
     if path.startswith("evidence/"):
@@ -197,14 +219,37 @@ def selector_key(value: str) -> bool:
     key = re.sub(r"(?<=[a-z])(?=[A-Z])", "_", value).lower().replace("-", "_")
     if key in KEY_EXCLUSIONS or any(word in key for word in ("secret", "password", "token", "api_key")):
         return False
-    return bool(SELECTOR.search(key) or key in {"model", "modelid", "modelname", "fallback_models"})
+    return bool(SELECTOR.search(key) or key in {"model", "modelid", "modelname", "fallback_models", "available_models"})
 
 
-def identifiers(value: str, allow_cli_alias: bool = False):
-    found = [match.group(0) for match in MODEL.finditer(value)]
+def identifiers(value: str, allow_cli_alias: bool = False, sentence: bool = False):
+    found = [match.group(0).rstrip(".") if sentence else match.group(0) for match in MODEL.finditer(value)]
     if not found and allow_cli_alias and value in CLI_ALIASES:
         found = [value]
     return found
+
+
+def command_identifiers(value: str | list[str], locate: bool = False):
+    """Read literal model arguments with the installed standard shell lexer."""
+    text = value if isinstance(value, str) else shlex.join(value)
+    if not re.search(r"(?:--model(?:-id)?|-m)(?:[=\s\"',])", text):
+        return []
+    if not MODEL.search(text) and not any(re.search(r"\b" + alias + r"\b", text) for alias in CLI_ALIASES):
+        return []
+    try:
+        tokens = shlex.split(value, comments=True) if isinstance(value, str) else value
+    except ValueError:
+        raise CurrencyError("active command string could not be parsed") from None
+    result = []
+    for index, token in enumerate(tokens):
+        flag = token.rstrip(",")
+        if flag in MODEL_FLAGS and index + 1 < len(tokens):
+            ids = identifiers(tokens[index + 1], "claude" in tokens)
+            result.extend((index + 1, item) if locate else item for item in ids)
+        elif any(flag.startswith(option + "=") for option in MODEL_FLAGS):
+            ids = identifiers(flag.split("=", 1)[1], "claude" in tokens)
+            result.extend((index, item) if locate else item for item in ids)
+    return result
 
 
 def selectors(text: str, path: Path):
@@ -222,7 +267,33 @@ def selectors(text: str, path: Path):
                 and re.search(r"(?:_at|date|time)(?:_utc)?$", key)
                 for key, value in document.items()):
             return []
-        def walk(value):
+        # json.loads supplies the grammar and decoded values. Retain the lexical
+        # string positions in that same traversal order, including skipped records.
+        tokens = iter((json.loads(match.group()), match.start())
+                      for match in re.finditer(r'"(?:[^"\\]|\\.)*"', text))
+        positions = {}
+        def string_position(expected):
+            token = next(tokens, None)
+            if token is None or token[0] != expected:
+                raise CurrencyError("active JSON source locations are ambiguous")
+            return token[1]
+        def locate(value, pointer=()):
+            if isinstance(value, dict):
+                for key, child in value.items():
+                    string_position(key)
+                    locate(child, (*pointer, key))
+            elif isinstance(value, list):
+                for index, child in enumerate(value):
+                    locate(child, (*pointer, index))
+            elif isinstance(value, str):
+                positions[pointer] = string_position(value)
+        locate(document)
+        if next(tokens, None) is not None:
+            raise CurrencyError("active JSON source locations are ambiguous")
+        def emit(pointer, identifier):
+            location = "".join("/" + str(key).replace("~", "~0").replace("/", "~1") for key in pointer)
+            results.append((text.count("\n", 0, positions[pointer]) + 1, identifier, location))
+        def walk(value, pointer=(), command=False):
             if isinstance(value, dict):
                 if measurement(value):
                     return
@@ -232,16 +303,24 @@ def selectors(text: str, path: Path):
                     if key in RECORD_KEYS:
                         continue
                     if selector_key(key) and isinstance(child, (str, list)):
-                        for item in child if isinstance(child, list) else [child]:
+                        for index, item in enumerate(child if isinstance(child, list) else [child]):
                             if isinstance(item, str):
                                 for identifier in identifiers(item, cli):
-                                    position = text.find(json.dumps(item))
-                                    results.append((text.count("\n", 0, max(0, position)) + 1, identifier))
+                                    emit((*pointer, key, index) if isinstance(child, list) else (*pointer, key), identifier)
+                    elif key in COMMAND_KEYS and isinstance(child, (str, list)):
+                        walk(child, (*pointer, key), True)
                     elif isinstance(child, (dict, list)):
-                        walk(child)
+                        walk(child, (*pointer, key), command)
             elif isinstance(value, list):
-                for child in value:
-                    walk(child)
+                if all(isinstance(child, str) for child in value) and (command or any(child in MODEL_FLAGS for child in value)):
+                    for index, identifier in command_identifiers(value, locate=True):
+                        emit((*pointer, index), identifier)
+                    return
+                for index, child in enumerate(value):
+                    walk(child, (*pointer, index), command)
+            elif command and isinstance(value, str):
+                for identifier in command_identifiers(value):
+                    emit(pointer, identifier)
         walk(document)
         return sorted(set(results))
     if path.suffix == ".py":
@@ -253,7 +332,11 @@ def selectors(text: str, path: Path):
             return [n for n in ast.walk(node) if isinstance(n, ast.Constant) and isinstance(n.value, str)]
         for node in ast.walk(tree):
             values = []
-            if isinstance(node, (ast.Assign, ast.AnnAssign)):
+            if isinstance(node, (ast.List, ast.Tuple)):
+                for index, item in enumerate(node.elts[:-1]):
+                    if isinstance(item, ast.Constant) and item.value in MODEL_FLAGS:
+                        values.extend(strings(node.elts[index + 1]))
+            elif isinstance(node, (ast.Assign, ast.AnnAssign)):
                 targets = node.targets if isinstance(node, ast.Assign) else [node.target]
                 regex_value = isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute) and node.value.func.attr == "compile"
                 if any(selector_key(ast.unparse(target)) for target in targets) and node.value and not regex_value:
@@ -276,7 +359,8 @@ def selectors(text: str, path: Path):
                 for identifier in identifiers(value.value, cli):
                     results.append((value.lineno, identifier))
         return sorted(set(results))
-    prose = path.suffix == ".md" and any(part in {"docs", "blueprints"} for part in path.parts)
+    prose = (path.suffix == ".md" and "agents" not in path.parts
+             and any(part in {"docs", "blueprints", "adoption"} for part in path.parts))
     historical_setup = prose and bool(re.search(r"setup below records.*?earlier.*?historical", text[:1500], re.S | re.I))
     record_section = False
     for number, line in enumerate(text.splitlines(), 1):
@@ -287,11 +371,25 @@ def selectors(text: str, path: Path):
             continue
         if historical_setup or record_section or (prose and re.search(r"source/parser checked|failed attempt|recorded provider probe", line, re.I)):
             continue
+        if not MODEL.search(line) and not (cli and any(re.search(r"\b" + alias + r"\b", line) for alias in CLI_ALIASES)):
+            continue
         # Model fields/frontmatter, environment defaults and native CLI arguments.
         field = re.search(r"(?:^|[\s{,])([\w.-]*model(?:_id|_name)?)[\s\"']*[:=]", line, re.I)
         argument = re.search(r"(?:--model(?:-id)?(?:[=\s])|\b(?:codex|claude)\b.*\s-m\s)", line)
         if field and selector_key(field[1]) or argument:
-            for identifier in identifiers(line, cli):
+            try:
+                logical = line.rstrip()
+                if logical.endswith("\\"):
+                    logical = logical[:-1]
+                tokens = shlex.split(logical, comments=True)
+            except ValueError:
+                if prose:
+                    tokens = [line.split("#", 1)[0]]
+                else:
+                    raise CurrencyError("active selector line could not be parsed") from None
+            if path.suffix in {".js", ".cjs", ".mjs", ".ts"}:
+                tokens = tokens[:next((index for index, token in enumerate(tokens) if token.startswith("//")), len(tokens))]
+            for identifier in identifiers(shlex.join(tokens), cli, sentence=prose):
                 results.append((number, identifier))
     return sorted(set(results))
 
@@ -310,6 +408,23 @@ def host_files(home: Path):
                home / ".local/state/native-agent-stack/coordination/ns2604-coop/tools",
                home / ".local/state/native-agent-stack/coordination/api-actions-20261008"]
     return singles + [p for folder in folders if folder.is_dir() for p in folder.iterdir() if p.is_file()]
+
+
+def model_candidate(path: Path) -> bool:
+    """Stream a value-free candidate test before size/UTF-8 validation.
+
+    Keep an overlap for tokens spanning read boundaries; unrelated large or
+    non-UTF-8 files do not make the model report incomplete.
+    """
+    overlap = b""
+    with path.open("rb") as stream:
+        while chunk := stream.read(65536):
+            text = (overlap + chunk).decode("utf-8", errors="ignore")
+            if MODEL.search(text) or ("model" in text.lower() and any(
+                    re.search(r"\b" + alias + r"\b", text) for alias in CLI_ALIASES)):
+                return True
+            overlap = chunk[-512:]
+    return False
 
 
 def check(manifest: dict, roots: list[Path], host: bool = False) -> dict:
@@ -337,6 +452,8 @@ def check(manifest: dict, roots: list[Path], host: bool = False) -> dict:
                 prefix = stream.read(512)
             if b"\0" in prefix:
                 continue
+            if not model_candidate(path):
+                continue
             if path.stat().st_size > MAX_BYTES:
                 errors.append(display + ": active text exceeds the check bound"); continue
             raw = path.read_bytes()
@@ -346,7 +463,7 @@ def check(manifest: dict, roots: list[Path], host: bool = False) -> dict:
             selected = selectors(text, path)
         except (OSError, UnicodeError, CurrencyError):
             errors.append(display + ": active selector source could not be checked"); continue
-        for number, identifier in selected:
+        for number, identifier, *locator in selected:
             if identifier in manifest.get("native_routing_aliases", []):
                 continue
             target = manifest["aliases"].get(identifier)
@@ -355,7 +472,10 @@ def check(manifest: dict, roots: list[Path], host: bool = False) -> dict:
             if target is None:
                 family = model_identity(EFFORT.sub("", identifier.removesuffix("[1m]")))
                 expected = manifest["latest"].get(family[0]) if family else None
-                findings.append({"path": display, "line": number, "model": identifier, "expected": expected})
+                finding = {"path": display, "line": number, "model": identifier, "expected": expected}
+                if locator:
+                    finding["json_pointer"] = locator[0]
+                findings.append(finding)
     return {"schema_version": 1, "status": "unknown" if errors else "stale" if findings else "current", "stale_count": len(findings),
             "findings": findings, "errors": errors, "coverage": {"candidate_files": len(set(files)), "record_exemptions": excluded, "host": host}}
 
@@ -366,7 +486,8 @@ def main(argv=None):
     build = sub.add_parser("generate")
     for source in ("codex", "omniroute", "claude"):
         build.add_argument("--" + source, required=True, type=Path)
-    build.add_argument("--observed-at", required=True)
+    build.add_argument("--recorded-at", "--observed-at", dest="recorded_at", required=True,
+                       help="Bundle recording label; never substituted for a source capture timestamp")
     build.add_argument("--output", required=True, type=Path)
     for command in ("check", "notice"):
         run = sub.add_parser(command)
@@ -386,7 +507,7 @@ def main(argv=None):
             return 0
     try:
         if args.command == "generate":
-            document = generate(args.codex, args.omniroute, args.claude, args.observed_at)
+            document = generate(args.codex, args.omniroute, args.claude, args.recorded_at)
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(document, indent=2) + "\n")
             print(json.dumps({"manifest": str(args.output), "sha256": hashlib.sha256(args.output.read_bytes()).hexdigest(), "latest": document["latest"]}))
@@ -398,6 +519,7 @@ def main(argv=None):
         if args.host and trading.is_dir() and trading.resolve() not in {root.resolve() for root in roots}:
             roots.append(trading)
         report = check(manifest, roots, args.host)
+        report["catalog_kind"] = manifest.get("catalog_kind", "live_observation")
     except (CurrencyError, OSError, ValueError, KeyError, TypeError) as error:
         report = {"schema_version": 1, "status": "unknown", "stale_count": 0, "findings": [], "errors": [str(error) if isinstance(error, CurrencyError) else "model currency could not complete"]}
     if args.command == "generate":

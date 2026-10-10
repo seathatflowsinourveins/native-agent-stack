@@ -57,3 +57,32 @@ User-level hook installation belongs to the CC. The PR carries an additive
 RFC 6902 patch and its inverse; the lane has applied neither. Production
 checks use real UTC, fail incomplete after 24 hours without refreshed native
 observations, and make no network call or configuration write themselves.
+
+## Review amendment: retained snapshot and precomputed notice (2026-10-09)
+
+The preceding paragraphs retain the initial proposal and its measurements.
+The coordinator's review repair withdraws the separate SessionStart model
+audit and its unapplied user patch. Startup uses the existing due-file notice;
+the September30 decision's no-startup-audit contract remains authoritative.
+The daily units are templates; native systemd259.5 readback found no installed
+stack-currency.timer. No host unit or user configuration was applied.
+
+The committed catalog is now an explicitly versioned comparison snapshot with
+no24-hour expiry. Unknown/expired live model observations are coverage gaps
+for the collector rather than fatal suppression of the other currency checks.
+The original bundle label and source hashes/counts remain; independently
+unattested source times are null. Generation uses per-source embedded times
+when supplied and never copies a bundle label into all sources.
+
+Red-before-green fixtures reproduce both public CLI paths after the old
+expiry, argv/JSON-command omissions, caller-home dependence, source-time
+invention, unrelated large/non-UTF8 files, comments/punctuation, repeated JSON
+locations, new Claude families and pinned allowlists. The retired append/pop
+test is replaced with actual startup-policy guards. Frozen research comparison
+source and receipts remain unchanged. No model/provider execution is claimed.
+
+Pinned implementation sources are CPython v3.13.16 AST/shlex/JSON/subprocess,
+Codex0.162.0 c1382380 models-manager/cache and manager, the Anthropic models
+API2023-06-01, RFC6901/6902 and systemd v259.5. Exact links and operational
+semantics are in the amended [guide](../active-model-currency.md). The earlier
+24-hour/startup-patch assertions above are superseded by this dated amendment.
