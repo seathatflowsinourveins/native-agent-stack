@@ -20,6 +20,7 @@ import re
 import shlex
 import subprocess
 import sys
+import tempfile
 import time
 import unittest
 from unittest import mock
@@ -1900,10 +1901,13 @@ REVIEW_STORE_PATH_SHAPES = {
 # The literal each STORE_PATHS pattern starts with (and its `:-` or separator forms), by the pattern's index: each is repeated to about
 # 199,000 characters, before a dump and before a harmless command.
 STORE_PATH_LEADS = {
-    0: [".config/native-agent-stack"], 1: ["XDG_CONFIG_HOME:-", "XDG_CONFIG_HOME"], 2: [".claude/.credentials.json"], 3: [".codex", "CODEX_HOME}"],
+    0: [".config/native-agent-stack"], 1: ["XDG_CONFIG_HOME:-", "XDG_CONFIG_HOME"], 2: [".claude/.credentials.json"],
+    3: [".codex", "CODEX_HOME}", "CODEX_HOME:-"],
     4: ["gh/hosts.yml"], 5: ["huggingface", "HF_HOME:-", "HF_HOME"], 6: [".tavily/config.json"], 7: ["ecosystem-grafana.env"],
     8: ["nativestack/generation.key"], 9: ["/proc", "/proc/"], 10: ["gh ", "gh auth "], 11: ["hf ", "hf auth "], 12: ["huggingface-cli "],
     13: ["--show-token"], 14: ["gh auth status ", "gh auth status  -tX"], 15: ["security "], 16: ["secret-tool "],
+    17: ["ai-memory/auth-", "AI_MEMORY_DATA_DIR:-", "AI_MEMORY_DATA_DIR}"], 18: [".config/muse/", "XDG_CONFIG_HOME}/muse/", "XDG_CONFIG_HOME:-/muse"],
+    19: [".codex/.env", "CODEX_HOME}/.env", "CODEX_HOME:-/.env"],
 }
 _LINEAR_CHILD = (
     "import json, sys, time\n"
@@ -2108,6 +2112,159 @@ class SecretPathGuardTests(unittest.TestCase):
         self.assertEqual(rule, "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)")
         self.assertIn(rule, deny)
         self.assertEqual(deny[deny.index(rule) + 1], "Read(**/" + rule[len("Read(~/"):])
+
+    # A2 finding G8-A02 (2026-10-17): the ai-memory bearer files, Muse Code's sign-in and Codex's dotenv file. Synthetic fixtures
+    # only: fake files under a temporary HOME, which the hook never opens (it reads the command text).
+    G8_A02_STORES = {
+        ".local/share/ai-memory/auth-token": "service_secret_path",
+        ".local/share/ai-memory/auth-header": "service_secret_path",
+        ".local/share/ai-memory/auth-tokens/default": "service_secret_path",
+        ".local/share/ai-memory/auth.json": "service_secret_path",
+        ".config/muse/auth.json": "native_store_path",
+        ".codex/.env": "native_store_path",
+    }
+    # Fold 2: the `${NAME:-default}` and override-variable spellings of the same stores (and of Codex's auth.json, whose
+    # ${CODEX_HOME:-$HOME/.codex} form the inventory itself uses), with the reason each gets. Fake defaults only.
+    G8_A02_SPELLINGS = {
+        'cat "${XDG_CONFIG_HOME:-$HOME/.config}/muse/auth.json"': "native_store_path",
+        "cat ${XDG_CONFIG_HOME:-/var/tmp/g8-fake-cfg}/muse/auth.json": "native_store_path",
+        'jq . "$XDG_CONFIG_HOME/muse/auth.json"': "native_store_path",
+        'cat "${CODEX_HOME:-$HOME/.codex}/.env"': "native_store_path",
+        "cp ${CODEX_HOME:-/var/tmp/g8-fake-codex}/.env /var/tmp/g8-copy": "native_store_path",
+        'cat "$CODEX_HOME/.env"': "native_store_path",
+        'cat "${CODEX_HOME:-$HOME/.codex}/auth.json"': "native_store_path",
+        "jq . ${CODEX_HOME:-/var/tmp/g8-fake-codex}/auth.json": "native_store_path",
+        'cat "$AI_MEMORY_DATA_DIR/auth-token"': "service_secret_path",
+        "cat ${AI_MEMORY_DATA_DIR:-/var/tmp/g8-fake-data}/auth-header": "service_secret_path",
+        "python3 -c 'print(open(\"${AI_MEMORY_DATA_DIR:-/var/tmp/g8-fake-data}/auth.json\").read())'": "service_secret_path",
+        'cat "${XDG_DATA_HOME:-$HOME/.local/share}/ai-memory/auth-tokens/default"': "service_secret_path",
+    }
+    # Whole-directory and top-level glob reads of the ai-memory data directory and the Muse Code config directory (the HF_HOME_ROOT
+    # precedent), and the controls that stay allowed: files beside the stores, a listing, and the native backup command.
+    G8_A02_ROOT_READS = (
+        "cp -r ~/.local/share/ai-memory /var/tmp/g8-copy", "grep -r token ~/.local/share/ai-memory/",
+        "cat ~/.local/share/ai-memory/*", 'cp -r "${XDG_DATA_HOME:-$HOME/.local/share}/ai-memory" /var/tmp/g8-copy',
+        'cp -r "$AI_MEMORY_DATA_DIR" /var/tmp/g8-copy', "cp -r ~/.config/muse /var/tmp/g8-copy", "cat ~/.config/muse/*",
+        'grep -r token "${XDG_CONFIG_HOME:-$HOME/.config}/muse"',
+    )
+    G8_A02_ALLOWED = (
+        "cat ~/.codex/config.toml", 'cat "${CODEX_HOME:-$HOME/.codex}/.env.example"', "cat ~/.config/muse/settings.json",
+        "ls -l ~/.local/share/ai-memory", "ai-memory --data-dir ~/.local/share/ai-memory backup --to /var/tmp/g8-backup.tar.gz",
+        "cat ~/.local/share/ai-memory-notes/auth-token-howto.md",
+    )
+
+    def test_g8_a02_store_readers_blocked(self):
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            for relative, reason in self.G8_A02_STORES.items():
+                fake = Path(home) / relative
+                fake.parent.mkdir(parents=True, exist_ok=True)
+                fake.write_text("SYNTHETIC-NOT-A-SECRET\n")
+                for path in (str(fake), "~/" + relative):
+                    for command in (f"cat {path}", f"cp {path} {home}/copy", f"jq . {path}",
+                                    f"python3 -c 'print(open(\"{path}\").read())'"):
+                        with self.subTest(command=command):
+                            result = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                            self.assertEqual(result.returncode, 2, result.stderr)
+                            self.assertIn(f"({reason})", result.stderr)
+
+    def test_g8_a02_default_and_override_spellings_blocked(self):
+        for command, reason in self.G8_A02_SPELLINGS.items():
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), reason)
+                result = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertEqual(result.returncode, 2, result.stderr)
+
+    def test_g8_a02_store_directory_reads_blocked_and_neighbours_allowed(self):
+        for command in self.G8_A02_ROOT_READS:
+            with self.subTest(command=command):
+                self.assertIsNotNone(guard.check(command))
+        backup = [line for line in fenced_lines(ROOT / "blueprints/us-equities/state-recovery/memory/README.md")
+                  if " backup --to " in line]
+        self.assertEqual(len(backup), 1)
+        for command in (*self.G8_A02_ALLOWED, *backup):
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_g8_a02_inventory_rows(self):
+        # The protection-only rows: each store's path template is a native_store the guard refuses to read. ai-memory's rows keep the
+        # default path, which the settings template's hooks pin with --data-dir; its data-directory override (v2.4.1 config.rs:573) is a
+        # directory, so it is an override_variables name (the checker's warning, and key exclusions under its value), never a pointer
+        # variable (which names a store file, docs/secret-storage.md). The guard still refuses a read through it.
+        inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
+        rows = {entry["id"]: entry for entry in inventory["entries"]}
+        data = "$HOME/.local/share/ai-memory"
+        expected = {
+            "ai-memory-auth-token": f"{data}/auth-token",
+            "ai-memory-auth-header": f"{data}/auth-header",
+            "ai-memory-auth-tokens": f"{data}/auth-tokens/default",
+            "ai-memory-provider-auth": f"{data}/auth.json",
+            "muse-native": "$HOME/.config/muse/auth.json",
+            "codex-dotenv": "${CODEX_HOME:-$HOME/.codex}/.env",
+        }
+        for identifier, template in expected.items():
+            with self.subTest(row=identifier):
+                entry = rows[identifier]
+                self.assertEqual(entry["store"], {"kind": "native_store", "path_template": template})
+                self.assertEqual((entry["variables"], entry["optional_variables"], entry["pointer_variables"]), ([], [], []))
+                self.assertEqual(entry.get("override_variables", []),
+                                 ["AI_MEMORY_DATA_DIR"] if identifier.startswith("ai-memory-") else [])
+                self.assertIsNotNone(guard.check(f'cat "{template}"'))
+        self.assertIsNotNone(guard.check(f'cat "{rows["codex-native"]["store"]["path_template"]}"'))
+        self.assertNotIn("AI_MEMORY_DATA_DIR", {name for entry in inventory["entries"] for name in entry["pointer_variables"]})
+        for command in ('cat "$AI_MEMORY_DATA_DIR/config.toml"', "cp -r ${AI_MEMORY_DATA_DIR} /var/tmp/g8-copy"):
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), "credential_file_read")
+
+    def test_g8_a02_ai_memory_hook_commands_pass(self):
+        settings = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))
+        commands = [hook["command"] for groups in settings["hooks"].values() for group in groups
+                    for hook in group.get("hooks", []) if "--data-dir" in hook.get("command", "")]
+        self.assertTrue(any("pre-tool-use" in command for command in commands))
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            for command in commands:
+                expanded = command.replace("${HOME}", home).replace("${AI_MEMORY_BIN}", f"{home}/.local/bin/ai-memory")
+                for text in (command, expanded):
+                    with self.subTest(command=text):
+                        result = run_hook({"tool_name": "Bash", "tool_input": {"command": text}})
+                        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_g8_a02_env_example_sibling_stays_readable(self):
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            example = Path(home) / ".codex/.env.example"
+            example.parent.mkdir(parents=True)
+            example.write_text("EXAMPLE_NAME=\n")
+            for command in (f"cat {example}", "cat ~/.codex/.env.example", f"cp {example} {home}/template.txt"):
+                with self.subTest(command=command):
+                    self.assertEqual(run_hook({"tool_name": "Bash", "tool_input": {"command": command}}).returncode, 0)
+
+    def test_g8_a02_template_denies_the_stores(self):
+        deny = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))[
+            "permissions"]["deny"]
+        for relative in self.G8_A02_DENIED:
+            for rule in (f"Read(~/{relative})", f"Read(**/{relative})", f"Edit(~/{relative})"):
+                with self.subTest(rule=rule):
+                    self.assertIn(rule, deny)
+        # A `!` carve-out reaches only the rules listed before it in the same list (permissions docs). Neither Codex .env rule matches a
+        # .env.example, so the order changes nothing here; the check keeps the template's rule that every .env-family deny sits before both
+        # carve-outs, which test_project_settings_register_hook_and_deny_rules holds for the project's generic .env rules.
+        for rule in ("Read(~/.codex/.env)", "Read(**/.codex/.env)"):
+            for carve_out in ("Read(!.env.example)", "Read(!.env.*.example)"):
+                self.assertLess(deny.index(rule), deny.index(carve_out), (rule, carve_out))
+
+    G8_A02_DENIED = (".local/share/ai-memory/auth-token", ".local/share/ai-memory/auth-header",
+                     ".local/share/ai-memory/auth-tokens/**", ".local/share/ai-memory/auth.json", ".config/muse/auth.json",
+                     ".codex/.env")
+
+    def test_g8_a02_hand_maintained_copies_carry_the_denies(self):
+        # The project settings and the hand-merge block of docs/secret-storage.md ("User-level guards") carry the same rules as the template.
+        project = json.loads((ROOT / ".claude/settings.json").read_text(encoding="utf-8"))["permissions"]["deny"]
+        block = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8").split(
+            "## User-level guards (deployed by the Claude profile)", 1)[1].split("```json", 1)[1].split("```", 1)[0]
+        for relative in self.G8_A02_DENIED:
+            for rule in (f"Read(~/{relative})", f"Read(**/{relative})", f"Edit(~/{relative})"):
+                with self.subTest(rule=rule):
+                    self.assertIn(rule, project)
+                    self.assertIn(f'"{rule}"', block)
 
     def test_documented_keyring_commands_pass(self):
         # The keyring commands in the fenced blocks of the pages that document them.
@@ -2367,9 +2524,11 @@ class SecretPathGuardTests(unittest.TestCase):
 
     def test_inventory_pointer_variables_are_guarded(self):
         # A pointer variable (PAPER_ENV_FILE, or huggingface_hub's own HF_TOKEN_PATH) names a
-        # credential file, so a reader on it is blocked for every inventory entry.
+        # credential file, so a reader on it is blocked for every inventory entry; so is a reader on an override variable (a store
+        # directory, such as AI_MEMORY_DATA_DIR).
         inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text())
-        pointers = {name for entry in inventory["entries"] for name in entry["pointer_variables"]}
+        pointers = {name for entry in inventory["entries"] for name in entry["pointer_variables"] + entry.get("override_variables", [])}
+        self.assertIn("AI_MEMORY_DATA_DIR", pointers)
         self.assertIn("HF_TOKEN_PATH", pointers)
         for name in sorted(pointers):
             with self.subTest(name=name):
@@ -2483,7 +2642,18 @@ class SecretPathGuardTests(unittest.TestCase):
                5: r"(?:huggingface|HF_HOME(?::-[^}\s]*)?)\}?[\"']?/(?:token|stored_tokens)(?![\w-])",
                9: r"/proc/(?:[^/\s]+/)*environ\b",
                14: r"\bgh\s+auth\s+status\b[^;&|\n]*\s-t\b"}
+        # A2 finding G8-A02 (2026-10-17): the four `${NAME:-default}` store patterns written as scans from the start, compared with
+        # their regular expressions the same way.
+        new = {3: r"(?:\.codex|CODEX_HOME(?::-[^}\s]*)?)\}?/auth\.json",
+               17: r"(?:ai-memory|AI_MEMORY_DATA_DIR(?::-[^}\s]*)?)\}?/auth(?:-(?:tokens?|header)(?![\w-])|\.json)",
+               18: r"(?:\.config|XDG_CONFIG_HOME(?::-[^}\s]*)?)\}?/muse/auth\.json",
+               19: r"(?:\.codex|CODEX_HOME(?::-[^}\s]*)?)\}?/\.env(?![\w.-])"}
         fragments = {
+            3: ["CODEX_HOME", ":-", "}", "/auth.json", ".codex", "${", "CODEX_HOME:-", "/", "auth.json", "x"],
+            17: ["AI_MEMORY_DATA_DIR", ":-", "}", "/auth-token", "/auth-tokens", "/auth-header", "/auth.json", "ai-memory",
+                 "AI_MEMORY_DATA_DIR:-", "-", "s", "/"],
+            18: ["XDG_CONFIG_HOME", ":-", "}", "/muse/auth.json", ".config", "/muse", "XDG_CONFIG_HOME:-", "/auth.json", "/"],
+            19: ["CODEX_HOME", ":-", "}", "/.env", ".codex", ".example", "CODEX_HOME:-", ".", "-", "/"],
             1: ["XDG_CONFIG_HOME", ":-", "}", "/native-agent-stack", "/native-agent-stac", "k", "${", "XDG_CONFIG_HOME:-", "/", "native-agent-stack"],
             5: ["HF_HOME", ":-", "}", "/token", "/stored_tokens", "huggingface", "'", '"', "HF_HOME:-", "s", "token", "/"],
             9: ["/proc/", "/proc", "/", "//", "environ", "/environ", "self", "environx", "e", "proc", "1"],
@@ -2494,11 +2664,14 @@ class SecretPathGuardTests(unittest.TestCase):
                 "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/x", "$XDG_CONFIG_HOME/native-agent-stack", "XDG_CONFIG_HOME:-/native-agent-stack",
                 "XDG_CONFIG_HOME:-a}/native-agent-stackx", "${HF_HOME:-~/.cache/huggingface}/token", "\"$HF_HOME\"/token", "HF_HOME:-x\"/stored_tokens",
                 "~/.cache/huggingface/token-x", "gh auth status -t", "gh auth status --hostname h -t", "gh auth status; -t", "gh auth status\n-t",
-                "gh auth status -tx", "gh\nauth\tstatus x -t"]
+                "gh auth status -tx", "gh\nauth\tstatus x -t",
+                "${CODEX_HOME:-$HOME/.codex}/auth.json", "${CODEX_HOME:-/x}/.env", "${CODEX_HOME:-/x}/.env.example", "$CODEX_HOME/.env-x",
+                "${AI_MEMORY_DATA_DIR:-/d}/auth-tokens/default", "${AI_MEMORY_DATA_DIR:-/d}/auth-tokensx", "~/.local/share/ai-memory/auth.json",
+                "${XDG_CONFIG_HOME:-$HOME/.config}/muse/auth.json", "${XDG_CONFIG_HOME:-a b}/muse/auth.json"]
         scans = [index for index, (rule, _reason) in enumerate(guard.STORE_PATHS) if isinstance(rule, guard.LinearScan)]
-        self.assertEqual(scans, sorted(old))
+        self.assertEqual(scans, sorted({**old, **new}))
         rng = random.Random(20260930)
-        for index, source in old.items():
+        for index, source in {**old, **new}.items():
             scan, pattern = guard.STORE_PATHS[index][0], re.compile(source)
             self.assertEqual(scan.pattern, source)
             alphabet = fragments[index] + noise

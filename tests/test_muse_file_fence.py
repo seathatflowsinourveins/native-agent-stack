@@ -130,6 +130,21 @@ print(json.dumps(out))
             Fence(self.work, self.brief, self.logs, self.runtime, self.auth,
                   inputs=[Path.home()/'.config/muse/settings.json'])
 
+    def test_local_share_home_input_refused(self):
+        # A2 finding G8-A02: ~/.local/share holds ai-memory's bearer files. Synthetic files under a temporary HOME only.
+        home = self.root / 'home'
+        store = home / '.local/share/ai-memory/auth-token'
+        store.parent.mkdir(parents=True)
+        store.write_text('SYNTHETIC-NOT-A-SECRET\n')
+        workspace = home / 'workspace/notes.md'
+        workspace.parent.mkdir(parents=True)
+        workspace.write_text('A harmless input.\n')
+        with mock.patch.dict(os.environ, {'HOME': str(home)}):
+            with self.assertRaisesRegex(ValueError, 'protected home input refused'):
+                Fence(self.work, self.brief, self.logs, self.runtime, self.auth, inputs=[store])
+            fence = Fence(self.work, self.brief, self.logs, self.runtime, self.auth, inputs=[workspace])
+        self.assertEqual(fence.inputs, [workspace])
+
     def test_environment_does_not_forward_injection(self):
         env = clean_env(Path.home(), self.logs)
         for name in ('META_API_KEY', 'LD_PRELOAD', 'PYTHONPATH', 'MUSE_AUTH_PATH',

@@ -12,6 +12,7 @@ real ecosystem-bounded-run is used wherever a class needs systemd scope containm
 Class prefixes (C13) and skip reasons: Boundary, Request, Stability, Mode, Fifo, Containment, Store, Probe, Command,
 Integrated. `python3 -I tests/test_canary_proof.py --skip-list` prints the machine-readable skip list.
 """
+import collections
 import copy
 import json
 import os
@@ -26,6 +27,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 for _directory in (ROOT / "tools" / "credentials", ROOT / "scripts", ROOT):
@@ -739,6 +741,275 @@ class IntegratedTests(unittest.TestCase):
 
 class UnitTests(unittest.TestCase):
     """Pure functions: canary grammar, forms, tags, CP03 layout, version codes and every routing row."""
+
+    def test_ai_memory_data_dir_override_is_no_pointer(self):
+        """A2 finding G8-A02: AI_MEMORY_DATA_DIR names ai-memory's data directory, not a store file. The settings template's hooks and
+        the drafted launchd template pin --data-dir to the default; runs without the flag follow the variable. Exported to a non-default
+        directory:
+        - it is not one of prepare's pointer paths (pointer_paths, the list the worker's pointer_binding facts are read from and refused
+          as pointer_target_not_file when a target is a directory), and the moved directory itself is no key path;
+        - the ai-memory token files under every U8 root stay key paths, and no root moves;
+        - the status checker reports the override (store_path_overridden on each ai-memory row, and the environment summary);
+        - credential_run leaves it in a child's environment.
+        Synthetic: a temporary HOME; the moved directory is never created, and no store file exists."""
+        import credential_run as runner
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            data = Path(home) / ".local" / "share" / "ai-memory-moved"
+            env = {"HOME": home, "XDG_CONFIG_HOME": f"{home}/.config", "AI_MEMORY_DATA_DIR": str(data)}
+            self.assertEqual(cp.pointer_paths(env), [], "G8-not-a-pointer")
+            exact, _glob = cp.exclusions(home, [f"{home}/.codex"], env, "confirmed", "agent", cp.pointer_paths(env))
+            keys = {path for path, kind in exact if kind == "key"}
+            self.assertNotIn(str(data), keys, "G8-directory-not-a-key-path")
+            roots = [path for kind, path in cp.sink_roots(home, os.getuid(), [f"{home}/.codex"], "-")["U8"]
+                     if kind == "dir" and path.endswith("/ai-memory")]
+            self.assertEqual(roots, [f"{home}/.local/share/ai-memory"], "G8-U8-ai-memory-roots")
+            for root in roots:
+                for name in ("auth-token", "auth-header", "auth-tokens/default", "auth.json"):
+                    self.assertIn(f"{root}/{name}", keys, f"G8-{name}-excluded-under-{root}")
+            inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
+            rows = [entry for entry in inventory["entries"] if entry["id"].startswith("ai-memory-")]
+            self.assertEqual(len(rows), 4)
+            self.assertIn("AI_MEMORY_DATA_DIR", cp.cs.native_store_overrides(inventory["entries"], env), "G8-override-reported")
+            for row in rows:
+                report = cp.cs.inspect_entry(row, env, os.getuid(), time.time())
+                self.assertIn("store_path_overridden", report["warnings"], f"G8-{row['id']}-override-warning")
+                self.assertEqual(report["state"], "missing", f"G8-{row['id']}-default-path-inspected")
+            entry = next(entry for entry in inventory["entries"] if entry["id"] == "tavily")
+            self.assertEqual(runner.child_environment(inventory, entry, {}, env).get("AI_MEMORY_DATA_DIR"), str(data),
+                             "G8-not-stripped-as-a-pointer")
+
+    def test_ai_memory_tokens_written_under_a_moved_data_dir_are_keys_under_every_root(self):
+        """A2 finding G8-A02, fold 5 (B1): ai-memory init, install-hooks and auth, run without --data-dir while AI_MEMORY_DATA_DIR is
+        exported, write the token files where the variable points. This covers the variable as exported to the canary proof itself (at
+        scan time): with it under A1 (~/.claude) or under a Codex home (A4), both the default and the moved token names are key
+        exclusions in exclusions(), the function prepare's digest and each scan's plan are built from, and no scan root moves. It does
+        not show that the writer's shell held the same value. Synthetic: a temporary HOME; no store file is created."""
+        names = ("auth-token", "auth-header", "auth-tokens/default", "auth.json")
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            codex = f"{home}/.codex"
+            before = cp.sink_roots(home, os.getuid(), [codex], "-")
+            for moved in (f"{home}/.claude/ai-memory", f"{codex}/ai-memory", f"  {home}/.claude/ai-memory  "):
+                env = {"HOME": home, "XDG_CONFIG_HOME": f"{home}/.config", "AI_MEMORY_DATA_DIR": moved}
+                with self.subTest(moved=moved.strip()):
+                    exact, _glob = cp.exclusions(home, [codex], env, "confirmed", "agent", cp.pointer_paths(env))
+                    keys = {path for path, kind in exact if kind == "key"}
+                    for name in names:
+                        self.assertIn(f"{home}/.local/share/ai-memory/{name}", keys, f"G8-default-{name}")
+                        self.assertIn(f"{moved.strip()}/{name}", keys, f"G8-moved-{name}")
+                    self.assertEqual(cp.sink_roots(home, os.getuid(), [codex], "-"), before, "G8-no-root-moves")
+            # A blank, relative or default-equal value adds no exclusion beyond the default's (prepare refuses the first three:
+            # test_ai_memory_override_refusal_for_empty_blank_or_relative_values).
+            base = {path for path, kind in cp.exclusions(home, [codex], {"HOME": home}, "confirmed", "agent", [])[0]}
+            for value in ("", "   ", "relative/ai-memory", f"{home}/.local/share/ai-memory"):
+                env = {"HOME": home, "AI_MEMORY_DATA_DIR": value}
+                with self.subTest(value=value):
+                    self.assertEqual({path for path, kind in cp.exclusions(home, [codex], env, "confirmed", "agent", [])[0]},
+                                     base, "G8-no-extra-exclusion")
+
+    def test_ai_memory_override_warning_for_any_set_value_other_than_the_default(self):
+        """A2 finding G8-A02, fold 6 (B2): an empty or blank AI_MEMORY_DATA_DIR is not unset for ai-memory. figment's Env provider keeps
+        it (figment 0.10.19 src/providers/env.rs:504-519; merged at v2.4.1 config.rs:1318) and canonicalise_or_keep keeps "" (:2254-2266),
+        so a run without --data-dir writes the token files into its working directory (ai-memory 3.1.0 `init`, measured). The checker
+        warns for any set value other than the default, empty and blank included; only unset and the default stay quiet."""
+        inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
+        rows = [entry for entry in inventory["entries"] if entry["id"].startswith("ai-memory-")]
+        with tempfile.TemporaryDirectory(prefix="g8-a02-home-") as home:
+            quiet = cp.cs.native_store_overrides(inventory["entries"], {"HOME": home})
+            self.assertNotIn("AI_MEMORY_DATA_DIR", quiet, "G8-unset-quiet")
+            cases = {"": True, "   ": True, "relative/ai-memory": True, f"{home}/.local/share/ai-memory": False,
+                     f" {home}/.local/share/ai-memory/ ": False, f"{home}/.claude/ai-memory": True}
+            for value, warns in cases.items():
+                env = {"HOME": home, "AI_MEMORY_DATA_DIR": value}
+                with self.subTest(value=value):
+                    self.assertEqual("AI_MEMORY_DATA_DIR" in cp.cs.native_store_overrides(inventory["entries"], env), warns)
+                    for row in rows:
+                        self.assertEqual("store_path_overridden" in cp.cs.inspect_entry(row, env, os.getuid(), time.time())[
+                            "warnings"], warns, row["id"])
+
+    def test_ai_memory_override_refusal_for_empty_blank_or_relative_values(self):
+        """A2 finding G8-A02, fold 6 (B2): prepare refuses with override_variable_not_absolute when AI_MEMORY_DATA_DIR is set to an
+        empty, blank or relative value, because the token files then sit in a working directory the proof cannot know. Unset and
+        absolute values pass this check."""
+        for value, code in (("", "override_variable_not_absolute"), ("   ", "override_variable_not_absolute"),
+                            ("relative/ai-memory", "override_variable_not_absolute"), ("./ai-memory", "override_variable_not_absolute"),
+                            ("/var/tmp/g8-a02-moved", None), (" /var/tmp/g8-a02-moved ", None)):
+            with self.subTest(value=value):
+                self.assertEqual(cp.override_refusal({"HOME": "/var/tmp/g8-a02-home", "AI_MEMORY_DATA_DIR": value}), code)
+        self.assertIsNone(cp.override_refusal({"HOME": "/var/tmp/g8-a02-home"}))
+
+    G8_TOKENS = ("auth-token", "auth-header", "auth-tokens/default", "auth.json")
+
+    @staticmethod
+    def g8_walk(home: str, codex: list, env: dict, sink: str, root_path: str = None, kind: str = "dir", walk_path: str = None,
+                extra_exact: tuple = ()) -> "wire.Walk":
+        """The worker's own pre-walk (canary_scan_worker.Walk.traverse) over one root of `sink`, with the plan's exclusions built by
+        canary_proof.exclusions the way scan_sink builds them: the sink's group ("user" for U*, else "agent") and the current pointer
+        paths. No scanner runs and no file is opened: a pre-walk lists, stats and classifies entries only. A stub stands in for the
+        Scan object's counters, key and name checks. `walk_path` walks that spelling of the root instead of the recipe's, as a
+        symlink may differ between what the exclusions were computed from and what the worker meets; `extra_exact` adds literal
+        exact rules the recipe does not carry."""
+        group = "user" if sink.startswith("U") else "agent"
+        pointers = cp.pointer_paths(env)
+        exact, glob = cp.exclusions(home, codex, env, "confirmed", group, pointers)
+        exact = exact + [(path, klass) for path, klass in extra_exact]
+        plan = {"roots": [], "threshold_ns": 0, "selection": "changed", "pointers": {"bound": [], "current": pointers},
+                "exclude": [{"path": path, "class": klass} for path, klass in exact],
+                "exclude_glob": [{"dir": directory, "glob": pattern, "class": klass} for directory, pattern, klass in glob],
+                "link_pairs": [], "user_roots": [], "coverage": []}
+        scan = SimpleNamespace(plan=plan, key=bytes(32), counters=collections.Counter(), reasons=[], sink=0,
+                               patterns=SimpleNamespace(find=lambda data, first_end: []), attribute=lambda *args: None)
+        roots = [path for recipe, path in cp.sink_roots(home, os.getuid(), codex, "")[sink] if recipe == kind]
+        path = root_path or roots[0]
+        assert path in roots, (path, roots)
+        walk = wire.Walk(scan, {"id": "00" * 16, "kind": kind, "path": walk_path or path, "present": True}, number=1)
+        walk.traverse("pre")
+        return walk
+
+    @unittest.skipUnless(LINUX, NOT_LINUX)
+    def test_ai_memory_moved_tokens_are_keyed_by_the_worker_in_every_spelling(self):
+        """A2 finding G8-A02, fold 7 (B1, the CC's ruling): exclusions match on literal or canonical forms on both sides. The worker
+        derives each walked root's canonical path from the descriptor it opened and also matches canonical_root + "/" + rel; scan_sink
+        adds realpath(dirname) + "/" + basename beside each literal exclusion. Driven through the worker's own walk, each shape keys
+        all four token files: a trailing-slash CODEX_HOME, a leading `//`, `.`, `..`, a symlinked HOME, a symlinked ancestor of a
+        root, and a trailing-slash HOME with the variable unset. Synthetic: temporary directories, empty fake token files."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real, tempfile.TemporaryDirectory(prefix="g8-a02-out-") as out:
+            real = os.path.realpath(real)
+            for directory in (".claude/aim", ".claude/x", ".codex/aim", ".local/share/ai-memory"):
+                for name in self.G8_TOKENS:
+                    os.makedirs(os.path.dirname(f"{real}/{directory}/{name}"), exist_ok=True)
+                    Path(f"{real}/{directory}/{name}").write_text("")
+            linked_home, ancestor = f"{out}/linked-home", f"{out}/ancestor"
+            os.symlink(real, linked_home)
+            os.symlink(real, ancestor)
+            shapes = {  # name: (HOME, Codex homes, value or None, sink, root string, relative directory of the tokens)
+                "trailing-slash-codex-home": (real, [f"{real}/.codex/"], f"{real}/.codex/aim", "A4", f"{real}/.codex/", "aim"),
+                "double-slash": (real, [f"{real}/.codex"], f"/{real}/.claude/aim", "A1", None, "aim"),
+                "dot": (real, [f"{real}/.codex"], f"{real}/.claude/./aim", "A1", None, "aim"),
+                "dotdot": (real, [f"{real}/.codex"], f"{real}/.claude/x/../aim", "A1", None, "aim"),
+                "symlinked-home": (linked_home, [f"{linked_home}/.codex"], f"{real}/.claude/aim", "A1", None, "aim"),
+                "symlinked-ancestor": (real, [f"{ancestor}/.codex"], f"{real}/.codex/aim", "A4", f"{ancestor}/.codex", "aim"),
+                "trailing-slash-home-unset": (f"{real}/", [f"{real}/.codex"], None, "U8", f"{real}//.local/share/ai-memory", ""),
+            }
+            for shape, (home, codex, value, sink, root, base) in shapes.items():
+                env = {"HOME": home, "XDG_CONFIG_HOME": f"{home}/.config"}
+                if value is not None:
+                    env["AI_MEMORY_DATA_DIR"] = value
+                with self.subTest(shape=shape):
+                    walk = self.g8_walk(home, codex, env, sink, root)
+                    for name in self.G8_TOKENS:
+                        rel = os.fsencode(f"{base}/{name}" if base else name)
+                        self.assertEqual(walk.items.get(rel), ("x", "key"), f"G8-{shape}-{name}")
+                    self.assertEqual(walk.counted["excluded_key"], 4, f"G8-{shape}-count")
+            # A glob exclusion (CODEX_HOME, *.toml*; an agent-group rule, so an A4 walk) behind a trailing-slash CODEX_HOME: the walked
+            # directory is spelled without the slash and the rule's directory with it, so only the canonical forms meet.
+            Path(f"{real}/.codex/config.toml").write_text("")
+            walk = self.g8_walk(real, [f"{real}/.codex/"], {"HOME": real}, "A4", f"{real}/.codex/")
+            self.assertEqual(walk.items.get(b"config.toml"), ("x", "user"), "G8-glob-canonical-parent")
+
+    @unittest.skipUnless(LINUX, NOT_LINUX)
+    def test_ai_memory_symlink_at_a_token_name_keys_only_itself(self):
+        """A2 finding G8-A02, fold 7 (B2): prepare never resolves an exclusion's final component, so a symlink planted at a token
+        name (<data>/auth-token pointing at a non-token directory under A1) keys only the link itself; the directory it points at,
+        and the file in it, are still walked and not keyed. Synthetic: temporary directories and one empty file."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real:
+            real = os.path.realpath(real)
+            os.makedirs(f"{real}/.claude/aim")
+            os.makedirs(f"{real}/.claude/notes")
+            Path(f"{real}/.claude/notes/chat.jsonl").write_text("")
+            os.symlink(f"{real}/.claude/notes", f"{real}/.claude/aim/auth-token")
+            env = {"HOME": real, "XDG_CONFIG_HOME": f"{real}/.config", "AI_MEMORY_DATA_DIR": f"{real}/.claude/aim"}
+            walk = self.g8_walk(real, [f"{real}/.codex"], env, "A1")
+            self.assertEqual(walk.items.get(b"aim/auth-token"), ("x", "key"), "G8-link-itself-keyed")
+            self.assertNotEqual(walk.items.get(b"notes"), ("x", "key"), "G8-target-dir-not-keyed")
+            self.assertIn(b"d:notes", walk.items, "G8-target-dir-walked")
+            self.assertEqual(walk.items.get(b"notes/chat.jsonl", ("missing",))[0], "f", "G8-target-file-walked")
+
+    @unittest.skipUnless(LINUX, NOT_LINUX)
+    def test_ai_memory_glob_exclusion_directory_that_is_a_symlink(self):
+        """A2 finding G8-A02, fold 8 (F1): a glob exclusion's directory is canonical by its whole realpath, because the worker compares
+        it with the fully resolved parent of a matched name. HOME/.claude/sessions (rule *.key) is a symlink to another directory under
+        the walked A1 root, so the names it matches are reached through the target. Synthetic: temporary directories, empty files."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real:
+            real = os.path.realpath(real)
+            os.makedirs(f"{real}/.claude/shared")
+            for name in ("x.key", "y.txt"):
+                Path(f"{real}/.claude/shared/{name}").write_text("")
+            os.symlink(f"{real}/.claude/shared", f"{real}/.claude/sessions")
+            walk = self.g8_walk(real, [f"{real}/.codex"], {"HOME": real}, "A1")
+            self.assertEqual(walk.items.get(b"shared/x.key"), ("x", "key"), "G8-glob-dir-symlink-keyed")
+            self.assertEqual(walk.items.get(b"shared/y.txt", ("missing",))[0], "f", "G8-glob-dir-symlink-others-walked")
+
+    @unittest.skipUnless(LINUX, NOT_LINUX)
+    def test_ai_memory_exclusions_match_through_the_workers_canonical_path_alone(self):
+        """A2 finding G8-A02, fold 8 (F6): the exclusions are computed from the real HOME and the worker walks each root through a
+        symlinked ancestor, so no literal spelling of a rule meets the walked path and only canonical_root + "/" + rel does: an exact
+        rule and a glob rule's parent in a directory root, a glob root, and a file root. Synthetic: temporary directories, empty files."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real, tempfile.TemporaryDirectory(prefix="g8-a02-out-") as out:
+            real = os.path.realpath(real)
+            os.makedirs(f"{real}/.codex")
+            for name in ("auth.json", "config.toml", "history.jsonl", "x.toml"):
+                Path(f"{real}/.codex/{name}").write_text("")
+            ancestor = f"{out}/ancestor"
+            os.symlink(real, ancestor)
+            codex, env = [f"{real}/.codex"], {"HOME": real}
+            walk = self.g8_walk(real, codex, env, "A4", walk_path=f"{ancestor}/.codex")
+            self.assertEqual(walk.items.get(b"auth.json"), ("x", "key"), "G8-canonical-only-exact")
+            self.assertEqual(walk.items.get(b"config.toml"), ("x", "user"), "G8-canonical-only-glob-parent")
+            # The user group has no glob exclusion and no file-root exclusion: a literal exact rule the recipe lacks stands in.
+            walk = self.g8_walk(real, codex, env, "U7", f"{real}/.codex/*.toml*", kind="glob",
+                                walk_path=f"{ancestor}/.codex/*.toml*", extra_exact=((f"{real}/.codex/x.toml", "key"),))
+            self.assertEqual(walk.items.get(b"x.toml"), ("x", "key"), "G8-canonical-only-glob-root")
+            walk = self.g8_walk(real, codex, env, "U6", f"{real}/.codex/history.jsonl", kind="file",
+                                walk_path=f"{ancestor}/.codex/history.jsonl",
+                                extra_exact=((f"{real}/.codex/history.jsonl", "key"),))
+            self.assertEqual(walk.items.get(b""), ("x", "key"), "G8-canonical-only-file-root")
+
+    @unittest.skipUnless(LINUX, NOT_LINUX)
+    def test_ai_memory_root_without_a_canonical_path_is_incomplete(self):
+        """A2 finding G8-A02, fold 8 (F2): when the kernel gives no path for an opened root's descriptor, the walk is incomplete
+        (walk_error), never a literal-only match. A seam forces fd_path to None for a directory root and a file root; fd_path itself
+        returns the real path of an open directory and None for a removed directory and for a descriptor that names no path."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real:
+            real = os.path.realpath(real)
+            os.makedirs(f"{real}/.claude/aim")
+            os.makedirs(f"{real}/.codex")
+            Path(f"{real}/.codex/history.jsonl").write_text("")
+            env = {"HOME": real, "AI_MEMORY_DATA_DIR": f"{real}/.claude/aim"}
+            original, wire.fd_path = wire.fd_path, lambda fd: None
+            try:
+                walk = self.g8_walk(real, [f"{real}/.codex"], env, "A1")
+                self.assertEqual(walk.state, "walk_error", "G8-no-canonical-dir-incomplete")
+                walk = self.g8_walk(real, [f"{real}/.codex"], env, "U6", f"{real}/.codex/history.jsonl", kind="file")
+                self.assertEqual(walk.state, "walk_error", "G8-no-canonical-file-incomplete")
+            finally:
+                wire.fd_path = original
+            descriptors = [os.open(real, wire.DIR_FLAGS)]
+            os.mkdir(f"{real}/gone")
+            descriptors.append(os.open(f"{real}/gone", wire.DIR_FLAGS))
+            os.rmdir(f"{real}/gone")
+            descriptors += os.pipe()
+            try:
+                self.assertEqual(wire.fd_path(descriptors[0]), os.fsencode(real), "G8-fd-path-real")
+                self.assertIsNone(wire.fd_path(descriptors[1]), "G8-fd-path-removed")
+                self.assertIsNone(wire.fd_path(descriptors[2]), "G8-fd-path-not-absolute")
+            finally:
+                for descriptor in descriptors:
+                    os.close(descriptor)
+
+    def test_canonical_exclusion_forms(self):
+        """A2 finding G8-A02, fold 8 (F1, F6): an exact rule keeps its final component unresolved, a glob rule's directory is resolved
+        whole, trailing slashes are dropped, a relative path is unchanged and the root stays the root."""
+        with tempfile.TemporaryDirectory(prefix="g8-a02-real-") as real:
+            real = os.path.realpath(real)
+            os.makedirs(f"{real}/target")
+            os.symlink(f"{real}/target", f"{real}/link")
+            self.assertEqual(cp.canonical_exclusion(f"{real}/link/"), f"{real}/link", "G8-canonical-final-component-kept")
+            self.assertEqual(cp.canonical_exclusion(f"{real}/link/", directory=True), f"{real}/target",
+                             "G8-canonical-glob-directory-resolved")
+            self.assertEqual(cp.canonical_exclusion(f"{real}/target/../link"), f"{real}/link", "G8-canonical-parent-resolved")
+        self.assertEqual(cp.canonical_exclusion("relative/x"), "relative/x", "G8-canonical-relative-unchanged")
+        self.assertEqual(cp.canonical_exclusion("/"), "/", "G8-canonical-root")
+        self.assertEqual(cp.canonical_exclusion("//", directory=True), "/", "G8-canonical-root-directory")
 
     def test_canary_grammar(self):
         import set_credential as writer
@@ -1899,6 +2170,57 @@ class StabilityTests(unittest.TestCase):
                          "ST9-bound-target-excluded")
         self.assertEqual(bound.finished()["sinks"]["A1"]["counters"]["excluded_key"], 1, "ST9-bound-target-counted")
         self.assertNotIn(str(target).encode(), (bound.path / "events.jsonl").read_bytes(), "ST9-no-raw-pointer-path")
+
+    def test_st9_ai_memory_data_dir_override_passes_prepare(self):
+        """A2 finding G8-A02: with AI_MEMORY_DATA_DIR exported to a directory, prepare binds no pointer to it, so it does not refuse
+        with pointer_target_not_file (UnitTests.test_ai_memory_data_dir_override_is_no_pointer covers the same without the worker).
+        Synthetic: a fake data directory under the test's temporary HOME."""
+        host = Host(self)
+        host.constants["AGENT_SINKS"] = ["A1"]
+        data = host.home / ".local" / "share" / "ai-memory-moved"
+        data.mkdir(parents=True)
+        env = host.env(AI_MEMORY_DATA_DIR=str(data))
+        result = host.tool("prepare", "--transcripts", "confirmed", env=env)
+        self.assertEqual(result.returncode, 0, result.stderr[-400:])
+        self.assertNotIn(b"pointer_target_not_file", result.stdout + result.stderr)
+        for value in ("", "   ", "relative/ai-memory"):
+            with self.subTest(value=value):
+                refused = host.tool("prepare", "--transcripts", "confirmed", env=host.env(AI_MEMORY_DATA_DIR=value))
+                self.assertEqual(refused.returncode, 1, "G8-override-refused")
+                self.assertIn(b"override_variable_not_absolute", refused.stderr, "G8-override-code")
+
+    def test_st9_ai_memory_moved_tokens_are_never_opened_end_to_end(self):
+        """A2 finding G8-A02, fold 7 (B1): end to end through prepare, the contained worker and the scan, a data directory moved
+        under A4 behind a trailing-slash CODEX_HOME, and one under A1 spelled with `..`, keep all four token files unopened (the
+        worker's forbid_paths seam) and counted as excluded_key. Synthetic: canary-only fake files under the test's HOME."""
+        names = UnitTests.G8_TOKENS
+        for sink, codex_home, value, data in (
+                ("A4", "{home}/.codex/", "{home}/.codex/aim", "{home}/.codex/aim"),
+                ("A1", None, "{home}/.claude/x/../aim", "{home}/.claude/aim")):
+            with self.subTest(sink=sink):
+                host = Host(self)
+                host.constants["AGENT_SINKS"] = [sink]
+                home = str(host.home)
+                (host.home / ".claude" / "x").mkdir(parents=True, exist_ok=True)
+                files = [Path(data.format(home=home)) / name for name in names]
+                for path in files:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text("placeholder\n")
+                extra = {"AI_MEMORY_DATA_DIR": value.format(home=home)}
+                if codex_home:
+                    extra["CODEX_HOME"] = codex_home.format(home=home)
+                env = host.env(**extra)
+                result = host.tool("prepare", "--transcripts", "confirmed", env=env)
+                self.assertEqual(result.returncode, 0, result.stderr[-400:])
+                host.run_id = re.search(rb"run: (cp-\S+)", result.stdout).group(1).decode()
+                # The canary exists only after prepare; writing it now makes each file selected (changed since the threshold), so
+                # only the exclusion keeps the worker from opening it.
+                for path in files:
+                    path.write_text(host.canary() + "\n")
+                # The worker's seam builds a dir_fd path from readlink(/proc/self/fd/<fd>), which never holds a doubled slash.
+                forbidden = [str(path) for path in files]
+                self.assertEqual(host.scan(env=env, worker={"forbid_paths": forbidden}).returncode, 0, "G8-e2e-scan")
+                self.assertEqual(host.finished()["sinks"][sink]["counters"]["excluded_key"], 4, "G8-e2e-excluded-key")
 
     def test_st9_route_recheck_under_deferred_timestamps(self):
         """Each selected file's format decision is re-derived after its views and in the final re-walk (9.3). A seam

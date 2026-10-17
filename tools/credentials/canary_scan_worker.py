@@ -415,6 +415,18 @@ def verify_scope() -> None:
     return os.getpid(), int(group.rsplit(b"-", 1)[1].split(b".", 1)[0])
 
 
+def fd_path(fd: int):
+    """The canonical path of an open directory descriptor, as the kernel records it (/proc/self/fd/<fd>; the proof runs on Linux
+    only, canary_proof.py platform_check), or None when unavailable or the directory was removed. A walked entry's real location
+    is this path plus "/" plus its relative path, because every directory below a root is opened O_NOFOLLOW relative to its parent
+    (A2 finding G8-A02: exclusions match on literal or canonical spellings)."""
+    try:
+        target = os.readlink(b"/proc/self/fd/%d" % fd)
+    except OSError:
+        return None
+    return None if not target.startswith(b"/") or target.endswith(b" (deleted)") else target
+
+
 def fs_magic(fd: int):
     """statfs f_type of an open descriptor, or None."""
     try:
@@ -1275,6 +1287,14 @@ class Walk:
         self.items, self.lists, self.routes, self.selected, self.stores = {}, {}, {}, set(), []
         self.state, self.name_check, self.named, self.mode, self.counted = "ok", None, 0, "pre", collections.Counter()
         self.threshold, self.all = scan.plan.get("threshold_ns", 0), scan.plan.get("selection") == "all"
+        self.canonical_dir = self.canonical_file = None  # from the descriptor traverse opened (fd_path)
+
+    def canonical_of(self, rel: bytes):
+        """The canonical spelling of the entry at `rel`: the walked directory's canonical path plus "/" plus rel, or for a file
+        root its canonical parent plus its name; None when the kernel gave no path."""
+        if not rel:
+            return self.canonical_file
+        return self.canonical_dir + b"/" + rel if self.canonical_dir else None
 
     def count(self, name: str) -> None:
         if self.mode == "pre":
@@ -1321,12 +1341,21 @@ class Walk:
                 if (os.fstat(fd).st_dev, os.fstat(fd).st_ino) != (info.st_dev, info.st_ino):
                     self.state = "file_set_changed"
                     return
+                self.canonical_dir = fd_path(fd)
+                if self.canonical_dir is None:  # no canonical spelling to match: incomplete, never literal-only
+                    self.state = "walk_error"
+                    return
                 self.directory(fd, b"", path, 0, None)
             finally:
                 os.close(fd)
         elif stat.S_ISREG(info.st_mode) and self.kind == "file":
             parent = os.open(os.path.dirname(path), DIR_FLAGS)
             try:
+                canonical_parent = fd_path(parent)
+                if canonical_parent is None:  # as for a directory root: incomplete, never literal-only
+                    self.state = "walk_error"
+                    return
+                self.canonical_file = canonical_parent.rstrip(b"/") + b"/" + os.path.basename(path)
                 self.fs_all = fs_magic(parent) not in FS_CHANGED_OK
                 if mode == "pre" and self.selected_by_time(info):
                     self.selected.add(b"")
@@ -1351,7 +1380,7 @@ class Walk:
             self.state = "git_validation_failed"
             return None
 
-    def excluded(self, child: bytes, parent: bytes, name: bytes):
+    def excluded(self, child: bytes, parent: bytes, name: bytes, canonical: bytes = None):
         plan = self.scan.plan
         if pointer_seal(self.scan.key, child).hex() in plan["pointers"]["bound"]:
             return "key"
@@ -1361,6 +1390,8 @@ class Walk:
         for rule in plan["exclude_glob"]:
             if parent == os.fsencode(rule["dir"]) and fnmatch.fnmatchcase(name, os.fsencode(rule["glob"])):
                 return rule["class"]
+        if canonical is not None and canonical != child:  # the same rules on the entry's canonical spelling (canonical_of)
+            return self.excluded(canonical, os.path.dirname(canonical), name)
         return None
 
     def selected_by_time(self, info) -> bool:
@@ -1439,7 +1470,7 @@ class Walk:
         self.named += self.mode == "pre"
         if rel:  # a file root's own path was checked whole by traverse
             self.names(path, len(path) - len(name) - 1)
-        excluded = self.excluded(path, os.path.dirname(path), name)
+        excluded = self.excluded(path, os.path.dirname(path), name, self.canonical_of(rel))
         if excluded:
             self.items[rel] = ("x", excluded)
             self.count({"key": "excluded_key", "declined": "declined"}.get(excluded, "excluded_user"))

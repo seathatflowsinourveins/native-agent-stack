@@ -2018,6 +2018,16 @@ For a host that does not use the template, merge the same rules by hand under
 "Read(//mnt/*/Users/*/.omniroute/**)", "Read(**/mnt/*/Users/*/.omniroute/**)",
 "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
 "Read(**/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
+"Read(~/.local/share/ai-memory/auth-token)", "Read(**/.local/share/ai-memory/auth-token)",
+"Edit(~/.local/share/ai-memory/auth-token)",
+"Read(~/.local/share/ai-memory/auth-header)", "Read(**/.local/share/ai-memory/auth-header)",
+"Edit(~/.local/share/ai-memory/auth-header)",
+"Read(~/.local/share/ai-memory/auth-tokens/**)", "Read(**/.local/share/ai-memory/auth-tokens/**)",
+"Edit(~/.local/share/ai-memory/auth-tokens/**)",
+"Read(~/.local/share/ai-memory/auth.json)", "Read(**/.local/share/ai-memory/auth.json)",
+"Edit(~/.local/share/ai-memory/auth.json)",
+"Read(~/.config/muse/auth.json)", "Read(**/.config/muse/auth.json)", "Edit(~/.config/muse/auth.json)",
+"Read(~/.codex/.env)", "Read(**/.codex/.env)", "Edit(~/.codex/.env)",
 "Edit(~/.bashrc)", "Edit(~/.profile)", "Edit(~/.zshrc)",
 "Bash(printenv)", "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)",
 "Bash(hf auth token)", "Bash(hf auth token *)",
@@ -2328,9 +2338,11 @@ whether a grammar check read a file. Native sign-in and service-held stores
 remain metadata-only. It also reports:
 
 - secret variable names that are set in the current environment, names only;
-- native store path overrides that are set (`HF_TOKEN_PATH`), names only; each
-  affected row also gets the warning `store_path_overridden`, because it then
-  inspects a path the tool no longer uses;
+- native store path overrides that are set, names only: a pointer variable
+  (`HF_TOKEN_PATH`), and an override variable (`AI_MEMORY_DATA_DIR`) set to
+  any value other than its default, empty included; each affected row also gets the
+  warning `store_path_overridden`, because a tool run without its own path flag
+  then uses a path other than the one inspected;
 - tracked files with credential-shaped basenames;
 - whether `core.hooksPath` points at `scripts/git-hooks`;
 - whether gitleaks is on `PATH`;

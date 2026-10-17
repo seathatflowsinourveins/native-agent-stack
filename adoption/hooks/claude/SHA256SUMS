@@ -1,7 +1,7 @@
 c0979c22a701538a267e8f6b980dd2228e79db0c0b2b6bcf8d91dd2681735fb7  currency-due-notice.py
 2a5f087f2c10437bab302e19469ae6b2e715828083a8bae07a7b177540b63e0e  effort-default-guard.py
 43f95fb0ff59954680c780b3bf015cbc7548285f57d5956313b704d5de280bac  research-routing-guard.py
-b19e15f5b7a2928e8bb190da812a9745e0683ba7a5ed5637811a6a2fcdb42773  ../../../scripts/hooks/secret_path_guard.py
+924ab13d5ab891eb3b69ef694c8220c8ac5c36b2504cacc48c80c23ed78a7735  ../../../scripts/hooks/secret_path_guard.py
 802f3d3cf9ecb667f3438ead781afcb0dc22c315c7cde47d4bc1e0900fb790f6  token-lanes-block.md
 a6858cbd0ddf171614b0f967dffc1e51817368960b8fcd938901cf03d0525d09  token-lanes-block.builder.md
 f20d5a9055b4add7eb93df8fcbbcc9cb95807f1bcb3a03d19a93dc04c69c7d34  token-lanes-block.main.md

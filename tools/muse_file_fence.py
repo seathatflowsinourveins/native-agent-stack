@@ -267,7 +267,7 @@ class Fence:
             if p == self.auth or p == self.settings:
                 raise ValueError("credential/config cannot be a brief input")
             protected = ('.ssh', '.codex', '.claude', '.config', '.hcom', '.aws',
-                         '.azure', '.gnupg', '.kube', '.local/state',
+                         '.azure', '.gnupg', '.kube', '.local/state', '.local/share',
                          '.netrc', '.npmrc', '.git-credentials')
             if p == self.home or any(p == self.home / n or (self.home / n) in p.parents
                                      for n in protected):

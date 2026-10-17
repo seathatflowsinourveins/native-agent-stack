@@ -81,7 +81,7 @@ tracked-source audit; all keep their original argv in this PR:
 | blueprints/native-skill-practice/e-series/e1/e1_run.py:100-104 | Promptfoo --slot wrapper | absent |
 | tools/credentials/canary_lane_consumer.sh:19-20 | Generated lane canary instruction | absent |
 | tools/credentials/canary_workflow.js:17,23 | Workflow probe/check instructions | absent |
-| tools/credentials/canary_proof.py:1420-1421 | Generated operator probe instruction | absent |
+| tools/credentials/canary_proof.py:1454-1455 | Generated operator probe instruction | absent |
 | tests/fixtures/seq2-launch.txt:391-398 | Historical lane B keyed wrapper | absent |
 | tests/fixtures/pre_skip/launch_seq2.py:391-398 | Earlier keyed wrapper fixture | absent |
 | tests/test_credential_run.py:186-241,299-305 | Isolated SYN CLI launchers | absent |
@@ -91,7 +91,7 @@ tracked-source audit; all keep their original argv in this PR:
 | tests/test_secret_path_guard.py:3513-3618,3842-3934,4993-5046 | Heuristic command-text cases | absent |
 | adoption/credential-inventory.json:174-705 | Declarative check instructions, exact lines in JSON | absent |
 
-Module-only consumers do not opt in: scripts/credential_status.py:317 uses
+Module-only consumers do not opt in: scripts/credential_status.py:361 uses
 inventory-policy helpers; tools/credentials/canary_scan_worker.py:53 uses
 Command/end_group; canary_proof.py:59 uses policy/helpers. The scalar run_command
 production caller is _main; its default dispatch remains the original3args.

@@ -1358,3 +1358,13 @@ go to the command center as a host diff. No piece is unwired and no sentence of 
 All earlier projections remain historical observations.
 
 Today: 404 pieces, 364 wired (211 practice, 153 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
+
+## Addendum 2026-10-17: credential-store denies for A2 finding G8-A02
+
+The template's `permissions.deny` gains eighteen practice pieces: a `Read(~/...)` deny, its `Read(**/...)` twin and an
+`Edit(~/...)` deny for each of ai-memory's `auth-token`, `auth-header`, `auth-tokens/` and `auth.json` under
+`~/.local/share/ai-memory`, Muse Code's `~/.config/muse/auth.json` and Codex's `~/.codex/.env`. The secret-path guard
+and `adoption/credential-inventory.json` list the same stores. No piece is unwired and no sentence of the instruction
+blocks changes. All earlier projections remain historical observations.
+
+Today: 422 pieces, 382 wired (229 practice, 153 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces

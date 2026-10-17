@@ -682,6 +682,7 @@ def exclusions(home: str, codex: list, env, transcripts: str, group: str, pointe
     inventory = json.loads((ROOT / cs.INVENTORY).read_text(encoding="utf-8"))
     exact += [(str(cs.expand_template(entry["store"]["path_template"], env)), "key")
               for entry in inventory["entries"] if entry["store"]["kind"] in cs.LOCAL_KINDS]
+    exact += [(path, "key") for entry in inventory["entries"] for path in cs.override_paths(entry, env)]  # no root moves
     glob = [(f"{h}/.claude/sessions", "*.key", "key")]
     for path in codex:
         exact.append((f"{path}/auth.json", "key"))
@@ -697,7 +698,26 @@ def exclusions(home: str, codex: list, env, transcripts: str, group: str, pointe
         glob.append((f"{h}/.claude", "settings.json.*", "user"))
     if transcripts == "exclude":
         exact.append((f"{h}/.claude/projects", "declined"))
+    # Each exclusion also in its canonical form, which the worker matches against canonical_root + "/" + rel (canary_scan_worker.py
+    # Walk.canonical_of): the literal spelling stays beside it (A2 finding G8-A02). scan_sink builds these forms at each scan
+    # against the live filesystem; prepare only records a digest of this list.
+    exact += [(canonical_exclusion(path), klass) for path, klass in exact]
+    glob += [(canonical_exclusion(directory, directory=True), pattern, klass) for directory, pattern, klass in glob]
     return sorted(set(exact)), sorted(set(glob))
+
+
+def canonical_exclusion(path: str, directory: bool = False) -> str:
+    """The canonical form of an exclusion, trailing slashes dropped first. An exact rule is realpath(dirname) + "/" + basename: the
+    final component is never resolved, so a symlink planted at an excluded name excludes only itself, never its target. A glob
+    rule's `directory` is the realpath of the whole directory, because the worker compares it with the canonical parent of a
+    matched name, which is fully resolved. A relative path is returned unchanged."""
+    if not os.path.isabs(path):
+        return path
+    trimmed = path.rstrip("/") or "/"
+    if directory:
+        return os.path.realpath(trimmed)
+    parent, name = os.path.split(trimmed)
+    return trimmed if not name else os.path.join(os.path.realpath(parent), name)
 
 
 def resolve_executables() -> dict:
@@ -717,6 +737,17 @@ def pointer_paths(env) -> list:
     inventory = json.loads((ROOT / cs.INVENTORY).read_text(encoding="utf-8"))
     names = sorted({name for entry in inventory["entries"] for name in entry["pointer_variables"]})
     return [env[name] for name in names if env.get(name) and os.path.isabs(env[name])]
+
+
+def override_refusal(env) -> str | None:
+    """The refusal code when an inventory override variable is set to an empty, blank or relative value: ai-memory then keeps its
+    data directory, token files included, in the working directory of whichever run wrote them (scripts/credential_status.py
+    override_value), which the proof cannot know or exclude. None when every override variable is unset or absolute."""
+    inventory = json.loads((ROOT / cs.INVENTORY).read_text(encoding="utf-8"))
+    names = sorted({name for entry in inventory["entries"] for name in entry.get("override_variables", [])})
+    if any(name in env and not os.path.isabs(cs.override_value(name, env) or "") for name in names):
+        return "override_variable_not_absolute"
+    return None
 
 
 # ---- Launching the contained worker and reading CP03 (contract 10, 11) ----------------------------------------------
@@ -1108,6 +1139,9 @@ def prepare(args, env) -> int:
     codex = [ordinary] + ([os.path.abspath(args.codex_home)] if args.codex_home else [])
     if len(set(codex)) != len(codex) or not os.path.isabs(home):
         raise Refused("codex_home_invalid")
+    refusal = override_refusal(env)
+    if refusal:
+        raise Refused(refusal)
     run.write("homes", json.dumps(codex).encode())
     if args.session:
         if not SESSION.fullmatch(args.session):

@@ -5052,8 +5052,8 @@
     },
     {
       "path": ".claude/settings.json",
-      "sha256": "8f65ca76f754b9c829de60685443fe1a16044cf2522a429076e0196683806117",
-      "bytes": 3069
+      "sha256": "37f910c043b24ef9e2f64b11f5abefba5d7e8835b67af6528119d3ea8c0f7a71",
+      "bytes": 3906
     },
     {
       "path": ".claude/skills/claude-native-practice/SKILL.md",
@@ -5487,8 +5487,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "9edb9ac1dea4b75b17883d7ba619129bd44a2a0f1c21314842cf2913d72f13a6",
-      "bytes": 45333
+      "sha256": "d91fc63e1d06706104dc64f619ff64549ab3879569248f4a5f61f21afb2fda69",
+      "bytes": 52999
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -5502,7 +5502,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "dd739c014f5cb6b4ec09b1b4b53558397356ddf5858f4df96fb0203581bb7846",
+      "sha256": "7aa895f61aabb397816c1eac82b83440e6e8e7a0bf8f17dd941427dcf9b7abd6",
       "bytes": 1229
     },
     {
@@ -5877,8 +5877,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "dd39aee7815e52aed292ee3c0e9c6c0e232e6be3c5aef943bb78237b6e81cb99",
-      "bytes": 13903
+      "sha256": "c4830d344ee3aad4ee122b5fba8ce6d8c2090dd691374d95df1a05ee5cccba4a",
+      "bytes": 14740
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -18563,8 +18563,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "e3a34084ab1682dbbaa17e9d58649e50a2700f7df1d87a42f7c976f4cd21df56",
-      "bytes": 94496
+      "sha256": "fc1c1b65144f9c014f711c16b9650ce38e1b07125bad86284b7c9ce7e5794c60",
+      "bytes": 99808
     },
     {
       "path": "docs/decisions/2026-09-29-max-default-effort.md",
@@ -18678,8 +18678,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "43cc2ff82481dbf509418b036aabbe868b52812c78870c587eeaadfc64c23490",
-      "bytes": 150626
+      "sha256": "112550b9ec5b3d778e6f4a6d6d93a2dc26a774496f82084a20ebd657f739dc73",
+      "bytes": 151405
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -19878,8 +19878,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "2b163760b42a608ce53bf27f204e3b25944e051fafaf03950ed45974adc8634e",
-      "bytes": 207692
+      "sha256": "eda2dc9c294d07b2b0ae6ddf38b2bebe9c7f4338846a116501f04d07d7e20507",
+      "bytes": 208585
     },
     {
       "path": "docs/stack.md",
@@ -63243,8 +63243,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "1f11b49fe3706d54d4e0ce96ffd20798ec36c946914a17ff9db0b11ef5b95931",
-      "bytes": 35807
+      "sha256": "1b87da0d4bd8a79a88995d9f80007f2dd0b3fa8542855cbe7bf59f1d40ec43c7",
+      "bytes": 39749
     },
     {
       "path": "scripts/currency_due.py",
@@ -63288,8 +63288,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "b19e15f5b7a2928e8bb190da812a9745e0683ba7a5ed5637811a6a2fcdb42773",
-      "bytes": 298097
+      "sha256": "924ab13d5ab891eb3b69ef694c8220c8ac5c36b2504cacc48c80c23ed78a7735",
+      "bytes": 302239
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -63453,8 +63453,8 @@
     },
     {
       "path": "tests/canary_mutants.py",
-      "sha256": "580c4d471815c69746167c830e679361cd37bbbf13335c573035197af7b71890",
-      "bytes": 61240
+      "sha256": "0b3043ee34885ff0669d602f357e7a97fc70d81cb95d8cf3a6c29feb66fe2824",
+      "bytes": 65616
     },
     {
       "path": "tests/fixtures/adaptive_paper_citations/asset-attributes.json",
@@ -64078,8 +64078,8 @@
     },
     {
       "path": "tests/test_canary_proof.py",
-      "sha256": "aa98d22b308befb9b0dd7e3b32745280ed83d16c6d9e9cdf1d4100d58270678b",
-      "bytes": 215840
+      "sha256": "62d290d2d562951a0198fd13e0e43d0f47df1cb06e89f0f4ce544b854a678a56",
+      "bytes": 241719
     },
     {
       "path": "tests/test_capability_gate.py",
@@ -64768,8 +64768,8 @@
     },
     {
       "path": "tests/test_muse_file_fence.py",
-      "sha256": "12e498dc0c7c0d04b9553326e29c73d618d39bd82fc3a9860f69e50295e18edb",
-      "bytes": 34078
+      "sha256": "d336106851a1669d83b792bce3da68b495499c9ca38f1913e9d42e61e5ca2af0",
+      "bytes": 34985
     },
     {
       "path": "tests/test_muse_runtime_currency.py",
@@ -65243,8 +65243,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "bae76bedf85231e10cb205d65e166cb90a4924d7b86554299d2b7e3487ca661e",
-      "bytes": 394232
+      "sha256": "f35c599338dd8618892d11bc089fa96f75f4d118f33f19d7ae0fdb911b869e99",
+      "bytes": 406989
     },
     {
       "path": "tests/test_secret_scan_metrics.py",
@@ -65793,13 +65793,13 @@
     },
     {
       "path": "tools/credentials/canary_proof.py",
-      "sha256": "3b78381c3bd24282b2b9c1eec8a9845d4221e36aaaaa46143b4b57cbe1ce7e76",
-      "bytes": 103189
+      "sha256": "35ead5b75b3e0d897c704b001ef43376ffb7b848eb4ca11b296e092170c2dcfe",
+      "bytes": 105504
     },
     {
       "path": "tools/credentials/canary_scan_worker.py",
-      "sha256": "aefc5aef230869182fde95c12328e992c07cd69f932642d255c297812fc6c382",
-      "bytes": 106350
+      "sha256": "ff6eb5cdc6cc1e5e3682f8dbaf249fe88478c90a1dd77ebd524b97dc77e22f9a",
+      "bytes": 108353
     },
     {
       "path": "tools/credentials/canary_workflow.js",
@@ -65913,8 +65913,8 @@
     },
     {
       "path": "tools/muse_file_fence.py",
-      "sha256": "0d8ad38a46ddd595f5a3b79d9789ece1c25c3b4c0e860b638cd4ef8805df9a17",
-      "bytes": 29177
+      "sha256": "04b6ac61b2e88c21c6763517e471db54ea4aaf4633567e7cc075a8704e848392",
+      "bytes": 29193
     },
     {
       "path": "tools/omniroute/gateway_record.py",

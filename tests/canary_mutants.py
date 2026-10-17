@@ -594,6 +594,53 @@ MUTANTS += [
              'sum(check.matches - 1 for check in views.values())')],
            "RepairTests.test_m2_negative_count_stays_unsigned_without_inband_control", "REPAIR-M2-negative-unsigned"),
 ]
+
+# ---- A2 finding G8-A02 (PR #1240 fold 8): canonical exclusion forms on both sides, each killed by a named unit test --------
+G8 = "UnitTests.test_ai_memory_"
+MUTANTS += [
+    mutant("G8-CANON-OF", "The worker gives no canonical spelling for an entry", WORKER,
+           [('        return self.canonical_dir + b"/" + rel if self.canonical_dir else None\n', '        return None\n')],
+           G8 + "moved_tokens_are_keyed_by_the_worker_in_every_spelling", "G8-trailing-slash-codex-home-auth-token"),
+    mutant("G8-CANON-EXACT", "No canonical form of an exact rule is added", PROOF,
+           [('    return trimmed if not name else os.path.join(os.path.realpath(parent), name)\n', '    return trimmed\n')],
+           G8 + "moved_tokens_are_keyed_by_the_worker_in_every_spelling", "G8-dotdot-auth-token"),
+    mutant("G8-CANON-GLOB", "A glob rule's directory keeps its final component unresolved", PROOF,
+           [('    if directory:\n        return os.path.realpath(trimmed)\n', '    if False:\n        return os.path.realpath(trimmed)\n')],
+           G8 + "glob_exclusion_directory_that_is_a_symlink", "G8-glob-dir-symlink-keyed"),
+    mutant("G8-WORKER-GLOB", "The worker matches a glob rule's parent literally only", WORKER,
+           [('            return self.excluded(canonical, os.path.dirname(canonical), name)\n',
+             '            return self.excluded(canonical, parent, name)\n')],
+           G8 + "exclusions_match_through_the_workers_canonical_path_alone", "G8-canonical-only-glob-parent"),
+    mutant("G8-FILE-ROOT", "A file root has no canonical spelling", WORKER,
+           [('                self.canonical_file = canonical_parent.rstrip(b"/") + b"/" + os.path.basename(path)\n',
+             '                self.canonical_file = None\n')],
+           G8 + "exclusions_match_through_the_workers_canonical_path_alone", "G8-canonical-only-file-root"),
+    mutant("G8-NONE-DIR", "A directory root without a canonical path falls back to literal matching", WORKER,
+           [('                if self.canonical_dir is None:  # no canonical spelling to match: incomplete, never literal-only\n',
+             '                if False:\n')],
+           G8 + "root_without_a_canonical_path_is_incomplete", "G8-no-canonical-dir-incomplete"),
+    mutant("G8-NONE-FILE", "A file root without a canonical path falls back to literal matching", WORKER,
+           [('                if canonical_parent is None:  # as for a directory root: incomplete, never literal-only\n'
+             '                    self.state = "walk_error"\n                    return\n'
+             '                self.canonical_file = canonical_parent.rstrip(b"/") + b"/" + os.path.basename(path)\n',
+             '                self.canonical_file = canonical_parent.rstrip(b"/") + b"/" + os.path.basename(path) if canonical_parent else None\n')],
+           G8 + "root_without_a_canonical_path_is_incomplete", "G8-no-canonical-file-incomplete"),
+    mutant("G8-FD-DELETED", "A removed directory's descriptor path is used", WORKER,
+           [('    return None if not target.startswith(b"/") or target.endswith(b" (deleted)") else target\n',
+             '    return None if not target.startswith(b"/") else target\n')],
+           G8 + "root_without_a_canonical_path_is_incomplete", "G8-fd-path-removed"),
+    mutant("G8-FD-RELATIVE", "A descriptor path that is not absolute is used", WORKER,
+           [('    return None if not target.startswith(b"/") or target.endswith(b" (deleted)") else target\n',
+             '    return None if target.endswith(b" (deleted)") else target\n')],
+           G8 + "root_without_a_canonical_path_is_incomplete", "G8-fd-path-not-absolute"),
+    mutant("G8-CANON-RELATIVE", "A relative exclusion is resolved against the working directory", PROOF,
+           [('    if not os.path.isabs(path):\n        return path\n    trimmed = path.rstrip("/") or "/"\n',
+             '    if False:\n        return path\n    trimmed = path.rstrip("/") or "/"\n')],
+           "UnitTests.test_canonical_exclusion_forms", "G8-canonical-relative-unchanged"),
+    mutant("G8-CANON-ROOT", "The root exclusion loses its slash", PROOF,
+           [('    trimmed = path.rstrip("/") or "/"\n    if directory:\n', '    trimmed = path.rstrip("/")\n    if directory:\n')],
+           "UnitTests.test_canonical_exclusion_forms", "G8-canonical-root"),
+]
 for ident, original, test, assertion in (
         ("R-S4", "G6-03", "RepairTests.test_equal_count_replacement_and_unselected_retry", "REPAIR-S4-retry-hit"),
         ("R-R1", "G6-02", "RepairTests.test_requests_all_groups_supersede_previous_pass", "REPAIR-R1-group-request"),

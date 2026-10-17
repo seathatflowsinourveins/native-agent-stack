@@ -76,6 +76,13 @@ CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
 TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/",
                      "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")
 NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
+# The inventory's directory for each override_variables name, a template prefix of the rows that declare it: the path this stack's
+# settings-template hooks pass as --data-dir. AI_MEMORY_DATA_DIR overrides ai-memory's data directory (read at akitaonrails/ai-memory
+# v2.4.1 crates/ai-memory-cli/src/config.rs:573 and through figment at :1318; v2.3.2 :462, :1099). ai-memory's own default is
+# dirs::data_local_dir()/ai-memory (v2.4.1 :2248-2252, v2.3.2 :1970-1974): $XDG_DATA_HOME when absolute, else ~/.local/share, on Linux
+# (dirs 5.0.1 src/lin.rs:11-12) and ~/Library/Application Support on macOS (src/mac.rs:7, :13); a config.toml data_dir (v2.4.1
+# :1316) also moves it when neither the flag nor the variable is given. Those moves are not modelled here.
+OVERRIDE_DEFAULTS = {"AI_MEMORY_DATA_DIR": "$HOME/.local/share/ai-memory"}
 # ${NAME:-default}, where the default may hold one nested ${NAME:-default}: huggingface_hub's
 # HF_HOME defaults to ${XDG_CACHE_HOME:-$HOME/.cache}/huggingface (constants.py).
 DEFAULT_FORM = re.compile(r"\$\{([A-Z_][A-Z0-9_]*):-((?:[^{}]|\$\{[A-Z_][A-Z0-9_]*:-[^{}]*\})*)\}")
@@ -155,12 +162,15 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
             if store["kind"] in MEMORY_KINDS and entry["status"] == "required":
                 errors.append(f"{label}: a required key cannot live only in the kernel keyring, which loses it "
                               "at every kernel restart; store it in a file")
-        for key in ("variables", "optional_variables", "pointer_variables"):
-            names = entry[key]
+        for key in ("variables", "optional_variables", "pointer_variables", "override_variables"):
+            names = entry.get(key, [])  # override_variables is optional: see native_store_overrides
             if not isinstance(names, list) or not all(isinstance(n, str) and NAME.match(n) for n in names):
                 errors.append(f"{label}: {key} must be uppercase variable names")
             elif len(set(names)) != len(names):
                 errors.append(f"{label}: {key} must not repeat a name")
+            elif key == "override_variables" and any(
+                    not str((store if isinstance(store, dict) else {}).get("path_template", "")).startswith(OVERRIDE_DEFAULTS.get(n, "\0") + "/") for n in names):
+                errors.append(f"{label}: an override variable needs an OVERRIDE_DEFAULTS directory that prefixes the path template")
         required = [n for n in entry["variables"] if isinstance(n, str)] \
             if isinstance(entry["variables"], list) else []
         optional = [n for n in entry["optional_variables"] if isinstance(n, str)] \
@@ -232,13 +242,46 @@ def git_tracks(path: Path) -> bool:
     return result.returncode == 0
 
 
-def native_store_overrides(entries, env) -> list[str]:
-    """Names of set pointer variables of native stores (a path override such as HF_TOKEN_PATH).
+def override_value(name: str, env) -> str | None:
+    """An override variable's value trimmed, or None when unset, empty or blank. ai-memory's env_string trims the same way (v2.4.1
+    crates/ai-memory-cli/src/config.rs:2086-2095), but an empty or blank value is NOT unset for ai-memory: figment's Env provider keeps
+    it (figment 0.10.19 src/providers/env.rs:504-519, merged at v2.4.1 config.rs:1318), the env_string branch (:1360-1364) does not
+    replace it, and canonicalise_or_keep (:2254-2266) keeps "", so the data directory becomes the working directory (measured with
+    ai-memory 3.1.0 `init`, PR #1240 fold 6). Callers therefore treat a set-but-blank value as an override (native_store_overrides)
+    and a refusal (canary_proof.py override_refusal), never as unset."""
+    value = (env.get(name) or "").strip()
+    return value or None
 
-    Our own stores are found through pointer variables on purpose; a native tool reads such a
-    variable itself, so the store is no longer where its template says. Names only."""
+
+def override_paths(entry: dict, env) -> list[str]:
+    """The entry's store file under each of its override variables' absolute, non-blank values, as written: the template with the
+    variable's directory (OVERRIDE_DEFAULTS) replaced by the value. ai-memory canonicalises its data directory (v2.4.1
+    config.rs:1366, v2.3.2 :1145, v3.1.0 :2357); the canary proof adds each exclusion's canonical form beside this literal one
+    (canary_proof.py canonical_exclusion) and its worker matches either. A relative or blank value adds nothing here (the proof
+    refuses it at prepare). These paths only add key exclusions; no root follows them."""
+    template, found = entry["store"]["path_template"], []
+    for name in entry.get("override_variables", []):
+        value, default = override_value(name, env), OVERRIDE_DEFAULTS.get(name, "")
+        if value and os.path.isabs(value) and default and template.startswith(default + "/"):
+            found.append(str(Path(value) / template[len(default) + 1:]))
+    return found
+
+
+def native_store_overrides(entries, env) -> list[str]:
+    """Names of set pointer variables, and of override variables set to anything but their default, of native stores.
+
+    A pointer variable such as HF_TOKEN_PATH moves the store file for a tool that reads it. An override variable such as
+    AI_MEMORY_DATA_DIR names the tool's data directory, which a run without its own path flag (ai-memory's --data-dir) then uses;
+    it warns for any set value other than the default, an empty or blank one included (see override_value). Names only."""
+    def overridden(name: str) -> bool:
+        if name not in env:
+            return False
+        value = override_value(name, env)
+        return value is None or os.path.normpath(value) != os.path.normpath(expand_template(OVERRIDE_DEFAULTS.get(name, ""), env))
     return sorted({name for entry in entries if entry["store"]["kind"] == "native_store"
-                   for name in entry["pointer_variables"] if name in env})
+                   for name in entry["pointer_variables"] if name in env}
+                  | {name for entry in entries if entry["store"]["kind"] == "native_store"
+                     for name in entry.get("override_variables", []) if overridden(name)})
 
 
 def inspect_entry(entry: dict, env, uid: int, now: float, *, check_store_lines: bool = True) -> dict:
@@ -253,7 +296,8 @@ def inspect_entry(entry: dict, env, uid: int, now: float, *, check_store_lines: 
     if report["variables_in_environment"]:
         report["warnings"].append("store_variables_exported_in_environment")
     if store["kind"] == "native_store" and native_store_overrides([entry], env):
-        # The tool then keeps its store where the variable points, not at the template.
+        # A tool that reads the variable, run without its own path flag (ai-memory's --data-dir), keeps its store where the variable
+        # points, not at the template, which is still the path inspected here.
         report["warnings"].append("store_path_overridden")
     if store["kind"] in NONLOCAL_KINDS:
         report["state"] = "not_local"

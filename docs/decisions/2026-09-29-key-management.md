@@ -1225,3 +1225,88 @@ Residuals from the re-check that this round does not fix:
 - The scan's own exit code comes from in-memory events that `Run.append` never
   validates (`scan` returns `report(..., exit_only=True)`). This round removes
   the one known disagreement (`inventory_unreconciled`), not the mechanism.
+
+## Addendum (2026-10-17): `override_variables`, a store directory's override
+
+An inventory row may now carry an optional `override_variables` list, beside
+`pointer_variables` (PR #1240, A2 finding G8-A02). The two fields differ:
+
+- A **pointer variable** holds the path of the row's store file
+  (`PAPER_ENV_FILE`, `HF_TOKEN_PATH`). The runner removes other rows'
+  pointers from a child's environment. The canary proof binds each pointer at
+  prepare and refuses a pointer that names a directory.
+- An **override variable** names the directory a native tool keeps the store
+  in. Today the only one is `AI_MEMORY_DATA_DIR`, ai-memory's data directory.
+  The `--data-dir` flag wins over it (akitaonrails/ai-memory v2.4.1, the
+  Linux pin, at `433a19f3`: `crates/ai-memory-cli/src/config.rs:1358-1364`,
+  with the variable read at `:573`; v2.3.2, the macOS pin, at `353841d9`:
+  `:1137-1143` and `:462`).
+  - **Without the flag or the variable**, a `config.toml` `data_dir` decides
+    (v2.4.1 `:1316`). Otherwise ai-memory's own default applies,
+    `dirs::data_local_dir()/ai-memory` (v2.4.1 `:2248-2252`, v2.3.2
+    `:1970-1974`).
+    - On Linux that is an absolute `$XDG_DATA_HOME`, else `~/.local/share`
+      (dirs 5.0.1 `src/lin.rs:11-12`).
+    - On macOS it is `~/Library/Application Support` (`src/mac.rs:7`, `:13`).
+  - **The row's `path_template`** is this stack's path,
+    `$HOME/.local/share/ai-memory`, which the settings template's hooks pass
+    as `--data-dir`. `scripts/credential_status.py` records it in
+    `OVERRIDE_DEFAULTS`. The `XDG_DATA_HOME`, macOS and `config.toml` moves
+    are not modelled.
+  - **An empty or blank value is not unset for ai-memory.**
+    - figment's Env provider keeps it (figment 0.10.19, the version
+      ai-memory's `Cargo.lock` pins at all three tags,
+      `src/providers/env.rs:504-519`; merged at v2.4.1 `config.rs:1318`).
+    - The trimming `env_string` branch (`:2086-2095`, used at `:1360-1364`)
+      does not replace it, and `canonicalise_or_keep` keeps `""`
+      (`:2254-2266`).
+    - So a run without the flag puts the data directory, token files
+      included, in its working directory. Measured with ai-memory 3.1.0
+      `init`, keyless, in a throwaway HOME, PR #1240 fold 6.
+  - **The checker** warns `store_path_overridden` for any set value other than
+    the default, empty and blank included.
+  - **The canary proof** refuses at prepare, with
+    `override_variable_not_absolute`, an empty, blank or relative value. For
+    an absolute value it also excludes the row's file, as written, as a key
+    path. No scan root moves.
+  - **Exclusions match on canonical forms on both sides** (fold 7; this
+    covers every exclusion, not only these rows):
+    - `scan_sink` builds these forms at each scan, against the live
+      filesystem (`canary_proof.py` `exclusions`); prepare only records a
+      digest of the list and stores no form that a scan reads. Beside each
+      literal exact exclusion it adds `realpath(dirname) + "/" + basename`,
+      and beside each glob exclusion's directory the realpath of the whole
+      directory (fold 8: the worker compares that directory with the fully
+      resolved parent of a matched name). The final component of an exact
+      rule is never resolved, so a symlink planted at a token name excludes
+      only itself.
+    - Residual, kept by the ruling (fold 8): a symlink at an excluded token
+      name keys only the link. If its target is an ordinary file inside a
+      covered root, that file is walked and scanned as itself; fold 6 had
+      excluded the resolved target. A target outside every root makes the
+      sink incomplete (`link_out`). A symlink to a directory at that name
+      leaves the directory walked, which is the ruling's purpose.
+    - The scan worker takes each walked root's canonical path from the
+      directory descriptor it opened (`/proc/self/fd/<fd>`; a file root uses
+      its parent's descriptor). It excludes an entry when either its literal
+      spelling or `canonical_root + "/" + rel` matches, and for a glob rule,
+      its parent either way. When the kernel gives no path for an opened
+      root's descriptor, the walk ends as `walk_error` and the sink is
+      incomplete (fold 8), never matched on the literal spelling alone; a
+      missing `/proc` fails closed earlier, at the scope check.
+    - The proof runs on Linux only (`canary_proof.py` `platform_check`,
+      called from prepare and scan). The ruling's macOS `F_GETPATH` branch is
+      not implemented: no macOS run is possible, and lifting that platform
+      gate needs the branch first.
+    - The same code serves `dir`, `glob`, `file`, `git` and `tasks` roots.
+      The tests exercise `dir`, `glob` and `file` roots through the worker's
+      own walk, and the ST9 end-to-end tests run only under a reviewed
+      ripgrep (14.1.0 or 15.2.0). The `git` and `tasks` roots are served and
+      untested.
+  - **The runner** leaves the variable in a child's environment.
+
+The settings template's hooks pass `--data-dir` with the default. Other
+documented ai-memory runs do not, so the canary exclusions cover the value
+exported to the proof itself instead of relying on the flag. A value exported
+only in the writer's shell is not caught: binding it at prepare is a recorded
+follow-up.
