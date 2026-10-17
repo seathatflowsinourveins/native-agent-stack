@@ -77,7 +77,7 @@ def orchestration_rule(o: dict, fixtures: list) -> dict:
 ROUTING_HEADS = [989, 974, 982, 970, 978]
 ROUTING_COST_BOUND = 0.60
 SONNET_CONDITION = "where the change is mechanical or a second Claude-family read exists"  # the command center's ruling: Sonnet at medium takes non-gate foundation changes only under this condition
-STOP_RECORD_PREFIX = "6fdeb8916960"  # paired-advisor/addendum-06-owner-priority-stop-20261011.md, a private working paper
+STOP_RECORD = "addendum-06-owner-priority-stop-20261011.md"  # in paired-advisor/, a private working paper named by file only
 
 
 def noise_floor(p: float, n: int, strict: bool) -> float:
@@ -155,14 +155,14 @@ def routing_paragraph(r: dict) -> str:
             f"at one shared detection rate of {got['pooled']:.2f} (two identical reviewers would pass it that rarely) and {got['strict_floor_per_finding']:.2f} with each finding's own pooled rate (a plug-in calculation from these runs, "
             f"not a significance test: a miss is less easily put down to chance than the first figure suggests, though it rests on {one_detection}); the tolerant reading, reported and not decisive, holds, and two identical "
             f"reviewers would satisfy it {got['tolerant_floor']:.2f} of the time ({got['tolerant_clause_floor']:.2f} for its per-finding clause alone, the figure the result record prints; the command center's ruling prints it too and is corrected in a sidecar "
-            f"file, sha256 `{papers['ruling_correction']['sha256'][:12]}`, which leaves the ruling's bytes unchanged). "
+            f"file `{papers['ruling_correction']['path']}`, which leaves the ruling's bytes unchanged). "
             f"Beside the rule, not inputs: outside the known findings Opus reported {beside['real_new_p1_p2']['O']} real and new P1 or P2 findings against Sonnet's {beside['real_new_p1_p2']['S']}, "
             f"and Sonnet approved {', '.join(differ_heads)}{' in both trials' if both_trials else ''} where Opus requested changes. The command center ruled the strict reading on {ruling['date']} "
-            f"(ruling sha256 `{ruling['sha256'][:12]}`, `{papers['ruling']['path']}`): Opus for trading code, gate code and any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation "
+            f"(ruling `{papers['ruling']['path']}`): Opus for trading code, gate code and any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation "
             f"changes (docs, pages, catalogs, generated reports) {SONNET_CONDITION}, which is the command center's routing discretion under the owner's direction to use the cheapest model that holds quality and not something "
             f"run 5 measured (none of the {len(ROUTING_HEADS)} heads was a docs, pages or generated-report change); no slot row, default or skill text changes. Limits: the same {len(ROUTING_HEADS)} heads in both trials, so the second trial measures run-to-run variation on them; one brief; medium effort only; "
             f"the judge and refuter are one family; the fence denies the client's persisted tool outputs and refused the runs that tried to read them ({r['exposure']['limit'].split('(')[1].rstrip(')')}); costs are API-list-equivalent, not billed. "
-            f"The preregistration is sha256 `{papers['preregistration']['sha256'][:12]}`, the result record `{papers['result']['sha256'][:12]}`, and the registration allows no third trial.")
+            f"The preregistration is `{papers['preregistration']['path']}` and the result record `{papers['result']['path']}`, both private, and the registration allows no third trial.")
 
 
 class PlanningRunTests(unittest.TestCase):
@@ -685,7 +685,7 @@ class RoutingRunTests(unittest.TestCase):
         ruling = self.r["ruling"]
         self.assertEqual(ruling["sha256"], self.r["papers"]["ruling"]["sha256"])
         self.assertIn("research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md", ruling["path"])
-        self.assertTrue(self.r["papers"]["preregistration"]["sha256"].startswith("66f87a9eb2b9"))
+        self.assertRegex(self.r["papers"]["preregistration"]["sha256"], r"^[0-9a-f]{64}$")
         self.assertEqual(self.r["beside_the_rule"]["verdicts_that_differ"], sorted(f"#{x['pr']} t{x['trial']}" for x in self.r["runs"] if x["arm"] == "S" and self.runs[f"{x['pr']}-O-{x['trial']}"]["verdict"] != x["verdict"]))
 
     def test_the_record_states_the_routing_decision_and_the_owed_table_is_right(self):
@@ -693,12 +693,14 @@ class RoutingRunTests(unittest.TestCase):
         self.assertEqual(self.record.count(paragraph), 1, "the addendum carries the paragraph the artifact gives")
         self.assertNotIn("Paired run 5 (preregistration", self.record, "a decided run is not owed")
         row = next(line for line in RECORD.read_text(encoding="utf-8").splitlines() if line.startswith("| Paired run 4 ("))
-        self.assertIn("33bd44ca34cb", row)
+        self.assertIn("(its private preregistration, approved by the command center", row)
         self.assertIn("stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs, with no verdict", row)
-        self.assertIn(STOP_RECORD_PREFIX, row)
+        self.assertIn(f"(private record `{STOP_RECORD}`)", row)
+        self.assertNotRegex(row, r"sha256 `[0-9a-f]{7,}`", "the row names its private records by file only")
         self.assertNotIn("its result is a later record", row)
-        for needle in ("no slot row, default or skill text changes", f"`{self.r['ruling']['sha256'][:12]}`"):
+        for needle in ("no slot row, default or skill text changes", f"`{self.r['papers']['ruling']['path']}`"):
             self.assertIn(needle, paragraph)
+        self.assertNotRegex(paragraph, r"sha256 `[0-9a-f]{7,}`", "the paragraph names its private papers by path only")
 
     def test_a_changed_figure_in_the_paragraph_is_caught(self):
         paragraph = routing_paragraph(self.r)
@@ -709,6 +711,13 @@ class RoutingRunTests(unittest.TestCase):
             if run["arm"] == "S":
                 run["cost_usd_m2"] *= 2
         self.assertNotIn(paragraph, routing_paragraph(mutated))
+
+
+class PrivateRecordNamingTests(unittest.TestCase):
+    def test_the_third_selection_row_names_its_private_sweep_by_file_only(self):
+        row = next(line for line in RECORD.read_text(encoding="utf-8").splitlines() if line.startswith("| Third selection |"))
+        self.assertIn("`research/api-surfaces-20261008/FINAL.md` on the producing host (corrected bytes)", row)
+        self.assertNotRegex(row, r"sha256 `[0-9a-f]{7,}`", "the row names its private sweep by file only")
 
 
 if __name__ == "__main__":

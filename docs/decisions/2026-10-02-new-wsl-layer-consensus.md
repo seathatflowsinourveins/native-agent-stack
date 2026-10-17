@@ -415,11 +415,11 @@ layers 37 | slots 90 {'foundation': 70, 'us-equities': 20} | definitive 31 | ins
 ```
 
 The batch rests on the wave-2 run `wf_18aa601f-b71` (14 layers, each a Claude dossier, a GPT-6 Astra check through
-`codex exec` and a Claude ruling) and its synthesis (`wsl-architecture-design-wave2-final-architecture-20261003.md`, sha256
-`3b51261387827a2c7c3eb0d866e36e2976ff8d66eb0b4ee9febb206878c4a8c1`). Both are private coordination records. `wave2-records.json` carries,
+`codex exec` and a Claude ruling) and its synthesis (`wsl-architecture-design-wave2-final-architecture-20261003.md`).
+Both are private coordination records. `wave2-records.json` carries,
 per layer the batch uses, the dossier's default, the GPT check's verdict and model, the ruling's decided default and the
-ruling's changes that the repository records cite, each event hashed in canonical JSON, with the journal's sha256
-`5f904de283d268f787b24bb0e8ee7c5dda07acf10faa6637861c4c2a9d40ecef`; it also carries the synthesis items the records rest on (X1 to X3, X5, X10
+ruling's changes that the repository records cite, each event hashed in canonical JSON, citing the run's private workflow
+journal; it also carries the synthesis items the records rest on (X1 to X3, X5, X10
 to X12, X16 to X18 and its phase 0) and the owner's decisions of 2026-10-03 as the coordinator's records relay them.
 
 ### Amendment 3

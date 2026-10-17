@@ -5102,8 +5102,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
-      "sha256": "f3c5367b9da4b8b8678c38a47b73414c24e91041da81c73246d87d9573f42ab8",
-      "bytes": 7327
+      "sha256": "4401385e283788cf5ed51e580ce7d34f30b3e2e3c96267b7eb909b41c9e1934e",
+      "bytes": 7371
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/scheduling-supervision.md",
@@ -5112,8 +5112,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "f186a40d8752fcbbfa64a173982aae131ac4541dd25b775fc7866f19085a0dda",
-      "bytes": 169733
+      "sha256": "3d63a1c245361ad42aa7b7632051a9a2bc6bd0265ccb96e46d3a1b200cc77e7e",
+      "bytes": 169777
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -19173,8 +19173,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
-      "sha256": "98947f11f2a3eb693c9c31b3fff6e58e1f20d476411aa49f42f66888d43c6d47",
-      "bytes": 54090
+      "sha256": "477f15846fcf8c870665eca5df835a2dbae78942a017e22583deb74ef724aece",
+      "bytes": 54121
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
@@ -21913,7 +21913,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "fe4e9cebcb0926e26da46bee2e1bf555f30cc4e39ea98fd71aa5a0712e2e54b8",
+      "sha256": "9ae4cffcf37a2ffa757c489ebf9ee159c7960a558d2f041151445a4770f027c0",
       "bytes": 238736
     },
     {
@@ -64833,8 +64833,8 @@
     },
     {
       "path": "tests/test_native_practice_meter_windows.py",
-      "sha256": "05c3dcaaa7eb0e5afebb730423c3abb883ef21fd9c695affcc77dc3e857e1ded",
-      "bytes": 9198
+      "sha256": "dbc05df4e0ef802d0dfb33c4176aa4bee1c330cd45ca6d6f539b22f8b868a014",
+      "bytes": 9218
     },
     {
       "path": "tests/test_native_practice_owed_check_corrections.py",
@@ -64993,8 +64993,8 @@
     },
     {
       "path": "tests/test_paired_runs_results.py",
-      "sha256": "1f152a8c62d7cedb4a7fdecb263cd80a1e3a8bae2db7741f7bdafc763d8ceac8",
-      "bytes": 56366
+      "sha256": "888a2fa6da701a7e73c5331ea5a65b5c949b3abc6db346ddbb0b997cfa136829",
+      "bytes": 57086
     },
     {
       "path": "tests/test_path_safety.py",

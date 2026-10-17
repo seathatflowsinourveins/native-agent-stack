@@ -6,7 +6,7 @@ Evidence entry state what the artifact shows; each figure here is derived from i
 
 The first version of the row (#1005 at bf864c370) said the events give Opus 5.5 "about 1.9 times" the counter's figure and that they leave the advisor's iterations out, with no window, counter sample or calculation
 in the repository (the Codex review in GitHub of #1005, P2, observation-inference.md:13). Metered again at two fixed instants the ratio is 2.56 and 1.64: 1.92 was the figure of the advisor run's preregistration at
-the instant it was written, so no single ratio holds across windows. The clause about the advisor was also wrong: the advisor run's Stage 0 (a private working paper, sha256 2377eb9ce915c3b0...) found the events
+the instant it was written, so no single ratio holds across windows. The clause about the advisor was also wrong: the advisor run's Stage 0 (the private working paper addendum-03-stage0-result-20261011.md) found the events
 book the advisor's dollars under the executor's model, the opposite of leaving them out. The row now carries the measured ratios of both windows and the Stage 0 finding, and the paired run 4 clause says the run
 was stopped, not proposed. Repository-text checks only: the private papers and the live metrics are not read.
 """
@@ -23,8 +23,8 @@ ARTIFACT_REL = "evidence/artifacts/claude-native-practice-20261009/meter-windows
 ARTIFACT = ROOT / ARTIFACT_REL
 REFERENCE = ROOT / ".claude/skills/claude-native-practice/reference"
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
-STAGE0_SHA12 = "2377eb9ce915"  # paired-advisor/addendum-03-stage0-result-20261011.md, a private working paper
-STOP_SHA12 = "6fdeb8916960"  # paired-advisor/addendum-06-owner-priority-stop-20261011.md, a private working paper
+STAGE0_PAPER = "addendum-03-stage0-result-20261011.md"  # in paired-advisor/, a private working paper named by file only
+STOP_PAPER = "addendum-06-owner-priority-stop-20261011.md"  # in paired-advisor/, a private working paper named by file only
 MODELS = ("claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-1")
 EVIDENCE_ITEM = f"Metered 2026-10-11 over two 24-hour windows ({ARTIFACT_REL})"
 
@@ -56,8 +56,8 @@ def row_sentence(artifact: dict) -> str:
             f"on claude-fable-5-1 the cost counter equals the token counters at the pricing page's rates (sha256 {artifact['pricing']['sha256'][:12]}) to within a cent in both windows; "
             f"the `api_request` events' `cost_usd` equals the counter on none of the three main models (events over counter in the first and second window: Opus 5.5 {pair('claude-opus-5-5')}, "
             f"Sonnet 5.5 {pair('claude-sonnet-5-5')}, Fable 5.1 {pair('claude-fable-5-1')}), so the events are not a spend meter, and the advisor run's Stage 0 found one cause: the events book the advisor's "
-            f"dollars under the executor's model (private working paper, sha256 {STAGE0_SHA12}); Fable 5.1, the model the advisor runs on here, was {share} of the counter's list-equivalent total. "
-            f"Paired run 4, which was to weigh that share against what the advisor buys, was stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs and has no verdict (private working paper, sha256 {STOP_SHA12}).")
+            f"dollars under the executor's model (private working paper `{STAGE0_PAPER}`); Fable 5.1, the model the advisor runs on here, was {share} of the counter's list-equivalent total. "
+            f"Paired run 4, which was to weigh that share against what the advisor buys, was stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs and has no verdict (private working paper `{STOP_PAPER}`).")
 
 
 class MeterWindowsTests(unittest.TestCase):
