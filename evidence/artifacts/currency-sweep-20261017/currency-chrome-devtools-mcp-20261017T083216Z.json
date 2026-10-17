@@ -1,0 +1,295 @@
+{
+ "kind": "currency_verification",
+ "host": "NativeHorizonNY",
+ "tool": "chrome-devtools-mcp",
+ "from": "1.10.1 (audit snapshot and plan pin; an npx argument in both client configs)",
+ "to": "1.11.0 (npm chrome-devtools-mcp)",
+ "result": "ALREADY_AT_TARGET: the lane builder re-pinned both client configs at 2026-10-17T00:33Z-00:35Z; verified first-hand by this sweep (npm integrity and provenance, installed bytes in the npx cache, MCP smoke through the configs' exact npx line). The sweep task's 'report the exact one-line diff' is empty: nothing to change. No client config was edited by this sweep.",
+ "finding": "A2 stage-1 audit G3-12 (P2): chrome-devtools-mcp 1.10.1 (npx argument in both clients) trailed 1.11.0.",
+ "recorded_utc": "2026-10-17T08:31:38Z",
+ "switch_record": {
+  "switched_by": "the lane builder",
+  "receipt": "<lane builder upgrade records (private)>/<receipt notes> section '(8) chrome-devtools-mcp 1.10.1 -> 1.11.0: DONE'",
+  "tracker": "<command-center tracker (private)> (the lane builder's queue)",
+  "commands_lane_builder_ran": [
+   "claude mcp remove chrome-devtools --scope user && claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.11.0 <same flags>",
+   "sed -i '122s/chrome-devtools-mcp@1\\.10\\.1/chrome-devtools-mcp@1.11.0/' ~/.codex/config.toml"
+  ]
+ },
+ "client_config_state_read_by_this_sweep": {
+  "claude_user_scope_args_masked_helper": [
+   "user.mcpServers.chrome-devtools.args.0 = -y",
+   "user.mcpServers.chrome-devtools.args.1 = chrome-devtools-mcp@1.11.0",
+   "user.mcpServers.chrome-devtools.args.2 = --headless",
+   "user.mcpServers.chrome-devtools.args.3 = --isolated",
+   "user.mcpServers.chrome-devtools.args.4 = --no-usage-statistics",
+   "user.mcpServers.chrome-devtools.args.5 = --no-performance-crux"
+  ],
+  "codex_mcp_list_args": [
+   [
+    "-y",
+    "chrome-devtools-mcp@1.11.0",
+    "--headless",
+    "--isolated",
+    "--no-usage-statistics",
+    "--no-performance-crux"
+   ]
+  ],
+  "exact_one_line_diff_that_the_task_asked_for": "none needed; for the record the change was args[1] 'chrome-devtools-mcp@1.10.1' to 'chrome-devtools-mcp@1.11.0' in ~/.claude.json mcpServers.chrome-devtools, and the args line of [mcp_servers.chrome-devtools] in ~/.codex/config.toml"
+ },
+ "upstream": {
+  "repo": "ChromeDevTools/chrome-devtools-mcp",
+  "release_url": "https://github.com/ChromeDevTools/chrome-devtools-mcp/releases/tag/chrome-devtools-mcp-v1.11.0",
+  "tag": "chrome-devtools-mcp-v1.11.0",
+  "npm_published_utc": "2026-10-15T14:05:14.995Z",
+  "release_age_at_verification": "42h26m (1.8 days)",
+  "latest_check": "npm dist-tags latest = 1.11.0 (registry read 07:43Z)"
+ },
+ "provenance": {
+  "registry": {
+   "integrity": "sha512-CytJ/5tnzrS+J/74be2P5aCOsS/mmGRHys/Si+IYC4ucrbnWAmES/dYdxGJjeUCECRcoFUilZAysdjlwqUjXIA==",
+   "shasum": "c370697cced824e867be0005e39b4bd9e62e32d2",
+   "fileCount": 370,
+   "unpackedSize": 14062824,
+   "tarball": "https://registry.npmjs.org/chrome-devtools-mcp/-/chrome-devtools-mcp-1.11.0.tgz"
+  },
+  "registry_signatures": 2,
+  "registry_attestation_predicate": {
+   "predicateType": "https://slsa.dev/provenance/v1"
+  },
+  "tarball": {
+   "file": "chrome-devtools-mcp-1.11.0.tgz",
+   "bytes": 2606605,
+   "integrity_computed": "sha512-CytJ/5tnzrS+J/74be2P5aCOsS/mmGRHys/Si+IYC4ucrbnWAmES/dYdxGJjeUCECRcoFUilZAysdjlwqUjXIA==",
+   "shasum_computed": "c370697cced824e867be0005e39b4bd9e62e32d2",
+   "integrity_match": true,
+   "shasum_match": true
+  },
+  "installed_vs_tarball": {
+   "installed_dir": "$HOME/.npm/_npx/053a863a8198098a/node_modules/chrome-devtools-mcp",
+   "files_match": 370,
+   "files_differ": 0,
+   "files_missing_in_installed": 0,
+   "differ_list": [],
+   "missing_list": []
+  },
+  "npm_audit_signatures_in_scratch_install": {
+   "cwd": "<scratch>",
+   "exit": 0,
+   "audited_packages": "1",
+   "verified_registry_signatures": "1",
+   "verified_attestations": "1"
+  },
+  "npx_cache_entry_checked": "$HOME/.npm/_npx/053a863a8198098a/node_modules/chrome-devtools-mcp (version 1.11.0, created 2026-10-17T07:17Z); the 1.10.1 entry in _npx/ba38acecdf97096f remains for rollback"
+ },
+ "release_notes_review": {
+  "read": [
+   "chrome-devtools-mcp-v1.11.0 release notes"
+  ],
+  "affects_our_use": [
+   "two new tools, screencast_start and screencast_stop (ffmpeg-free, on by default); no tool removed",
+   "evaluate_script gains format and sourcePath and 'function' leaves its required list; emulate gains forcedColors, prefersContrast, prefersReducedMotion; performance_start_trace gains ignoreCache (all additive)",
+   "lighthouse_audit now returns failing audits and DOM nodes inline; long names are truncated to 100 characters by default (output changes, not call changes)",
+   "new opt-in --file-navigations flag rejects file: URL navigations (not used by our args)"
+  ],
+  "breaking": "none for the launch arguments --headless --isolated --no-usage-statistics --no-performance-crux"
+ },
+ "smoke": {
+  "method": "scratch mcp_smoke.py under systemd-run --user --scope -p CPUWeight=idle through $ECO/bin/npx -y chrome-devtools-mcp@<v> --headless --isolated --no-usage-statistics --no-performance-crux (the configs' exact line; the npx cache avoids a download); tools/list only, no browser is launched",
+  "mcp_1_11_0": {
+   "ok": true,
+   "serverInfo": {
+    "name": "chrome_devtools",
+    "title": "Chrome DevTools MCP server",
+    "version": "1.11.0"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 32,
+   "tools_schema_sha256": "fed42acf73a6db1a1ad6d19188f46453f2f8890ddbf44c991b23978dbb235b07",
+   "server_exit": 0,
+   "elapsed_s": 1.8,
+   "error": null,
+   "has_instructions": false
+  },
+  "mcp_1_10_1_baseline": {
+   "ok": true,
+   "serverInfo": {
+    "name": "chrome_devtools",
+    "title": "Chrome DevTools MCP server",
+    "version": "1.10.1"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 30,
+   "tools_schema_sha256": "bea49872ff24493d05709980a1a3073c69cd847f8829f15e4df2d5c0c21a5730",
+   "server_exit": 0,
+   "elapsed_s": 1.67,
+   "error": null,
+   "has_instructions": false
+  },
+  "harness_exits": {
+   "1.11.0": 0,
+   "1.10.1": 0
+  },
+  "tool_diff_1_10_1_to_1_11_0": [
+   "old=30 new=32 added=2 removed=0",
+   "ADDED: screencast_start, screencast_stop",
+   "SCHEMA-CHANGED (30):",
+   "   click | schema-detail",
+   "   close_page | schema-detail",
+   "   drag | schema-detail",
+   "   emulate | props +['forcedColors', 'prefersContrast', 'prefersReducedMotion'] -[]",
+   "   evaluate_script | props +['format', 'sourcePath'] -[]; required +[] -['function']",
+   "   fill | schema-detail",
+   "   fill_form | schema-detail",
+   "   get_console_message | schema-detail",
+   "   get_css_styles | schema-detail",
+   "   get_network_request | schema-detail",
+   "   handle_dialog | schema-detail",
+   "   hover | schema-detail",
+   "   lighthouse_audit | schema-detail",
+   "   list_console_messages | schema-detail",
+   "   list_network_requests | schema-detail",
+   "   list_pages | schema-detail",
+   "   navigate_page | schema-detail",
+   "   new_page | schema-detail",
+   "   performance_analyze_insight | schema-detail",
+   "   performance_start_trace | props +['ignoreCache'] -[]",
+   "   performance_stop_trace | schema-detail",
+   "   press_key | schema-detail",
+   "   resize_page | schema-detail",
+   "   select_page | schema-detail",
+   "   take_heapsnapshot | schema-detail",
+   "   take_screenshot | schema-detail",
+   "   take_snapshot | schema-detail",
+   "   type_text | schema-detail",
+   "   upload_file | schema-detail",
+   "   wait_for | schema-detail",
+   "DESCRIPTION-CHANGED: 4 of 30 common tools"
+  ],
+  "live_session_tool_list_check": "the 32 tool names in a live Claude session this sweep ran in equal the 1.11.0 list exactly (that session's server is already 1.11.0)"
+ },
+ "link": {
+  "changed_by_this_sweep": false,
+  "pinned_by": "the npx argument in the client configs (no link)"
+ },
+ "rollback": "per the lane builder: claude mcp remove chrome-devtools --scope user and re-add with chrome-devtools-mcp@1.10.1; sed -i '122s/chrome-devtools-mcp@1\\.11\\.0/chrome-devtools-mcp@1.10.1/' ~/.codex/config.toml (not run by this sweep)",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "release_age_at_verification": "42h27m (1.8 days)",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "chrome-devtools-mcp-v1.11.0 release notes"
+   ],
+   "README.md": {
+    "bytes": 6445,
+    "window_hits": []
+   },
+   "SECURITY.md": {
+    "bytes": 5286,
+    "window_hits": []
+   },
+   "repo": "ChromeDevTools/chrome-devtools-mcp",
+   "tag": "chrome-devtools-mcp-v1.11.0",
+   "pattern": "cooldown|minimum release age|release age|quarantine period|days after release|exclude-newer|embargo"
+  },
+  "SECURITY.md_note": "5286 bytes at the tag; the 1.11.0 notes add 'document trusted host environment in SECURITY.md', not a window"
+ },
+ "public_copy": {
+  "of": "currency-chrome-devtools-mcp receipt written by the currency sweep of 2026-10-17 (private original kept on the host)",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-chrome-devtools-mcp-20261017T083216Z.json",
+  "amended_by_the_fold": {
+   "blocks": [
+    "digest_comparison",
+    "source_commit_resolution"
+   ],
+   "from_private_addendum": "currency-fold-digests-20261017T144813Z.json",
+   "why": "the verdict on PR #1243 asked that each public receipt carry the registry's own digests, the locally computed digests of the same bytes and how the source commit was resolved"
+  }
+ },
+ "digest_comparison": {
+  "read_utc": "2026-10-17T14:36:20Z",
+  "what_was_compared_with_what": "npm publishes, for each version, a sha512 SRI string (dist.integrity) and a sha1 (dist.shasum) and no sha256. The tarball at dist.tarball was downloaded, and its sha512 and sha1 were computed locally: both equal the published values. The sha256 recorded in the profile row is computed locally over the same bytes; it has no registry counterpart to be compared with.",
+  "registry": {
+   "fields_read": [
+    "dist.tarball",
+    "dist.integrity",
+    "dist.shasum",
+    "dist.fileCount",
+    "dist.unpackedSize",
+    "gitHead"
+   ],
+   "fileCount": 370,
+   "name": "npm registry",
+   "npm_publishes_sha256": false,
+   "published_digests": {
+    "integrity_sha512_sri": "sha512-CytJ/5tnzrS+J/74be2P5aCOsS/mmGRHys/Si+IYC4ucrbnWAmES/dYdxGJjeUCECRcoFUilZAysdjlwqUjXIA==",
+    "shasum_sha1": "c370697cced824e867be0005e39b4bd9e62e32d2"
+   },
+   "tarball_url": "https://registry.npmjs.org/chrome-devtools-mcp/-/chrome-devtools-mcp-1.11.0.tgz",
+   "unpackedSize": 14062824,
+   "url_read": "https://registry.npmjs.org/chrome-devtools-mcp/1.11.0"
+  },
+  "comparisons": [
+   {
+    "equal": true,
+    "local_algorithm": "sha512 (base64 SRI)",
+    "local_value": "sha512-CytJ/5tnzrS+J/74be2P5aCOsS/mmGRHys/Si+IYC4ucrbnWAmES/dYdxGJjeUCECRcoFUilZAysdjlwqUjXIA==",
+    "registry_field": "dist.integrity (sha512 SRI)",
+    "registry_value": "sha512-CytJ/5tnzrS+J/74be2P5aCOsS/mmGRHys/Si+IYC4ucrbnWAmES/dYdxGJjeUCECRcoFUilZAysdjlwqUjXIA=="
+   },
+   {
+    "equal": true,
+    "local_algorithm": "sha1",
+    "local_value": "c370697cced824e867be0005e39b4bd9e62e32d2",
+    "registry_field": "dist.shasum (sha1)",
+    "registry_value": "c370697cced824e867be0005e39b4bd9e62e32d2"
+   },
+   {
+    "equal": null,
+    "local_algorithm": "sha256",
+    "local_value": "e9f0ab97ad9515927c7d9f0a3dfbdb9ea485d2810d572e4a64eb84b192c8bf0c",
+    "note": "the profile's pinned sha256 is computed here from the registry tarball; it has no registry counterpart to compare with, and is as strong as the sha512 and sha1 matches above, which cover the same bytes",
+    "registry_field": "(npm publishes no sha256)",
+    "registry_value": null
+   }
+  ],
+  "all_registry_comparisons_equal": true,
+  "profile_pin": {
+   "row": "Chrome DevTools MCP",
+   "pin": "1.11.0",
+   "checksum": {
+    "algorithm": "sha256",
+    "value": "e9f0ab97ad9515927c7d9f0a3dfbdb9ea485d2810d572e4a64eb84b192c8bf0c"
+   },
+   "equals_local_sha256": true
+  },
+  "local_download": {
+   "bytes": 2606605,
+   "saved_as": "dl/chrome-devtools-mcp/chrome-devtools-mcp-1.11.0.tgz (heavy scratch)",
+   "sha1": "c370697cced824e867be0005e39b4bd9e62e32d2",
+   "sha256": "e9f0ab97ad9515927c7d9f0a3dfbdb9ea485d2810d572e4a64eb84b192c8bf0c",
+   "sha512_sri": "sha512-CytJ/5tnzrS+J/74be2P5aCOsS/mmGRHys/Si+IYC4ucrbnWAmES/dYdxGJjeUCECRcoFUilZAysdjlwqUjXIA==",
+   "url": "https://registry.npmjs.org/chrome-devtools-mcp/-/chrome-devtools-mcp-1.11.0.tgz"
+  }
+ },
+ "source_commit_resolution": {
+  "gitHead_read_from": "https://registry.npmjs.org/chrome-devtools-mcp/1.11.0 (field gitHead)",
+  "git_ls_remote": {
+   "command": "git ls-remote https://github.com/ChromeDevTools/chrome-devtools-mcp.git refs/tags/chrome-devtools-mcp-v1.11.0 refs/tags/chrome-devtools-mcp-v1.11.0^{}",
+   "commit": "a878bcad39584337e055778353246820deafa7c0",
+   "exit": 0,
+   "lines": [
+    "a878bcad39584337e055778353246820deafa7c0\trefs/tags/chrome-devtools-mcp-v1.11.0"
+   ],
+   "tag_kind": "lightweight",
+   "tag_object": null
+  },
+  "npm_gitHead": "a878bcad39584337e055778353246820deafa7c0",
+  "npm_gitHead_equals_tag_commit": true,
+  "tag_commit": "a878bcad39584337e055778353246820deafa7c0",
+  "tag_commit_equals_profile_or_recorded_commit": true,
+  "method": "git ls-remote https://github.com/<repo>.git refs/tags/<tag> refs/tags/<tag>^{} (an annotated tag lists its object and, peeled, its commit; a lightweight tag lists only the commit); for npm packages the version document's gitHead and, when it differs from the tag commit, the GitHub compare API between the two"
+ }
+}

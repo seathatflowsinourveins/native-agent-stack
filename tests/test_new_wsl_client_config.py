@@ -1594,12 +1594,12 @@ class RenderTests(unittest.TestCase):
         self.assertNotIn("defaultMode", settings["permissions"])        # an authorization setting: not by default
         self.assertNotIn("allow", settings["permissions"])              # an allow rule is one too
         self.assertNotIn("skipDangerousModePermissionPrompt", settings)
-        # The wave-2 rows: context-mode's plugin (an interim install) and claude-hud 0.10.0 (the statusline row), whose
+        # The wave-2 rows: context-mode's plugin (an interim install) and claude-hud 0.11.3 (the statusline row), whose
         # status line is the command its setup.mjs writes; the codex plugin for Claude Code stays out.
         self.assertEqual(settings["enabledPlugins"], {"context-mode@context-mode": True, "claude-hud@claude-hud": True,
                                                       "cc-plugin-you-should-know@builtin": True})
         self.assertEqual(sorted(settings["extraKnownMarketplaces"]), ["claude-hud", "context-mode"])
-        self.assertEqual(settings["extraKnownMarketplaces"]["claude-hud"]["source"]["ref"], "v0.10.0")
+        self.assertEqual(settings["extraKnownMarketplaces"]["claude-hud"]["source"]["ref"], "v0.11.3")
         self.assertEqual(settings["statusLine"], {
             "type": "command", "refreshInterval": 5,
             "command": "'/home/example/.local/share/mise/installs/node/24.21.0/bin/node' "

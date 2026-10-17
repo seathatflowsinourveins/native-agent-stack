@@ -1,0 +1,171 @@
+{
+ "kind": "currency_verification",
+ "host": "NativeHorizonNY",
+ "tool": "headroom-ai",
+ "from": "0.40.0 (audit snapshot; the plan's Linux wheel pin; the profile row still names 0.37.0)",
+ "to": "0.41.0 (PyPI headroom-ai[mcp]==0.41.0)",
+ "result": "ALREADY_AT_TARGET: switched by the lane builder at 2026-10-17T00:14Z-00:15Z; verified first-hand by this sweep (PyPI attestations, installed bytes, MCP smoke). Not switched by this sweep.",
+ "finding": "A2 stage-1 audit G3-12 / ledger 3.1: headroom trailed a newer same-line release.",
+ "recorded_utc": "2026-10-17T08:19:07Z",
+ "switch_record": {
+  "switched_by": "the lane builder",
+  "receipt": "<lane builder upgrade records (private)>/<receipt notes> section '(4) headroom 0.40.0 -> 0.41.0: DONE'",
+  "scripts_and_logs": [
+   "<lane builder script (private)>",
+   "<lane builder log (private)>",
+   "<lane builder log (private)>",
+   "<lane builder log (private)>",
+   "<lane builder backup (private)>/ (old uv-receipt)"
+  ],
+  "tracker": "<command-center tracker (private)>:540",
+  "command_lane_builder_ran": "UV_TOOL_DIR=$ECO/python-tools UV_TOOL_BIN_DIR=$ECO/bin uv tool install --python 3.13 'headroom-ai[mcp]==0.41.0'",
+  "lane_builder_smoke": "bin/headroom mcp serve --proxy-url http://127.0.0.1:1 with the live offline and no-track variables: initialize ok, tools/list 3 tools, tools/call headroom_stats ok (527 chars)"
+ },
+ "upstream": {
+  "repo": "headroomlabs-ai/headroom",
+  "release_url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.41.0",
+  "tag": "v0.41.0",
+  "commit": "76133cff59b71284399bf760c5578dc373c97231",
+  "github_release_published_utc": "2026-10-14T22:46:09Z",
+  "pypi_upload_utc": "2026-10-14T23:04:09.218406Z",
+  "release_age_at_verification": "57h14m (2.4 days)",
+  "latest_check": "0.41.0 is the newest release (PyPI info.version 0.41.0; releases list read 07:43Z; v0.40.0 is the previous one)"
+ },
+ "provenance": {
+  "pypi_sha256": {
+   "headroom_ai-0.41.0-cp310-abi3-manylinux_2_28_x86_64.whl": {
+    "downloaded": "f4db5e5119a73af3ed952b1c10caff2430831d899eb17d995a27574ae6e6b306",
+    "pypi_json": "f4db5e5119a73af3ed952b1c10caff2430831d899eb17d995a27574ae6e6b306",
+    "match": true
+   },
+   "headroom_ai-0.41.0.tar.gz": {
+    "downloaded": "b24e6b33becfa767d7b82bce02b9ca06f05ce2a3daf1392f8e591947a9c5bf28",
+    "pypi_json": "b24e6b33becfa767d7b82bce02b9ca06f05ce2a3daf1392f8e591947a9c5bf28",
+    "match": true
+   }
+  },
+  "pypi_attestations": {
+   "headroom_ai-0.41.0-cp310-abi3-manylinux_2_28_x86_64.whl": {
+    "provenance_http": 200,
+    "publisher": [
+     {
+      "environment": "pypi",
+      "kind": "GitHub",
+      "repository": "headroomlabs-ai/headroom",
+      "workflow": "release.yml"
+     }
+    ],
+    "verify": {
+     "cmd": "uvx --from pypi-attestations==0.0.30 pypi-attestations verify pypi --repository https://github.com/headroomlabs-ai/headroom pypi:headroom_ai-0.41.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+     "exit": 0,
+     "tail": "OK: headroom_ai-0.41.0-cp310-abi3-manylinux_2_28_x86_64.whl"
+    }
+   },
+   "headroom_ai-0.41.0.tar.gz": {
+    "provenance_http": 200,
+    "publisher": [
+     {
+      "environment": "pypi",
+      "kind": "GitHub",
+      "repository": "headroomlabs-ai/headroom",
+      "workflow": "release.yml"
+     }
+    ],
+    "verify": {
+     "cmd": "uvx --from pypi-attestations==0.0.30 pypi-attestations verify pypi --repository https://github.com/headroomlabs-ai/headroom pypi:headroom_ai-0.41.0.tar.gz",
+     "exit": 0,
+     "tail": "OK: headroom_ai-0.41.0.tar.gz"
+    }
+   }
+  },
+  "verifier": "pypi-attestations 0.0.30 (PyPA, published 2026-07-28) run as an ephemeral 'uvx --from pypi-attestations==0.0.30' probe; not installed",
+  "installed_bytes_vs_wheel_RECORD": {
+   "site_packages": "$ECO_ROOT/python-tools/headroom-ai/lib/python3.13/site-packages",
+   "wheel": "headroom_ai-0.41.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+   "record_files_matching_installed": 586,
+   "mismatched": 0,
+   "missing": 0,
+   "skipped_scripts_or_data": 0,
+   "mismatched_list": [],
+   "missing_list": []
+  },
+  "installed_uv_receipt": "[tool] requirements = [{ name = \"headroom-ai\", extras = [\"mcp\"], specifier = \"==0.41.0\" }] python = \"3.13\" entrypoints = [     { name = \"headroom\", install-path = \"$ECO_ROOT/bin/headroom\", from = \"headroom-ai\" },     { name = \"headroom-cache-ttl\", install-path = \"$ECO_ROOT/bin/headroom-cache-ttl\", from = \"headroom-ai\" }, ]"
+ },
+ "release_notes_review": {
+  "read": [
+   "v0.41.0 release notes (evidence pack copy of the GitHub release body)"
+  ],
+  "affects_our_use": [
+   "none found: fixes, security alert resolutions (23 CodeQL alerts, two npm advisories) and deprecations of unused internals; 'remove test-only and dead helpers from wrap, proxy and mcp (#4118)' is checked by the MCP smoke below"
+  ],
+  "mcp_server_version_string": "the MCP server reports version 1.30.0, the tool env's mcp SDK version, not headroom's own (same as the lane builder's note)",
+  "deliberate_local_config": "the dead proxy URL (127.0.0.1:1) and offline flags are deliberate per the lane builder's receipt section (G6) citing docs/decisions/2026-10-04-token-full-stack-owner-default.md:109,156",
+  "ledger_note": "adoption/new-wsl-profile.json still names 0.37.0 (ledger 3.1) and the Linux wheel pin names 0.40.0; see the PR description for the re-pin and the W1b requalification hold"
+ },
+ "smoke": {
+  "method": "scratch mcp_smoke.py under systemd-run --user --scope -p CPUWeight=idle, the clients' own args (mcp serve --proxy-url http://127.0.0.1:1), isolated HOME, empty cwd",
+  "version_flag": {
+   "cmd": "$ECO_ROOT/bin/headroom --version",
+   "exit": 0,
+   "out_head": "headroom, version 0.41.0"
+  },
+  "mcp": {
+   "ok": true,
+   "serverInfo": {
+    "name": "headroom",
+    "version": "1.30.0"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 3,
+   "tools_schema_sha256": "604a237cc9977b51a6aab703a2b1047f5271bc30f5bae454025a8bc6880a0403",
+   "server_exit": 0,
+   "elapsed_s": 0.99,
+   "error": null,
+   "has_instructions": false
+  },
+  "harness_exit": 0,
+  "tool_names_vs_a_live_session_list": "identical: headroom_compress, headroom_retrieve, headroom_stats",
+  "live_env_flags_not_replicated_here": "the four offline and no-track variables of the live config were not set in this sweep's smoke: the secret-path guard refused the first command that set them and it was not retried in any form; the server started and listed tools in under one second without them, and the lane builder's smoke (with the flags, plus a tools/call) is cited above"
+ },
+ "processes_still_on_old_modules": "live headroom MCP processes map to python-tools/headroom-ai (pids 3998143, 732036, 989869); those started before 00:14Z hold 0.40.0 modules until their sessions restart. Not touched.",
+ "link": {
+  "changed_by_this_sweep": false,
+  "bin_headroom": {
+   "path": "$ECO_ROOT/bin/headroom",
+   "target": "$ECO_ROOT/python-tools/headroom-ai/bin/headroom",
+   "link_mtime_utc": "2026-10-17T00:14:29Z"
+  },
+  "bin_headroom_cache_ttl": {
+   "path": "$ECO_ROOT/bin/headroom-cache-ttl",
+   "target": "$ECO_ROOT/python-tools/headroom-ai/bin/headroom-cache-ttl",
+   "link_mtime_utc": "2026-10-17T00:14:29Z"
+  }
+ },
+ "rollback": "UV_TOOL_DIR=$ECO/python-tools UV_TOOL_BIN_DIR=$ECO/bin uv tool install --python 3.13 'headroom-ai[mcp]==0.40.0' (the lane builder's inverse; old receipt in <lane builder backup (private)>/)",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "release_age_at_verification": "57h14m (2.4 days)",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "v0.41.0 release notes"
+   ],
+   "README.md": {
+    "bytes": 34323,
+    "window_hits": []
+   },
+   "SECURITY.md": {
+    "bytes": 8357,
+    "window_hits": []
+   },
+   "repo": "headroomlabs-ai/headroom",
+   "tag": "v0.41.0",
+   "pattern": "cooldown|minimum release age|release age|quarantine period|days after release|exclude-newer|embargo"
+  }
+ },
+ "public_copy": {
+  "of": "currency-headroom-ai receipt written by the currency sweep of 2026-10-17 (private original kept on the host)",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-headroom-ai-20261017T081908Z.json"
+ }
+}

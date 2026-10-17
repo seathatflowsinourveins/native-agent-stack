@@ -1,0 +1,272 @@
+{
+ "kind": "currency_verification",
+ "host": "NativeHorizonNY",
+ "tool": "promptfoo",
+ "from": "0.123.1 (audit snapshot and plan pin)",
+ "to": "0.124.1 (npm promptfoo)",
+ "result": "ALREADY_AT_TARGET: switched by the lane builder at 2026-10-17T00:10Z-00:12Z (bin/promptfoo relinked); verified first-hand by this sweep (npm integrity, installed bytes, npm audit signatures, MCP smoke, repo config validation). Not switched by this sweep.",
+ "finding": "A2 stage-1 audit G3-12 (P2): promptfoo 0.123.1 trailed 0.124.1 (dependency and MCP SDK security fixes in 0.124.0 and 0.124.1).",
+ "recorded_utc": "2026-10-17T08:31:38Z",
+ "switch_record": {
+  "switched_by": "the lane builder",
+  "receipt": "<lane builder upgrade records (private)>/<receipt notes> section '(3) promptfoo 0.123.1 -> 0.124.1: DONE'",
+  "scripts_and_logs": [
+   "<lane builder script (private)>",
+   "<lane builder log (private)>",
+   "<lane builder log (private)>"
+  ],
+  "tracker": "<command-center tracker (private)>:537",
+  "command_lane_builder_ran": "npm install --global --include=optional --prefix tools/promptfoo-0.124.1 <tgz>, then ln -sfn tools/promptfoo-0.124.1/bin/promptfoo bin/promptfoo (the plan's install.sh promptfoo() form with the version changed)"
+ },
+ "upstream": {
+  "repo": "promptfoo/promptfoo",
+  "release_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.124.1",
+  "tag": "0.124.1",
+  "npm_published_utc": "2026-10-08T14:48:50.750Z",
+  "release_age_at_verification": "209h42m (8.7 days)",
+  "latest_check": "npm dist-tags latest = 0.124.1 (registry read 07:43Z and again by this script)"
+ },
+ "provenance": {
+  "registry": {
+   "integrity": "sha512-Y6fq/WGTL7lPvDsirNSmmmcPLhURwRao03iv8fCoLbFq6H1eqg5VVTmXiap5Jl+fiRaQQZXYMHb2N1gQm1tGyQ==",
+   "shasum": "32926e36a0345cdd67adef19104317ec5a6eca9a",
+   "fileCount": 706,
+   "unpackedSize": 31700958,
+   "tarball": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.124.1.tgz"
+  },
+  "registry_signatures": 2,
+  "registry_attestation_predicate": {
+   "predicateType": "https://slsa.dev/provenance/v1"
+  },
+  "tarball": {
+   "file": "promptfoo-0.124.1.tgz",
+   "bytes": 6700228,
+   "integrity_computed": "sha512-Y6fq/WGTL7lPvDsirNSmmmcPLhURwRao03iv8fCoLbFq6H1eqg5VVTmXiap5Jl+fiRaQQZXYMHb2N1gQm1tGyQ==",
+   "shasum_computed": "32926e36a0345cdd67adef19104317ec5a6eca9a",
+   "integrity_match": true,
+   "shasum_match": true
+  },
+  "installed_vs_tarball": {
+   "installed_dir": "$ECO_ROOT/tools/promptfoo-0.124.1/lib/node_modules/promptfoo",
+   "files_match": 706,
+   "files_differ": 0,
+   "files_missing_in_installed": 0,
+   "differ_list": [],
+   "missing_list": []
+  },
+  "npm_audit_signatures_on_installed_tree": {
+   "cwd": "<scratch>",
+   "exit": 0,
+   "audited_packages": "612",
+   "verified_registry_signatures": "612",
+   "verified_attestations": "152"
+  },
+  "meaning": "the top-level promptfoo 0.124.1 carries an npm provenance attestation (SLSA v1); npm audit signatures verified registry signatures for every installed package and attestations for those that publish them"
+ },
+ "release_notes_review": {
+  "read": [
+   "0.124.0 release notes (BREAKING CHANGES block, MCP SDK line)",
+   "0.124.1 release notes"
+  ],
+  "breaking_in_0_124_0": [
+   "remove hosted ChatKit provider",
+   "WatsonX, Langfuse, Slack, OpenAI Agents, Codex Security, browser SDKs and local Transformers become opt-in (moved from optionalDependencies to peerDependencies in the installed package.json)"
+  ],
+  "affects_our_use": "none found: the repository's promptfoo configs use anthropic:claude-agent-sdk, openai:codex-sdk, exec:, file://, HTTP and echo providers; @anthropic-ai/claude-agent-sdk (0.3.263 to 0.3.283) and @openai/codex-sdk (^0.153.2 to ^0.156.1) remain optionalDependencies at 0.124.1",
+  "security": "MCP SDK to ^1.32.0 for redirect security fixes (0.124.0); Sharp and Codex SDK vulnerability patches (0.124.1)",
+  "dependency_diff_0_123_1_to_0_124_1": {
+   "dependencies": "80 to 76",
+   "optionalDependencies": "45 to 27",
+   "peerDependencies": "0 to 10"
+  }
+ },
+ "smoke": {
+  "method": "scratch mcp_smoke.py under systemd-run --user --scope -p CPUWeight=idle with the clients' own args (mcp --transport stdio), isolated HOME, scratch PROMPTFOO_CONFIG_DIR, PROMPTFOO_DISABLE_UPDATE=1",
+  "version_flag": {
+   "cmd": "$ECO_ROOT/bin/promptfoo --version",
+   "exit": 0,
+   "out_head": "0.124.1"
+  },
+  "mcp_0_124_1": {
+   "ok": true,
+   "serverInfo": {
+    "name": "Promptfoo MCP",
+    "version": "1.0.0",
+    "description": "MCP server for LLM evaluation, red teaming, and security testing with promptfoo. Provides tools for running evaluations, testing providers, generating datasets, and performing security assessments."
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 14,
+   "tools_schema_sha256": "ef91427af005fcbee1bc359bffcbb6db25539862908a31340d49fa2383911b4e",
+   "server_exit": 0,
+   "elapsed_s": 2.47,
+   "error": null,
+   "has_instructions": false
+  },
+  "mcp_0_123_1_baseline": {
+   "ok": true,
+   "serverInfo": {
+    "name": "Promptfoo MCP",
+    "version": "1.0.0",
+    "description": "MCP server for LLM evaluation, red teaming, and security testing with promptfoo. Provides tools for running evaluations, testing providers, generating datasets, and performing security assessments."
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 14,
+   "tools_schema_sha256": "1e80ce903e633967e4253aa8870e5ce66ff7bd0b82876ca03a38e2d17c22fb5e",
+   "server_exit": 0,
+   "elapsed_s": 3.67,
+   "error": null,
+   "has_instructions": false
+  },
+  "harness_exits": {
+   "0.124.1": 0,
+   "0.123.1": 0
+  },
+  "tool_diff_0_123_1_to_0_124_1": [
+   "old=14 new=14 added=0 removed=0",
+   "SCHEMA-CHANGED (5):",
+   "   compare_providers | schema-detail",
+   "   generate_dataset | schema-detail",
+   "   generate_test_cases | schema-detail",
+   "   run_evaluation | schema-detail",
+   "   test_provider | schema-detail",
+   "DESCRIPTION-CHANGED: 0 of 14 common tools"
+  ],
+  "tool_diff_meaning": "the five schema-detail differences are description examples only (model names such as openai:gpt-4o to openai:gpt-5.6); no property or required change",
+  "repo_config_validation": {
+   "command": "promptfoo validate -c <config> for the repository's 8 promptfoo configs, once per version, isolated HOME",
+   "same_outcome_both_versions": 8,
+   "of": 8,
+   "detail": "3 valid and 5 failing identically in both versions (frozen inputs absent from a clean checkout), so no version-caused difference"
+  }
+ },
+ "link": {
+  "changed_by_this_sweep": false,
+  "bin_promptfoo": {
+   "path": "$ECO_ROOT/bin/promptfoo",
+   "target": "$ECO_ROOT/tools/promptfoo-0.124.1/bin/promptfoo",
+   "link_mtime_utc": "2026-10-17T00:11:54Z"
+  },
+  "note": "both client configs run $ECO/bin/promptfoo mcp --transport stdio, so new sessions take 0.124.1; sessions started earlier keep their running process"
+ },
+ "rollback": "ln -sfn ~/.local/share/codex-ecosystem/tools/promptfoo-0.123.1/bin/promptfoo ~/.local/share/codex-ecosystem/bin/promptfoo   (the lane builder's inverse; tools/promptfoo-0.123.1 is kept)",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "release_age_at_verification": "209h43m (8.7 days)",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "0.124.0 and 0.124.1 release notes"
+   ],
+   "README.md": {
+    "bytes": 4592,
+    "window_hits": []
+   },
+   "SECURITY.md": {
+    "bytes": 43333,
+    "window_hits": [
+     "## Embargo and Non-Disclosure"
+    ]
+   },
+   "repo": "promptfoo/promptfoo",
+   "tag": "0.124.1",
+   "pattern": "cooldown|minimum release age|release age|quarantine period|days after release|exclude-newer|embargo"
+  },
+  "SECURITY.md_note": "one pattern hit: an 'Embargo and Non-Disclosure' section about vulnerability reports, not a consumer release-age window"
+ },
+ "public_copy": {
+  "of": "currency-promptfoo receipt written by the currency sweep of 2026-10-17 (private original kept on the host)",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-promptfoo-20261017T083212Z.json",
+  "amended_by_the_fold": {
+   "blocks": [
+    "digest_comparison",
+    "source_commit_resolution"
+   ],
+   "from_private_addendum": "currency-fold-digests-20261017T144813Z.json",
+   "why": "the verdict on PR #1243 asked that each public receipt carry the registry's own digests, the locally computed digests of the same bytes and how the source commit was resolved"
+  }
+ },
+ "digest_comparison": {
+  "read_utc": "2026-10-17T14:36:21Z",
+  "what_was_compared_with_what": "npm publishes, for each version, a sha512 SRI string (dist.integrity) and a sha1 (dist.shasum) and no sha256. The tarball at dist.tarball was downloaded, and its sha512 and sha1 were computed locally: both equal the published values. The sha256 recorded in the profile row is computed locally over the same bytes; it has no registry counterpart to be compared with.",
+  "registry": {
+   "fields_read": [
+    "dist.tarball",
+    "dist.integrity",
+    "dist.shasum",
+    "dist.fileCount",
+    "dist.unpackedSize",
+    "gitHead"
+   ],
+   "fileCount": 706,
+   "name": "npm registry",
+   "npm_publishes_sha256": false,
+   "published_digests": {
+    "integrity_sha512_sri": "sha512-Y6fq/WGTL7lPvDsirNSmmmcPLhURwRao03iv8fCoLbFq6H1eqg5VVTmXiap5Jl+fiRaQQZXYMHb2N1gQm1tGyQ==",
+    "shasum_sha1": "32926e36a0345cdd67adef19104317ec5a6eca9a"
+   },
+   "tarball_url": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.124.1.tgz",
+   "unpackedSize": 31700958,
+   "url_read": "https://registry.npmjs.org/promptfoo/0.124.1"
+  },
+  "comparisons": [
+   {
+    "equal": true,
+    "local_algorithm": "sha512 (base64 SRI)",
+    "local_value": "sha512-Y6fq/WGTL7lPvDsirNSmmmcPLhURwRao03iv8fCoLbFq6H1eqg5VVTmXiap5Jl+fiRaQQZXYMHb2N1gQm1tGyQ==",
+    "registry_field": "dist.integrity (sha512 SRI)",
+    "registry_value": "sha512-Y6fq/WGTL7lPvDsirNSmmmcPLhURwRao03iv8fCoLbFq6H1eqg5VVTmXiap5Jl+fiRaQQZXYMHb2N1gQm1tGyQ=="
+   },
+   {
+    "equal": true,
+    "local_algorithm": "sha1",
+    "local_value": "32926e36a0345cdd67adef19104317ec5a6eca9a",
+    "registry_field": "dist.shasum (sha1)",
+    "registry_value": "32926e36a0345cdd67adef19104317ec5a6eca9a"
+   },
+   {
+    "equal": null,
+    "local_algorithm": "sha256",
+    "local_value": "be3fe4dd4cd78e61a2fc81a8bcaaad1c8f29b63ebed16f08e629a5856f0c270f",
+    "note": "the profile's pinned sha256 is computed here from the registry tarball; it has no registry counterpart to compare with, and is as strong as the sha512 and sha1 matches above, which cover the same bytes",
+    "registry_field": "(npm publishes no sha256)",
+    "registry_value": null
+   }
+  ],
+  "all_registry_comparisons_equal": true,
+  "profile_pin": {
+   "row": "promptfoo",
+   "pin": "0.124.1",
+   "checksum": {
+    "algorithm": "sha256",
+    "value": "be3fe4dd4cd78e61a2fc81a8bcaaad1c8f29b63ebed16f08e629a5856f0c270f"
+   },
+   "equals_local_sha256": true
+  },
+  "local_download": {
+   "bytes": 6700228,
+   "saved_as": "dl/promptfoo/promptfoo-0.124.1.tgz (heavy scratch)",
+   "sha1": "32926e36a0345cdd67adef19104317ec5a6eca9a",
+   "sha256": "be3fe4dd4cd78e61a2fc81a8bcaaad1c8f29b63ebed16f08e629a5856f0c270f",
+   "sha512_sri": "sha512-Y6fq/WGTL7lPvDsirNSmmmcPLhURwRao03iv8fCoLbFq6H1eqg5VVTmXiap5Jl+fiRaQQZXYMHb2N1gQm1tGyQ==",
+   "url": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.124.1.tgz"
+  }
+ },
+ "source_commit_resolution": {
+  "gitHead_read_from": "https://registry.npmjs.org/promptfoo/0.124.1 (field gitHead)",
+  "git_ls_remote": {
+   "command": "git ls-remote https://github.com/promptfoo/promptfoo.git refs/tags/0.124.1 refs/tags/0.124.1^{}",
+   "commit": "421e7959642c5d4cc1c983259a268de1c6f847b9",
+   "exit": 0,
+   "lines": [
+    "421e7959642c5d4cc1c983259a268de1c6f847b9\trefs/tags/0.124.1"
+   ],
+   "tag_kind": "lightweight",
+   "tag_object": null
+  },
+  "npm_gitHead": null,
+  "tag_commit": "421e7959642c5d4cc1c983259a268de1c6f847b9",
+  "tag_commit_equals_profile_or_recorded_commit": true,
+  "method": "git ls-remote https://github.com/<repo>.git refs/tags/<tag> refs/tags/<tag>^{} (an annotated tag lists its object and, peeled, its commit; a lightweight tag lists only the commit); for npm packages the version document's gitHead and, when it differs from the tag commit, the GitHub compare API between the two"
+ }
+}

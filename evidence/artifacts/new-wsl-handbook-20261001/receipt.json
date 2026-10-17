@@ -4,16 +4,16 @@
   "source_main": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
   "evidence_class": "local_integration",
   "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
-  "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+  "profile_sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06",
   "outputs": {
-    "docs/new-wsl-handbook.md": "eecab4436abed523af18d7f35a12248835621dd74a13409959280d6eb416c5ba",
-    "docs/new-wsl-handbook.json": "ebc83bb69269c45b1f02edb4ad544fcb6621922f6aa85d1c23b19668001078b4"
+    "docs/new-wsl-handbook.md": "b07ab00fc67df4f55e24b5527f36ebd13864c04ba9a3394efb4b0f9464f42fc6",
+    "docs/new-wsl-handbook.json": "fc084659740ea5d543c592ae6a9a9ca85b2a69ba7b6b3e1340ad5d6353a40fcc"
   },
   "inventory": {
     "layers": 37,
     "profile_entries": 78,
     "projected_tools": 82,
-    "canonical_package_ids": 26
+    "canonical_package_ids": 27
   },
   "validation": [
     {
@@ -1093,6 +1093,34 @@
       },
       "evidence_class": "local_integration",
       "scope": "CC196662 MinerU activation prerequisite; binding refresh under grant186741. No native service acceptance."
+    },
+    {
+      "date": "2026-10-17",
+      "source_base": "cdaf31f50dfe4ddeb75b9f59cc2dd087a469b569",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+      "profile_sha256": "8589ba1933ce1589a817ae6d69a713f7c0ee30c14e3fa0db3297621d05431ffb",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "f1417f93594b137f8833f197880b2756515fef1d7d74310e3837f427dd6d5c02",
+        "docs/new-wsl-handbook.json": "338077c0711891bc3159e3c326e6a22c1a152a0f878c377bf373f407fe611067"
+      },
+      "evidence_class": "local_integration",
+      "scope": "Currency re-pin of seven profile rows (docs/decisions/2026-10-17-currency-sweep-repin.md): generated-byte binding refresh after the profile's pins, blocking gaps and evidence references changed, and the inventory's canonical package count follows the handbook; no host or upstream acceptance."
+    },
+    {
+      "date": "2026-10-17",
+      "source_base": "cdaf31f50dfe4ddeb75b9f59cc2dd087a469b569",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+      "profile_sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "b07ab00fc67df4f55e24b5527f36ebd13864c04ba9a3394efb4b0f9464f42fc6",
+        "docs/new-wsl-handbook.json": "fc084659740ea5d543c592ae6a9a9ca85b2a69ba7b6b3e1340ad5d6353a40fcc"
+      },
+      "evidence_class": "local_integration",
+      "scope": "Second fold of PR #1243 (docs/decisions/2026-10-17-currency-sweep-repin.md): generated-byte binding refresh after the RTK, SocratiCode and codebase-memory-mcp rows' blocking gaps changed; no host or upstream acceptance. The entry before it records the first fold's bytes."
     }
   ],
   "previous_outputs": [

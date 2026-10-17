@@ -1,0 +1,375 @@
+{
+ "kind": "currency_hold_measurement",
+ "host": "NativeHorizonNY",
+ "tool": "codebase-memory-mcp",
+ "from": "0.11.0 (live link, daemon and sessions)",
+ "to": "0.12.1 (staged and verified; not activated)",
+ "recorded_utc": "2026-10-17T14:48:17Z",
+ "finding": "the command center's sealed verdict on PR #1243 at fad884532b441a5b9e462613831875dbf49f295a (CHANGES_REQUESTED), B8: if the native install/update coordinates activation with running sessions, switch by that route now; otherwise record the hold citing README :155 and :157-159.",
+ "decision": "HOLD RECORDED, with the route measured: it does coordinate (it stops running sessions), but it refuses this host's layout at staging and, where it works, stops every session and edits ~/.profile; none of that is within this builder's remit, so the switch is left to the command center with the verified command below.",
+ "upstream": {
+  "repo": "DeusData/codebase-memory-mcp",
+  "tag": "v0.12.1",
+  "commit": "a7158ac2f48ca646b4527341b76f930f2aeff87e",
+  "immutable_release": true,
+  "readme_v0_12_1": {
+   "line_155": "All active CBM processes must run the exact same version, executable build, coordination ABI, and canonical cache root. Equivalent `CBM_CACHE_DIR` aliases resolve to the same root; a genuinely different root is rejected while any CBM process is active. MCP servers, hooks, one-shot CLI commands, temporary index workers, and the daemon share a crash-safe OS admission barrier; starting an ordinary conflicting process fails before doing work and records an explicit conflict in `${CBM_CACHE_DIR}/logs/daemon-conflicts.ndjson`.",
+   "line_157": "The native `install`, `update`, and `uninstall` commands are the deliberate exception to that conflict rule. Download, verification, and private same-filesystem staging happen first so a bad candidate never disrupts active work. Activation then publishes account-wide maintenance intent, asks the daemon and every temporary local operation to cancel, and waits to a finite deadline for all coordinated CBM processes to exit. It holds the admission and lifetime barriers exclusively while changing the active binary, configuration, PATH, or indexes. New CBM work cannot enter during this window. Activation progress and results are recorded in `${CBM_CACHE_DIR}/logs/activation-events.ndjson`, and a successful command tells you to restart open coding-agent sessions so they launch the activated build.",
+   "line_159": "Package-manager setup (npm, PyPI, or Go) verifies and caches the native executable for that package. It does not replace the active native installation and therefore does not stop running CBM sessions. When that cached binary is executed, it still enters the same exact-build admission barrier. The shell and PowerShell installers invoke the verified candidate's native `install` command, so they do receive the full account-wide activation guarantee.",
+   "line_261": "**Updates run from the install script on every platform, not from inside the running binary.** `codebase-memory-mcp update` validates your flags and then prints the exact command to run:",
+   "line_101": "Options: `--skip-config` (binary only, no agent setup), `--dir=<path>` (custom location)."
+  },
+  "source_anchors_at_the_tag_commit": {
+   "drain": "src/cli/cli.c:79 CLI_ACTIVATION_DRAIN_TIMEOUT_MS = 15000; :699 'Stopping active CBM sessions and operations for %s...'; :11561 quiesce_required = has_binary_validator || delete_indexes",
+   "target_must_be_a_regular_file": "src/cli/activation_transaction.c:1324-1340 activation_posix_entry_snapshot_with_links: fstatat(AT_SYMLINK_NOFOLLOW), then S_ISREG, owner == geteuid(), st_nlink == 1 and no group/world write are all required; :1605 activation_note_refusal('target-entry-snapshot')",
+   "path_edit": "src/cli/cli.c:11209 printf('Added %s to PATH in %s'), the shell rc chosen by cbm_detect_shell_rc (:1072-1104, default ~/.profile)"
+  }
+ },
+ "measurement": {
+  "method": "an isolated user, mount and PID namespace (unshare --user --map-root-user --mount --pid --fork --mount-proc) with a private root owned by the sandbox user (the activation transaction trusts only ancestors owned by uid 0 or the effective uid, and the real root-owned directories appear as nobody in an unprivileged user namespace), /usr, /etc and /dev bound in, /proc mounted fresh, /tmp a directory of the private root, and COPIES of the 0.11.0 and 0.12.1 binaries; a stand-in 0.11.0 MCP session (initialize and tools/list answered, 17 tools) was started where noted. Nothing under the live ecosystem prefix, home or /tmp was touched; the live daemon and sessions were not involved.",
+  "command_measured": "<candidate 0.12.1 binary> install -y --force --dir=<ecosystem bin> --skip-config   (exactly the arguments install.sh passes the candidate, plus --skip-config)",
+  "scenarios": {
+   "symlink_layout_no_session": {
+    "after": {
+     "bin_dir_listing": [
+      "codebase-memory-mcp",
+      "neighbour-tool"
+     ],
+     "bin_entry": {
+      "is_symlink": true,
+      "sha256_of_entry": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+      "size": 299052664,
+      "target": "/eco/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp"
+     },
+     "home_files_written": [],
+     "logs": {},
+     "neighbour_tool_link": "/usr/bin/true",
+     "sha256_0_11_0_file_unchanged": true,
+     "sha256_0_12_1_candidate_unchanged": true,
+     "shell_rc_mentions_eco": {},
+     "tools_dir_listing": [
+      "codebase-memory-mcp-0.11.0",
+      "codebase-memory-mcp-0.12.1"
+     ],
+     "version_via_entry": "codebase-memory-mcp 0.11.0"
+    },
+    "before": {
+     "bin_entry": {
+      "is_symlink": true,
+      "sha256": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+      "target": "/eco/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp"
+     },
+     "sha256_0_11_0_file": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+     "sha256_0_12_1_candidate": "6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8",
+     "version_via_link": "codebase-memory-mcp 0.11.0"
+    },
+    "install": {
+     "argv": [
+      "/eco/tools/codebase-memory-mcp-0.12.1/codebase-memory-mcp",
+      "install",
+      "-y",
+      "--force",
+      "--dir=/eco/bin",
+      "--skip-config"
+     ],
+     "exit": 1,
+     "seconds": 0.0,
+     "stderr": "error: failed to stage install candidate: activation transaction I/O failed: target-entry-snapshot (os 0)\n",
+     "stdout": "codebase-memory-mcp install 0.12.1\n\n"
+    },
+    "layout": "symlink",
+    "path_has_install_dir": false,
+    "scenario": "no-session"
+   },
+   "symlink_layout_running_0_11_0_session": {
+    "after": {
+     "bin_dir_listing": [
+      "codebase-memory-mcp",
+      "neighbour-tool"
+     ],
+     "bin_entry": {
+      "is_symlink": true,
+      "sha256_of_entry": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+      "size": 299052664,
+      "target": "/eco/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp"
+     },
+     "home_files_written": [],
+     "logs": {},
+     "neighbour_tool_link": "/usr/bin/true",
+     "sha256_0_11_0_file_unchanged": true,
+     "sha256_0_12_1_candidate_unchanged": true,
+     "shell_rc_mentions_eco": {},
+     "standin_session": {
+      "exit_code": null,
+      "exited": false,
+      "stderr_tail": ""
+     },
+     "tools_dir_listing": [
+      "codebase-memory-mcp-0.11.0",
+      "codebase-memory-mcp-0.12.1"
+     ],
+     "version_via_entry": "codebase-memory-mcp 0.11.0"
+    },
+    "before": {
+     "bin_entry": {
+      "is_symlink": true,
+      "sha256": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+      "target": "/eco/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp"
+     },
+     "daemon_status": {
+      "argv": [
+       "/eco/bin/codebase-memory-mcp",
+       "daemon",
+       "status"
+      ],
+      "exit": 0,
+      "seconds": 1.3,
+      "stderr": "",
+      "stdout": "daemon: active (session-managed)\n  pid: 10\n  build: 0.11.0 (a831cdcafaed...)\n  committed clients: 1\n    - pid 8\n  ui: configured at http://127.0.0.1:9749 (readiness not checked; `daemon start --open` verifies it)\n"
+     },
+     "sha256_0_11_0_file": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+     "sha256_0_12_1_candidate": "6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8",
+     "standin_session": {
+      "initialize_ok": true,
+      "pid_alive": true,
+      "server": {
+       "name": "codebase-memory-mcp",
+       "version": "0.11.0"
+      },
+      "tools": 17
+     },
+     "version_via_link": "codebase-memory-mcp 0.11.0"
+    },
+    "install": {
+     "argv": [
+      "/eco/tools/codebase-memory-mcp-0.12.1/codebase-memory-mcp",
+      "install",
+      "-y",
+      "--force",
+      "--dir=/eco/bin",
+      "--skip-config"
+     ],
+     "exit": 1,
+     "seconds": 0.0,
+     "stderr": "error: failed to stage install candidate: activation transaction I/O failed: target-entry-snapshot (os 0)\n",
+     "stdout": "codebase-memory-mcp install 0.12.1\n\n"
+    },
+    "layout": "symlink",
+    "path_has_install_dir": false,
+    "scenario": "with-session"
+   },
+   "regular_file_layout_running_0_11_0_session": {
+    "after": {
+     "bin_dir_listing": [
+      "codebase-memory-mcp",
+      "neighbour-tool"
+     ],
+     "bin_entry": {
+      "is_symlink": false,
+      "sha256_of_entry": "6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8",
+      "size": 331387792,
+      "target": null
+     },
+     "home_files_written": [
+      ".profile"
+     ],
+     "logs": {
+      "activation-events.ndjson": "{\"event\":\"cbm.activation\",\"phase\":\"requested\",\"action\":\"install\",\"requester_pid\":23,\"timestamp_unix_s\":1792248387,\"source_version\":\"0.12.1\",\"source_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"daemon_active_clients\":0,\"daemon_active_connections\":0,\"restart_required\":true,\"target_version\":\"0.12.1\",\"target_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\"}\n{\"event\":\"cbm.activation\",\"phase\":\"daemon_stopped\",\"action\":\"install\",\"requester_pid\":23,\"timestamp_unix_s\":1792248389,\"source_version\":\"0.12.1\",\"source_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"daemon_active_clients\":1,\"daemon_active_connections\":1,\"restart_required\":true,\"target_version\":\"0.12.1\",\"target_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"detail\":\"cohort drained\"}\n{\"event\":\"cbm.activation\",\"phase\":\"completed\",\"action\":\"install\",\"requester_pid\":23,\"timestamp_unix_s\":1792248389,\"source_version\":\"0.12.1\",\"source_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"daemon_active_clients\":1,\"daemon_active_connections\":1,\"restart_required\":true,\"target_version\":\"0.12.1\",\"target_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"detail\":\"activation mutation completed; configuration APIs do not provide an aggregate rollback status\"}\n"
+     },
+     "neighbour_tool_link": "/usr/bin/true",
+     "sha256_0_11_0_file_unchanged": true,
+     "sha256_0_12_1_candidate_unchanged": true,
+     "shell_rc_mentions_eco": {
+      ".profile": true
+     },
+     "standin_session": {
+      "exit_code": 0,
+      "exited": true,
+      "stderr_tail": ""
+     },
+     "tools_dir_listing": [
+      "codebase-memory-mcp-0.11.0",
+      "codebase-memory-mcp-0.12.1"
+     ],
+     "version_via_entry": "codebase-memory-mcp 0.12.1"
+    },
+    "before": {
+     "bin_entry": {
+      "is_symlink": false,
+      "sha256": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+      "target": null
+     },
+     "daemon_status": {
+      "argv": [
+       "/eco/bin/codebase-memory-mcp",
+       "daemon",
+       "status"
+      ],
+      "exit": 0,
+      "seconds": 1.4,
+      "stderr": "",
+      "stdout": "daemon: active (session-managed)\n  pid: 10\n  build: 0.11.0 (a831cdcafaed...)\n  committed clients: 1\n    - pid 8\n  ui: configured at http://127.0.0.1:9749 (readiness not checked; `daemon start --open` verifies it)\n"
+     },
+     "sha256_0_11_0_file": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+     "sha256_0_12_1_candidate": "6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8",
+     "standin_session": {
+      "initialize_ok": true,
+      "pid_alive": true,
+      "server": {
+       "name": "codebase-memory-mcp",
+       "version": "0.11.0"
+      },
+      "tools": 17
+     },
+     "version_via_link": "codebase-memory-mcp 0.11.0"
+    },
+    "install": {
+     "argv": [
+      "/eco/tools/codebase-memory-mcp-0.12.1/codebase-memory-mcp",
+      "install",
+      "-y",
+      "--force",
+      "--dir=/eco/bin",
+      "--skip-config"
+     ],
+     "exit": 0,
+     "seconds": 2.8,
+     "stderr": "",
+     "stdout": "codebase-memory-mcp install 0.12.1\n\nStopping active CBM sessions and operations for install...\nInstalled binary -> /eco/bin/codebase-memory-mcp\n\n\nAdded /eco/bin to PATH in <sandbox HOME>/.profile\n\nInstall complete. Please restart your coding-agent sessions to properly take this into account.\nRestart your shell or run:\n  source <sandbox HOME>/.profile\n"
+    },
+    "layout": "regular",
+    "path_has_install_dir": false,
+    "scenario": "with-session"
+   },
+   "regular_file_layout_running_0_11_0_session_install_dir_on_PATH": {
+    "after": {
+     "bin_dir_listing": [
+      "codebase-memory-mcp",
+      "neighbour-tool"
+     ],
+     "bin_entry": {
+      "is_symlink": false,
+      "sha256_of_entry": "6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8",
+      "size": 331387792,
+      "target": null
+     },
+     "home_files_written": [
+      ".profile"
+     ],
+     "logs": {
+      "activation-events.ndjson": "{\"event\":\"cbm.activation\",\"phase\":\"requested\",\"action\":\"install\",\"requester_pid\":23,\"timestamp_unix_s\":1792248403,\"source_version\":\"0.12.1\",\"source_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"daemon_active_clients\":0,\"daemon_active_connections\":0,\"restart_required\":true,\"target_version\":\"0.12.1\",\"target_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\"}\n{\"event\":\"cbm.activation\",\"phase\":\"daemon_stopped\",\"action\":\"install\",\"requester_pid\":23,\"timestamp_unix_s\":1792248405,\"source_version\":\"0.12.1\",\"source_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"daemon_active_clients\":1,\"daemon_active_connections\":1,\"restart_required\":true,\"target_version\":\"0.12.1\",\"target_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"detail\":\"cohort drained\"}\n{\"event\":\"cbm.activation\",\"phase\":\"completed\",\"action\":\"install\",\"requester_pid\":23,\"timestamp_unix_s\":1792248405,\"source_version\":\"0.12.1\",\"source_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"daemon_active_clients\":1,\"daemon_active_connections\":1,\"restart_required\":true,\"target_version\":\"0.12.1\",\"target_build\":\"6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8\",\"detail\":\"activation mutation completed; configuration APIs do not provide an aggregate rollback status\"}\n"
+     },
+     "neighbour_tool_link": "/usr/bin/true",
+     "sha256_0_11_0_file_unchanged": true,
+     "sha256_0_12_1_candidate_unchanged": true,
+     "shell_rc_mentions_eco": {
+      ".profile": true
+     },
+     "standin_session": {
+      "exit_code": 0,
+      "exited": true,
+      "stderr_tail": ""
+     },
+     "tools_dir_listing": [
+      "codebase-memory-mcp-0.11.0",
+      "codebase-memory-mcp-0.12.1"
+     ],
+     "version_via_entry": "codebase-memory-mcp 0.12.1"
+    },
+    "before": {
+     "bin_entry": {
+      "is_symlink": false,
+      "sha256": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+      "target": null
+     },
+     "daemon_status": {
+      "argv": [
+       "/eco/bin/codebase-memory-mcp",
+       "daemon",
+       "status"
+      ],
+      "exit": 0,
+      "seconds": 1.4,
+      "stderr": "",
+      "stdout": "daemon: active (session-managed)\n  pid: 10\n  build: 0.11.0 (a831cdcafaed...)\n  committed clients: 1\n    - pid 8\n  ui: configured at http://127.0.0.1:9749 (readiness not checked; `daemon start --open` verifies it)\n"
+     },
+     "sha256_0_11_0_file": "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6",
+     "sha256_0_12_1_candidate": "6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8",
+     "standin_session": {
+      "initialize_ok": true,
+      "pid_alive": true,
+      "server": {
+       "name": "codebase-memory-mcp",
+       "version": "0.11.0"
+      },
+      "tools": 17
+     },
+     "version_via_link": "codebase-memory-mcp 0.11.0"
+    },
+    "install": {
+     "argv": [
+      "/eco/tools/codebase-memory-mcp-0.12.1/codebase-memory-mcp",
+      "install",
+      "-y",
+      "--force",
+      "--dir=/eco/bin",
+      "--skip-config"
+     ],
+     "exit": 0,
+     "seconds": 2.9,
+     "stderr": "",
+     "stdout": "codebase-memory-mcp install 0.12.1\n\nStopping active CBM sessions and operations for install...\nInstalled binary -> /eco/bin/codebase-memory-mcp\n\n\nAdded /eco/bin to PATH in <sandbox HOME>/.profile\n\nInstall complete. Please restart your coding-agent sessions to properly take this into account.\nRestart your shell or run:\n  source <sandbox HOME>/.profile\n"
+    },
+    "layout": "regular",
+    "path_has_install_dir": true,
+    "scenario": "with-session"
+   }
+  }
+ },
+ "findings": [
+  "COORDINATES: on a regular-file active entry the install drained a running 0.11.0 session cooperatively (the stand-in exited 0; activation-events: requested, daemon_stopped 'cohort drained', completed; restart_required true) and activated 0.12.1 in about 3 s.",
+  "REFUSES THIS HOST'S LAYOUT: bin/codebase-memory-mcp is a symlink into tools/codebase-memory-mcp-<version>/. With that layout the install exits 1 at staging, before it touches any session: 'failed to stage install candidate: activation transaction I/O failed: target-entry-snapshot (os 0)'. The running session stayed up and nothing changed.",
+  "EDITS A USER FILE: where it works it appends the install directory to the user's shell profile (~/.profile in the sandbox: 'Added <dir> to PATH in <home>/.profile'), also with --skip-config and with the directory already on PATH.",
+  "THE BARRIER COVERS ITS OWN MUTATION ONLY: after the install the active entry is a regular file; the versioned link layout is gone for this tool (tools/codebase-memory-mcp-0.11.0 stays as the rollback copy)."
+ ],
+ "switch_by_the_native_route_not_run": {
+  "who_and_when": "the command center, at a time when stopping every running CBM session (all agents; they restart without the codebase-memory tools until relaunched) is acceptable",
+  "prerequisites": [
+   "no other change is needed to the verified staged candidate tools/codebase-memory-mcp-0.12.1 (checked: hashes agree four ways; gh release verify and verify-asset pass)",
+   "the active entry must first become a regular file (below), which gives up the versioned link for this tool",
+   "expect one appended PATH line in the user's shell profile; check it afterwards"
+  ],
+  "commands": [
+   "ECO=$ECO_ROOT",
+   "cp --reflink=auto -p \"$ECO/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp\" \"$ECO/bin/.codebase-memory-mcp.regular\" && mv -T \"$ECO/bin/.codebase-memory-mcp.regular\" \"$ECO/bin/codebase-memory-mcp\"",
+   "\"$ECO/tools/codebase-memory-mcp-0.12.1/codebase-memory-mcp\" install -y --force --dir=\"$ECO/bin\" --skip-config",
+   "\"$ECO/bin/codebase-memory-mcp\" --version   # expect: codebase-memory-mcp 0.12.1",
+   "then restart the coding-agent sessions"
+  ],
+  "rollback": [
+   "ln -s \"$ECO/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp\" \"$ECO/bin/.codebase-memory-mcp.new\" && mv -T \"$ECO/bin/.codebase-memory-mcp.new\" \"$ECO/bin/codebase-memory-mcp\"",
+   "an index rebuilt by 0.12.1 (format 2) is not guaranteed readable by 0.11.0: keep copies of the .db files before the first 0.12.1 index"
+  ],
+  "install_sh_note": "the staged install.sh downloads the latest release itself; the command above runs the already verified staged binary's own native install, which is what install.sh runs for its candidate"
+ },
+ "install_commands": [
+  "none run on the host"
+ ],
+ "link": {
+  "before": "$ECO_ROOT/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp",
+  "after": "$ECO_ROOT/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp",
+  "changed_by_this_builder": false
+ },
+ "rollback": "nothing switched",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "upstream_window_found": false,
+  "see": "currency-codebase-memory-mcp-20261017T080146Z.json"
+ },
+ "public_copy": {
+  "of": "currency-codebase-memory-mcp-native-route-20261017T144817Z.json (written by the fold of PR #1243; private original kept on the host)",
+  "subject": "codebase-memory-mcp 0.12.1's native install measured in a sandbox, and the hold it supports",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-codebase-memory-mcp-native-route-20261017T144817Z.json"
+ }
+}

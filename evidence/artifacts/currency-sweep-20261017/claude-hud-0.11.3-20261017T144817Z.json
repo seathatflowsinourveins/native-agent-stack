@@ -1,0 +1,455 @@
+{
+ "kind": "client_plugin_currency_pin_isolated_route",
+ "host": "NativeHorizonNY",
+ "tool": "claude-hud",
+ "from": "v0.11.2 (the host's live pin since 2026-10-17T07:28:49Z; commit ad322b8d9016816a1858334ba57a085512110e83)",
+ "to": "v0.11.3 (commit 5621429b84ea2503185221244c43a06797bfd05e)",
+ "recorded_utc": "2026-10-17T14:48:17Z",
+ "finding": "the command center's sealed verdict on PR #1243 at fad884532b441a5b9e462613831875dbf49f295a (CHANGES_REQUESTED), B7: claude-hud v0.11.3 was published 2026-10-17T00:42:18Z, before the host's v0.11.2 move, and the zero-tolerance record allows no stale pick; pin it through the same tagged marketplace route.",
+ "upstream": {
+  "repo": "jarrodwatts/claude-hud",
+  "release_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.11.3",
+  "tag": "v0.11.3",
+  "tag_kind": "lightweight (no peeled entry; the ref sha is the commit)",
+  "commit": "5621429b84ea2503185221244c43a06797bfd05e",
+  "commit_object_check": "5621429b84ea2503185221244c43a06797bfd05e | release: prepare v0.11.3 (#811)\n\nCo-authored-by: Claude Opus | 2026-10-16T13:26:00Z",
+  "published_utc": "2026-10-17T00:42:18Z",
+  "release_created_utc": "2026-10-16T13:26:00Z",
+  "release_age_at_verification": "14h05m (0.6 days)",
+  "release_notes": "### Fixed\n- Background agents whose completion notice is logged as a queued command (seen in forked or resumed sessions) no longer stay `\u25d0` running after they finish (#810).",
+  "git_ls_remote_lines": [
+   "8b16685a20b4d356868389b407a01a7d8db312ef\trefs/tags/v0.11.2",
+   "ad322b8d9016816a1858334ba57a085512110e83\trefs/tags/v0.11.2^{}",
+   "5621429b84ea2503185221244c43a06797bfd05e\trefs/tags/v0.11.3"
+  ],
+  "published_advisories": [
+   {
+    "ghsa": "GHSA-fq7j-8hxj-jfqh",
+    "patched": [
+     "0.11.1"
+    ],
+    "published_at": "2026-10-12T11:23:37Z",
+    "severity": "high",
+    "summary": "Arbitrary command execution via a repository's git configuration",
+    "vulnerable": [
+     "< 0.11.1"
+    ]
+   },
+   {
+    "ghsa": "GHSA-q436-5523-5x82",
+    "patched": [
+     "0.10.0"
+    ],
+    "published_at": "2026-10-12T11:23:55Z",
+    "severity": "medium",
+    "summary": "Terminal escape-sequence injection via unsanitized todo content",
+    "vulnerable": [
+     ">= 0.6.0, < 0.10.0"
+    ]
+   }
+  ],
+  "advisory_status": "both published advisories are patched in 0.11.3 (GHSA-fq7j-8hxj-jfqh in 0.11.1, GHSA-q436-5523-5x82 in 0.10.0); no advisory names 0.11.3",
+  "compare_v0_11_2_to_v0_11_3": {
+   "ahead_by": 5,
+   "behind_by": 0,
+   "commits": [
+    {
+     "date": "2026-10-13T04:57:20Z",
+     "message": "build: compile dist/ [auto]",
+     "sha": "02d73c416b52b4e510a9be004fca469f961cd5bc"
+    },
+    {
+     "date": "2026-10-16T12:04:02Z",
+     "message": "fix(transcript): complete background agents whose notice arrives as a queued_command attachment (#810)",
+     "sha": "407d31bc36b7724e40a79334f9b5d9606b2c662a"
+    },
+    {
+     "date": "2026-10-16T12:04:28Z",
+     "message": "build: compile dist/ [auto]",
+     "sha": "451e371488744585b148241605ee8236c39f20e8"
+    },
+    {
+     "date": "2026-10-16T13:22:46Z",
+     "message": "docs: explain how to turn on auto-update for claude-hud (#813)",
+     "sha": "f1744f447f080dc0c611d59029366f1614167bc9"
+    },
+    {
+     "date": "2026-10-16T13:26:00Z",
+     "message": "release: prepare v0.11.3 (#811)",
+     "sha": "5621429b84ea2503185221244c43a06797bfd05e"
+    }
+   ],
+   "files": [
+    {
+     "additions": 1,
+     "deletions": 1,
+     "filename": ".claude-plugin/marketplace.json",
+     "status": "modified"
+    },
+    {
+     "additions": 1,
+     "deletions": 1,
+     "filename": ".claude-plugin/plugin.json",
+     "status": "modified"
+    },
+    {
+     "additions": 5,
+     "deletions": 0,
+     "filename": "CHANGELOG.md",
+     "status": "modified"
+    },
+    {
+     "additions": 9,
+     "deletions": 0,
+     "filename": "README.md",
+     "status": "modified"
+    },
+    {
+     "additions": 9,
+     "deletions": 0,
+     "filename": "README.zh.md",
+     "status": "modified"
+    },
+    {
+     "additions": 1,
+     "deletions": 1,
+     "filename": "dist/transcript.d.ts.map",
+     "status": "modified"
+    },
+    {
+     "additions": 16,
+     "deletions": 7,
+     "filename": "dist/transcript.js",
+     "status": "modified"
+    },
+    {
+     "additions": 1,
+     "deletions": 1,
+     "filename": "dist/transcript.js.map",
+     "status": "modified"
+    },
+    {
+     "additions": 2,
+     "deletions": 2,
+     "filename": "package-lock.json",
+     "status": "modified"
+    },
+    {
+     "additions": 1,
+     "deletions": 1,
+     "filename": "package.json",
+     "status": "modified"
+    },
+    {
+     "additions": 13,
+     "deletions": 6,
+     "filename": "src/transcript.ts",
+     "status": "modified"
+    },
+    {
+     "additions": 18,
+     "deletions": 0,
+     "filename": "tests/transcript.test.js",
+     "status": "modified"
+    }
+   ],
+   "status": "ahead",
+   "total_commits": 5
+  },
+  "diff_review": "5 commits and 12 files: a transcript fix (src/transcript.ts, its compiled dist/transcript.js and source maps, one test), a README note on turning on auto-update (README.md, README.zh.md), version bumps (package.json, package-lock.json, .claude-plugin/plugin.json, .claude-plugin/marketplace.json, CHANGELOG.md). No change to dist/git.js (the GHSA-fq7j-8hxj-jfqh hardening), to scripts/, to hooks or to the command the statusline runs.",
+  "cited_line_ranges": {
+   "scripts/setup.mjs:21-32": {
+    "identical_at_v0_11_2_and_v0_11_3": true,
+    "lines_at_v0_11_3": 12
+   },
+   "scripts/setup.mjs:69-80": {
+    "identical_at_v0_11_2_and_v0_11_3": true,
+    "lines_at_v0_11_3": 12
+   },
+   "scripts/statusline.mjs:8-10": {
+    "identical_at_v0_11_2_and_v0_11_3": true,
+    "lines_at_v0_11_3": 3
+   }
+  }
+ },
+ "route": "adoption/bootstrap.md (the repository's documented tagged-marketplace route): the declared pin in settings, claude plugin marketplace add jarrodwatts/claude-hud@<tag> --scope user, claude plugin install claude-hud@claude-hud --scope user --json, claude plugin update claude-hud@claude-hud",
+ "isolation": "HOME and CLAUDE_CONFIG_DIR are scratch directories; the live ~/.claude, ~/.claude.json and plugin cache are not read or written",
+ "claude_version": "2.1.302 (Claude Code)",
+ "install_commands": [
+  [
+   "claude",
+   "plugin",
+   "marketplace",
+   "add",
+   "jarrodwatts/claude-hud@v0.11.2",
+   "--scope",
+   "user"
+  ],
+  [
+   "claude",
+   "plugin",
+   "install",
+   "claude-hud@claude-hud",
+   "--scope",
+   "user",
+   "--json"
+  ],
+  [
+   "claude",
+   "plugin",
+   "marketplace",
+   "update",
+   "claude-hud"
+  ],
+  [
+   "claude",
+   "plugin",
+   "marketplace",
+   "add",
+   "jarrodwatts/claude-hud@v0.11.3",
+   "--scope",
+   "user"
+  ],
+  [
+   "claude",
+   "plugin",
+   "install",
+   "claude-hud@claude-hud",
+   "--scope",
+   "user",
+   "--json"
+  ],
+  [
+   "claude",
+   "plugin",
+   "update",
+   "claude-hud@claude-hud"
+  ]
+ ],
+ "smoke": {
+  "steps": [
+   {
+    "label": "A1 marketplace add v0.11.2",
+    "exit": 0,
+    "seconds": 0.9,
+    "stdout_head": "Adding marketplace\u2026SSH not configured, cloning via HTTPS: https://github.com/jarrodwatts/claude-hud.git\nRefreshing marketplace cache (timeout: 120s)\u2026\nCloning repository (timeout: 120s): https://github.com/jarrodwatts/claude-hud.git (ref: v0.11.2)\nClone complete, validating marketplace\u2026\nCleaning up o",
+    "stderr_head": ""
+   },
+   {
+    "label": "A2 install",
+    "exit": 0,
+    "seconds": 0.4,
+    "stdout_head": "{\"command\":\"install\",\"outcome\":\"ok\",\"plugin\":\"claude-hud@claude-hud\",\"pluginId\":\"claude-hud@claude-hud\",\"scope\":\"user\",\"message\":\"Successfully installed plugin: claude-hud@claude-hud (scope: user)\"}",
+    "stderr_head": ""
+   },
+   {
+    "label": "S1 settings edit: extraKnownMarketplaces.claude-hud.source.ref v0.11.2 -> v0.11.3 in the isolated settings.json (a file edit, no command)",
+    "exit": 0,
+    "position": "between A2 and B0. The private original did not time-stamp the edit; the position follows from the state blocks (ref v0.11.2 after phase A, v0.11.3 after phase B, the tagged add does not write the ref itself: without S1 it fails, see b0_cause_reproduction) and from the reproduction in b0_cause_reproduction, where B0 fails exactly when the edit precedes it"
+   },
+   {
+    "label": "B0 marketplace update (after S1; the host's v0.11.2 move saw 'Marketplace not found' here)",
+    "exit": 1,
+    "seconds": 0.2,
+    "stdout_head": "Updating marketplace: claude-hud...",
+    "stderr_head": "\u2718 Failed to update marketplace(s): Marketplace 'claude-hud' not found. Available marketplaces: anthropic-plugin-directory"
+   },
+   {
+    "label": "B1 marketplace add v0.11.3",
+    "exit": 0,
+    "seconds": 0.7,
+    "stdout_head": "Adding marketplace\u2026SSH not configured, cloning via HTTPS: https://github.com/jarrodwatts/claude-hud.git\nRefreshing marketplace cache (timeout: 120s)\u2026\nCloning repository (timeout: 120s): https://github.com/jarrodwatts/claude-hud.git (ref: v0.11.3)\nClone complete, validating marketplace\u2026\nCleaning up o",
+    "stderr_head": ""
+   },
+   {
+    "label": "B2 install",
+    "exit": 0,
+    "seconds": 0.4,
+    "stdout_head": "{\"command\":\"install\",\"outcome\":\"ok\",\"plugin\":\"claude-hud@claude-hud\",\"pluginId\":\"claude-hud@claude-hud\",\"scope\":\"user\",\"message\":\"Successfully installed plugin: claude-hud@claude-hud (scope: user)\"}",
+    "stderr_head": ""
+   },
+   {
+    "label": "B3 update",
+    "exit": 0,
+    "seconds": 0.3,
+    "stdout_head": "Checking for updates for plugin \"claude-hud@claude-hud\"\u2026\n\u2714 claude-hud is already at the latest version (0.11.3).",
+    "stderr_head": ""
+   }
+  ],
+  "note": "B0 fails with \"Marketplace 'claude-hud' not found\" although known_marketplaces.json lists claude-hud with an installLocation (state_after_phase_A_v0_11_2). Cause, reproduced by the fold's second run (b0_cause_reproduction): the settings declaration (ref v0.11.3, after S1) no longer matches the source recorded for the marketplace on disk (ref v0.11.2); without S1, B0 succeeds. The tagged add then works because it matches the declaration. The client's internal check was not read; this is an observed condition, not a source-level explanation.",
+  "state_after_phase_A_v0_11_2": {
+   "cache_versions": [
+    "0.11.2"
+   ],
+   "installed_plugins.json": {
+    "plugins": {
+     "claude-hud@claude-hud": [
+      {
+       "gitCommitSha": "ad322b8d9016816a1858334ba57a085512110e83",
+       "installPath": "<isolated HOME>/.claude/plugins/cache/claude-hud/claude-hud/0.11.2",
+       "installedAt": "2026-10-17T14:34:48.111Z",
+       "lastUpdated": "2026-10-17T14:34:48.111Z",
+       "scope": "user",
+       "version": "0.11.2"
+      }
+     ]
+    },
+    "version": 2
+   },
+   "known_marketplaces.json": {
+    "claude-hud": {
+     "installLocation": "<isolated HOME>/.claude/plugins/marketplaces/claude-hud",
+     "lastUpdated": "2026-10-17T14:34:47.770Z",
+     "source": {
+      "ref": "v0.11.2",
+      "repo": "jarrodwatts/claude-hud",
+      "source": "github"
+     }
+    }
+   },
+   "settings_json": {
+    "enabledPlugins": {
+     "claude-hud@claude-hud": true
+    },
+    "extraKnownMarketplaces": {
+     "claude-hud": {
+      "source": {
+       "ref": "v0.11.2",
+       "repo": "jarrodwatts/claude-hud",
+       "source": "github"
+      }
+     }
+    }
+   }
+  },
+  "state_after_phase_B_v0_11_3": {
+   "cache_versions": [
+    "0.11.2",
+    "0.11.3"
+   ],
+   "installed_plugins.json": {
+    "plugins": {
+     "claude-hud@claude-hud": [
+      {
+       "gitCommitSha": "5621429b84ea2503185221244c43a06797bfd05e",
+       "installPath": "<isolated HOME>/.claude/plugins/cache/claude-hud/claude-hud/0.11.3",
+       "installedAt": "2026-10-17T14:34:49.474Z",
+       "lastUpdated": "2026-10-17T14:34:49.474Z",
+       "scope": "user",
+       "version": "0.11.3"
+      }
+     ]
+    },
+    "version": 2
+   },
+   "known_marketplaces.json": {
+    "claude-hud": {
+     "installLocation": "<isolated HOME>/.claude/plugins/marketplaces/claude-hud",
+     "lastUpdated": "2026-10-17T14:34:49.108Z",
+     "source": {
+      "ref": "v0.11.3",
+      "repo": "jarrodwatts/claude-hud",
+      "source": "github"
+     }
+    }
+   },
+   "settings_json": {
+    "enabledPlugins": {
+     "claude-hud@claude-hud": true
+    },
+    "extraKnownMarketplaces": {
+     "claude-hud": {
+      "source": {
+       "ref": "v0.11.3",
+       "repo": "jarrodwatts/claude-hud",
+       "source": "github"
+      }
+     }
+    }
+   }
+  },
+  "b0_cause_reproduction": {
+   "recorded_utc": "2026-10-17T17:27:21Z",
+   "client": "2.1.302 (Claude Code), the version of the run above",
+   "isolation": "HOME and CLAUDE_CONFIG_DIR in scratch (<scratch>); the live ~/.claude, ~/.claude.json and plugin cache not read or written",
+   "run_without_S1": {
+    "A1": 0,
+    "A2": 0,
+    "B0_marketplace_update": "exit 0, 'Successfully updated marketplace: claude-hud'",
+    "B1_tagged_add_v0_11_3": "fails: 'its source doesn't match its extraKnownMarketplaces entry in user or managed settings; add it from the source that entry lists, or change the entry' (the settings ref must be edited first)"
+   },
+   "run_with_S1_between_A2_and_B0": {
+    "A1": 0,
+    "A2": 0,
+    "S1": "settings ref edited to v0.11.3; known_marketplaces.json still records v0.11.2",
+    "B0_marketplace_update": "exit 1, \"Marketplace 'claude-hud' not found. Available marketplaces: anthropic-plugin-directory\"",
+    "B1_tagged_add_v0_11_3": "exit 0",
+    "B2_install": "exit 0",
+    "B3_update": "exit 0, 'updated from 0.11.2 to 0.11.3'"
+   },
+   "meaning": "the documented upgrade order (edit the settings ref, then marketplace update, then plugin update) fails at the marketplace update on this client; the working order is the settings edit, then the tagged marketplace add, then install and plugin update"
+  }
+ },
+ "verification": {
+  "installed_gitCommitSha_equals_the_v0_11_3_commit": true,
+  "cached_versions": [
+   "0.11.2",
+   "0.11.3"
+  ],
+  "plugin_json_versions": {
+   "0.11.2": "0.11.2",
+   "0.11.3": "0.11.3"
+  },
+  "dist_git_js_fsmonitor_hardening_present_by_version": {
+   "0.11.2": true,
+   "0.11.3": true
+  }
+ },
+ "link": {
+  "changed_by_this_builder": false,
+  "pinned_by": "the marketplace ref in settings (extraKnownMarketplaces.claude-hud.source.ref); no link",
+  "host_state": "this builder does not edit the user's ~/.claude/settings.json; the live host stays on v0.11.2 until the command center applies the commands below"
+ },
+ "live_application_for_the_command_center_not_run_here": [
+  "edit ~/.claude/settings.json extraKnownMarketplaces.claude-hud.source.ref v0.11.2 -> v0.11.3 (the declared pin)",
+  "claude plugin marketplace add jarrodwatts/claude-hud@v0.11.3 --scope user",
+  "claude plugin install claude-hud@claude-hud --scope user --json",
+  "claude plugin update claude-hud@claude-hud",
+  "then compare gitCommitSha in installed_plugins.json with 5621429b84ea2503185221244c43a06797bfd05e"
+ ],
+ "rollback": "settings ref back to v0.11.2, then claude plugin marketplace add jarrodwatts/claude-hud@v0.11.2 --scope user and claude plugin install claude-hud@claude-hud --scope user --json (commit ad322b8d9016816a1858334ba57a085512110e83)",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "release_age_at_verification": "14h05m (0.6 days)",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "v0.11.3 release notes"
+   ],
+   "README.md": {
+    "window_hits": []
+   },
+   "SECURITY.md": {
+    "bytes": 458,
+    "window_hits": []
+   },
+   "repo": "jarrodwatts/claude-hud",
+   "tag": "v0.11.3",
+   "pattern": "cooldown|embargo|delay|waiting period|days before|days after"
+  }
+ },
+ "public_copy": {
+  "of": "claude-hud-0.11.3-20261017T144817Z.json (written by the fold of PR #1243; private original kept on the host)",
+  "subject": "claude-hud v0.11.3 through the tagged marketplace route, run in an isolated config directory",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "claude-hud-0.11.3-20261017T144817Z.json",
+  "amended_by_the_second_fold": {
+   "blocks": [
+    "smoke.steps S1",
+    "smoke.note",
+    "smoke.b0_cause_reproduction"
+   ],
+   "why": "the review of the fold (F1, F8) found the settings edit missing as a step and the 'not yet on disk' explanation of B0 contradicted by the receipt's own state"
+  }
+ }
+}

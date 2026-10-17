@@ -1353,7 +1353,7 @@
       "status": "picked",
       "title": "Code navigation",
       "tools": [
-        "a657f9c8c7842ed1",
+        "4cebdc71e684e95f",
         "c55fbddc4ae657bf"
       ],
       "uses": []
@@ -7891,7 +7891,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a"
+      "sha256": "abbea7713de2719ad65b072e759ffadc4ed6fa6c3bd846164cff73355e577e06"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -8845,27 +8845,25 @@
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Same exact source checkout with the upstream developer environment: uv venv -p 3.13, activate the owned virtual environment, then uv sync --extra dev.",
+          "An exact source checkout at the v2.0.0 commit with the upstream developer environment: uv venv -p 3.13, activate the owned virtual environment, then uv sync --extra dev.",
           "The upstream Poe test task supplies pytest test -vv; language-server dependencies remain those of the upstream test configuration."
         ],
         "scope": "Unchanged upstream source test task, not installed language-server, MCP, provider or new-host acceptance.",
-        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/pyproject.toml",
+        "source": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/pyproject.toml",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "Serena"
       ],
       "blocking_gaps": [
-        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
-        "The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; the documented source-checkout installation does not establish PyPI equivalence.",
-        "checksum: real SHA-256 and its source pending in W-PROF",
-        "checksum: source identity does not verify an install artifact or lockfile"
+        "The plan's install artifacts (evidence/artifacts/new-wsl-install-plan-20261002) and adoption/pins-linux-x86_64.json still carry the 2.0.0.dev0 git pin c6fbd1c5 until the install-plan carriers are amended in their own change.",
+        "A fresh serena-agent 2.0.0 configuration defaults to the REPL agent interface (serena_config.template.yml sets agent_interface: REPL), which exposes 2 tools for Claude Code and 3 for Codex against the 21 and 23 of the classic interface that this host's configuration keeps (evidence/artifacts/currency-sweep-20261017/currency-serena-20261017T081640Z.json, 'PLAN GAP'). The plan's install.sh runs `serena init` with no agent_interface (evidence/artifacts/new-wsl-install-plan-20261002/install.sh:432) and nothing in the repository seeds it, so a fresh install through the plan exposes only the REPL set until the plan seeds `agent_interface: tools` or adopts the REPL deliberately."
       ],
       "checksum": {
-        "algorithm": "git-sha1",
-        "kind": "source",
-        "source": "https://api.github.com/repos/oraios/serena/commits/c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
-        "value": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://pypi.org/pypi/serena-agent/2.0.0/json",
+        "value": "910e1df8cf634e58997afb5f4ada0062a8f7be8339526afed4f5fb2f609162be"
       },
       "documented_install": [
         {
@@ -8878,23 +8876,24 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/code-navigation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+        "evidence/artifacts/currency-sweep-20261017/currency-serena-20261017T081640Z.json"
       ],
       "install": {
-        "command": "uv tool install --reinstall -p 3.13 .",
+        "command": "uv tool install -p 3.13 serena-agent==2.0.0",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from an owned checkout at c6fbd1c5932df2494ffa0020af5a9fbe80b82143; the dot operand refers to that checkout.",
-          "uv and Python 3.13 must be available; this local source install does not prove equivalence to the PyPI package."
+          "uv and Python 3.13 must be available (serena-agent 2.0.0 requires Python >=3.11,<3.15). The exact pin is the documented command with uv's == specifier."
         ],
-        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70",
+        "source": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/docs/02-usage/010_installation.md#L23",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "Serena",
       "owner_layer_id": "code-navigation",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "package_id": "pypi:serena-agent",
+      "pin": "2.0.0",
       "position": 5,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/oraios/serena",
@@ -8907,7 +8906,7 @@
       ],
       "stage": "native-extensions",
       "status": "picked",
-      "tool_id": "a657f9c8c7842ed1",
+      "tool_id": "4cebdc71e684e95f",
       "used_by": [
         "code-navigation"
       ]
@@ -8984,20 +8983,22 @@
       "acceptance": {
         "command": "npm test",
         "evidence_class": "upstream_test_command_not_executed",
-        "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md"
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/eb94e073cb8aa80d08fd56c8aecfe7f2fa065be8/README.md"
       },
       "aliases": [
         "SocratiCode"
       ],
       "blocking_gaps": [
         "Package pin is verified; Codex/Claude plugin pinning, Docker and embedding-provider configuration remain comparison prerequisites.",
-        "The source recommendation installs a native plugin. A pin-matching plugin install is unresolved; a global npm install is not established by the reviewed primary README."
+        "The source recommendation installs a native plugin. A pin-matching plugin install is unresolved; a global npm install is not established by the reviewed primary README.",
+        "The plan's code-search row installs 1.15.0 into tools/socraticode-1.15.0 and the client map's two dist/index.js path entries (asserted by tests/test_new_wsl_client_config.py) point at that prefix, so they stay at 1.15.0 until the install-plan carriers are amended in their own change. Both clients on the host already run tools/socraticode-1.16.1. The same carriers also keep the age buffer of ours that this row's command drops: install.sh and install-plan.json of evidence/artifacts/new-wsl-install-plan-20261002 install SocratiCode 1.15.0 with --before=2026-09-24T12:00:00Z, and the handbook's dated layer table names it; a fresh install through the plan keeps the buffer until they are amended in their own change."
       ],
       "checksum": {
         "algorithm": "sha256",
+        "integrity": "sha512-qTA9WV0a7gRWxUJutW8T7RVBAeydbvXkGUq98IbxRzvIzWBsZHDIG0Wj6YGKckf7rrXSFIFc3IEfC2V+lKH5Ng==",
         "kind": "artifact",
-        "source": "https://registry.npmjs.org/socraticode/1.15.0",
-        "value": "f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1"
+        "source": "https://registry.npmjs.org/socraticode/1.16.1",
+        "value": "870dd285999984e217b5144b6a3abfae0499f1a618d751eb47f0c47d2a16ba24"
       },
       "documented_install": [
         {
@@ -9010,22 +9011,23 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
-        "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+        "https://github.com/giancarloerra/SocratiCode/blob/eb94e073cb8aa80d08fd56c8aecfe7f2fa065be8/README.md",
+        "https://github.com/giancarloerra/SocratiCode/blob/eb94e073cb8aa80d08fd56c8aecfe7f2fa065be8/README.md",
         "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-        "docs/token-efficiency-stack.json"
+        "docs/token-efficiency-stack.json",
+        "evidence/artifacts/currency-sweep-20261017/currency-socraticode-20261017T083215Z.json"
       ],
       "install": {
-        "command": "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.15.0\" --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0",
-        "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md"
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.16.1\" --ignore-scripts socraticode@1.16.1",
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/eb94e073cb8aa80d08fd56c8aecfe7f2fa065be8/README.md"
       },
       "name": "SocratiCode",
       "owner_layer_id": "semantic-rag",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "npm:socraticode",
-      "pin": "1.15.0",
+      "pin": "1.16.1",
       "position": 1,
       "provisioning_status": "unprovisioned_comparison_arm",
       "repository": "https://github.com/giancarloerra/SocratiCode",
@@ -9054,13 +9056,14 @@
       ],
       "blocking_gaps": [
         "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The plan's install artifacts (evidence/artifacts/new-wsl-install-plan-20261002) still carry 0.6.1 until the install-plan carriers are amended in their own change.",
         "acceptance: upstream test or documented example and source pending in W-PROF"
       ],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://pypi.org/pypi/semble/0.6.1/json",
-        "value": "fea96cf60d93555966d57f26604b8ef935bf3f876757568cec9fe655dd651256"
+        "source": "https://pypi.org/pypi/semble/0.7.0/json",
+        "value": "06c568d5a06f3a5352f22357d5a7ab17525d4404fddde8f1ae1405e3e87ac4a7"
       },
       "documented_install": [
         {
@@ -9073,17 +9076,18 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md"
+        "https://github.com/MinishLab/semble/blob/8ee6463efbb1ff755c339e965c7298b7afd7db5b/README.md",
+        "evidence/artifacts/currency-sweep-20261017/currency-semble-20261017T082840Z.json"
       ],
       "install": {
-        "command": "uv tool install semble==0.6.1 && semble install",
-        "source": "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md"
+        "command": "uv tool install semble==0.7.0 && semble install",
+        "source": "https://github.com/MinishLab/semble/blob/8ee6463efbb1ff755c339e965c7298b7afd7db5b/README.md"
       },
       "name": "semble",
       "owner_layer_id": "semantic-rag",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "pypi:semble",
-      "pin": "0.6.1",
+      "pin": "0.7.0",
       "position": 2,
       "provisioning_status": "unprovisioned_comparison_arm",
       "repository": "https://github.com/MinishLab/semble",
@@ -9690,25 +9694,28 @@
     },
     {
       "acceptance": {
-        "command": "rtk git log -n 10",
+        "command": "rtk git status",
         "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
           "A git checkout."
         ],
-        "scope": "Upstream's one-line commit example in a checkout; rtk proxy git log -n 10 returns the raw output when a condensed result is unusable (README line 313).",
-        "source": "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L193"
+        "scope": "Upstream's Quick Start test in a checkout (README L161: git status is rewritten to rtk git status); rtk bypass git status returns the raw output when a condensed result is unusable (README L224; rtk proxy remains an alias since v1.0.0).",
+        "source": "https://github.com/rtk-ai/rtk/blob/v1.0.1/README.md#L161"
       },
       "aliases": [
         "rtk-ai/rtk",
         "RTK"
       ],
-      "blocking_gaps": [],
+      "blocking_gaps": [
+        "Owed before the plan's Codex hook trust step accepts this pin: tools/adoption/codex_hook_trust.py refuses an rtk whose version differs from the one tools/adoption/exec_rules_reviewed.json was reviewed for (0.51.0). Re-derive rtk-rewrite-heads at v1.0.1 and re-review that entry; 0.52.0 and later also rewrite the inner command of quoted sh, bash and zsh -c wrappers (measured: bash -c 'git status' becomes bash -c 'rtk git status'). tools/adoption/runtime_profiles.py:562 (the pi and opencode profile build) also compares rtk --version and the source checkout's commit with 0.51.0 and e001f773 and raises 'RTK installer/source version mismatch' for any other pin; it is routed with this review, as its own change.",
+        "The plan's install artifacts (evidence/artifacts/new-wsl-install-plan-20261002) and adoption/pins-linux-x86_64.json still carry 0.51.0 until the install-plan carriers are amended in their own change."
+      ],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt",
-        "value": "5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5"
+        "source": "https://github.com/rtk-ai/rtk/releases/download/v1.0.1/checksums.txt",
+        "value": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41"
       },
       "documented_install": [
         {
@@ -9727,23 +9734,24 @@
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "docs/token-efficiency-stack.json",
-        "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md",
-        "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt"
+        "https://github.com/rtk-ai/rtk/blob/v1.0.1/README.md",
+        "https://github.com/rtk-ai/rtk/releases/download/v1.0.1/checksums.txt",
+        "evidence/artifacts/currency-sweep-20261017/currency-rtk-20261017T081134Z.json"
       ],
       "install": {
-        "command": "gh release download v0.51.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.51.0\" && (cd \"$STACK_HOME/downloads/rtk-0.51.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")",
+        "command": "gh release download v1.0.1 --repo rtk-ai/rtk --pattern rtk-oss-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-oss-1.0.1\" && (cd \"$STACK_HOME/downloads/rtk-oss-1.0.1\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-oss-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")",
         "execution_status": "UNRUN",
-        "pinning_source": "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L113",
+        "pinning_source": "https://github.com/rtk-ai/rtk/blob/v1.0.1/README.md#L127-L129",
         "prerequisites": [
           "tar and sha256sum."
         ],
-        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The Claude Code hook and its exclude_commands are the client configuration's. The install plan's command-output row also runs rtk init -g --codex (the Codex PreToolUse hook, RTK.md and an inert @RTK.md pointer line in the Codex AGENTS.md; upstream: rtk-ai/rtk v0.51.0 README.md L133 (rtk init -g --codex)) and then tools/adoption/codex_hook_trust.py --command \"rtk hook codex\" --apply, which trusts that one hook at its current hash, on the decision of 2026-10-04 (docs/decisions/2026-10-04-codex-rtk-hook-qualified.md).",
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The pinned archive is the rtk-oss edition (Apache-2.0 only: the hook core and every command filter, no compression engine; README.md L127-L129 at v1.0.1); the default rtk download adds a BUSL-1.1 engine and installs a binary of the same name, so one edition is installed. The host has run this edition since 2026-10-17T04:21:11Z (docs/decisions/2026-10-17-currency-sweep-repin.md). The Claude Code hook and its exclude_commands are the client configuration's. The install plan's command-output row also runs rtk init -g --codex (the Codex PreToolUse hook, RTK.md and an inert @RTK.md pointer line in the Codex AGENTS.md; upstream: rtk-ai/rtk v1.0.1 README.md L146 (rtk init -g --codex)) and then tools/adoption/codex_hook_trust.py --command \"rtk hook codex\" --apply, which trusts that one hook at its current hash, on the decision of 2026-10-04 (docs/decisions/2026-10-04-codex-rtk-hook-qualified.md).",
         "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L41"
       },
       "name": "RTK",
       "owner_layer_id": "token-efficiency",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "0.51.0",
+      "pin": "1.0.1",
       "position": 14,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/rtk-ai/rtk",
@@ -10282,23 +10290,26 @@
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the 0.123.1 source checkout after the contributing guide's developer setup.",
+          "Run from the 0.124.1 source checkout after the contributing guide's developer setup.",
           "The tagged package.json maps npm test to vitest run; integration, smoke, browser and provider benchmark scripts are separate."
         ],
         "scope": "Documented source install and test commands only; no installed CLI/provider evaluation or new-host acceptance.",
-        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/contributing.md",
+        "source": "https://github.com/promptfoo/promptfoo/blob/0.124.1/site/docs/contributing.md",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "Promptfoo",
         "promptfoo"
       ],
-      "blocking_gaps": [],
+      "blocking_gaps": [
+        "The plan's install artifacts (evidence/artifacts/new-wsl-install-plan-20261002) still carry 0.123.1 until the install-plan carriers are amended in their own change."
+      ],
       "checksum": {
         "algorithm": "sha256",
+        "integrity": "sha512-Y6fq/WGTL7lPvDsirNSmmmcPLhURwRao03iv8fCoLbFq6H1eqg5VVTmXiap5Jl+fiRaQQZXYMHb2N1gQm1tGyQ==",
         "kind": "artifact",
-        "source": "https://registry.npmjs.org/promptfoo/0.123.1",
-        "value": "53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f"
+        "source": "https://registry.npmjs.org/promptfoo/0.124.1",
+        "value": "be3fe4dd4cd78e61a2fc81a8bcaaad1c8f29b63ebed16f08e629a5856f0c270f"
       },
       "documented_install": [
         {
@@ -10311,17 +10322,18 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "https://github.com/promptfoo/promptfoo/blob/421e7959642c5d4cc1c983259a268de1c6f847b9/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+        "evidence/artifacts/currency-sweep-20261017/currency-promptfoo-20261017T083212Z.json"
       ],
       "install": {
         "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only promptfoo",
         "execution_status": "UNRUN",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
         "prerequisites": [
-          "Node/npm and an owned global install scope for promptfoo 0.123.1."
+          "Node/npm and an owned global install scope for promptfoo 0.124.1."
         ],
-        "scope": "Plan row: checksum-verified 0.123.1 tarball in an owned prefix, optional MCP SDK and both clients' native registration; run the install plan instead of an unverified global npm command.",
+        "scope": "Plan row: checksum-verified 0.124.1 tarball in an owned prefix, optional MCP SDK and both clients' native registration; run the install plan instead of an unverified global npm command.",
         "source": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
@@ -10329,7 +10341,7 @@
       "owner_layer_id": "quality-evaluation",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "npm:promptfoo",
-      "pin": "0.123.1",
+      "pin": "0.124.1",
       "position": 11,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/promptfoo/promptfoo",
@@ -12022,45 +12034,48 @@
           "Puppeteer 25.11.0 getConfiguration.ts:140-145 supports the explicit Linux Chrome executable override; no CI AppArmor-disable step is applied to the host."
         ],
         "scope": "Six unchanged upstream files through the published test runner; separate synthetic native-client integration. Neither is a new host pass or a comparative trial.",
-        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/.github/workflows/run-tests.yml#L72",
+        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/a878bcad39584337e055778353246820deafa7c0/.github/workflows/run-tests.yml#L72",
         "source_review_ref": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
       },
       "aliases": [
         "Chrome DevTools MCP"
       ],
-      "blocking_gaps": [],
+      "blocking_gaps": [
+        "The plan's playwright-cli row and its checker (evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py, browser_contract), the client map's owner strings and the two client template additions (adoption/new-wsl/templates) name 1.10.1 and must agree with one another, so they stay at 1.10.1 until the install-plan carriers are amended in their own change. Both clients on the host already run 1.11.0."
+      ],
       "checksum": {
         "algorithm": "sha256",
-        "integrity": "sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw==",
+        "integrity": "sha512-CytJ/5tnzrS+J/74be2P5aCOsS/mmGRHys/Si+IYC4ucrbnWAmES/dYdxGJjeUCECRcoFUilZAysdjlwqUjXIA==",
         "kind": "artifact",
-        "source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
-        "value": "012cbcf6e832d4f6709dad0c21d7bef17089e94adee9cf33179d15ea0a9adf2b"
+        "source": "https://registry.npmjs.org/chrome-devtools-mcp/1.11.0",
+        "value": "e9f0ab97ad9515927c7d9f0a3dfbdb9ea485d2810d572e4a64eb84b192c8bf0c"
       },
       "documented_install": [],
       "evidence_refs": [
         "docs/decisions/2026-10-04-final-architecture-round2.md",
         "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
         "docs/decisions/2026-10-04-round2-plan-g2-browser.md",
-        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
-        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/tests/index.test.ts#L38"
+        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/a878bcad39584337e055778353246820deafa7c0/docs/client-configurations.md#L74",
+        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/a878bcad39584337e055778353246820deafa7c0/tests/index.test.ts#L37",
+        "evidence/artifacts/currency-sweep-20261017/currency-chrome-devtools-mcp-20261017T083216Z.json"
       ],
       "install": {
-        "command": "claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux && codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux",
+        "command": "claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.11.0 --headless --isolated --no-usage-statistics --no-performance-crux && codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.11.0 --headless --isolated --no-usage-statistics --no-performance-crux",
         "execution_status": "UNRUN",
-        "pinning_source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
+        "pinning_source": "https://registry.npmjs.org/chrome-devtools-mcp/1.11.0",
         "prerequisites": [
           "NativeStack2604 amd64, Linux-side Google Chrome 154.0.8037.97-1 through the signed apt repository and fingerprint-restricted keyring; privilege is declared by its helper.",
           "Plan Node 24.21.0; destination client templates must include the prepared chrome-devtools entries."
         ],
         "scope": "Release-pinned documented npx stdio route and Linux-side WSL Chrome prerequisites; single browser owner for both clients and diagnostics.",
-        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
+        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/a878bcad39584337e055778353246820deafa7c0/docs/client-configurations.md#L74",
         "source_review_ref": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
       },
       "name": "Chrome DevTools MCP",
       "owner_layer_id": "web-research",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "npm:chrome-devtools-mcp",
-      "pin": "1.10.1",
+      "pin": "1.11.0",
       "position": 7,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
@@ -12148,21 +12163,22 @@
           "A project-scoped registration and an index of the selected code."
         ],
         "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L141"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/de0a67e5cf63c49930b79777ba2c314d58060e77/README.md#L141"
       },
       "aliases": [
         "jcodemunch-mcp"
       ],
       "blocking_gaps": [
-        "This profile records source identity only (manifests/stack.json); the W1 receipt evidence/receipts/jcodemunch-1108327-qualification-20261003.json records the qualified wheel digest and its limitations. uv checks its index hashes.",
+        "This profile records source identity only (the tag commit); the verified wheel and sdist digests of 1.108.374, with the registry digests they were compared with, are in evidence/artifacts/currency-sweep-20261017/currency-jcodemunch-mcp-20261017T082641Z.json. The W1 receipt evidence/receipts/jcodemunch-1108327-qualification-20261003.json qualified the previous pin 1.108.327 and records that version's wheel digest and limitations; this row does not inherit it. uv checks its index hashes.",
+        "The plan's install artifacts (evidence/artifacts/new-wsl-install-plan-20261002) still carry 1.108.327 until the install-plan carriers are amended in their own change.",
         "checksum: real SHA-256 and its source pending in W-PROF",
         "checksum: source identity does not verify an install artifact or lockfile"
       ],
       "checksum": {
         "algorithm": "git-sha1",
         "kind": "source",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
-        "value": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.374",
+        "value": "de0a67e5cf63c49930b79777ba2c314d58060e77"
       },
       "documented_install": [],
       "evidence_refs": [
@@ -12170,23 +12186,24 @@
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "docs/token-efficiency-stack.json",
-        "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/de0a67e5cf63c49930b79777ba2c314d58060e77/README.md#L91",
         "manifests/stack.json (components[id=jcodemunch-mcp])",
-        "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
+        "evidence/receipts/jcodemunch-1108327-qualification-20261003.json",
+        "evidence/artifacts/currency-sweep-20261017/currency-jcodemunch-mcp-20261017T082641Z.json"
       ],
       "install": {
-        "command": "uv tool install jcodemunch-mcp==1.108.327",
+        "command": "uv tool install jcodemunch-mcp==1.108.374",
         "execution_status": "UNRUN",
         "prerequisites": [
           "uv with CPython 3.13."
         ],
         "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/de0a67e5cf63c49930b79777ba2c314d58060e77/README.md#L91"
       },
       "name": "jcodemunch-mcp",
       "owner_layer_id": "token-efficiency",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "1.108.327",
+      "pin": "1.108.374",
       "position": 17,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
@@ -12218,7 +12235,9 @@
       "aliases": [
         "codebase-memory-mcp"
       ],
-      "blocking_gaps": [],
+      "blocking_gaps": [
+        "Held at 0.11.0: v0.12.1 is staged and verified (hashes agree four ways; gh release verify and verify-asset pass) but not activated. Upstream README v0.12.1 :155 requires every active CBM process to run the exact same version, build, coordination ABI and cache root; :157-159 documents the native install, update and uninstall commands as the coordinated exception, which stops running sessions. Measured on copies in an isolated namespace: on this host's layout (bin/codebase-memory-mcp is a symlink into tools/codebase-memory-mcp-0.11.0) that route refuses at staging ('target-entry-snapshot'); on a regular-file layout it stops every running session and appends a PATH line to the user's shell profile. The older route needs no layout change and stays valid when no codebase-memory process is running: relink with ln -s and mv -T (switch_when_ready in evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-20261017T080146Z.json); only upstream's native route needs the regular-file layout. The coordination condition of the native route held on a regular-file layout, so the hold rests on the remit reading in docs/decisions/2026-10-17-currency-sweep-repin.md (stopping sessions and editing a shell profile are not a builder's to do), and the switch waits for the command center's choice of moment; evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-native-route-20261017T144817Z.json holds the command."
+      ],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
@@ -12231,7 +12250,8 @@
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "docs/token-efficiency-stack.json",
-        "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L88"
+        "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L88",
+        "evidence/artifacts/currency-sweep-20261017/currency-codebase-memory-mcp-native-route-20261017T144817Z.json"
       ],
       "install": {
         "command": "gh release download v0.11.0 --repo DeusData/codebase-memory-mcp --pattern codebase-memory-mcp-linux-amd64.tar.gz --dir \"$DOWNLOAD_DIR\" && tar -xf \"$DOWNLOAD_DIR/codebase-memory-mcp-linux-amd64.tar.gz\" -C \"$PREFIX\"",
@@ -13161,7 +13181,9 @@
       "aliases": [
         "Headroom"
       ],
-      "blocking_gaps": [],
+      "blocking_gaps": [
+        "Held at 0.37.0 under the W1b hold (docs/decisions/2026-10-03-currency-wave-w1b.md:96) while the repository carries three pins: this row 0.37.0, adoption/pins-linux-x86_64.json:319-320 and manifests/stack.json:521-523 0.40.0 (the 2026-10-08 drift refresh; what bootstrap-linux.sh installs), and the host 0.41.0. The hold's recheck (omitted-line counts, required facts, exact retrieval), run on 2026-10-17 on 0.40.0 and on 0.41.0, passes required facts, exact retrieval and the tool list but not the omission count: the notice still reads '[593 lines omitted: 1 ERROR]' for 593 omitted rows none of which is an error, as in 0.39.0 (evidence/artifacts/currency-sweep-20261017/currency-headroom-recheck-20261017T144817Z.json). The host and the pins files therefore run ahead of the hold's own condition; overturning it (its second criterion, a measured log-input answer-quality comparison, was not run) or holding them back is the command center's decision."
+      ],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
@@ -13179,7 +13201,8 @@
         "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-        "docs/token-efficiency-stack.json"
+        "docs/token-efficiency-stack.json",
+        "evidence/artifacts/currency-sweep-20261017/currency-headroom-recheck-20261017T144817Z.json"
       ],
       "install": {
         "command": "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'",

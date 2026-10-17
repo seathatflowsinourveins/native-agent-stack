@@ -1,0 +1,234 @@
+{
+ "kind": "currency_staged_not_switched",
+ "host": "NativeHorizonNY",
+ "tool": "codebase-memory-mcp",
+ "from": "0.11.0",
+ "to": "0.12.1",
+ "result": "NOT_SWITCHED: 0.12.1 is verified and smoke-clean in isolation, but a link switch now would break codebase-memory-mcp in every NEW session until the live 0.11.0 daemon and its sessions have closed (upstream version-cohort rule). The link stays on 0.11.0.",
+ "finding": "A2 stage-1 audit G3-05 (P2): 0.11.0 lacks the v0.12.0 security fixes (Cypher OPTIONAL MATCH heap overflow #2445, search_code path escape #2491, alias scan #2489).",
+ "recorded_utc": "2026-10-17T08:01:45Z",
+ "upstream": {
+  "repo": "DeusData/codebase-memory-mcp",
+  "release_url": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.12.1",
+  "tag": "v0.12.1",
+  "commit": "a7158ac2f48ca646b4527341b76f930f2aeff87e",
+  "published_utc": "2026-10-16T23:35:48Z",
+  "immutable_release": true,
+  "latest_0_12_x": "v0.12.1 is the newest 0.12.x (releases list read at 07:43Z; the only newer-than-0.11.0 tags are v0.12.0 and v0.12.1)",
+  "asset": "codebase-memory-mcp-linux-amd64.tar.gz",
+  "asset_sha256": "8453015145f072c1b9b019cbdd02cea8cc6f18cc5e116036dd20992631c638c7",
+  "checksums_txt_sha256": "103ddf75ccbe4e4de9faa57f074ee5f16b88edab6fd2f7dfd34e50d147dddffe",
+  "binary_sha256": "6761236d038de87bf49da5695dd52d7928180d814624d4ceb8d8e849ba07f4c8",
+  "release_age_at_verification": "8h25m (0.4 days)"
+ },
+ "provenance": {
+  "tarball_hash_agreement": {
+   "fresh_download": "8453015145f072c1b9b019cbdd02cea8cc6f18cc5e116036dd20992631c638c7",
+   "staged_download": "8453015145f072c1b9b019cbdd02cea8cc6f18cc5e116036dd20992631c638c7",
+   "release_checksums_txt": "8453015145f072c1b9b019cbdd02cea8cc6f18cc5e116036dd20992631c638c7",
+   "staged_checksums_txt_identical_to_fresh": true,
+   "github_release_asset_digest": "8453015145f072c1b9b019cbdd02cea8cc6f18cc5e116036dd20992631c638c7",
+   "all_agree": true
+  },
+  "checksums_txt_sha256_vs_release_asset_digest": [
+   "103ddf75ccbe4e4de9faa57f074ee5f16b88edab6fd2f7dfd34e50d147dddffe",
+   "103ddf75ccbe4e4de9faa57f074ee5f16b88edab6fd2f7dfd34e50d147dddffe"
+  ],
+  "staged_install_vs_fresh_extraction": {
+   "codebase-memory-mcp": true,
+   "LICENSE": true,
+   "install.sh": true,
+   "THIRD_PARTY_NOTICES.md": true
+  },
+  "binary_sha256_equals_release_notes_shipped_linux_amd64": true,
+  "gh_release_verify": {
+   "cmd": "gh release verify v0.12.1 --repo DeusData/codebase-memory-mcp",
+   "exit": 0,
+   "out_head": "Resolved tag v0.12.1 to sha1:a7158ac2f48ca646b4527341b76f930f2aeff87e\nLoaded attestation from GitHub API\n\u2713 Release v0.12.1 verified!\n\nAssets\nchecksums.txt\tsha256:103ddf75ccbe4e4de9faa57f074ee5f16b88edab6fd2f7dfd34e50d147dddffe\nchecksums.txt.bundle\tsha256:44f3369ac3b0c1769a6e19b36af744b490dcf2446998f"
+  },
+  "gh_release_verify_asset": {
+   "cmd": "gh release verify-asset v0.12.1 <scratch> --repo DeusData/codebase-memory-mcp",
+   "exit": 0,
+   "out_head": "Calculated digest for codebase-memory-mcp-linux-amd64.tar.gz: sha256:8453015145f072c1b9b019cbdd02cea8cc6f18cc5e116036dd20992631c638c7\nResolved tag v0.12.1 to sha1:a7158ac2f48ca646b4527341b76f930f2aeff87e\nLoaded attestation from GitHub API\n\n\u2713 Verification succeeded! codebase-memory-mcp-linux-amd64.ta"
+  },
+  "sigstore_bundle_identity_read": "Fulcio certificate SAN https://github.com/DeusData/codebase-memory-mcp/.github/workflows/release.yml@refs/heads/main, OIDC issuer token.actions.githubusercontent.com, source commit equals the tag commit above, Rekor hashedrekord entries present for the tarball and checksums.txt bundles. Read with openssl; NOT a signature verification (no cosign or sigstore verifier is pinned in this repository and none is installed).",
+  "staged_by": "the lane builder, 2026-10-17T00:09Z (tracker <command-center tracker (private)>:537); this sweep re-verified, did not re-install"
+ },
+ "release_notes_review": {
+  "read": [
+   "v0.12.0 notes (Security fixes, Upgrade notes, Breaking changes, MCP tools)",
+   "v0.12.1 notes (full)"
+  ],
+  "affects_our_use": [
+   "VERSION COHORT: one codebase-memory-mcp version per account at a time (see blocker).",
+   "Index format moves 1 to 2: each existing project index is rebuilt in full once at its next index; the old graph keeps answering until then. Live indexes: _config.db 0 MB, native-agent-stack.db 1741 MB, us-equities-trading.db 476 MB",
+   "Some qualified names changed (C macros '<module>.<NAME>#macro', enumerators, '#field', Rust cfg twins); saved queries storing those names need an update.",
+   "detect_changes default base is now origin/HEAD (then main/master/upstream)."
+  ],
+  "does_not_affect_us": [
+   "tool names unchanged (17 of 17); schema changes are additive optional parameters",
+   "uninstall/install subcommands are never run by this host's install plan"
+  ],
+  "tool_surface_diff_0_11_0_to_0_12_1": [
+   "old=17 new=17 added=0 removed=0",
+   "SCHEMA-CHANGED (7):",
+   "   detect_changes | props +['config_path', 'edge_types', 'fixpoint', 'seed_cursor', 'seed_filter', 'seed_limit', 'seed_offset', 'seeds', 'via'] -[]",
+   "   get_architecture | props +['entry_node_id', 'expected_generation', 'include_behavior_evidence', 'target_node_id'] -[]",
+   "   index_repository | props +['async', 'doc_candidates', 'status'] -[]",
+   "   ingest_traces | props +['label'] -[]",
+   "   search_code | schema-detail",
+   "   search_graph | props +['kind', 'namespace'] -[]",
+   "   trace_path | schema-detail",
+   "DESCRIPTION-CHANGED: 4 of 17 common tools"
+  ]
+ },
+ "install_commands": {
+  "this_sweep_ran": [
+   "gh release download v0.12.1 --repo DeusData/codebase-memory-mcp --pattern codebase-memory-mcp-linux-amd64.tar.gz --pattern codebase-memory-mcp-linux-amd64.tar.gz.bundle --pattern checksums.txt --pattern checksums.txt.bundle --pattern sbom.json --dir <scratch>/prov-cbm-0.12.1/dl   (verification copy only; exit 0)",
+   "tar -xzf <scratch tarball> -C <scratch>/prov-cbm-0.12.1/extract   (verification copy only)"
+  ],
+  "layout": "tools/codebase-memory-mcp-0.12.1/ (binary, LICENSE, install.sh, THIRD_PARTY_NOTICES.md) and downloads/codebase-memory-mcp-0.12.1/ (tarball, checksums.txt, linux-amd64.sha256), both from the lane builder's staging"
+ },
+ "smoke": {
+  "method": "scripts/mcp_smoke.py (scratch): initialize (2025-06-18) -> notifications/initialized -> tools/list, under systemd-run --user --scope -p CPUWeight=idle, inside 'unshare --user --map-root-user' (uid 0 inside gives a separate /tmp/cbm-daemon-0 rendezvous, so no live process or the real cache is touched) with isolated HOME/XDG dirs and an empty cwd",
+  "version_0_11_0": {
+   "version_flag": {
+    "cmd": "$ECO_ROOT/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp --version",
+    "exit": 0,
+    "out_head": "codebase-memory-mcp 0.11.0"
+   },
+   "mcp": {
+    "ok": true,
+    "serverInfo": {
+     "name": "codebase-memory-mcp",
+     "version": "0.11.0"
+    },
+    "protocolVersion": "2025-06-18",
+    "tool_count": 17,
+    "tools_schema_sha256": "e770bab711aa4d449d7283378d75d4e14ca164b17627ec54813431ad0bfb3e77",
+    "server_exit": 0,
+    "elapsed_s": 5.63,
+    "error": null,
+    "has_instructions": true
+   },
+   "harness_exit": 0
+  },
+  "version_0_12_1": {
+   "version_flag": {
+    "cmd": "$ECO_ROOT/tools/codebase-memory-mcp-0.12.1/codebase-memory-mcp --version",
+    "exit": 0,
+    "out_head": "codebase-memory-mcp 0.12.1"
+   },
+   "mcp": {
+    "ok": true,
+    "serverInfo": {
+     "name": "codebase-memory-mcp",
+     "version": "0.12.1"
+    },
+    "protocolVersion": "2025-06-18",
+    "tool_count": 17,
+    "tools_schema_sha256": "1c50da73326b131241e8079eadf32c2fae7499bbf8f3bf553a2a5dd8f3821591",
+    "server_exit": 0,
+    "elapsed_s": 1.44,
+    "error": null,
+    "has_instructions": true
+   },
+   "harness_exit": 0
+  },
+  "functional_0_12_1": {
+   "mcp": {
+    "ok": true,
+    "serverInfo": {
+     "name": "codebase-memory-mcp",
+     "version": "0.12.1"
+    },
+    "protocolVersion": "2025-06-18",
+    "tool_count": 17,
+    "tools_schema_sha256": "1c50da73326b131241e8079eadf32c2fae7499bbf8f3bf553a2a5dd8f3821591",
+    "server_exit": 0,
+    "elapsed_s": 1.85,
+    "error": null,
+    "has_instructions": true,
+    "calls": [
+     {
+      "name": "index_repository",
+      "is_error": false
+     },
+     {
+      "name": "list_projects",
+      "is_error": false
+     },
+     {
+      "name": "search_graph",
+      "is_error": false
+     },
+     {
+      "name": "query_graph",
+      "is_error": false
+     },
+     {
+      "name": "get_architecture",
+      "is_error": false
+     }
+    ]
+   },
+   "harness_exit": 0,
+   "what": "index_repository on a 2-file scratch git repo (25 nodes, 45 edges), list_projects, search_graph, query_graph with an OPTIONAL MATCH relationship join (6 rows, no crash), get_architecture"
+  },
+  "in_place_attempts_without_namespace": {
+   "result": "FAILED, harness exit 1, server exit rc=1 after about 32 s, both versions",
+   "0_11_0": "refused: the active account daemon uses a different cache directory (isolated HOME requested)",
+   "0_12_1": "refused: a conflicting CBM process is active (active version 0.11.0, requested 0.12.1); active daemon pid 256141 session-managed, exits when its last session closes; sessions using it: pids 3998614, 732064, 989902; 'codebase-memory-mcp daemon stop' retires it once no session uses it"
+  }
+ },
+ "blocker": {
+  "why_not_switched": "Upstream's version-cohort admission lets one build run per account. Switching bin/codebase-memory-mcp to 0.12.1 now makes every new Claude or Codex session's MCP server exit rc=1 (conflict with the live 0.11.0 daemon) and lose the codebase-memory tools until the last 0.11.0 session closes. The sweep task's rule: a smoke that fails in place keeps the old link.",
+  "live_processes_seen": "daemon pid 256141 plus sessions 3998614, 732064, 989902 (pid and name only; not stopped by this sweep)",
+  "daemon_log": "$HOME/.cache/codebase-memory-mcp/logs/cbm-daemon.log"
+ },
+ "link": {
+  "path": "$ECO_ROOT/bin/codebase-memory-mcp",
+  "before": "$ECO_ROOT/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp",
+  "after": "$ECO_ROOT/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp",
+  "changed": false
+ },
+ "switch_when_ready": {
+  "precondition": "no codebase-memory process is running: test -z \"$(pgrep -l codebase-memory)\"   (all 0.11.0 sessions closed, so the daemon has retired; or the CC retires it with 'codebase-memory-mcp daemon stop' once no session uses it)",
+  "commands": [
+   "ECO=$ECO_ROOT",
+   "ln -s \"$ECO/tools/codebase-memory-mcp-0.12.1/codebase-memory-mcp\" \"$ECO/bin/.codebase-memory-mcp.new\" && mv -T \"$ECO/bin/.codebase-memory-mcp.new\" \"$ECO/bin/codebase-memory-mcp\"",
+   "\"$ECO/bin/codebase-memory-mcp\" --version   # expect: codebase-memory-mcp 0.12.1"
+  ],
+  "after_switch_cost": "the first index of each project is a full rebuild; run it deliberately under idle priority, for example: systemd-run --user --scope -p CPUWeight=idle \"$ECO/bin/codebase-memory-mcp\" cli index_repository --repo-path <repo>   (then cross-repo linking must be re-run for linked projects)"
+ },
+ "rollback": "ln -s \"$ECO/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp\" \"$ECO/bin/.codebase-memory-mcp.new\" && mv -T \"$ECO/bin/.codebase-memory-mcp.new\" \"$ECO/bin/codebase-memory-mcp\"; tools/codebase-memory-mcp-0.11.0 is kept (live processes run from it). An index rebuilt by 0.12.1 (format 2) is not guaranteed readable by 0.11.0; keep copies of the .db files before the first 0.12.1 index if a rollback must stay possible.",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies; no age buffer of ours. CC ruling in this session: no age buffer applies.",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "v0.12.0",
+    "v0.12.1"
+   ],
+   "README.md": {
+    "bytes": 108108,
+    "window_hits": []
+   },
+   "SECURITY.md": {
+    "bytes": 18835,
+    "window_hits": []
+   },
+   "pattern": "cooldown|minimum release age|release age|quarantine period|days after release|exclude-newer|embargo"
+  }
+ },
+ "notes_for_cc": [
+  "The tarball and checksums.txt are covered by GitHub's immutable-release attestation (gh release verify exit 0).",
+  "Python tool venvs and Node trees are unaffected; only this tool has the one-version-per-account rule."
+ ],
+ "public_copy": {
+  "of": "currency-codebase-memory-mcp receipt written by the currency sweep of 2026-10-17 (private original kept on the host)",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-codebase-memory-mcp-20261017T080146Z.json",
+  "renamed_keys": "keys of the private original that the repository's secret scan reads as API keys (an api-prefixed name beside a 64-hex value; the values are sha256 digests of public release assets) or that mislead (attestations_verified holds exit codes) appear here under these names: checksums_txt_sha256_vs_api_digest -> checksums_txt_sha256_vs_release_asset_digest; github_api_digest -> github_release_asset_digest"
+ }
+}

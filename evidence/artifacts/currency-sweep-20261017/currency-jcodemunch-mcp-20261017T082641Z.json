@@ -1,0 +1,418 @@
+{
+ "kind": "currency_switch",
+ "host": "NativeHorizonNY",
+ "tool": "jcodemunch-mcp",
+ "from": "1.108.367 (live before this sweep; the lane builder's 24-hour-cutoff pick at 2026-10-17T02:38Z; the audit snapshot and plan pin said 1.108.327)",
+ "to": "1.108.374",
+ "result": "SWITCHED by this sweep at 2026-10-17T08:25:55Z (all three entrypoints repointed at once); smoke clean before and after.",
+ "finding": "A2 stage-1 audit G3-12 (P2): jcodemunch-mcp trailed newer same-line releases. CC ruling in this session: no age buffer applies, take the latest 1.108.x now.",
+ "recorded_utc": "2026-10-17T08:26:39Z",
+ "upstream": {
+  "repo": "jgravelle/jcodemunch-mcp",
+  "release_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.374",
+  "tag": "v1.108.374",
+  "commit": "de0a67e5cf63c49930b79777ba2c314d58060e77",
+  "github_release_published_utc": "2026-10-17T04:34:14Z",
+  "pypi_upload_utc": "2026-10-17T04:33:08.615988Z",
+  "release_age_at_install": "about 3h51m (installed 2026-10-17T08:24:57Z; PyPI upload 2026-10-17T04:33:08Z)",
+  "release_age_at_receipt": "3h53m (0.2 days)",
+  "latest_check_at_receipt": {
+   "pypi_info_version": "1.108.374",
+   "is_target_the_latest": true
+  },
+  "files": [
+   {
+    "filename": "jcodemunch_mcp-1.108.374-py3-none-any.whl",
+    "size": 1868557,
+    "sha256_downloaded": "e36752c27a7db86bb3b511e1f96b711f78a316ef487b3a07b47578731df04cae",
+    "upload_time": "2026-10-17T04:33:08.615988Z"
+   },
+   {
+    "filename": "jcodemunch_mcp-1.108.374.tar.gz",
+    "size": 6447633,
+    "sha256_downloaded": "f4b9ad75f700e05b4429a29902d4aef6cbcbd286e15aab560f88c63a2dd789cb",
+    "upload_time": "2026-10-17T04:33:10.698844Z"
+   }
+  ]
+ },
+ "provenance": {
+  "pypi_sha256": {
+   "jcodemunch_mcp-1.108.374-py3-none-any.whl": {
+    "downloaded": "e36752c27a7db86bb3b511e1f96b711f78a316ef487b3a07b47578731df04cae",
+    "pypi_json": "e36752c27a7db86bb3b511e1f96b711f78a316ef487b3a07b47578731df04cae",
+    "match": true
+   },
+   "jcodemunch_mcp-1.108.374.tar.gz": {
+    "downloaded": "f4b9ad75f700e05b4429a29902d4aef6cbcbd286e15aab560f88c63a2dd789cb",
+    "pypi_json": "f4b9ad75f700e05b4429a29902d4aef6cbcbd286e15aab560f88c63a2dd789cb",
+    "match": true
+   }
+  },
+  "pypi_attestations": {
+   "jcodemunch_mcp-1.108.374-py3-none-any.whl": {
+    "provenance_http": 200,
+    "publisher": [
+     {
+      "environment": "pypi",
+      "kind": "GitHub",
+      "repository": "jgravelle/jcodemunch-mcp",
+      "workflow": "release.yml"
+     }
+    ],
+    "verify": {
+     "cmd": "uvx --from pypi-attestations==0.0.30 pypi-attestations verify pypi --repository https://github.com/jgravelle/jcodemunch-mcp pypi:jcodemunch_mcp-1.108.374-py3-none-any.whl",
+     "exit": 0,
+     "tail": "OK: jcodemunch_mcp-1.108.374-py3-none-any.whl"
+    }
+   },
+   "jcodemunch_mcp-1.108.374.tar.gz": {
+    "provenance_http": 200,
+    "publisher": [
+     {
+      "environment": "pypi",
+      "kind": "GitHub",
+      "repository": "jgravelle/jcodemunch-mcp",
+      "workflow": "release.yml"
+     }
+    ],
+    "verify": {
+     "cmd": "uvx --from pypi-attestations==0.0.30 pypi-attestations verify pypi --repository https://github.com/jgravelle/jcodemunch-mcp pypi:jcodemunch_mcp-1.108.374.tar.gz",
+     "exit": 0,
+     "tail": "OK: jcodemunch_mcp-1.108.374.tar.gz"
+    }
+   }
+  },
+  "verifier": "pypi-attestations 0.0.30 (PyPA, published 2026-07-28) as an ephemeral 'uvx --from pypi-attestations==0.0.30' probe; not installed",
+  "installed_bytes_vs_wheel_RECORD": {
+   "site_packages": "$ECO_ROOT/tools/jcodemunch-mcp-1.108.374/jcodemunch-mcp/lib/python3.13/site-packages",
+   "wheel": "jcodemunch_mcp-1.108.374-py3-none-any.whl",
+   "record_files_matching_installed": 307,
+   "mismatched": 0,
+   "missing": 0,
+   "skipped_scripts_or_data": 0,
+   "mismatched_list": [],
+   "missing_list": []
+  },
+  "release_notes_say": "Published by the Release workflow with PyPI trusted publishing and sigstore-signed artifacts (v1.108.368..374 notes)",
+  "from_side_1_108_367": {
+   "pypi_attestations_verify_exit_codes_one_per_file_0_means_verified": [
+    0,
+    0
+   ],
+   "installed_bytes_vs_wheel_RECORD": {
+    "site_packages": "$ECO_ROOT/python-tools/jcodemunch-mcp/lib/python3.13/site-packages",
+    "wheel": "jcodemunch_mcp-1.108.367-py3-none-any.whl",
+    "record_files_matching_installed": 306,
+    "mismatched": 0,
+    "missing": 0,
+    "skipped_scripts_or_data": 0,
+    "mismatched_list": [],
+    "missing_list": []
+   }
+  }
+ },
+ "release_notes_review": {
+  "read": [
+   "GitHub release notes v1.108.368 through v1.108.374 (seven releases between the old and new pin; saved in scratch)"
+  ],
+  "affects_our_use": [
+   "1.108.368: a context provider that runs out of its 30 s budget now marks the index and the next index_folder over the whole tree re-parses every file (rebuild_reason context_provider_cut); possible one-time slower index.",
+   "1.108.374: a Python virtualenv is skipped by pyvenv.cfg whatever its folder name (changes what the index holds; skip_virtualenvs false or JCODEMUNCH_SKIP_VIRTUALENVS=0 turns it off); dead_code_pct can rise on repositories with more than 100 candidates."
+  ],
+  "security_items": "1.108.369 hardens rust-analyzer launch only when enrichment.lsp_enabled is on; ~/.code-index/config.jsonc leaves 'enrichment' as: [\"786:  // \\\"enrichment\\\": {},\"] (the lane builder read the same line as commented out)",
+  "does_not_affect_us": [
+   "no tool renamed or removed: 6 front-door tools identical in names, schemas and descriptions",
+   "install/uninstall (client config writers) are never run by this host's plan",
+   "no Claude or Codex hook names jcodemunch (the lane builder's check, 1.108.363 hooks note)"
+  ],
+  "upstream_window": "the lane builder's receipt states 'Upstream defines no cooldown'; this sweep found none either (see cooldown)"
+ },
+ "install_commands": {
+  "this_sweep_ran": [
+   "mkdir -p $ECO/tools/jcodemunch-mcp-1.108.374/bin",
+   "UV_TOOL_DIR=$ECO/tools/jcodemunch-mcp-1.108.374 UV_TOOL_BIN_DIR=$ECO/tools/jcodemunch-mcp-1.108.374/bin systemd-run --user --scope -p CPUWeight=idle --quiet -- uv tool install --python 3.13 jcodemunch-mcp==1.108.374   (exit 0, 3 executables: gcm, jcodemunch-mcp, munch-bench)",
+   "for each of jcodemunch-mcp gcm munch-bench: ln -s $ECO/tools/jcodemunch-mcp-1.108.374/bin/<n> $ECO/bin/.<n>.new && mv -T $ECO/bin/.<n>.new $ECO/bin/<n>   (exit 0; all three temp links created first, then renamed together)"
+  ],
+  "layout": "side by side: tools/jcodemunch-mcp-1.108.374/{jcodemunch-mcp (uv tool venv + uv-receipt.toml), bin (entrypoint links)}; the old uv tool venv python-tools/jcodemunch-mcp stays in place",
+  "uv_tool_list_of_new_dir": [
+   "jcodemunch-mcp v1.108.374",
+   "- gcm",
+   "- jcodemunch-mcp",
+   "- munch-bench"
+  ]
+ },
+ "smoke": {
+  "method": "scratch mcp_smoke.py under systemd-run --user --scope -p CPUWeight=idle: initialize -> notifications/initialized -> tools/list, isolated HOME, scratch CODE_INDEX_PATH (the shared ~/.code-index is untouched), JCODEMUNCH_SHARE_SAVINGS=0 as in the live config, cwd a scratch git repo",
+  "version_flags_after_switch": {
+   "jcodemunch-mcp": {
+    "cmd": "$ECO_ROOT/bin/jcodemunch-mcp --version",
+    "exit": 0,
+    "out_head": "jcodemunch-mcp 1.108.374"
+   },
+   "gcm": {
+    "cmd": "$ECO_ROOT/bin/gcm --version",
+    "exit": 0,
+    "out_head": "gcm (jcodemunch-mcp 1.108.374)"
+   },
+   "munch-bench": {
+    "cmd": "$ECO_ROOT/bin/munch-bench --help",
+    "exit": 0,
+    "out_head": "usage: munch-bench [-h] [--version] {run,compare,corpus-stat"
+   }
+  },
+  "mcp_live_1_108_367_before": {
+   "ok": true,
+   "serverInfo": {
+    "name": "jcodemunch-mcp",
+    "version": "1.108.367"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 6,
+   "tools_schema_sha256": "ab38187a8080e6575d5fb3c0b723e415db9842068865cc8fb35f4a68ced7c66d",
+   "server_exit": 0,
+   "elapsed_s": 0.78,
+   "error": null,
+   "has_instructions": true
+  },
+  "mcp_new_1_108_374_before_switch": {
+   "ok": true,
+   "serverInfo": {
+    "name": "jcodemunch-mcp",
+    "version": "1.108.374"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 6,
+   "tools_schema_sha256": "ab38187a8080e6575d5fb3c0b723e415db9842068865cc8fb35f4a68ced7c66d",
+   "server_exit": 0,
+   "elapsed_s": 0.86,
+   "error": null,
+   "has_instructions": true
+  },
+  "mcp_via_real_link_after_switch": {
+   "ok": true,
+   "serverInfo": {
+    "name": "jcodemunch-mcp",
+    "version": "1.108.374"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 6,
+   "tools_schema_sha256": "ab38187a8080e6575d5fb3c0b723e415db9842068865cc8fb35f4a68ced7c66d",
+   "server_exit": 0,
+   "elapsed_s": 0.79,
+   "error": null,
+   "has_instructions": true,
+   "calls": [
+    {
+     "name": "menu",
+     "is_error": false
+    }
+   ]
+  },
+  "harness_exits": {
+   "1.108.367": 0,
+   "1.108.374": 0,
+   "post_switch": 0
+  },
+  "tool_surface": "6 tools both versions (set_tool_tier, announce_model, jcodemunch_guide, order, menu, route), no schema or description difference",
+  "functional_both_versions_equal": {
+   "1.108.367": [
+    {
+     "call": "menu",
+     "is_error": false,
+     "head": "query\\\":null,\\\"count\\\":5,\\\"total_actions\\\":91,\\\"actions\\\":[{\\\"action\\\":\\\"index_repo\\\",\\\"summary\\\":\\\"Index a GitHub repository's source code."
+    },
+    {
+     "call": "order",
+     "is_error": false,
+     "head": "epo\\\":\\\"local/cbm-fixture-repo\\\",\\\"folder_path\\\":\\\"<scratch>"
+    },
+    {
+     "call": "order",
+     "is_error": false,
+     "head": "\":[{\\\"repo\\\":\\\"local/cbm-fixture-repo\\\",\\\"indexed_at\\\":\\\"2026-10-17T04:25:38.680279\\\",\\\"symbol_count\\\":31,\\\"file_count\\\":3,\\\"git_head\\\":\\\"6c"
+    }
+   ],
+   "1.108.374": [
+    {
+     "call": "menu",
+     "is_error": false,
+     "head": "query\\\":null,\\\"count\\\":5,\\\"total_actions\\\":91,\\\"actions\\\":[{\\\"action\\\":\\\"index_repo\\\",\\\"summary\\\":\\\"Index a GitHub repository's source code."
+    },
+    {
+     "call": "order",
+     "is_error": false,
+     "head": "epo\\\":\\\"local/cbm-fixture-repo\\\",\\\"folder_path\\\":\\\"<scratch>"
+    },
+    {
+     "call": "order",
+     "is_error": false,
+     "head": "\":[{\\\"repo\\\":\\\"local/cbm-fixture-repo\\\",\\\"indexed_at\\\":\\\"2026-10-17T04:25:39.760708\\\",\\\"symbol_count\\\":31,\\\"file_count\\\":3,\\\"git_head\\\":\\\"6c"
+    }
+   ]
+  }
+ },
+ "link": {
+  "changed_by_this_sweep": true,
+  "before": {
+   "jcodemunch-mcp": "$ECO_ROOT/python-tools/jcodemunch-mcp/bin/jcodemunch-mcp",
+   "gcm": "$ECO_ROOT/python-tools/jcodemunch-mcp/bin/gcm",
+   "munch-bench": "$ECO_ROOT/python-tools/jcodemunch-mcp/bin/munch-bench"
+  },
+  "after": {
+   "jcodemunch-mcp": {
+    "path": "$ECO_ROOT/bin/jcodemunch-mcp",
+    "target": "$ECO_ROOT/tools/jcodemunch-mcp-1.108.374/bin/jcodemunch-mcp",
+    "link_mtime_utc": "2026-10-17T08:25:55Z"
+   },
+   "gcm": {
+    "path": "$ECO_ROOT/bin/gcm",
+    "target": "$ECO_ROOT/tools/jcodemunch-mcp-1.108.374/bin/gcm",
+    "link_mtime_utc": "2026-10-17T08:25:55Z"
+   },
+   "munch-bench": {
+    "path": "$ECO_ROOT/bin/munch-bench",
+    "target": "$ECO_ROOT/tools/jcodemunch-mcp-1.108.374/bin/munch-bench",
+    "link_mtime_utc": "2026-10-17T08:25:55Z"
+   }
+  }
+ },
+ "processes_still_on_the_old_venv": "three live jcodemunch MCP processes (pids 3998938, 732335, 990196) run from python-tools/jcodemunch-mcp and keep 1.108.367 modules until their sessions restart; their venv was not modified, so nothing under them changed. New sessions start 1.108.374 through the link.",
+ "layout_note": "python-tools/jcodemunch-mcp/uv-receipt.toml still says ==1.108.367 and no longer describes what is live; the live version is the new tool dir's receipt (tools/jcodemunch-mcp-1.108.374/jcodemunch-mcp/uv-receipt.toml). Audit readers should follow bin/jcodemunch-mcp.",
+ "rollback": "for n in jcodemunch-mcp gcm munch-bench: ln -s $ECO/python-tools/jcodemunch-mcp/bin/<n> $ECO/bin/.<n>.new && mv -T $ECO/bin/.<n>.new $ECO/bin/<n>   (python-tools/jcodemunch-mcp stays installed at 1.108.367; tools/jcodemunch-mcp-1.108.374 can be deleted afterwards)",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "release_age_at_verification": "3h53m (0.2 days)",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "v1.108.368 through v1.108.374 release notes",
+    "SECURITY.md (45468 bytes at v1.108.374)"
+   ],
+   "README.md": {
+    "bytes": 27755,
+    "window_hits": []
+   },
+   "SECURITY.md": {
+    "bytes": 45468,
+    "window_hits": []
+   },
+   "repo": "jgravelle/jcodemunch-mcp",
+   "tag": "v1.108.374",
+   "pattern": "cooldown|minimum release age|release age|quarantine period|days after release|exclude-newer|embargo"
+  },
+  "note": "the lane builder's 24-hour cutoff (protocol step 6) is superseded by the CC's ruling and by docs/decisions/2026-10-17-zero-tolerance-currency.md:52-57; the target is only 3h51m old at install, accepted under that rule"
+ },
+ "public_copy": {
+  "of": "currency-jcodemunch-mcp receipt written by the currency sweep of 2026-10-17 (private original kept on the host)",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-jcodemunch-mcp-20261017T082641Z.json",
+  "amended_by_the_fold": {
+   "blocks": [
+    "digest_comparison",
+    "source_commit_resolution"
+   ],
+   "from_private_addendum": "currency-fold-digests-20261017T144813Z.json",
+   "why": "the verdict on PR #1243 asked that each public receipt carry the registry's own digests, the locally computed digests of the same bytes and how the source commit was resolved"
+  },
+  "renamed_keys": "keys of the private original that the repository's secret scan reads as API keys (an api-prefixed name beside a 64-hex value; the values are sha256 digests of public release assets) or that mislead (attestations_verified holds exit codes) appear here under these names: attestations_verified -> pypi_attestations_verify_exit_codes_one_per_file_0_means_verified"
+ },
+ "digest_comparison": {
+  "read_utc": "2026-10-17T14:36:21Z",
+  "what_was_compared_with_what": "PyPI publishes a sha256 for every file of a release (urls[].digests.sha256). Each file of the release (wheel and sdist) was downloaded and its sha256 computed locally: each equals the published sha256. Where the profile row pins a sha256 it is the wheel's, and equals the local sha256.",
+  "registry": {
+   "fields_read": [
+    "urls[].filename",
+    "urls[].digests",
+    "urls[].upload_time_iso_8601"
+   ],
+   "files": [
+    {
+     "filename": "jcodemunch_mcp-1.108.374-py3-none-any.whl",
+     "local": {
+      "bytes": 1868557,
+      "sha1": "baa28100110537f79bd3be6e072b516a5ddaf52c",
+      "sha256": "e36752c27a7db86bb3b511e1f96b711f78a316ef487b3a07b47578731df04cae",
+      "sha512_sri": "sha512-2TZVRml6Gb60xZYDSMtuy3Vpn1aFkviMWsVouiyLQTGBMneN/cG+q09roT0O30eCzu2/tYUTu/hngfWVxzA4AQ=="
+     },
+     "packagetype": "bdist_wheel",
+     "registry_published_digests": {
+      "blake2b_256": "abb3312ca4aa8293fdf6f01c9ee5121e1e724e4ec91cd9b92216bd02ee2c040f",
+      "md5": "8cbbbcc18b4d3f1fcfb06a9d1666d6f0",
+      "sha256": "e36752c27a7db86bb3b511e1f96b711f78a316ef487b3a07b47578731df04cae"
+     },
+     "sha256_equal": true,
+     "size_registry": 1868557,
+     "upload_time_iso_8601": "2026-10-17T04:33:08.615988Z",
+     "url": "https://files.pythonhosted.org/packages/ab/b3/312ca4aa8293fdf6f01c9ee5121e1e724e4ec91cd9b92216bd02ee2c040f/jcodemunch_mcp-1.108.374-py3-none-any.whl",
+     "yanked": false
+    },
+    {
+     "filename": "jcodemunch_mcp-1.108.374.tar.gz",
+     "local": {
+      "bytes": 6447633,
+      "sha1": "0c87e7a14e2da78d01f24d2f854f4afb616cec7c",
+      "sha256": "f4b9ad75f700e05b4429a29902d4aef6cbcbd286e15aab560f88c63a2dd789cb",
+      "sha512_sri": "sha512-mJphdUq1gehl/0+IQBqTksklFw5XkgnCB7WKdOLpqwUqHefpnPdGZYT7v6iLt2oZX+fpI4hBh/k5GTrfFwtSKQ=="
+     },
+     "packagetype": "sdist",
+     "registry_published_digests": {
+      "blake2b_256": "2ab71d043633eb2047ccca9d75962e7ec4919dae7b191e74358d69eb805d8ad5",
+      "md5": "bfe54fc0d89ca3556a61fe5a6beffc2e",
+      "sha256": "f4b9ad75f700e05b4429a29902d4aef6cbcbd286e15aab560f88c63a2dd789cb"
+     },
+     "sha256_equal": true,
+     "size_registry": 6447633,
+     "upload_time_iso_8601": "2026-10-17T04:33:10.698844Z",
+     "url": "https://files.pythonhosted.org/packages/2a/b7/1d043633eb2047ccca9d75962e7ec4919dae7b191e74358d69eb805d8ad5/jcodemunch_mcp-1.108.374.tar.gz",
+     "yanked": false
+    }
+   ],
+   "name": "PyPI",
+   "url_read": "https://pypi.org/pypi/jcodemunch-mcp/1.108.374/json"
+  },
+  "comparisons": [
+   {
+    "equal": true,
+    "local_algorithm": "sha256",
+    "local_value": "e36752c27a7db86bb3b511e1f96b711f78a316ef487b3a07b47578731df04cae",
+    "registry_field": "urls[].digests.sha256 of jcodemunch_mcp-1.108.374-py3-none-any.whl",
+    "registry_value": "e36752c27a7db86bb3b511e1f96b711f78a316ef487b3a07b47578731df04cae"
+   },
+   {
+    "equal": true,
+    "local_algorithm": "sha256",
+    "local_value": "f4b9ad75f700e05b4429a29902d4aef6cbcbd286e15aab560f88c63a2dd789cb",
+    "registry_field": "urls[].digests.sha256 of jcodemunch_mcp-1.108.374.tar.gz",
+    "registry_value": "f4b9ad75f700e05b4429a29902d4aef6cbcbd286e15aab560f88c63a2dd789cb"
+   }
+  ],
+  "all_registry_comparisons_equal": true,
+  "profile_pin": {
+   "row": "jcodemunch-mcp",
+   "pin": "1.108.374",
+   "checksum": {
+    "algorithm": "git-sha1",
+    "value": "de0a67e5cf63c49930b79777ba2c314d58060e77"
+   },
+   "equals_local_sha256": null,
+   "note": "The jcodemunch-mcp profile row records only the tag commit (source-identity form, integrity_observation source_identity_only): the checksum of the row is that commit. The verified wheel and sdist digests are the ones above; the row cites this receipt for them."
+  }
+ },
+ "source_commit_resolution": {
+  "git_ls_remote": {
+   "command": "git ls-remote https://github.com/jgravelle/jcodemunch-mcp.git refs/tags/v1.108.374 refs/tags/v1.108.374^{}",
+   "commit": "de0a67e5cf63c49930b79777ba2c314d58060e77",
+   "exit": 0,
+   "lines": [
+    "f76dae0de1d5dbc40d3638f46d95ef83a86af447\trefs/tags/v1.108.374",
+    "de0a67e5cf63c49930b79777ba2c314d58060e77\trefs/tags/v1.108.374^{}"
+   ],
+   "tag_kind": "annotated",
+   "tag_object": "f76dae0de1d5dbc40d3638f46d95ef83a86af447"
+  },
+  "note": "PyPI files carry no source commit; the source is identified by the git tag below",
+  "tag_commit": "de0a67e5cf63c49930b79777ba2c314d58060e77",
+  "tag_commit_equals_profile_or_recorded_commit": true,
+  "method": "git ls-remote https://github.com/<repo>.git refs/tags/<tag> refs/tags/<tag>^{} (an annotated tag lists its object and, peeled, its commit; a lightweight tag lists only the commit); for npm packages the version document's gitHead and, when it differs from the tag commit, the GitHub compare API between the two"
+ }
+}

@@ -1,0 +1,390 @@
+{
+ "kind": "currency_switch",
+ "host": "NativeHorizonNY",
+ "tool": "semble",
+ "from": "0.6.1 (audit snapshot, live and plan pin)",
+ "to": "0.7.0",
+ "result": "SWITCHED by this sweep at 2026-10-17T08:28:04Z (~/.local/bin/semble repointed); smoke clean before and after.",
+ "finding": "A2 stage-1 audit G3-12 (P2): semble 0.6.1 trailed 0.7.0. the lane builder had deferred it under its 24-hour cutoff (receipt section (14), tracker :746); the CC's ruling in this session removed any age buffer of ours.",
+ "recorded_utc": "2026-10-17T08:28:39Z",
+ "upstream": {
+  "repo": "MinishLab/semble",
+  "release_url": "https://github.com/MinishLab/semble/releases/tag/v0.7.0",
+  "tag": "v0.7.0",
+  "commit": "8ee6463efbb1ff755c339e965c7298b7afd7db5b",
+  "github_release_published_utc": "2026-10-16T10:48:43Z",
+  "pypi_upload_utc": "2026-10-16T12:16:18.518944Z",
+  "release_age_at_install": "about 20h11m (installed 2026-10-17T08:27:24Z; PyPI upload 2026-10-16T12:16:18Z)",
+  "release_age_at_receipt": "20h12m (0.8 days)",
+  "latest_check_at_receipt": {
+   "pypi_info_version": "0.7.0",
+   "is_target_the_latest": true
+  },
+  "files": [
+   {
+    "filename": "semble-0.7.0-py3-none-any.whl",
+    "size": 91636,
+    "sha256_downloaded": "06c568d5a06f3a5352f22357d5a7ab17525d4404fddde8f1ae1405e3e87ac4a7",
+    "upload_time": "2026-10-16T12:16:18.518944Z"
+   },
+   {
+    "filename": "semble-0.7.0.tar.gz",
+    "size": 121881,
+    "sha256_downloaded": "83a2bfeea20854d1354cfa95ed83ad580fac5dcf8ccdbd4f987da216bf5f694f",
+    "upload_time": "2026-10-16T12:16:20.020997Z"
+   }
+  ]
+ },
+ "provenance": {
+  "pypi_sha256": {
+   "semble-0.7.0-py3-none-any.whl": {
+    "downloaded": "06c568d5a06f3a5352f22357d5a7ab17525d4404fddde8f1ae1405e3e87ac4a7",
+    "pypi_json": "06c568d5a06f3a5352f22357d5a7ab17525d4404fddde8f1ae1405e3e87ac4a7",
+    "match": true
+   },
+   "semble-0.7.0.tar.gz": {
+    "downloaded": "83a2bfeea20854d1354cfa95ed83ad580fac5dcf8ccdbd4f987da216bf5f694f",
+    "pypi_json": "83a2bfeea20854d1354cfa95ed83ad580fac5dcf8ccdbd4f987da216bf5f694f",
+    "match": true
+   }
+  },
+  "pypi_attestations": {
+   "semble-0.7.0-py3-none-any.whl": {
+    "provenance_http": 200,
+    "publisher": [
+     {
+      "environment": "release",
+      "kind": "GitHub",
+      "repository": "MinishLab/semble",
+      "workflow": "release.yaml"
+     }
+    ],
+    "verify": {
+     "cmd": "uvx --from pypi-attestations==0.0.30 pypi-attestations verify pypi --repository https://github.com/MinishLab/semble pypi:semble-0.7.0-py3-none-any.whl",
+     "exit": 0,
+     "tail": "OK: semble-0.7.0-py3-none-any.whl"
+    }
+   },
+   "semble-0.7.0.tar.gz": {
+    "provenance_http": 200,
+    "publisher": [
+     {
+      "environment": "release",
+      "kind": "GitHub",
+      "repository": "MinishLab/semble",
+      "workflow": "release.yaml"
+     }
+    ],
+    "verify": {
+     "cmd": "uvx --from pypi-attestations==0.0.30 pypi-attestations verify pypi --repository https://github.com/MinishLab/semble pypi:semble-0.7.0.tar.gz",
+     "exit": 0,
+     "tail": "OK: semble-0.7.0.tar.gz"
+    }
+   }
+  },
+  "verifier": "pypi-attestations 0.0.30 (PyPA, published 2026-07-28) as an ephemeral 'uvx --from pypi-attestations==0.0.30' probe; not installed",
+  "installed_bytes_vs_wheel_RECORD": {
+   "site_packages": "$ECO_ROOT/tools/semble-0.7.0/semble/lib/python3.13/site-packages",
+   "wheel": "semble-0.7.0-py3-none-any.whl",
+   "record_files_matching_installed": 50,
+   "mismatched": 0,
+   "missing": 0,
+   "skipped_scripts_or_data": 0,
+   "mismatched_list": [],
+   "missing_list": []
+  },
+  "from_side_0_6_1": {
+   "pypi_attestations_verify_exit_codes_one_per_file_0_means_verified": [
+    0,
+    0
+   ],
+   "installed_bytes_vs_wheel_RECORD": {
+    "site_packages": "$HOME/.local/share/uv/tools/semble/lib/python3.13/site-packages",
+    "wheel": "semble-0.6.1-py3-none-any.whl",
+    "record_files_matching_installed": 50,
+    "mismatched": 0,
+    "missing": 0,
+    "skipped_scripts_or_data": 0,
+    "mismatched_list": [],
+    "missing_list": []
+   }
+  }
+ },
+ "release_notes_review": {
+  "read": [
+   "GitHub release v0.6.2 (fixes: manifest-mtime cache validation, exit the MCP server on stdin EOF or SIGTERM)",
+   "GitHub release v0.7.0 (8 changes)"
+  ],
+  "affects_our_use": [
+   "0.7.0 stores BM25 postings as numpy arrays and upgrades model2vec: an index cache built by 0.6.1 is not guaranteed reusable (the lane builder expected a rebuild). The live per-client caches (~/.cache/semble-claude and ~/.cache/semble-codex, named in the client configs) do not exist yet, so nothing is migrated; the first search per repository builds a new index.",
+   "MCP SDK 2.x: the server now reports semble's own version in serverInfo (0.6.1 reported the SDK's 1.30.0).",
+   "'Use bare MCP tool names in agent instructions' (#289) changes the text that semble's own install command writes into agent instruction files; this host never runs that command (the plan registers the server through the clients' MCP config).",
+   "0.6.2's exit-on-stdin-EOF/SIGTERM fix (orphan servers) is included."
+  ],
+  "does_not_affect_us": [
+   "tool names and schemas unchanged: find_related and search, identical schemas and descriptions",
+   "the live local model path (SEMBLE_MODEL_NAME) loads and searches under 0.7.0 with the same top hit and score as 0.6.1"
+  ]
+ },
+ "install_commands": {
+  "this_sweep_ran": [
+   "mkdir -p $ECO/tools/semble-0.7.0/bin",
+   "UV_TOOL_DIR=$ECO/tools/semble-0.7.0 UV_TOOL_BIN_DIR=$ECO/tools/semble-0.7.0/bin systemd-run --user --scope -p CPUWeight=idle --quiet -- uv tool install --python 3.13 'semble[mcp]==0.7.0'   (exit 0; the receipt's exact specifier from the lane builder's plan)",
+   "ln -s $ECO/tools/semble-0.7.0/bin/semble ~/.local/bin/.semble.new && mv -T ~/.local/bin/.semble.new ~/.local/bin/semble   (exit 0)"
+  ],
+  "layout": "side by side: tools/semble-0.7.0/{semble (uv tool venv + uv-receipt.toml), bin/semble}; the old uv tool venv ~/.local/share/uv/tools/semble stays in place at 0.6.1",
+  "uv_tool_list_of_new_dir": [
+   "semble v0.7.0",
+   "- semble"
+  ]
+ },
+ "smoke": {
+  "method": "scratch mcp_smoke.py under systemd-run --user --scope -p CPUWeight=idle: initialize -> notifications/initialized -> tools/list -> tools/call search, isolated HOME, scratch SEMBLE_CACHE_LOCATION, the live SEMBLE_MODEL_NAME (read-only local model dir), cwd and repo a scratch git repo",
+  "mcp_0_6_1_before": {
+   "ok": true,
+   "serverInfo": {
+    "name": "semble",
+    "version": "1.30.0"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 2,
+   "tools_schema_sha256": "28c67b194d1336c5a92a9ea09ddb8e3385727a426d1041283fb667aef01416f1",
+   "server_exit": 0,
+   "elapsed_s": 1.9,
+   "error": null,
+   "has_instructions": true,
+   "calls": [
+    {
+     "name": "search",
+     "is_error": false
+    }
+   ]
+  },
+  "mcp_0_7_0_before_switch": {
+   "ok": true,
+   "serverInfo": {
+    "name": "semble",
+    "version": "0.7.0"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 2,
+   "tools_schema_sha256": "28c67b194d1336c5a92a9ea09ddb8e3385727a426d1041283fb667aef01416f1",
+   "server_exit": 0,
+   "elapsed_s": 2.69,
+   "error": null,
+   "has_instructions": true,
+   "calls": [
+    {
+     "name": "search",
+     "is_error": false
+    }
+   ]
+  },
+  "mcp_via_bare_command_after_switch": {
+   "ok": true,
+   "serverInfo": {
+    "name": "semble",
+    "version": "0.7.0"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 2,
+   "tools_schema_sha256": "28c67b194d1336c5a92a9ea09ddb8e3385727a426d1041283fb667aef01416f1",
+   "server_exit": 0,
+   "elapsed_s": 1.83,
+   "error": null,
+   "has_instructions": true,
+   "calls": [
+    {
+     "name": "search",
+     "is_error": false
+    }
+   ]
+  },
+  "harness_exits": {
+   "0.6.1": 0,
+   "0.7.0": 0,
+   "post_switch": 0
+  },
+  "version_flag": {
+   "via_new_dir": {
+    "cmd": "$ECO_ROOT/tools/semble-0.7.0/bin/semble --version",
+    "exit": 0,
+    "out_head": "0.7.0"
+   },
+   "via_PATH_after_switch": {
+    "cmd": "semble --version",
+    "exit": 0,
+    "out_head": "0.7.0"
+   }
+  },
+  "search_results": {
+   "0.6.1": [
+    {
+     "call": "search",
+     "is_error": false,
+     "head": "{\"content\": [{\"type\": \"text\", \"text\": \"{\\\"query\\\": \\\"function that adds one to a number\\\", \\\"results\\\": [{\\\"file_path\\\": \\\"src/a.py\\\", \\\"start_line\\\": 1, \\\"end_line\\\": 12, \\\"score\\\": 0.019672131147540985, \\\"content\\\": \\\"def helper"
+    }
+   ],
+   "0.7.0": [
+    {
+     "call": "search",
+     "is_error": false,
+     "head": "{\"content\": [{\"text\": \"{\\\"query\\\": \\\"function that adds one to a number\\\", \\\"results\\\": [{\\\"file_path\\\": \\\"src/a.py\\\", \\\"start_line\\\": 1, \\\"end_line\\\": 12, \\\"score\\\": 0.019672131147540985, \\\"content\\\": \\\"def helper(x):\\\\n    retur"
+    }
+   ],
+   "post-switch": [
+    {
+     "call": "search",
+     "is_error": false,
+     "head": "{\"content\": [{\"text\": \"{\\\"query\\\": \\\"function that adds one to a number\\\", \\\"results\\\": [{\\\"file_path\\\": \\\"src/a.py\\\", \\\"start_line\\\": 1, \\\"end_line\\\": 12, \\\"score\\\": 0.019672131147540985, \\\"content\\\": \\\"def helper(x):\\\\n    retur"
+    }
+   ]
+  },
+  "tool_surface": "find_related and search in both versions, no schema or description difference"
+ },
+ "link": {
+  "changed_by_this_sweep": true,
+  "path": "$HOME/.local/bin/semble",
+  "before": "$HOME/.local/share/uv/tools/semble/bin/semble",
+  "after": {
+   "path": "$HOME/.local/bin/semble",
+   "target": "$ECO_ROOT/tools/semble-0.7.0/bin/semble",
+   "link_mtime_utc": "2026-10-17T08:28:04Z"
+  },
+  "which_semble": "$HOME/.local/bin/semble (the client configs run the bare command 'semble')"
+ },
+ "processes_still_on_the_old_venv": "three live semble MCP processes (pids 3999198, 732414, 990200) run from ~/.local/share/uv/tools/semble (0.6.1); that venv was not modified. New sessions start 0.7.0 through the link.",
+ "layout_note": "~/.local/share/uv/tools/semble/uv-receipt.toml still says semble[mcp]==0.6.1 and 'uv tool list' in the default tool dir still lists semble v0.6.1; the live version is the new dir's receipt (tools/semble-0.7.0/semble/uv-receipt.toml). Follow ~/.local/bin/semble.",
+ "rollback": "ln -s $HOME/.local/share/uv/tools/semble/bin/semble ~/.local/bin/.semble.new && mv -T ~/.local/bin/.semble.new ~/.local/bin/semble   (the 0.6.1 venv stays installed; tools/semble-0.7.0 can be deleted afterwards)",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "release_age_at_verification": "20h12m (0.8 days)",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "v0.6.2 and v0.7.0 GitHub release notes"
+   ],
+   "README.md": {
+    "bytes": 17035,
+    "window_hits": []
+   },
+   "SECURITY.md": null,
+   "repo": "MinishLab/semble",
+   "tag": "v0.7.0",
+   "pattern": "cooldown|minimum release age|release age|quarantine period|days after release|exclude-newer|embargo"
+  },
+  "SECURITY.md_note": "MinishLab/semble has no SECURITY.md at v0.7.0",
+  "note": "the lane builder's deferral (24-hour cutoff, eligible 2026-10-17T12:16Z) and the CC's earlier 'semble waits' line (tracker :746) are superseded by the CC's ruling in this session and by docs/decisions/2026-10-17-zero-tolerance-currency.md:52-57"
+ },
+ "public_copy": {
+  "of": "currency-semble receipt written by the currency sweep of 2026-10-17 (private original kept on the host)",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-semble-20261017T082840Z.json",
+  "amended_by_the_fold": {
+   "blocks": [
+    "digest_comparison",
+    "source_commit_resolution"
+   ],
+   "from_private_addendum": "currency-fold-digests-20261017T144813Z.json",
+   "why": "the verdict on PR #1243 asked that each public receipt carry the registry's own digests, the locally computed digests of the same bytes and how the source commit was resolved"
+  },
+  "renamed_keys": "keys of the private original that the repository's secret scan reads as API keys (an api-prefixed name beside a 64-hex value; the values are sha256 digests of public release assets) or that mislead (attestations_verified holds exit codes) appear here under these names: attestations_verified -> pypi_attestations_verify_exit_codes_one_per_file_0_means_verified"
+ },
+ "digest_comparison": {
+  "read_utc": "2026-10-17T14:36:23Z",
+  "what_was_compared_with_what": "PyPI publishes a sha256 for every file of a release (urls[].digests.sha256). Each file of the release (wheel and sdist) was downloaded and its sha256 computed locally: each equals the published sha256. Where the profile row pins a sha256 it is the wheel's, and equals the local sha256.",
+  "registry": {
+   "fields_read": [
+    "urls[].filename",
+    "urls[].digests",
+    "urls[].upload_time_iso_8601"
+   ],
+   "files": [
+    {
+     "filename": "semble-0.7.0-py3-none-any.whl",
+     "local": {
+      "bytes": 91636,
+      "sha1": "0a537797b81c84c36b34c2ac5f10f915d4f01208",
+      "sha256": "06c568d5a06f3a5352f22357d5a7ab17525d4404fddde8f1ae1405e3e87ac4a7",
+      "sha512_sri": "sha512-jxnjf/iaNIi3ivOoxrDXpSJ6nsRON8VxHNEoOjzrjiHBEWp7uNYP7Y7dpRIRX+29JEXwfb+mlQzuO9w7mzQZ/g=="
+     },
+     "packagetype": "bdist_wheel",
+     "registry_published_digests": {
+      "blake2b_256": "af1000ed65627f5050d006ea01b363f709bdb208d037176bb2fb8e7044df5c12",
+      "md5": "97e172b86aedecfc6658efeb5273f3c6",
+      "sha256": "06c568d5a06f3a5352f22357d5a7ab17525d4404fddde8f1ae1405e3e87ac4a7"
+     },
+     "sha256_equal": true,
+     "size_registry": 91636,
+     "upload_time_iso_8601": "2026-10-16T12:16:18.518944Z",
+     "url": "https://files.pythonhosted.org/packages/af/10/00ed65627f5050d006ea01b363f709bdb208d037176bb2fb8e7044df5c12/semble-0.7.0-py3-none-any.whl",
+     "yanked": false
+    },
+    {
+     "filename": "semble-0.7.0.tar.gz",
+     "local": {
+      "bytes": 121881,
+      "sha1": "89c4bc9db59b965d12ee985b5730447e959c83f2",
+      "sha256": "83a2bfeea20854d1354cfa95ed83ad580fac5dcf8ccdbd4f987da216bf5f694f",
+      "sha512_sri": "sha512-m2BG8rl3cl+xosqQEPJ4HCTUxU8mJ9tKteHM07F2earJQ6fPBOUScv8RB1ufzWEPH2nacCNdLhyc0wqOPyggkA=="
+     },
+     "packagetype": "sdist",
+     "registry_published_digests": {
+      "blake2b_256": "b136322a4802521f6a84b1ac5ed1dbd539129c439c78cfaaef1897f79ad8ba1a",
+      "md5": "c88f0ab246be9b977c272baf55be8932",
+      "sha256": "83a2bfeea20854d1354cfa95ed83ad580fac5dcf8ccdbd4f987da216bf5f694f"
+     },
+     "sha256_equal": true,
+     "size_registry": 121881,
+     "upload_time_iso_8601": "2026-10-16T12:16:20.020997Z",
+     "url": "https://files.pythonhosted.org/packages/b1/36/322a4802521f6a84b1ac5ed1dbd539129c439c78cfaaef1897f79ad8ba1a/semble-0.7.0.tar.gz",
+     "yanked": false
+    }
+   ],
+   "name": "PyPI",
+   "url_read": "https://pypi.org/pypi/semble/0.7.0/json"
+  },
+  "comparisons": [
+   {
+    "equal": true,
+    "local_algorithm": "sha256",
+    "local_value": "06c568d5a06f3a5352f22357d5a7ab17525d4404fddde8f1ae1405e3e87ac4a7",
+    "registry_field": "urls[].digests.sha256 of semble-0.7.0-py3-none-any.whl",
+    "registry_value": "06c568d5a06f3a5352f22357d5a7ab17525d4404fddde8f1ae1405e3e87ac4a7"
+   },
+   {
+    "equal": true,
+    "local_algorithm": "sha256",
+    "local_value": "83a2bfeea20854d1354cfa95ed83ad580fac5dcf8ccdbd4f987da216bf5f694f",
+    "registry_field": "urls[].digests.sha256 of semble-0.7.0.tar.gz",
+    "registry_value": "83a2bfeea20854d1354cfa95ed83ad580fac5dcf8ccdbd4f987da216bf5f694f"
+   }
+  ],
+  "all_registry_comparisons_equal": true,
+  "profile_pin": {
+   "row": "semble",
+   "pin": "0.7.0",
+   "checksum": {
+    "algorithm": "sha256",
+    "value": "06c568d5a06f3a5352f22357d5a7ab17525d4404fddde8f1ae1405e3e87ac4a7"
+   },
+   "equals_local_sha256": true
+  }
+ },
+ "source_commit_resolution": {
+  "git_ls_remote": {
+   "command": "git ls-remote https://github.com/MinishLab/semble.git refs/tags/v0.7.0 refs/tags/v0.7.0^{}",
+   "commit": "8ee6463efbb1ff755c339e965c7298b7afd7db5b",
+   "exit": 0,
+   "lines": [
+    "8ee6463efbb1ff755c339e965c7298b7afd7db5b\trefs/tags/v0.7.0"
+   ],
+   "tag_kind": "lightweight",
+   "tag_object": null
+  },
+  "note": "PyPI files carry no source commit; the source is identified by the git tag below",
+  "tag_commit": "8ee6463efbb1ff755c339e965c7298b7afd7db5b",
+  "tag_commit_equals_profile_or_recorded_commit": true,
+  "method": "git ls-remote https://github.com/<repo>.git refs/tags/<tag> refs/tags/<tag>^{} (an annotated tag lists its object and, peeled, its commit; a lightweight tag lists only the commit); for npm packages the version document's gitHead and, when it differs from the tag commit, the GitHub compare API between the two"
+ }
+}

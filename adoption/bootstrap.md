@@ -486,11 +486,11 @@ GitHub-hosted macOS runner; see
    ```sh
    eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
-     uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143
+     uv tool install --python 3.13 serena-agent==2.0.0
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
-     uv tool install --python 3.13 jcodemunch-mcp==1.108.327
-   "$eco/bin/serena" --version           # Serena 2.0.0.dev0
-   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.327
+     uv tool install --python 3.13 jcodemunch-mcp==1.108.374
+   "$eco/bin/serena" --version           # Serena 2.0.0
+   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.374
    ```
    Then run the installer:
    ```sh
@@ -649,7 +649,7 @@ GitHub-hosted macOS runner; see
    missing entry at the end, so it would put the template's Context Mode
    twins after `Read(!.env.example)` and deny that file again; apply the
    template from a checkout that has both changes.
-   The template registers the `rtk hook claude` Bash hook, so with the rtk 0.51.0 pin also make the `[hooks]` table of rtk's config file (`~/.config/rtk/config.toml` on Linux, or `$XDG_CONFIG_HOME/rtk/config.toml` when that is set to an absolute path; `~/Library/Application Support/rtk/config.toml` on macOS, where rtk ignores `XDG_CONFIG_HOME`; `rtk config` prints the file on its first line, `evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt`) hold `exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)', "jq"]`: inside the existing `[hooks]` table, **replace** the key's whole value, from `exclude_commands =` through its closing `]` (or add the key when the table lacks it), and add a `[hooks]` header line only when the file has no `[hooks]` table (a second `[hooks]` header or `exclude_commands` key is invalid TOML, and rtk then silently falls back to defaults, `src/core/config.rs:278-281`, rather than erroring): 0.50.0's hook windows `git show <rev>:<path>` blobs, so a piped `| tail` reads the window instead of the file's end, and a rewritten `diff` exits 1 instead of 2 on a missing file; the bare `"^git show [^ ]*:"` pattern misses a `git -C <dir> show HEAD:path` form, which is still windowed (8,261 of 22,907 bytes in one fixture), so the third entry anchors to the git subcommand position, matching `git show REV:path` in a bare, `-C`/`-c`/`--git-dir`/`--work-tree` or other `--flag` global-option form (the same global options rtk's own discovery strips, `GIT_GLOBAL_OPT`, `src/discover/registry.rs:78`) without also excluding a command that merely mentions "show" as an ordinary argument; and `git branch -a`'s branch-name compaction keeps git's local-worktree `+ ` prefix unconditionally ([`src/cmds/git/git_cmd.rs:3185-3244`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/cmds/git/git_cmd.rs#L3185-L3244), specifically `git_cmd.rs:3209-3211`, unchanged on `develop`), but only misreports that branch as remote-only when a remote-tracking branch of the same name also exists (`git_cmd.rs:3224-3227`) -- 31 vs 6 real in one fixture -- so the fourth entry similarly anchors `git branch` to native git ([RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks); retained check `evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt`); the fifth, plain `"jq"`, keeps a standalone `jq` command native, because rtk's `jq` rewrite truncated structured output (the recipe's fifth-entry paragraph). At `v2026.09.25.2` rtk was pinned at 0.49.0 and `adoption/bootstrap-linux.sh` printed no reminder at all -- the reminder was added after that tag (#291). It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here it requires every entry of that value, exactly once, to be present (five since F2 added `"jq"`). It also changed after `v2026.09.26` in a second way (#314): once the text matches, it runs the installed `rtk hook check` on `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a`, `git -C . branch` and `jq -r .x f.json`, and still reminds unless each answers `No rewrite for: ...` with exit 1, because rtk can ignore a TOML-valid file with the exact text (a `[tracking]` table without `history_days` fails `TrackingConfig`, `src/core/config.rs:152-158`); check the file the same way after any edit. A single-regex alternative tested on 2026-09-26 is retained as evidence only; the adopted recipe is the five-entry set.
+   The template registers the `rtk hook claude` Bash hook, so with the rtk-oss 1.0.1 pin also make the `[hooks]` table of rtk's config file (`~/.config/rtk/config.toml` on Linux, or `$XDG_CONFIG_HOME/rtk/config.toml` when that is set to an absolute path; `~/Library/Application Support/rtk/config.toml` on macOS, where rtk ignores `XDG_CONFIG_HOME`; `rtk config` prints the file on its first line, `evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt`) hold `exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)', "jq"]`: inside the existing `[hooks]` table, **replace** the key's whole value, from `exclude_commands =` through its closing `]` (or add the key when the table lacks it), and add a `[hooks]` header line only when the file has no `[hooks]` table (a second `[hooks]` header or `exclude_commands` key is invalid TOML, and rtk then silently falls back to defaults, `src/core/config.rs:278-281`, rather than erroring): 0.50.0's hook windows `git show <rev>:<path>` blobs, so a piped `| tail` reads the window instead of the file's end, and a rewritten `diff` exits 1 instead of 2 on a missing file; the bare `"^git show [^ ]*:"` pattern misses a `git -C <dir> show HEAD:path` form, which is still windowed (8,261 of 22,907 bytes in one fixture), so the third entry anchors to the git subcommand position, matching `git show REV:path` in a bare, `-C`/`-c`/`--git-dir`/`--work-tree` or other `--flag` global-option form (the same global options rtk's own discovery strips, `GIT_GLOBAL_OPT`, `src/discover/registry.rs:78`) without also excluding a command that merely mentions "show" as an ordinary argument; and `git branch -a`'s branch-name compaction keeps git's local-worktree `+ ` prefix unconditionally ([`src/cmds/git/git_cmd.rs:3185-3244`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/cmds/git/git_cmd.rs#L3185-L3244), specifically `git_cmd.rs:3209-3211`, unchanged on `develop`), but only misreports that branch as remote-only when a remote-tracking branch of the same name also exists (`git_cmd.rs:3224-3227`) -- 31 vs 6 real in one fixture -- so the fourth entry similarly anchors `git branch` to native git ([RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks); retained check `evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt`); the fifth, plain `"jq"`, keeps a standalone `jq` command native, because rtk's `jq` rewrite truncated structured output (the recipe's fifth-entry paragraph). At `v2026.09.25.2` rtk was pinned at 0.49.0 and `adoption/bootstrap-linux.sh` printed no reminder at all -- the reminder was added after that tag (#291). It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here it requires every entry of that value, exactly once, to be present (five since F2 added `"jq"`). It also changed after `v2026.09.26` in a second way (#314): once the text matches, it runs the installed `rtk hook check` on `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a`, `git -C . branch` and `jq -r .x f.json`, and still reminds unless each answers `No rewrite for: ...` with exit 1, because rtk can ignore a TOML-valid file with the exact text (a `[tracking]` table without `history_days` fails `TrackingConfig`, `src/core/config.rs:152-158`); check the file the same way after any edit. A single-regex alternative tested on 2026-09-26 is retained as evidence only; the adopted recipe is the five-entry set.
    The agent definitions in `adoption/agents/claude/` changed after `v2026.09.26.2` in `blind-adjudicator.md`, whose
    leak check now names the GPT-6 and Claude families (astra, gpt-6-sol, gpt-6-luna, gpt-5.6-terra, fable, mythos);
    a host at that tag installs the earlier list. They changed after `v2026.09.24.1`:
@@ -689,39 +689,66 @@ GitHub-hosted macOS runner; see
    ```sh
    claude plugin marketplace add mksglu/context-mode --scope user
    claude plugin install context-mode@context-mode --scope user --json
-   claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user
+   claude plugin marketplace add jarrodwatts/claude-hud@v0.11.3 --scope user
    claude plugin install claude-hud@claude-hud --scope user --json
    claude plugin marketplace add openai/codex-plugin-cc@v1.0.6 --scope user
    claude plugin install codex@openai-codex --scope user --json
    ```
 
-   **Upgrade an existing claude-hud 0.8.0 installation:** first apply the
-   template's `extraKnownMarketplaces.claude-hud.source.ref` value `v0.10.0`
+   **Upgrade an existing claude-hud installation (0.8.0, 0.10.0, or 0.11.2 on 2026-10-17):** first apply the
+   template's `extraKnownMarketplaces.claude-hud.source.ref` value `v0.11.3`
    in the host's user settings, retaining the other marketplace declarations.
    [The loading reference](https://code.claude.com/docs/en/plugins/loading#plugins-and-marketplaces-that-arent-on-disk-at-session-start)
    documents re-fetching a changed declared source at the next native session
-   start. Let that synchronization finish before updating. A marketplace
+   start. Let that synchronization finish before the next step. A marketplace
    refresh follows its configured tag; it does not advance a source that still
    names `v0.8.0` ([CLI reference](https://code.claude.com/docs/en/plugins/cli-reference#plugin-marketplace-update)).
-   Then refresh the retargeted marketplace and update the installed plugin:
+   Then re-add the marketplace at the tag, install and update the plugin (the
+   route that ran on a host and in isolation, below):
    ```sh
-   claude plugin marketplace update claude-hud
-   claude plugin update claude-hud@claude-hud --scope user
+   claude plugin marketplace add jarrodwatts/claude-hud@v0.11.3 --scope user
+   claude plugin install claude-hud@claude-hud --scope user --json
+   claude plugin update claude-hud@claude-hud
    ```
-   These are separate steps: the shell marketplace command refreshes the
-   listing, and the plugin command updates the installed plugin
+   Do not put `claude plugin marketplace update claude-hud` first: after the
+   settings edit it failed with "Marketplace 'claude-hud' not found" on the host's
+   v0.11.2 move and on both isolated runs that edited the settings first, although in
+   those runs the marketplace was on disk. The condition that reproduces it is a settings declaration that no
+   longer matches the source recorded for the marketplace on disk (the isolated
+   run without the settings edit refreshes fine, and its tagged add then fails
+   with "its source doesn't match its extraKnownMarketplaces entry"); the client's
+   own check was not read, so the cause is established as that condition only
+   ([receipt](../evidence/artifacts/currency-sweep-20261017/claude-hud-0.11.3-20261017T144817Z.json), `smoke.b0_cause_reproduction`).
+   The shell marketplace command refreshes the listing and the plugin command
+   updates the installed plugin
    ([Update plugins now](https://code.claude.com/docs/en/plugins/install#update-plugins-now)).
    Restart Claude Code or run `/reload-plugins`, then use the revision check
-   below to compare the installed `gitCommitSha` with `75683c6de1ac07f6bbef00d739001679dba0740c`.
-   Status: **documented, host verification pending**. R642b checked the native
-   2.1.288 command help with both `HOME` and `CLAUDE_CONFIG_DIR` in temporary
-   directories; it did not execute a marketplace or plugin update. A safe
-   offline reproduction of the GitHub-tag transition remains unverified.
-   Main's [2026-10-04 host receipt and limitations](../evidence/receipts/claude-hud-0100-qualification-20261004.json)
+   below to compare the installed `gitCommitSha` with `5621429b84ea2503185221244c43a06797bfd05e`.
+   Status: the tagged add, install and plugin update are verified on a host (the
+   v0.11.2 move) and in isolation (v0.11.3), both below; the marketplace-update-first
+   order is not a route. R642b checked the native 2.1.288 command help with both
+   `HOME` and `CLAUDE_CONFIG_DIR` in temporary directories and executed no marketplace
+   or plugin update. Main's [2026-10-04 host receipt and limitations](../evidence/receipts/claude-hud-0100-qualification-20261004.json)
    record the observed path after a tagged marketplace add failed on the old
    source entry: the host ran `claude plugin marketplace remove claude-hud`,
    repeated the tagged add and ran `claude plugin install claude-hud@claude-hud --scope user --json`
-   successfully; W1's marketplace-update/plugin-update path above remains unverified.
+   successfully.
+
+   The 2026-10-17 move from v0.10.0 to v0.11.2 (v0.11.1's fix for
+   [GHSA-fq7j-8hxj-jfqh](https://github.com/jarrodwatts/claude-hud/security/advisories/GHSA-fq7j-8hxj-jfqh): a repository whose git
+   config names `core.fsmonitor` or a filter driver ran that command on every render) took the tagged add on a host:
+   `claude plugin marketplace update claude-hud` returned "Marketplace not found" after the settings edit; then
+   the documented tagged marketplace add of v0.11.2,
+   `claude plugin install claude-hud@claude-hud --scope user --json` and `claude plugin update claude-hud@claude-hud` each
+   returned 0, and the installed `gitCommitSha` is `ad322b8d9016816a1858334ba57a085512110e83`
+   ([update record](../evidence/artifacts/currency-sweep-20261017/claude-hud-0.11.2-20261017T072723Z.json)).
+
+   The same day the pin moved on to v0.11.3 (published 2026-10-17T00:42:18Z, before that host move; a fix for background agents that stay marked running; no security content, and the
+   hardening of `dist/git.js` is unchanged). v0.11.3's tag is lightweight, so it points straight at the commit the release was cut from, `5621429b84ea2503185221244c43a06797bfd05e`. The route was run for it in an isolated
+   config directory (`HOME` and `CLAUDE_CONFIG_DIR` in scratch, so no user settings were touched): the v0.11.2 add and install, the settings edit to v0.11.3 (a recorded step), then `claude plugin marketplace update claude-hud`
+   failed again ("Marketplace 'claude-hud' not found"; a second isolated run without the edit refreshed fine and then refused the tagged add); the tagged `claude plugin marketplace add jarrodwatts/claude-hud@v0.11.3 --scope user`, `claude plugin install claude-hud@claude-hud --scope user --json` and
+   `claude plugin update claude-hud@claude-hud` each returned 0, and the installed `gitCommitSha` is that commit
+   ([route record](../evidence/artifacts/currency-sweep-20261017/claude-hud-0.11.3-20261017T144817Z.json)). That record also holds the commands for the host, which still runs v0.11.2 until the command center applies them.
 
    Then compare the `gitCommitSha` that landed with the reviewed revisions in
    those rows (the check reads `$CLAUDE_CONFIG_DIR` when it is set, as Claude
@@ -733,9 +760,9 @@ GitHub-hosted macOS runner; see
    ```sh
    python3 - <<'EOF'
    import json, os, pathlib, re, subprocess
-   reviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.10.0), codex-for-claude
+   reviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.11.3), codex-for-claude
        "context-mode@context-mode": "6f0cc6841c687e754059f36714a11233fda1a02b",
-       "claude-hud@claude-hud": "75683c6de1ac07f6bbef00d739001679dba0740c",
+       "claude-hud@claude-hud": "5621429b84ea2503185221244c43a06797bfd05e",
        "codex@openai-codex": "db52e28f4d9ded852ab3942cea316258ae4ef346",
    }
    by_content = {"context-mode@context-mode": "mksglu/context-mode"}  # default-branch install, no ref

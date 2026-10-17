@@ -1,0 +1,308 @@
+{
+ "kind": "currency_recheck_of_a_hold",
+ "host": "NativeHorizonNY",
+ "tool": "headroom-ai",
+ "from": "the plan's hold: profile row at 0.37.0 under the W1b hold (docs/decisions/2026-10-03-currency-wave-w1b.md:96)",
+ "to": "no pin moved by this receipt; the recheck the hold names ran on the two other versions the repository carries",
+ "recorded_utc": "2026-10-17T14:48:17Z",
+ "finding": "the command center's sealed verdict on PR #1243 at fad884532b441a5b9e462613831875dbf49f295a (CHANGES_REQUESTED), B6: the hold names two pins where the repository carries three, and its owed recheck had not been run.",
+ "pins_in_the_repository": {
+  "profile_row_adoption_new_wsl_profile_json": "0.37.0 (the W1b hold)",
+  "adoption_pins_linux_x86_64_json": "0.40.0 (lines 319-320, the 2026-10-08 drift refresh; what bootstrap-linux.sh installs)",
+  "manifests_stack_json": "0.40.0 (lines 521-523)",
+  "host": "0.41.0 (python-tools/headroom-ai, verified in currency-headroom-ai-20261017T081908Z.json: PyPI attestations, installed bytes, MCP smoke)"
+ },
+ "hold": {
+  "w1b_record": "docs/decisions/2026-10-03-currency-wave-w1b.md:96: 'Recheck a release containing the #3828 fix, using omitted-line counts, required facts and exact retrieval, or a measured log-input answer-quality comparison.'",
+  "overturn_in_the_2026_09_25_record": "docs/decisions/2026-09-25-workstation-sota-refresh.md:549-550: 'Overturn when upstream counts levels over the omitted lines only, or a measured answer-quality comparison on log inputs shows net value for 0.39.0's log routing.'",
+  "defect_at_0_39_0": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.39.0/compressed-A.txt: '[593 lines omitted: 1 ERROR]' while all 593 omitted rows are status=200 (the one ERROR is the kept planted row)"
+ },
+ "upstream": {
+  "pr_3828": {
+   "title": "fix(log_compressor): keep and name pytest short-summary failures",
+   "merged_at": "2026-09-29T04:11:36Z",
+   "merge_commit": "d90b32008dc47f25737d9cef8da942fd8dc1af76",
+   "files_changed": [
+    "crates/headroom-core/src/transforms/log_compressor.rs",
+    "headroom/transforms/log_compressor.py",
+    "tests/test_transforms_log_compressor.py"
+   ],
+   "what_it_changes": "pytest short-summary FAILED lines are kept and named; it does not change how the omission notice's level counts are computed"
+  },
+  "ancestry_of_the_merge_commit": {
+   "v0.39.1": {
+    "status": "behind",
+    "ahead_by": 0,
+    "behind_by": 12
+   },
+   "v0.40.0": {
+    "status": "ahead",
+    "ahead_by": 191,
+    "behind_by": 0
+   },
+   "v0.41.0": {
+    "status": "ahead",
+    "ahead_by": 332,
+    "behind_by": 0
+   }
+  },
+  "notice_source_at_v0_41_0": {
+   "file": "crates/headroom-core/src/transforms/log_compressor.rs",
+   "level_stats": "L1523-1529: count_level(all_lines, ...) for errors, fails, warnings and info, over every input line, kept or omitted",
+   "notice": "L1564-1569: format!(\"[{} lines omitted: {}{}]\", omitted, summary_parts.join(\", \"), omitted_names) with those all-line counts"
+  }
+ },
+ "install_commands": [
+  "UV_TOOL_DIR=<scratch>/tools UV_TOOL_BIN_DIR=<scratch>/bin UV_CACHE_DIR=<scratch>/cache uv tool install --python <mise CPython 3.13> 'headroom-ai[mcp]==0.40.0'"
+ ],
+ "install_result": {
+  "exit": 0,
+  "installed_version": "0.40.0",
+  "recorded_utc": "2026-10-17T14:39:25Z",
+  "where": "a scratch uv tool directory with an isolated uv cache; nothing under the live ecosystem prefix or the live uv directories"
+ },
+ "harness": {
+  "G": {
+   "sha256_repository_copy": "c419b3af27337cf6edb3e21af11d0de3064930f7327d28dbb9314cf3c9f9b129",
+   "sha256_scratch_copy": "c419b3af27337cf6edb3e21af11d0de3064930f7327d28dbb9314cf3c9f9b129"
+  },
+  "mcp_session.py": {
+   "sha256_repository_copy": "dbf2d0ed74fdf174585218dc18ca1315c589a2f8188e58ec64b838abb2edfbb9",
+   "sha256_scratch_copy": "dbf2d0ed74fdf174585218dc18ca1315c589a2f8188e58ec64b838abb2edfbb9"
+  }
+ },
+ "fixture_b_file": {
+  "bytes": 183628,
+  "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/mcp-tool-listing.json",
+  "sha256": "2b17eb36da607cc8d2f6f0e2802193c0a0587ffbae361e667d093930d3a5533d"
+ },
+ "rechecks": {
+  "0.40.0_scratch_install": {
+   "all_checks_pass": false,
+   "checks": {
+    "A_compressed_smaller_than_original": true,
+    "A_hash_is_sha256_prefix24": true,
+    "A_marker_nsr_anomaly_present": true,
+    "A_planted_critical_row_verbatim": true,
+    "A_retrieve_byte_exact": true,
+    "A_timestamps_verbatim": true,
+    "B_compressed_smaller_than_original": true,
+    "B_hash_is_sha256_prefix24": true,
+    "B_retrieve_byte_exact": true,
+    "omission_notice_levels_equal_levels_over_omitted_lines_only": false,
+    "omission_notice_present": true,
+    "omission_notice_total_equals_omitted_lines": true,
+    "tools_exact": true
+   },
+   "commands": [
+    {
+     "exit": 0,
+     "label": "package version under G",
+     "seconds": 0.1,
+     "stderr_tail": "",
+     "stdout_tail": "0.40.0"
+    },
+    {
+     "exit": 0,
+     "label": "recorded session harness (mcp_session.py session): compress and retrieve fixtures A and B, unknown hash, stats",
+     "seconds": 48.5,
+     "stderr_tail": "",
+     "stdout_tail": "_retrievals\": 2, \"tools\": [\"headroom_compress\", \"headroom_retrieve\", \"headroom_stats\"], \"unknown_hash_error\": \"Content not found. It may have expired or the hash may be incorrect.\", \"workspace\": \"ws\"}"
+    }
+   ],
+   "criteria_failing": [
+    "omission_notice_levels_equal_levels_over_omitted_lines_only"
+   ],
+   "fixture_a": {
+    "compressed_tokens": 257,
+    "kept_rows": 7,
+    "levels_over_omitted_rows": {},
+    "lines": 600,
+    "notice_claimed_levels": {
+     "ERROR": 1
+    },
+    "notice_claimed_total": 593,
+    "notice_text": [
+     "[593 lines omitted: 1 ERROR]"
+    ],
+    "omitted_rows": 593,
+    "original_tokens": 16820,
+    "savings_percent": 98.5,
+    "transforms": [
+     "router:log:0.02"
+    ]
+   },
+   "fixture_b": {
+    "compressed_tokens": 3292,
+    "original_tokens": 39064,
+    "savings_percent": 91.6,
+    "transforms": [
+     "router:mixed:0.09"
+    ]
+   },
+   "fixture_b_file": {
+    "bytes": 183628,
+    "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/mcp-tool-listing.json",
+    "sha256": "2b17eb36da607cc8d2f6f0e2802193c0a0587ffbae361e667d093930d3a5533d"
+   },
+   "harness": {
+    "G": {
+     "sha256_repository_copy": "c419b3af27337cf6edb3e21af11d0de3064930f7327d28dbb9314cf3c9f9b129",
+     "sha256_scratch_copy": "c419b3af27337cf6edb3e21af11d0de3064930f7327d28dbb9314cf3c9f9b129"
+    },
+    "mcp_session.py": {
+     "sha256_repository_copy": "dbf2d0ed74fdf174585218dc18ca1315c589a2f8188e58ec64b838abb2edfbb9",
+     "sha256_scratch_copy": "dbf2d0ed74fdf174585218dc18ca1315c589a2f8188e58ec64b838abb2edfbb9"
+    }
+   },
+   "headroom_ai_version": "0.40.0",
+   "label": "0.40.0-scratch",
+   "recorded_utc": "2026-10-17T14:41:01Z",
+   "server_info": {
+    "name": "headroom",
+    "version": "1.30.0"
+   },
+   "session_exit": 0,
+   "stats": {
+    "compressions": 2,
+    "retrievals": 2
+   },
+   "unknown_hash_error": "Content not found. It may have expired or the hash may be incorrect."
+  },
+  "0.41.0_live_install": {
+   "all_checks_pass": false,
+   "checks": {
+    "A_compressed_smaller_than_original": true,
+    "A_hash_is_sha256_prefix24": true,
+    "A_marker_nsr_anomaly_present": true,
+    "A_planted_critical_row_verbatim": true,
+    "A_retrieve_byte_exact": true,
+    "A_timestamps_verbatim": true,
+    "B_compressed_smaller_than_original": true,
+    "B_hash_is_sha256_prefix24": true,
+    "B_retrieve_byte_exact": true,
+    "omission_notice_levels_equal_levels_over_omitted_lines_only": false,
+    "omission_notice_present": true,
+    "omission_notice_total_equals_omitted_lines": true,
+    "tools_exact": true
+   },
+   "commands": [
+    {
+     "exit": 0,
+     "label": "package version under G",
+     "seconds": 0.1,
+     "stderr_tail": "",
+     "stdout_tail": "0.41.0"
+    },
+    {
+     "exit": 0,
+     "label": "recorded session harness (mcp_session.py session): compress and retrieve fixtures A and B, unknown hash, stats",
+     "seconds": 47.0,
+     "stderr_tail": "",
+     "stdout_tail": "_retrievals\": 2, \"tools\": [\"headroom_compress\", \"headroom_retrieve\", \"headroom_stats\"], \"unknown_hash_error\": \"Content not found. It may have expired or the hash may be incorrect.\", \"workspace\": \"ws\"}"
+    }
+   ],
+   "criteria_failing": [
+    "omission_notice_levels_equal_levels_over_omitted_lines_only"
+   ],
+   "fixture_a": {
+    "compressed_tokens": 257,
+    "kept_rows": 7,
+    "levels_over_omitted_rows": {},
+    "lines": 600,
+    "notice_claimed_levels": {
+     "ERROR": 1
+    },
+    "notice_claimed_total": 593,
+    "notice_text": [
+     "[593 lines omitted: 1 ERROR]"
+    ],
+    "omitted_rows": 593,
+    "original_tokens": 16820,
+    "savings_percent": 98.5,
+    "transforms": [
+     "router:log:0.02"
+    ]
+   },
+   "fixture_b": {
+    "compressed_tokens": 3292,
+    "original_tokens": 39064,
+    "savings_percent": 91.6,
+    "transforms": [
+     "router:mixed:0.09"
+    ]
+   },
+   "fixture_b_file": {
+    "bytes": 183628,
+    "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/mcp-tool-listing.json",
+    "sha256": "2b17eb36da607cc8d2f6f0e2802193c0a0587ffbae361e667d093930d3a5533d"
+   },
+   "harness": {
+    "G": {
+     "sha256_repository_copy": "c419b3af27337cf6edb3e21af11d0de3064930f7327d28dbb9314cf3c9f9b129",
+     "sha256_scratch_copy": "c419b3af27337cf6edb3e21af11d0de3064930f7327d28dbb9314cf3c9f9b129"
+    },
+    "mcp_session.py": {
+     "sha256_repository_copy": "dbf2d0ed74fdf174585218dc18ca1315c589a2f8188e58ec64b838abb2edfbb9",
+     "sha256_scratch_copy": "dbf2d0ed74fdf174585218dc18ca1315c589a2f8188e58ec64b838abb2edfbb9"
+    }
+   },
+   "headroom_ai_version": "0.41.0",
+   "label": "0.41.0-live",
+   "recorded_utc": "2026-10-17T14:41:50Z",
+   "server_info": {
+    "name": "headroom",
+    "version": "1.30.0"
+   },
+   "session_exit": 0,
+   "stats": {
+    "compressions": 2,
+    "retrievals": 2
+   },
+   "unknown_hash_error": "Content not found. It may have expired or the hash may be incorrect."
+  }
+ },
+ "criteria": {
+  "the_hold_names": [
+   "omission-count (the notice counts levels over the omitted lines only)",
+   "required facts",
+   "exact retrieval",
+   "or a measured log-input answer-quality comparison"
+  ],
+  "passing_on_both_versions": [
+   "A_compressed_smaller_than_original",
+   "A_hash_is_sha256_prefix24",
+   "A_marker_nsr_anomaly_present",
+   "A_planted_critical_row_verbatim",
+   "A_retrieve_byte_exact",
+   "A_timestamps_verbatim",
+   "B_compressed_smaller_than_original",
+   "B_hash_is_sha256_prefix24",
+   "B_retrieve_byte_exact",
+   "omission_notice_present",
+   "omission_notice_total_equals_omitted_lines",
+   "tools_exact"
+  ],
+  "failing_on_both_versions": [
+   "omission_notice_levels_equal_levels_over_omitted_lines_only"
+  ],
+  "answer_quality_comparison": "not run (it needs model calls and a judged input set; the first overturn criterion is the cheaper one and it is unmet)"
+ },
+ "result": "RECHECK RUN, HOLD'S FIRST OVERTURN CRITERION UNMET on 0.40.0 and 0.41.0: required facts, exact retrieval, hashes and the tool list pass, but the omission notice still reads '[593 lines omitted: 1 ERROR]' for 593 omitted rows none of which is an error (identical to 0.39.0). The host (0.41.0) and the pins files (0.40.0) therefore run ahead of the hold's own condition; whether to overturn it by the second criterion or to hold the host and pins back is the command center's call.",
+ "link": {
+  "changed_by_this_builder": false,
+  "live_link": "python-tools/headroom-ai/bin/headroom at 0.41.0, unchanged"
+ },
+ "rollback": "nothing switched; delete the scratch install directory",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "upstream_window_found": false,
+  "see": "currency-headroom-ai-20261017T081908Z.json (release notes, README and SECURITY of v0.41.0 read; no window)"
+ },
+ "public_copy": {
+  "of": "currency-headroom-recheck-20261017T144817Z.json (written by the fold of PR #1243; private original kept on the host)",
+  "subject": "the W1b recheck of Headroom's omission notice on 0.40.0 and 0.41.0",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-headroom-recheck-20261017T144817Z.json"
+ }
+}

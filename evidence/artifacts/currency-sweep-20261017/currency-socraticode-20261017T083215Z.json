@@ -1,0 +1,344 @@
+{
+ "kind": "currency_verification",
+ "host": "NativeHorizonNY",
+ "tool": "socraticode",
+ "from": "1.15.0 (audit snapshot and plan pin)",
+ "to": "1.16.1 (npm socraticode)",
+ "result": "ALREADY_AT_TARGET: installed by the lane builder at 2026-10-17T02:44Z-02:48Z and both client configs re-pinned by the lane builder to tools/socraticode-1.16.1; verified first-hand by this sweep (npm integrity, installed bytes, npm audit signatures, MCP smoke). Not switched by this sweep, and no client config was edited by this sweep.",
+ "finding": "A2 stage-1 audit G3-12 (P2): socraticode 1.15.0 trailed 1.16.1.",
+ "recorded_utc": "2026-10-17T08:31:38Z",
+ "switch_record": {
+  "switched_by": "the lane builder",
+  "receipt": "<lane builder upgrade records (private)>/<receipt notes> section '(13) socraticode 1.15.0 -> 1.16.1: DONE'",
+  "scripts_and_logs": [
+   "<lane builder script (private)>",
+   "<lane builder log (private)>",
+   "<lane builder script (private)>",
+   "<lane builder log (private)>",
+   "<lane builder log (private)>",
+   "<lane builder log (private)>"
+  ],
+  "command_lane_builder_ran": "npm install --global --prefix ~/.local/share/codex-ecosystem/tools/socraticode-1.16.1 --ignore-scripts --before=2026-10-16T02:43:00Z socraticode@1.16.1 (the profile's own form with a 24-hour --before cutoff, now superseded by the CC's ruling)",
+  "client_pin": "pinned by PATH in both client configs, not by a link: ~/.claude.json mcpServers.socraticode.args[0] and ~/.codex/config.toml [mcp_servers.socraticode] args (both read by this sweep, unchanged by it)"
+ },
+ "client_config_state_read_by_this_sweep": {
+  "claude_user_scope_args_masked_helper": [
+   "user.mcpServers.socraticode.args.0 = $ECO_ROOT/tools/socraticode-1.16.1/lib/node_modules/socraticode/dist/index.js"
+  ],
+  "codex_mcp_list_args": [
+   [
+    "$ECO_ROOT/tools/socraticode-1.16.1/lib/node_modules/socraticode/dist/index.js"
+   ]
+  ],
+  "one_line_diff_to_report": "none: both configs already name tools/socraticode-1.16.1 (the audit-time value was tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js)"
+ },
+ "upstream": {
+  "repo": "giancarloerra/socraticode",
+  "release_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.1",
+  "tag": "v1.16.1",
+  "npm_published_utc": "2026-10-15T22:23:41.952Z",
+  "release_age_at_verification": "34h07m (1.4 days)",
+  "latest_check": "npm dist-tags latest = 1.16.1 (registry read 07:43Z)"
+ },
+ "provenance": {
+  "registry": {
+   "integrity": "sha512-qTA9WV0a7gRWxUJutW8T7RVBAeydbvXkGUq98IbxRzvIzWBsZHDIG0Wj6YGKckf7rrXSFIFc3IEfC2V+lKH5Ng==",
+   "shasum": "fbe230277d353b32e8f3eff10d67c76ed526e6ae",
+   "fileCount": 247,
+   "unpackedSize": 3836428,
+   "tarball": "https://registry.npmjs.org/socraticode/-/socraticode-1.16.1.tgz"
+  },
+  "registry_signatures": 2,
+  "registry_attestation_predicate": null,
+  "tarball": {
+   "file": "socraticode-1.16.1.tgz",
+   "bytes": 1082779,
+   "integrity_computed": "sha512-qTA9WV0a7gRWxUJutW8T7RVBAeydbvXkGUq98IbxRzvIzWBsZHDIG0Wj6YGKckf7rrXSFIFc3IEfC2V+lKH5Ng==",
+   "shasum_computed": "fbe230277d353b32e8f3eff10d67c76ed526e6ae",
+   "integrity_match": true,
+   "shasum_match": true
+  },
+  "installed_vs_tarball": {
+   "installed_dir": "$ECO_ROOT/tools/socraticode-1.16.1/lib/node_modules/socraticode",
+   "files_match": 247,
+   "files_differ": 0,
+   "files_missing_in_installed": 0,
+   "differ_list": [],
+   "missing_list": []
+  },
+  "npm_audit_signatures_on_installed_tree": {
+   "cwd": "<scratch>",
+   "exit": 0,
+   "audited_packages": "188",
+   "verified_registry_signatures": "188",
+   "verified_attestations": "19"
+  },
+  "meaning": "socraticode itself publishes no npm provenance attestation (registry signatures only); its dependency tree was audited: registry signatures verified for every installed package, attestations verified for the dependencies that publish them"
+ },
+ "release_notes_review": {
+  "read": [
+   "v1.16.0 notes",
+   "v1.16.1 notes"
+  ],
+  "affects_our_use": [
+   "1.16.1 adds an optional limit argument to codebase_symbol, codebase_impact and codebase_flow (additive)",
+   "1.16.0 adds opt-in Git-triggered refresh; 1.16.1 adds opt-in cleanup of retired local indexes (both off by default)",
+   "1.16.1 retries Qdrant requests once on a closed connection"
+  ],
+  "breaking": "none found"
+ },
+ "smoke": {
+  "method": "scratch mcp_smoke.py under systemd-run --user --scope -p CPUWeight=idle, node dist/index.js, isolated HOME, QDRANT_MODE=external and the live QDRANT_URL (so nothing starts a container), cwd a scratch dir",
+  "node": {
+   "cmd": "$ECO_ROOT/bin/node --version",
+   "exit": 0,
+   "out_head": "v24.22.0"
+  },
+  "mcp_1_16_1": {
+   "ok": true,
+   "serverInfo": {
+    "name": "socraticode",
+    "version": "1.16.1"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 26,
+   "tools_schema_sha256": "57ba4e9b98f622c94e358079a8d13181def74b4ec791029d84350756f7ea357c",
+   "server_exit": 0,
+   "elapsed_s": 0.63,
+   "error": null,
+   "has_instructions": false
+  },
+  "mcp_1_15_0_baseline": {
+   "ok": true,
+   "serverInfo": {
+    "name": "socraticode",
+    "version": "1.15.0"
+   },
+   "protocolVersion": "2025-06-18",
+   "tool_count": 26,
+   "tools_schema_sha256": "852fd332007aeba84da09f1b0633cd04bcfd79379610ee2d663d935b0ac13927",
+   "server_exit": 0,
+   "elapsed_s": 0.59,
+   "error": null,
+   "has_instructions": false
+  },
+  "harness_exits": {
+   "1.16.1": 0,
+   "1.15.0": 0
+  },
+  "tool_diff_1_15_0_to_1_16_1": [
+   "old=26 new=26 added=0 removed=0",
+   "SCHEMA-CHANGED (3):",
+   "   codebase_flow | props +['limit'] -[]",
+   "   codebase_impact | props +['limit'] -[]",
+   "   codebase_symbol | props +['limit'] -[]",
+   "DESCRIPTION-CHANGED: 2 of 26 common tools"
+  ],
+  "note": "socraticode has no --version flag (the process only logs MCP shutdown messages); the version is read from the initialize serverInfo"
+ },
+ "link": {
+  "changed_by_this_sweep": false,
+  "tools_dirs_present": [
+   "tools/socraticode-1.15.0 (rollback target; sessions started earlier still run it)",
+   "tools/socraticode-1.16.1"
+  ]
+ },
+ "rollback": "per the lane builder: claude mcp remove socraticode --scope user and re-add the entry naming tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js; and the one args line in [mcp_servers.socraticode] of ~/.codex/config.toml (not run by this sweep)",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "release_age_at_verification": "34h08m (1.4 days)",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "v1.16.0 and v1.16.1 release notes"
+   ],
+   "README.md": {
+    "bytes": 149811,
+    "window_hits": []
+   },
+   "SECURITY.md": {
+    "bytes": 2031,
+    "window_hits": []
+   },
+   "repo": "giancarloerra/socraticode",
+   "tag": "v1.16.1",
+   "pattern": "cooldown|minimum release age|release age|quarantine period|days after release|exclude-newer|embargo"
+  },
+  "SECURITY.md_note": "2031 bytes, no window"
+ },
+ "public_copy": {
+  "of": "currency-socraticode receipt written by the currency sweep of 2026-10-17 (private original kept on the host)",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-socraticode-20261017T083215Z.json",
+  "amended_by_the_fold": {
+   "blocks": [
+    "digest_comparison",
+    "source_commit_resolution"
+   ],
+   "from_private_addendum": "currency-fold-digests-20261017T144813Z.json",
+   "why": "the verdict on PR #1243 asked that each public receipt carry the registry's own digests, the locally computed digests of the same bytes and how the source commit was resolved"
+  },
+  "amended_by_the_second_fold": {
+   "blocks": [
+    "no_buffer_command_scratch_run"
+   ],
+   "why": "the review of the fold (F7) found that the no-buffer install command had never been run and that the audited tree came from the --before command"
+  }
+ },
+ "digest_comparison": {
+  "read_utc": "2026-10-17T14:36:22Z",
+  "what_was_compared_with_what": "npm publishes, for each version, a sha512 SRI string (dist.integrity) and a sha1 (dist.shasum) and no sha256. The tarball at dist.tarball was downloaded, and its sha512 and sha1 were computed locally: both equal the published values. The sha256 recorded in the profile row is computed locally over the same bytes; it has no registry counterpart to be compared with.",
+  "registry": {
+   "fields_read": [
+    "dist.tarball",
+    "dist.integrity",
+    "dist.shasum",
+    "dist.fileCount",
+    "dist.unpackedSize",
+    "gitHead"
+   ],
+   "fileCount": 247,
+   "name": "npm registry",
+   "npm_publishes_sha256": false,
+   "published_digests": {
+    "integrity_sha512_sri": "sha512-qTA9WV0a7gRWxUJutW8T7RVBAeydbvXkGUq98IbxRzvIzWBsZHDIG0Wj6YGKckf7rrXSFIFc3IEfC2V+lKH5Ng==",
+    "shasum_sha1": "fbe230277d353b32e8f3eff10d67c76ed526e6ae"
+   },
+   "tarball_url": "https://registry.npmjs.org/socraticode/-/socraticode-1.16.1.tgz",
+   "unpackedSize": 3836428,
+   "url_read": "https://registry.npmjs.org/socraticode/1.16.1"
+  },
+  "comparisons": [
+   {
+    "equal": true,
+    "local_algorithm": "sha512 (base64 SRI)",
+    "local_value": "sha512-qTA9WV0a7gRWxUJutW8T7RVBAeydbvXkGUq98IbxRzvIzWBsZHDIG0Wj6YGKckf7rrXSFIFc3IEfC2V+lKH5Ng==",
+    "registry_field": "dist.integrity (sha512 SRI)",
+    "registry_value": "sha512-qTA9WV0a7gRWxUJutW8T7RVBAeydbvXkGUq98IbxRzvIzWBsZHDIG0Wj6YGKckf7rrXSFIFc3IEfC2V+lKH5Ng=="
+   },
+   {
+    "equal": true,
+    "local_algorithm": "sha1",
+    "local_value": "fbe230277d353b32e8f3eff10d67c76ed526e6ae",
+    "registry_field": "dist.shasum (sha1)",
+    "registry_value": "fbe230277d353b32e8f3eff10d67c76ed526e6ae"
+   },
+   {
+    "equal": null,
+    "local_algorithm": "sha256",
+    "local_value": "870dd285999984e217b5144b6a3abfae0499f1a618d751eb47f0c47d2a16ba24",
+    "note": "the profile's pinned sha256 is computed here from the registry tarball; it has no registry counterpart to compare with, and is as strong as the sha512 and sha1 matches above, which cover the same bytes",
+    "registry_field": "(npm publishes no sha256)",
+    "registry_value": null
+   }
+  ],
+  "all_registry_comparisons_equal": true,
+  "profile_pin": {
+   "row": "SocratiCode",
+   "pin": "1.16.1",
+   "checksum": {
+    "algorithm": "sha256",
+    "value": "870dd285999984e217b5144b6a3abfae0499f1a618d751eb47f0c47d2a16ba24"
+   },
+   "equals_local_sha256": true
+  },
+  "local_download": {
+   "bytes": 1082779,
+   "saved_as": "dl/socraticode/socraticode-1.16.1.tgz (heavy scratch)",
+   "sha1": "fbe230277d353b32e8f3eff10d67c76ed526e6ae",
+   "sha256": "870dd285999984e217b5144b6a3abfae0499f1a618d751eb47f0c47d2a16ba24",
+   "sha512_sri": "sha512-qTA9WV0a7gRWxUJutW8T7RVBAeydbvXkGUq98IbxRzvIzWBsZHDIG0Wj6YGKckf7rrXSFIFc3IEfC2V+lKH5Ng==",
+   "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.16.1.tgz"
+  }
+ },
+ "source_commit_resolution": {
+  "compare_gitHead_to_tag_commit": {
+   "ahead_by": 1,
+   "behind_by": 0,
+   "commits": [
+    {
+     "message": "chore: release v1.16.1",
+     "sha": "eb94e073cb8aa80d08fd56c8aecfe7f2fa065be8"
+    }
+   ],
+   "endpoint": "repos/giancarloerra/SocratiCode/compare/520247be3d78...eb94e073cb8a",
+   "files": [
+    ".claude-plugin/plugin.json",
+    ".codex-plugin/plugin.json",
+    ".cursor-plugin/plugin.json",
+    "CHANGELOG.md",
+    "extension/package-lock.json",
+    "extension/package.json",
+    "gemini-extension.json",
+    "package-lock.json",
+    "package.json",
+    "server.json"
+   ],
+   "files_total": 10,
+   "status": "ahead"
+  },
+  "gitHead_read_from": "https://registry.npmjs.org/socraticode/1.16.1 (field gitHead)",
+  "git_ls_remote": {
+   "command": "git ls-remote https://github.com/giancarloerra/SocratiCode.git refs/tags/v1.16.1 refs/tags/v1.16.1^{}",
+   "commit": "eb94e073cb8aa80d08fd56c8aecfe7f2fa065be8",
+   "exit": 0,
+   "lines": [
+    "152db329f65fe8e5f32da767ed0169ad63065d31\trefs/tags/v1.16.1",
+    "eb94e073cb8aa80d08fd56c8aecfe7f2fa065be8\trefs/tags/v1.16.1^{}"
+   ],
+   "tag_kind": "annotated",
+   "tag_object": "152db329f65fe8e5f32da767ed0169ad63065d31"
+  },
+  "npm_gitHead": "520247be3d78c0a79715be419821c12f7f0d22eb",
+  "npm_gitHead_equals_tag_commit": false,
+  "tag_commit": "eb94e073cb8aa80d08fd56c8aecfe7f2fa065be8",
+  "tag_commit_equals_profile_or_recorded_commit": true,
+  "method": "git ls-remote https://github.com/<repo>.git refs/tags/<tag> refs/tags/<tag>^{} (an annotated tag lists its object and, peeled, its commit; a lightweight tag lists only the commit); for npm packages the version document's gitHead and, when it differs from the tag commit, the GitHub compare API between the two"
+ },
+ "no_buffer_command_scratch_run": {
+  "read_utc": "2026-10-17T17:26:29Z",
+  "why": "the profile row's install command carries no --before, but the install and the audit above ran the lane builder's command, which did (verdict F7). This block records the exact row command run in a scratch prefix, its audit, and a comparison of the resolved tree with the --before tree.",
+  "row_command": "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.16.1\" --ignore-scripts socraticode@1.16.1",
+  "ran": "the row command with --prefix <scratch>/nobuf in place of the tools prefix and a scratch HOME and npm cache; the comparison tree used the same command with --before=2026-10-16T02:43:00Z and --prefix <scratch>/before",
+  "node": "v24.22.0",
+  "npm": "11.19.1",
+  "install_exit": {
+   "without_before": 0,
+   "with_before": 0
+  },
+  "tree_comparison": {
+   "method": "every package directory under lib/node_modules (scoped packages included): relative path and the version in its package.json, compared as two maps",
+   "package_directories": {
+    "without_before": 188,
+    "with_before": 188
+   },
+   "differences": 0,
+   "meaning": "on 2026-10-17 the no-buffer command resolves the same 188 package versions as the --before command; the audited tree and the no-buffer tree are one tree for this release (a later install may resolve newer dependency releases, which is what the zero-tolerance record asks for)"
+  },
+  "npm_audit_signatures": {
+   "without_before": {
+    "cwd": "<scratch>/nobuf/lib",
+    "exit": 0,
+    "audited_packages": "187",
+    "verified_registry_signatures": "187",
+    "verified_attestations": "19"
+   },
+   "with_before": {
+    "cwd": "<scratch>/before/lib",
+    "exit": 0,
+    "audited_packages": "187",
+    "verified_registry_signatures": "187",
+    "verified_attestations": "19"
+   },
+   "project_form_check": {
+    "command": "npm install --ignore-scripts socraticode@1.16.1 into an empty scratch project, then npm audit signatures",
+    "exit": 0,
+    "audited_packages": "188",
+    "verified_registry_signatures": "188",
+    "verified_attestations": "19"
+   },
+   "count_note": "a global-prefix audit counts the 187 dependencies; socraticode itself is the 188th, which the project form counts: 188 here equals the 188 of the audit above, which was taken on the --before tree"
+  },
+  "tarball_note": "the registry's sha512 and sha1 of socraticode-1.16.1.tgz and the installed-bytes match are in provenance above; this scratch install was not byte-compared again"
+ }
+}

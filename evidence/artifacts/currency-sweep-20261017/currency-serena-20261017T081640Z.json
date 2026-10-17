@@ -1,0 +1,356 @@
+{
+ "kind": "currency_verification",
+ "host": "NativeHorizonNY",
+ "tool": "serena",
+ "from": "2.0.0.dev0 at git c6fbd1c5932d (audit snapshot and plan pin)",
+ "to": "2.0.0 (PyPI serena-agent==2.0.0)",
+ "result": "ALREADY_AT_TARGET: switched by the lane builder at 2026-10-17T00:02Z-00:05Z; verified first-hand by this sweep (checksums, installed bytes, MCP smoke). Not switched by this sweep.",
+ "finding": "A2 stage-1 audit G3-11 (P2): serena ran a pre-release snapshot 141 commits behind v2.0.0.",
+ "recorded_utc": "2026-10-17T08:16:36Z",
+ "switch_record": {
+  "switched_by": "the lane builder",
+  "receipt": "<lane builder upgrade records (private)>/<receipt notes> sections '(1) serena 2.0.0.dev0 (git c6fbd1c5) -> 2.0.0: DONE' and the python-tools relink in the later gateway-lane section",
+  "logs": [
+   "<lane builder log (private)>",
+   "<lane builder log (private)>",
+   "<lane builder log (private)>",
+   "<lane builder backup (private)>/ (serena_config.yml.before, uv-receipt.toml.before)"
+  ],
+  "tracker": "<command-center tracker (private)>:537 and :811",
+  "command_lane_builder_ran": "uv tool install -p 3.13 'serena-agent==2.0.0' (default uv tool dir), later the plan's form UV_TOOL_DIR=$ECO/python-tools UV_TOOL_BIN_DIR=$ECO/bin uv tool install --python 3.13 'serena-agent==2.0.0' and bin/serena relinked"
+ },
+ "upstream": {
+  "repo": "oraios/serena",
+  "release_url": "https://github.com/oraios/serena/releases/tag/v2.0.0",
+  "tag": "v2.0.0",
+  "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+  "published_utc": "2026-10-13T12:25:45Z",
+  "compare_from_old_pin": {
+   "base": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+   "status": "ahead",
+   "ahead_by": 141,
+   "files_changed": 186
+  },
+  "pypi_wheel": "serena_agent-2.0.0-py3-none-any.whl",
+  "pypi_upload_utc": "2026-10-13T12:26:13.638081Z",
+  "release_age_at_verification": "91h50m (3.8 days)",
+  "latest_check": "v2.0.0 is the newest release (releases list read 07:43Z; PyPI serena-agent info.version 2.0.0)"
+ },
+ "provenance": {
+  "pypi_sha256": {
+   "serena_agent-2.0.0-py3-none-any.whl": {
+    "downloaded": "910e1df8cf634e58997afb5f4ada0062a8f7be8339526afed4f5fb2f609162be",
+    "pypi_json": "910e1df8cf634e58997afb5f4ada0062a8f7be8339526afed4f5fb2f609162be",
+    "match": true
+   },
+   "serena_agent-2.0.0.tar.gz": {
+    "downloaded": "50afdd69f7b114544d2f52deec58a41ad31a328c5a31808adf6f59afdda5d9cf",
+    "pypi_json": "50afdd69f7b114544d2f52deec58a41ad31a328c5a31808adf6f59afdda5d9cf",
+    "match": true
+   }
+  },
+  "installed_bytes_vs_wheel_RECORD": {
+   "python-tools/serena-agent": {
+    "site_packages": "$ECO_ROOT/python-tools/serena-agent/lib/python3.13/site-packages",
+    "wheel": "serena_agent-2.0.0-py3-none-any.whl",
+    "record_files_matching_installed": 246,
+    "mismatched": 0,
+    "missing": 0,
+    "skipped_scripts_or_data": 0,
+    "mismatched_list": [],
+    "missing_list": []
+   },
+   "~/.local/share/uv/tools/serena-agent": {
+    "site_packages": "$HOME/.local/share/uv/tools/serena-agent/lib/python3.13/site-packages",
+    "wheel": "serena_agent-2.0.0-py3-none-any.whl",
+    "record_files_matching_installed": 246,
+    "mismatched": 0,
+    "missing": 0,
+    "skipped_scripts_or_data": 0,
+    "mismatched_list": [],
+    "missing_list": []
+   }
+  },
+  "pypi_attestations": "none published (integrity API HTTP 404 for the wheel and the sdist); checksums and the RECORD match are the available provenance"
+ },
+ "release_notes_review": {
+  "read": [
+   "GitHub release v2.0.0 (body is a link to CHANGELOG.md)",
+   "CHANGELOG.md at v2.0.0, section 'v2.0.0 (2026-10-13)'"
+  ],
+  "affects_our_use": [
+   "Licence: the Serena application is now GPL-3.0-or-later (SolidLSP stays MIT); the lane builder noted licences do not gate on this PC.",
+   "New default agent interface for NEW configs: serena_config.template.yml sets agent_interface: REPL (a reduced REPL tool set). This host's ~/.serena/serena_config.yml carries agent_interface: tools (same value before the upgrade, from the lane builder's backup), so live sessions keep the classic tools. A fresh HOME in this sweep's smoke got REPL (2 to 3 tools).",
+   "PLAN GAP: the repository seeds no agent_interface anywhere (git grep over origin/main outside evidence: 0 hits), so a fresh serena 2.0.0 install on a new machine would expose only the REPL set unless the plan seeds agent_interface: tools or adopts REPL on purpose.",
+   "auth_secret is added to serena_config.yml (random UUID persisted when missing); the config file mode is tightened to 0600 on load.",
+   "MCP SDK upgraded 1.28.1 to 2.2.0 (the server now reports Serena's own version); urllib3 2.8.0."
+  ],
+  "does_not_affect_us": [
+   "no tool renamed or removed under the classic interface (21 tools claude-code, 23 codex, matching the lane builder's counts)",
+   "no Claude or Codex hook calls serena-hooks"
+  ],
+  "residual_from_lane_builder": "the typescript-language-server fix (#2129) and the symlink fix (#2163) are on main only; do not open untrusted TypeScript repositories through Serena"
+ },
+ "smoke": {
+  "method": "scratch mcp_smoke.py under systemd-run --user --scope -p CPUWeight=idle, the clients' own args with --enable-web-dashboard false --open-web-dashboard false --enable-gui-log-window false (the dashboard would bind a port), isolated HOME, cwd a scratch git project (--project-from-cwd); initial_instructions called once",
+  "version_flags": [
+   {
+    "cmd": "$ECO_ROOT/bin/serena --version",
+    "exit": 0,
+    "out_head": "Serena 2.0.0"
+   },
+   {
+    "cmd": "$HOME/.local/bin/serena --version",
+    "exit": 0,
+    "out_head": "Serena 2.0.0"
+   }
+  ],
+  "classic_tools_interface_claude_code_context": {
+   "mcp": {
+    "ok": true,
+    "serverInfo": {
+     "name": "Serena",
+     "version": "2.0.0",
+     "websiteUrl": "https://oraios.github.io/serena"
+    },
+    "protocolVersion": "2025-06-18",
+    "tool_count": 21,
+    "tools_schema_sha256": "14b41e7f0f17107e35feaecf843c9068fa73cce97989ece0dc8a0d0de51bb781",
+    "server_exit": 0,
+    "elapsed_s": 2.86,
+    "error": null,
+    "has_instructions": true,
+    "calls": [
+     {
+      "name": "initial_instructions",
+      "is_error": false
+     }
+    ]
+   },
+   "harness_exit": 0,
+   "tools_missing_vs_an_older_live_session_list": [
+    "open_dashboard (dashboard disabled in the smoke)"
+   ]
+  },
+  "classic_tools_interface_codex_context": {
+   "mcp": {
+    "ok": true,
+    "serverInfo": {
+     "name": "Serena",
+     "version": "2.0.0",
+     "websiteUrl": "https://oraios.github.io/serena"
+    },
+    "protocolVersion": "2025-06-18",
+    "tool_count": 23,
+    "tools_schema_sha256": "10901c8da5fd86a1b09f4a2d9737ad77eea06a31f8fbd7f395644169bcb108e6",
+    "server_exit": 0,
+    "elapsed_s": 2.95,
+    "error": null,
+    "has_instructions": true,
+    "calls": [
+     {
+      "name": "initial_instructions",
+      "is_error": false
+     }
+    ]
+   },
+   "harness_exit": 0
+  },
+  "fresh_home_default_REPL_interface": {
+   "claude_code": {
+    "ok": true,
+    "serverInfo": {
+     "name": "Serena",
+     "version": "2.0.0",
+     "websiteUrl": "https://oraios.github.io/serena"
+    },
+    "protocolVersion": "2025-06-18",
+    "tool_count": 2,
+    "tools_schema_sha256": "5ad8e5ac184767f0a4c329dd0006148e02e44567b419adb034c75ceb9a38a86b",
+    "server_exit": 0,
+    "elapsed_s": 3.74,
+    "error": null,
+    "has_instructions": true,
+    "calls": [
+     {
+      "name": "initial_instructions",
+      "is_error": false
+     }
+    ]
+   },
+   "codex": {
+    "ok": true,
+    "serverInfo": {
+     "name": "Serena",
+     "version": "2.0.0",
+     "websiteUrl": "https://oraios.github.io/serena"
+    },
+    "protocolVersion": "2025-06-18",
+    "tool_count": 3,
+    "tools_schema_sha256": "0bd36f20ba9457a446a8b22aebc99302c7e8324412f5c946f068bbcce246177f",
+    "server_exit": 0,
+    "elapsed_s": 3.62,
+    "error": null,
+    "has_instructions": true,
+    "calls": [
+     {
+      "name": "initial_instructions",
+      "is_error": false
+     }
+    ]
+   },
+   "meaning": "agent_interface defaults to REPL for a new config: only initial_instructions, serena_repl (and activate_project in the codex context)"
+  }
+ },
+ "processes_still_on_old_modules": "three live serena MCP processes started before the switch (pids 731798, 989854 from the default uv tool dir; 3998074 from python-tools); they keep the old code until their sessions restart (the lane builder's restart table). Not touched.",
+ "link": {
+  "changed_by_this_sweep": false,
+  "bin_serena": {
+   "path": "$ECO_ROOT/bin/serena",
+   "target": "$ECO_ROOT/python-tools/serena-agent/bin/serena",
+   "link_mtime_utc": "2026-10-17T04:05:29Z"
+  },
+  "bin_serena_agent": {
+   "path": "$ECO_ROOT/bin/serena-agent",
+   "target": "$ECO_ROOT/python-tools/serena-agent/bin/serena-agent",
+   "link_mtime_utc": "2026-10-17T04:05:29Z"
+  },
+  "bin_serena_hooks": {
+   "path": "$ECO_ROOT/bin/serena-hooks",
+   "target": "$ECO_ROOT/python-tools/serena-agent/bin/serena-hooks",
+   "link_mtime_utc": "2026-10-17T04:05:29Z"
+  },
+  "which_a": "$ECO/bin/serena resolves first on PATH; ~/.local/bin/serena (default uv tool dir copy, also 2.0.0) second"
+ },
+ "rollback": "uv tool install -p 3.13 'git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143' (the lane builder's inverse); restore <lane builder backup (private)>/serena_config.yml.before if 2.0.0 changed it; restart the MCP clients",
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57 (merged 2026-10-17T05:23:57Z, #1237): only an upstream's own documented window applies, no age buffer of ours; the CC ruled the same for this sweep",
+  "release_age_at_verification": "91h50m (3.8 days)",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "GitHub release v2.0.0 body",
+    "CHANGELOG.md v2.0.0 section"
+   ],
+   "README.md": {
+    "bytes": 15290,
+    "window_hits": []
+   },
+   "SECURITY.md": null,
+   "repo": "oraios/serena",
+   "tag": "v2.0.0",
+   "pattern": "cooldown|minimum release age|release age|quarantine period|days after release|exclude-newer|embargo"
+  },
+  "SECURITY.md_note": "oraios/serena has no SECURITY.md at v2.0.0 (the contents API returns nothing)"
+ },
+ "public_copy": {
+  "of": "currency-serena receipt written by the currency sweep of 2026-10-17 (private original kept on the host)",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-serena-20261017T081640Z.json",
+  "amended_by_the_fold": {
+   "blocks": [
+    "digest_comparison",
+    "source_commit_resolution"
+   ],
+   "from_private_addendum": "currency-fold-digests-20261017T144813Z.json",
+   "why": "the verdict on PR #1243 asked that each public receipt carry the registry's own digests, the locally computed digests of the same bytes and how the source commit was resolved"
+  }
+ },
+ "digest_comparison": {
+  "read_utc": "2026-10-17T14:36:20Z",
+  "what_was_compared_with_what": "PyPI publishes a sha256 for every file of a release (urls[].digests.sha256). Each file of the release (wheel and sdist) was downloaded and its sha256 computed locally: each equals the published sha256. Where the profile row pins a sha256 it is the wheel's, and equals the local sha256.",
+  "registry": {
+   "fields_read": [
+    "urls[].filename",
+    "urls[].digests",
+    "urls[].upload_time_iso_8601"
+   ],
+   "files": [
+    {
+     "filename": "serena_agent-2.0.0-py3-none-any.whl",
+     "local": {
+      "bytes": 1130053,
+      "sha1": "42a9d77fc2c78cf447c3d1931eb673ff08a30ccb",
+      "sha256": "910e1df8cf634e58997afb5f4ada0062a8f7be8339526afed4f5fb2f609162be",
+      "sha512_sri": "sha512-riwZoTcdgDjsxvvJO9D+Y30LbRqDALjIVSb7RLhDq3Hmi6Ukn8lmy+87u4prq6NRAPNkyzn749qe/u/xcCHVMg=="
+     },
+     "packagetype": "bdist_wheel",
+     "registry_published_digests": {
+      "blake2b_256": "08bf2bbb3a6adcb7580fea5beaddfa6cd18990a24e661f9f3e5412d51765fdd2",
+      "md5": "4862b9d0c4abfd35d9a339f6c71166be",
+      "sha256": "910e1df8cf634e58997afb5f4ada0062a8f7be8339526afed4f5fb2f609162be"
+     },
+     "sha256_equal": true,
+     "size_registry": 1130053,
+     "upload_time_iso_8601": "2026-10-13T12:26:13.638081Z",
+     "url": "https://files.pythonhosted.org/packages/08/bf/2bbb3a6adcb7580fea5beaddfa6cd18990a24e661f9f3e5412d51765fdd2/serena_agent-2.0.0-py3-none-any.whl",
+     "yanked": false
+    },
+    {
+     "filename": "serena_agent-2.0.0.tar.gz",
+     "local": {
+      "bytes": 2461856,
+      "sha1": "71090d5208283db6bde66e2d0f9bd6db4ed4badf",
+      "sha256": "50afdd69f7b114544d2f52deec58a41ad31a328c5a31808adf6f59afdda5d9cf",
+      "sha512_sri": "sha512-tN0jAfVSnwMxtza9B48VrkF8RHNnZ4fq8CVG4gc58s54y149JczcfTggDMA029EHstPydar42O/Z08+a2tj+MQ=="
+     },
+     "packagetype": "sdist",
+     "registry_published_digests": {
+      "blake2b_256": "74b90d0822226d2bbcc92331d6953fee6c229a8c9f4b2e6ef3caf88c2841c9c0",
+      "md5": "6154428cc501c82cde6fcf47e8d3519d",
+      "sha256": "50afdd69f7b114544d2f52deec58a41ad31a328c5a31808adf6f59afdda5d9cf"
+     },
+     "sha256_equal": true,
+     "size_registry": 2461856,
+     "upload_time_iso_8601": "2026-10-13T12:26:15.006692Z",
+     "url": "https://files.pythonhosted.org/packages/74/b9/0d0822226d2bbcc92331d6953fee6c229a8c9f4b2e6ef3caf88c2841c9c0/serena_agent-2.0.0.tar.gz",
+     "yanked": false
+    }
+   ],
+   "name": "PyPI",
+   "url_read": "https://pypi.org/pypi/serena-agent/2.0.0/json"
+  },
+  "comparisons": [
+   {
+    "equal": true,
+    "local_algorithm": "sha256",
+    "local_value": "910e1df8cf634e58997afb5f4ada0062a8f7be8339526afed4f5fb2f609162be",
+    "registry_field": "urls[].digests.sha256 of serena_agent-2.0.0-py3-none-any.whl",
+    "registry_value": "910e1df8cf634e58997afb5f4ada0062a8f7be8339526afed4f5fb2f609162be"
+   },
+   {
+    "equal": true,
+    "local_algorithm": "sha256",
+    "local_value": "50afdd69f7b114544d2f52deec58a41ad31a328c5a31808adf6f59afdda5d9cf",
+    "registry_field": "urls[].digests.sha256 of serena_agent-2.0.0.tar.gz",
+    "registry_value": "50afdd69f7b114544d2f52deec58a41ad31a328c5a31808adf6f59afdda5d9cf"
+   }
+  ],
+  "all_registry_comparisons_equal": true,
+  "profile_pin": {
+   "row": "Serena",
+   "pin": "2.0.0",
+   "checksum": {
+    "algorithm": "sha256",
+    "value": "910e1df8cf634e58997afb5f4ada0062a8f7be8339526afed4f5fb2f609162be"
+   },
+   "equals_local_sha256": true
+  }
+ },
+ "source_commit_resolution": {
+  "git_ls_remote": {
+   "command": "git ls-remote https://github.com/oraios/serena.git refs/tags/v2.0.0 refs/tags/v2.0.0^{}",
+   "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+   "exit": 0,
+   "lines": [
+    "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3\trefs/tags/v2.0.0"
+   ],
+   "tag_kind": "lightweight",
+   "tag_object": null
+  },
+  "note": "PyPI files carry no source commit; the source is identified by the git tag below",
+  "tag_commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+  "tag_commit_equals_profile_or_recorded_commit": true,
+  "method": "git ls-remote https://github.com/<repo>.git refs/tags/<tag> refs/tags/<tag>^{} (an annotated tag lists its object and, peeled, its commit; a lightweight tag lists only the commit); for npm packages the version document's gitHead and, when it differs from the tag commit, the GitHub compare API between the two"
+ }
+}

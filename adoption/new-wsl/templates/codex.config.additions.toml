@@ -32,7 +32,7 @@ tool_suggest = false
 [mcp_servers.ai-memory]
 default_tools_approval_mode = "approve"
 
-# semble 0.6.1 (MinishLab/semble, a uv tool), the code-search slot's interim install (definitive manifest, amendment 3;
+# semble 0.7.0 (MinishLab/semble, a uv tool; 0.6.1 under the definitive manifest's amendment 3), the code-search slot's interim install (definitive manifest, amendment 3;
 # wave-2 code-search ruling, changes 2-5). Stdio, CPU only, no port. Its two tools carry no MCP annotations, so Codex
 # 0.160.0 asks before each call unless the approval mode approves them (authorization, as above); enabled_tools names
 # them. SEMBLE_MODEL_NAME is the local snapshot of the pinned model (minishlab/potion-code-16M-v2 at e9d2a44c), and

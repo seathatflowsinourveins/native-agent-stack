@@ -101,7 +101,7 @@ class NewWslProfileCliTests(unittest.TestCase):
         self.assertIn("[mcp]", by_name["Headroom"]["install"]["command"])
         self.assertNotIn("[all]", by_name["Headroom"]["install"]["command"])
         self.assertNotIn("cargo", by_name["RTK"]["install"]["command"])
-        self.assertIn("rtk-x86_64-unknown-linux-musl.tar.gz", by_name["RTK"]["install"]["command"])
+        self.assertIn("rtk-oss-x86_64-unknown-linux-musl.tar.gz", by_name["RTK"]["install"]["command"])  # the Apache-2.0 edition since 1.0.1
         boundary = data["boundary"]
         self.assertTrue(boundary["install_dispatch"].startswith("Do not iterate over entries."))
         for name in owner:

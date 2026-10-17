@@ -11416,8 +11416,8 @@
   "scope": "One row per layer of the final stack: the landscape verdict rows and the planned layers, each with its status, verdict wave and next review, winners with their verdict and run pins, alternates, unadjudicated sweep survivors, open gaps, research state, saturation and the found-to-adopted funnel; the run pins; the intake; and a repository and component index; sourced angle summaries and explicit FINAL checks. A read-only join of evidence recorded elsewhere; it selects nothing.",
   "sources": {
     "adoption/manifest.json": "2cdec6a1b92580527226c2c2196b8d5de809ee81877bdc6d95bf43481e388ee5",
-    "adoption/pins-linux-x86_64.json": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449",
-    "adoption/pins-macos-arm64.json": "539a4840e1c5e2d5377685c274932f697d22bd16e28f99e70c12b2f86dc9f24c",
+    "adoption/pins-linux-x86_64.json": "df050f84c58c778530713fa2fdc16d938906d299c2f5debcc41fea63f00f2e34",
+    "adoption/pins-macos-arm64.json": "a8f510cdcc0488581b0efe03f8c39684456a64006a9051ec945e2ef0d67bfa3a",
     "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
     "catalogs/landscape/angles/foundation-agent-sdks.json": "2ca80cb4cbf9ab3abc3ad8c561b76334eba91125d0ab41e5702de354b8435cde",
     "catalogs/landscape/angles/foundation-model-routes.json": "f71c92983ce1a7ebcf47574793509213c465fc719f194e5fcdc3fae915a1506e",

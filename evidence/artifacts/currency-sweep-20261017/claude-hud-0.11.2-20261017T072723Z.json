@@ -1,0 +1,33 @@
+{
+ "kind": "client_plugin_security_update",
+ "host": "NativeHorizonNY",
+ "applied_utc": "2026-10-17T07:28:49Z",
+ "finding": "A2 stage-1 audit G3-01 (P1): claude-hud 0.10.0 statusline affected by GHSA-fq7j-8hxj-jfqh (high, CVSS 7.8; vulnerable < 0.11.1, patched 0.11.1): a cwd whose git config names core.fsmonitor or a filter driver runs that command on each 5 s render.",
+ "upstream": {
+  "repo": "jarrodwatts/claude-hud",
+  "tag": "v0.11.2",
+  "tag_object": "8b16685a20b4d356868389b407a01a7d8db312ef",
+  "commit": "ad322b8d9016816a1858334ba57a085512110e83",
+  "published_utc": "2026-10-13T04:58:49Z",
+  "fix_in_installed_code": "~/.claude/plugins/cache/claude-hud/claude-hud/0.11.2/dist/git.js:13 (core.fsmonitor=false) and :28-33 (filter drivers neutralized)"
+ },
+ "route": "adoption/bootstrap.md:692-693 (the repository's documented tagged-marketplace route), with the new tag",
+ "commands": [
+  "edit ~/.claude/settings.json extraKnownMarketplaces.claude-hud.source.ref v0.10.0 -> v0.11.2 (the declared pin)",
+  "claude plugin marketplace add jarrodwatts/claude-hud@v0.11.2 --scope user  (rc 0; known_marketplaces ref v0.11.2)",
+  "claude plugin install claude-hud@claude-hud --scope user --json  (rc 0; reported 0.11.2 offered)",
+  "claude plugin update claude-hud@claude-hud  (rc 0; 0.10.0 -> 0.11.2, gitCommitSha ad322b8d)"
+ ],
+ "note_failed_first_attempt": "claude plugin marketplace update claude-hud returned 'Marketplace not found' after the settings edit; the documented tagged add then worked.",
+ "verification": [
+  "installed_plugins.json: claude-hud@claude-hud 0.11.2 at cache/claude-hud/claude-hud/0.11.2",
+  "statusline.mjs loads the newest cached version (its version scan), so renders use 0.11.2",
+  "probe render with a sample session JSON: rc 0"
+ ],
+ "follow_up": "Re-pin the repository's plan and template to v0.11.2 (adoption/templates/claude.settings.template.json extraKnownMarketplaces ref; adoption/new-wsl/client-config-map.json; adoption/bootstrap.md:685-723; docs/community-native-practice.md:156) so a re-render keeps the patched version.",
+ "public_copy": {
+  "of": "claude-hud-0.11.2-20261017T072723Z.json (the command center's receipt)",
+  "omitted": "the backup path and the two digests of the private user settings file (a digest of a private file is not published)",
+  "sanitized": "home paths replaced by placeholders"
+ }
+}

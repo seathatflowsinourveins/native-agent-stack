@@ -1,0 +1,4317 @@
+{
+ "kind": "currency_verification_and_comparison",
+ "host": "NativeHorizonNY",
+ "tool": "rtk",
+ "from": "0.51.0 (the audit snapshot and the repository plan pin; the live link had already moved)",
+ "to": "1.0.1, the rtk-oss edition (live since 2026-10-17T04:21:11Z; switched by the lane builder, GO by the CC); 0.52.0 compared as the same-line reference",
+ "result": "NO_LINK_CHANGE by this sweep. The CC ruled: keep the live rtk-oss 1.0.1, no link change in either direction. The sweep task's premise (0.51.0 live, move to 0.52.x only) came from the audit's earlier read and was superseded by the 04:21:11Z switch.",
+ "finding": "A2 stage-1 audit G3-10 (P2): rtk 0.51.0 lacks 0.52.0's three permission-gate fixes (PR #4129). Closed on the host by the 1.0.1 switch; this receipt shows 1.0.1 carries every one of them.",
+ "recorded_utc": "2026-10-17T08:11:29Z",
+ "switch_record": {
+  "switched_by": "the lane builder, the CC's GO (a command-center message)",
+  "link_mtime_utc": "2026-10-17T04:21:11Z (ls -l --time-style of bin/rtk read by this sweep)",
+  "lane_builder_receipt": "<lane builder upgrade records (private)>/<receipt notes> (sections '(G6) ... RTK screened and trialed' and '(G6b) RTK switched to rtk-oss 1.0.1: DONE')",
+  "lane_builder_scripts_and_logs": [
+   "<lane builder script (private)>",
+   "<lane builder log (private)>",
+   "<lane builder script (private)>",
+   "<lane builder log (private)>"
+  ],
+  "tracker": "<command-center tracker (private)>:847-848",
+  "lane_builder_trial": "36 PreToolUse payloads (18 commands through rtk hook claude and rtk hook codex) gave identical decisions 36 of 36 against 0.51.0",
+  "lane_builder_recorded_binary_sha256": "38b915f2a52ce4b7ef7d6dc3966aaeccb9f754731b2933571bf85026bcba8677",
+  "live_binary_sha256": "38b915f2a52ce4b7ef7d6dc3966aaeccb9f754731b2933571bf85026bcba8677",
+  "live_binary_matches_lane_builder_record": true,
+  "licence_note_from_lane_builder_not_reread_here": "v1.0.0 makes the default binary Apache-2.0 plus BUSL-1.1 (new pipeline engine); rtk-oss is Apache-2.0 only and is the hook core plus every filter, the 0.51.0 function set"
+ },
+ "upstream": {
+  "repo": "rtk-ai/rtk",
+  "same_line_check": "v0.52.0 is the only 0.52.x release (no 0.52.1 exists; releases list read 07:43Z); v1.0.0 and v1.0.1 follow it",
+  "v0.52.0": {
+   "release_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.52.0",
+   "commit": "b35f2c912bd41ab96593401bfdf213ebbcca1723",
+   "published_utc": "2026-10-13T10:53:37Z",
+   "assets_total": 10,
+   "linux_x86_64_musl_archive_and_checksums_present": true,
+   "asset": "rtk-x86_64-unknown-linux-musl.tar.gz",
+   "asset_sha256": "46765d4e570ccb3d759e95bcec11feb42fceed5ab2453eac8d787f81d4a0cdab",
+   "checksums_listed": "46765d4e570ccb3d759e95bcec11feb42fceed5ab2453eac8d787f81d4a0cdab",
+   "release_asset_digest": "46765d4e570ccb3d759e95bcec11feb42fceed5ab2453eac8d787f81d4a0cdab",
+   "age_at_verification": "93h17m (3.9 days)"
+  },
+  "v1.0.1": {
+   "release_url": "https://github.com/rtk-ai/rtk/releases/tag/v1.0.1",
+   "commit": "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100",
+   "published_utc": "2026-10-14T13:31:42Z",
+   "assets_total": 24,
+   "asset": "rtk-oss-x86_64-unknown-linux-musl.tar.gz",
+   "asset_sha256": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+   "checksums_listed": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+   "release_asset_digest": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+   "age_at_verification": "66h39m (2.8 days)",
+   "immutable_release": false
+  },
+  "v1.0.0_breaking_changes": "rtk proxy becomes rtk bypass (old name kept as an alias); --ultra-compact removed; rtk gain excludes oversized outputs from its headline rate; the default binary's licence changes and an Apache-2.0 edition (rtk-oss) ships alongside (release notes of v1.0.0; BREAKING_CHANGES.md upstream)",
+  "documented_security_fixes_in_0_52_0": "PR #4129 'close three permission-gate holes in command segmentation' (ANSI-C quoting, leading redirects, grammar residue), merged 2026-10-02T15:04:33Z; plus 'defer on a denied command inside a prefixed shell wrapper' (ffa5651, 4d37aa8)"
+ },
+ "provenance": {
+  "v1_0_1_oss_tarball_hash_agreement": {
+   "listed_in_checksums_txt": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+   "fresh_download": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+   "staged_download": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+   "github_release_asset_digest": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+   "all_agree": true
+  },
+  "live_binary_identical_to_fresh_upstream_extraction": true,
+  "v0_52_0_tarball_hash_agreement": true,
+  "attestation": {
+   "gh_attestation_verify_v1_0_1": {
+    "cmd": "gh attestation verify <scratch> --repo rtk-ai/rtk",
+    "exit": 1,
+    "out_head": "Error: HTTP 404: Not Found (https://api.github.com/repos/rtk-ai/rtk/attestations/sha256:a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41?per_page=30&predicate_type=https%3A%2F%2Fslsa.dev%2Fprovenance%2Fv1)"
+   },
+   "gh_release_verify_v1_0_1": {
+    "cmd": "gh release verify v1.0.1 --repo rtk-ai/rtk",
+    "exit": 1,
+    "out_head": "no attestations for tag v1.0.1 (sha1:4ef8730cf3a0dea11c8d64a9b90bc0616fe52100)"
+   },
+   "meaning": "rtk publishes no GitHub attestation and its releases are not immutable; the publisher checksums.txt plus the API digest are the available provenance"
+  }
+ },
+ "cooldown": {
+  "rule": "docs/decisions/2026-10-17-zero-tolerance-currency.md:27 and :52-57; CC ruling in this session: no age buffer of ours applies",
+  "upstream_window_found": false,
+  "looked_at": {
+   "release_notes": [
+    "v0.52.0",
+    "v1.0.0",
+    "v1.0.1"
+   ],
+   "README.md": {
+    "bytes": 21248,
+    "window_hits": []
+   },
+   "SECURITY.md": {
+    "bytes": 6560,
+    "window_hits": [
+     "- **Disclosure**: We follow responsible disclosure practices (90-day embargo)"
+    ]
+   },
+   "note_on_the_one_hit": "SECURITY.md mentions a 90-day embargo for responsible disclosure of vulnerability reports; that is not a consumer release-age window"
+  }
+ },
+ "comparison": {
+  "binaries": {
+   "0.51.0": "$ECO_ROOT/tools/rtk-0.51.0/rtk",
+   "0.52.0": "scratch extraction only (never placed under the ecosystem tree; nothing to remove under tools/ or downloads/)",
+   "1.0.1": "$ECO_ROOT/tools/rtk-oss-1.0.1/rtk"
+  },
+  "config": "all three ran against the same live ~/.config/rtk/config.toml ([hooks] exclude_commands, five entries) except where a harness uses its own scratch config; tracking DB isolated per run (RTK_DB_PATH/XDG_DATA_HOME in scratch); telemetry off",
+  "summary": {
+   "recorded_hook_acceptance_v3_1": {
+    "counts": {
+     "0.51.0": {
+      "PASS": 87,
+      "FAIL": 1,
+      "NOTE": 3
+     },
+     "0.52.0": {
+      "PASS": 87,
+      "FAIL": 1,
+      "NOTE": 3
+     },
+     "1.0.1": {
+      "PASS": 87,
+      "FAIL": 1,
+      "NOTE": 3
+     }
+    },
+    "case_status_differences_between_versions": 0,
+    "the_one_fail_in_all_three": "'git show HEAD:big.txt' blob-window case: the live config excludes git show <ref>:<path> from rewriting, so the hook defers; identical on 0.51.0, 0.52.0 and 1.0.1",
+    "note_differences": [
+     {
+      "0.51.0": "hook stderr non-empty in 1 of 45 payload calls; first: git status :: [rtk] /!\\ No hook installed \u2014 run `rtk init -g` for automatic token savings ",
+      "0.52.0": "hook stderr non-empty in 1 of 45 payload calls; first: git status :: [rtk] /!\\ No hook installed \u2014 run `rtk init -g` for automatic token savings ",
+      "1.0.1": "hook stderr non-empty in 0 of 45 payload calls"
+     }
+    ]
+   },
+   "targeted_gate_cases": {
+    "cases": 18,
+    "cases_differing_from_0_51_0": [
+     "G1-ansi-c-quote",
+     "G2b-redirect-second-segment-deny",
+     "G4b-redirect-second-segment-allow",
+     "G13-ansi-c-quote-deny",
+     "G3-brace-residue",
+     "G7-inner-rewrite-feature"
+    ],
+    "0_52_0_equals_1_0_1_in_all": true
+   },
+   "recorded_hook_check_exclusion_cases": {
+    "cases": 24,
+    "all_three_identical": true,
+    "recorded_0_50_0_exit_codes_match_1_0_1": true
+   },
+   "recorded_behaviour_probe": {
+    "rows": 146,
+    "rows_differing": [
+     [
+      "rewrite",
+      "upstream_defaults",
+      "bash -c 'git status'"
+     ],
+     [
+      "rewrite",
+      "repository_exclusions",
+      "bash -c 'git status'"
+     ]
+    ],
+    "my_0_51_0_run_reproduces_the_recorded_file": true,
+    "compact_form_comparisons_identical": true
+   },
+   "verdict": "Every difference from 0.51.0 is a documented change: the three PR #4129 segmentation fixes (G1, G13, G2b, G4b, G3), and the documented 0.52.0 feature that rewrites inner commands of quoted sh/bash/zsh -c wrappers (G7 and the probe's bash -c 'git status' row). 0.52.0 and live 1.0.1 are identical on every gate, exclusion, rewrite, Codex-hook and compact-form case. No undocumented difference was found."
+  },
+  "sources": {
+   "hook_acceptance": "evidence/artifacts/sota-refresh-20260925/rtk/rtk-hook-acceptance-v3.1.sh (git blob 4d8eb577ec0b, run unchanged per version)",
+   "behaviour_probe": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk_behaviour_probe.py and its recorded rtk-behaviour-probe.json (run from a checkout, output to scratch)",
+   "hook_check_cases": "evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt (19 recorded commands replayed, plus 5 extra)",
+   "gate_cases": "scratch rtk_gate_cases.py built from PR #4129's description (rtk-ai/rtk#4129) and the v0.52.0 notes"
+  },
+  "tables": {
+   "hook_acceptance_cases": [
+    {
+     "case": "version",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "precondition: live settings have 0 Bash allow rules",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "robust: empty payload -> exit 0, silent",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "robust: malformed payload -> exit 0, silent",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "robust: no-command payload -> exit 0, silent",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "head-1 rewrite",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "head-1 bytes==native",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "head-5 rewrite",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "head-5 bytes==native",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "cat bytes==native [rtk read <T>/f.txt]",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "tail-3 bytes==native [rtk read <T>/f.txt --tail-lines 3]",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "wc rc=1",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "wc stderr kept",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep rc=2",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep stderr kept",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "pytest rc=4",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "pytest stderr kept",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "ls missing rc=2 (native 2)",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "ls missing error text on stderr",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "cat missing rc=1 (native 1)",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "cat missing error text on stderr",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "find missing rc=1 (native 1)",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "find missing error text on stderr",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep -rn missing-dir rc=2 (native 2)",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep -rn missing-dir error text on stderr",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "rg missing rc=2 (native 2)",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "rg missing error text on stderr",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "ruff check (stderr-only) rc=2 (native 2)",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "ruff check (stderr-only) error text on stderr",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git status outside repo rc=128 (native 128)",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git status outside repo error text on stderr",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "gitlog rc=128",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "gitlog stderr kept",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git diff bad ref rc=128 (native 128)",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git diff bad ref error text on stderr",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "silent: command substitution",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "silent: file redirect",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "silent: heredoc",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "silent: no rtk equivalent",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "silent: non-display pipe consumer",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "silent: no rtk equivalent (uname)",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "proxy==raw",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "blob not windowed/announced: []",
+     "0.51.0": "FAIL",
+     "0.52.0": "FAIL",
+     "1.0.1": "FAIL"
+    },
+    {
+     "case": "log cap announced",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git log -3 keeps subject big",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git log -3 keeps subject c12",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git log -3 keeps subject c11",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git log --oneline -5 keeps subject big",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git log --oneline -5 keeps subject c12",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git log --oneline -5 keeps subject c11",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git log --oneline -5 keeps subject c10",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git log --oneline -5 keeps subject c9",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "plain git log (13 commits, no -n): 10 distinct subjects shown, cap notice=none [rtk git log]",
+     "0.51.0": "NOTE",
+     "0.52.0": "NOTE",
+     "1.0.1": "NOTE"
+    },
+    {
+     "case": "git show HEAD~1 keeps subject c12",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git show HEAD~1 names n.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git show HEAD~1 keeps +12",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git status shows n.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git status shows untracked-file.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git status shows staged-file.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git diff names n.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git diff keeps added line",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep -rn keeps needle one",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep -rn keeps needle two",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep -rn keeps y needle three",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep -rn keeps a.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep -rn keeps b.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "grep -rn keeps c.md",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "ls keeps one.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "ls keeps two.log",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "ls keeps three",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git diff --cached names cached-file.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "git diff --cached keeps added line",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "rg -n keeps needle one",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "rg -n keeps needle two",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "rg -n keeps y needle three",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "rg -n keeps a.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "rg -n keeps b.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "rg -n keeps c.md",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "find keeps a.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "find keeps sub/b.txt",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "find excludes c.md",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "wc -l keeps count 40",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "explicit allow rule -> allow",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "partly allowed compound -> no decision",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "ask rule -> no decision",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "silent: deny rule",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "allow rule Bash(git status) applied to 'git status --short': rc=0 permissionDecision=allow",
+     "0.51.0": "NOTE",
+     "0.52.0": "NOTE",
+     "1.0.1": "NOTE"
+    },
+    {
+     "case": "legacy colon allow rule -> allow",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "silent: leading-wildcard deny rule",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "compound with unallowed segment -> no decision",
+     "0.51.0": "PASS",
+     "0.52.0": "PASS",
+     "1.0.1": "PASS"
+    },
+    {
+     "case": "hook stderr non-empty in 1 of 45 payload calls; first: git status :: [rtk] /!\\ No hook installed \u2014 run `rtk init -g` for automatic token savings ",
+     "0.51.0": "NOTE",
+     "0.52.0": "NOTE",
+     "1.0.1": "NOTE"
+    }
+   ],
+   "targeted_gate_cases": [
+    {
+     "id": "G1-ansi-c-quote",
+     "config": "allow-ls",
+     "command": "ls -la $'\\'' ; rm -rf /",
+     "documented_basis": "PR #4129 hole 1 (ANSI-C quoting hid the rm -rf from the allow gate): 0.51.0 auto-allows, 0.52.0+ must not",
+     "decision": {
+      "0.51.0": "rewrite:permissionDecision=allow",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": "rtk ls -la $'\\'' ; rm -rf /",
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": true,
+      "1.0.1": true
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G2-leading-redirect",
+     "config": "deny-log",
+     "command": "2>&1 git log --oneline -3",
+     "documented_basis": "PR #4129 hole 2 (leading redirect left no segment, deny never fired): upstream states that 0.51.0 rewrites and 0.52.0+ defers; MEASURED here for this exact command under this config, all three versions defer (silent), so this case shows no difference and hole 2's measured difference appears in G2b and G4b",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G2c-control-no-redirect",
+     "config": "deny-log",
+     "command": "git log --oneline -3",
+     "documented_basis": "control: deny seen in every version, all defer",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G2b-redirect-second-segment-deny",
+     "config": "deny-log",
+     "command": "git status && 2>&1 git log --oneline -3",
+     "documented_basis": "PR #4129 hole 2 as observable through the hook: a leading-redirect segment hid the denied command, so 0.51.0 rewrote the compound; 0.52.0+ must defer",
+     "decision": {
+      "0.51.0": "rewrite",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": "rtk git status && 2>&1 git log --oneline -3",
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": true,
+      "1.0.1": true
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G4b-redirect-second-segment-allow",
+     "config": "allow-status",
+     "command": "git status && 2>&1 rm -rf /",
+     "documented_basis": "PR #4129 hole 2 on the allow side: 0.51.0 could not see the second segment, so every visible segment was allowed; 0.52.0+ must not auto-allow",
+     "decision": {
+      "0.51.0": "rewrite:permissionDecision=allow",
+      "0.52.0": "rewrite",
+      "1.0.1": "rewrite"
+     },
+     "rewritten": {
+      "0.51.0": "rtk git status && 2>&1 rm -rf /",
+      "0.52.0": "rtk git status && 2>&1 rm -rf /",
+      "1.0.1": "rtk git status && 2>&1 rm -rf /"
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": true,
+      "1.0.1": true
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G13-ansi-c-quote-deny",
+     "config": "deny-rm",
+     "command": "git status $'\\'' ; rm -rf /",
+     "documented_basis": "PR #4129 hole 1 on the deny side: the lexer confusion hid rm -rf / from the deny rule",
+     "decision": {
+      "0.51.0": "rewrite",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": "rtk git status $'\\'' ; rm -rf /",
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": true,
+      "1.0.1": true
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G3-brace-residue",
+     "config": "deny-rm",
+     "command": "git status && { rm -rf / ; }",
+     "documented_basis": "PR #4129 hole 3 (grammar residue '{ rm -rf /' missed the exact deny): 0.51.0 rewrites, 0.52.0+ defers",
+     "decision": {
+      "0.51.0": "rewrite",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": "rtk git status && { rm -rf /; }",
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": true,
+      "1.0.1": true
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G3c-control-plain-segment",
+     "config": "deny-rm",
+     "command": "git status && rm -rf /",
+     "documented_basis": "control: deny seen in every version, all defer",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G4-allow-widening-redirect",
+     "config": "allow-status",
+     "command": "2>&1 git status",
+     "documented_basis": "PR #4129 documented widening: 2>&1 <cmd> now matches the allow rule that covers <cmd> (0.52.0+ allow, 0.51.0 default)",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G5-allow-no-brace-strip",
+     "config": "allow-git",
+     "command": "{ git status ; }",
+     "documented_basis": "control: allow deliberately does not strip '{' (PR #4129), no version may auto-allow",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G6a-wrapper-deny-bash-c",
+     "config": "deny-log",
+     "command": "bash -c 'git log --oneline -3'",
+     "documented_basis": "0.52.0 'defer on a denied command inside a prefixed shell wrapper': defer in 0.52.0+; 0.51.0 does not rewrite wrappers",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G6b-wrapper-deny-env-prefix",
+     "config": "deny-log",
+     "command": "env FOO=1 bash -c 'git log --oneline -3'",
+     "documented_basis": "0.52.0 'defer when a prefixed shell wrapper's script hits a deny rule'",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G7-inner-rewrite-feature",
+     "config": "none",
+     "command": "bash -c 'git status'",
+     "documented_basis": "0.52.0 feature: rewrite inner commands of quoted sh/bash/zsh -c wrappers (#2767); 0.51.0 leaves it",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "rewrite",
+      "1.0.1": "rewrite"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": "bash -c 'rtk git status'",
+      "1.0.1": "bash -c 'rtk git status'"
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": true,
+      "1.0.1": true
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G8-case-terminators",
+     "config": "none",
+     "command": "case x in x) git status;; esac",
+     "documented_basis": "0.52.0 fix #3197: keep case terminators intact when rewriting",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G9-plain-rewrite",
+     "config": "none",
+     "command": "git status",
+     "documented_basis": "control: plain rewrite, no difference expected",
+     "decision": {
+      "0.51.0": "rewrite",
+      "0.52.0": "rewrite",
+      "1.0.1": "rewrite"
+     },
+     "rewritten": {
+      "0.51.0": "rtk git status",
+      "0.52.0": "rtk git status",
+      "1.0.1": "rtk git status"
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G10-rtk-prefixed",
+     "config": "none",
+     "command": "rtk git status",
+     "documented_basis": "control: already-rtk command",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G11-proxy-alias",
+     "config": "none",
+     "command": "rtk proxy git status",
+     "documented_basis": "v1.0.0 renames proxy to bypass and keeps the old name as an alias; hook treatment of an explicit raw-recovery command",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    },
+    {
+     "id": "G12-quoted-separator",
+     "config": "none",
+     "command": "echo 'a ; b' | head -2",
+     "documented_basis": "control: quoted separator and a pipe",
+     "decision": {
+      "0.51.0": "silent(defer)",
+      "0.52.0": "silent(defer)",
+      "1.0.1": "silent(defer)"
+     },
+     "rewritten": {
+      "0.51.0": null,
+      "0.52.0": null,
+      "1.0.1": null
+     },
+     "differs_from_0_51_0": {
+      "0.52.0": false,
+      "1.0.1": false
+     },
+     "0_52_0_equals_1_0_1": true
+    }
+   ],
+   "hook_check_exclusion_cases": [
+    {
+     "cmd": "git show HEAD:x",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git -C /p show HEAD:x",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git -C p show --format=%H HEAD:a/b",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git show HEAD:x | tail -n 5",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git --no-pager show HEAD:x",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git branch -a",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git -C p branch",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git --no-pager branch -vv",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git --git-dir /r/.git show HEAD:x",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git --work-tree /w branch -a",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "diff a.txt missing.txt",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git show --stat HEAD",
+     "0.51.0": [
+      0,
+      "rtk git show --stat HEAD"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git show --stat HEAD"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git show --stat HEAD"
+     ],
+     "recorded_0_50_0": {
+      "exit": 0,
+      "stdout": "rtk git show --stat HEAD"
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git show HEAD~1",
+     "0.51.0": [
+      0,
+      "rtk git show HEAD~1"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git show HEAD~1"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git show HEAD~1"
+     ],
+     "recorded_0_50_0": {
+      "exit": 0,
+      "stdout": "rtk git show HEAD~1"
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git status",
+     "0.51.0": [
+      0,
+      "rtk git status"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git status"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git status"
+     ],
+     "recorded_0_50_0": {
+      "exit": 0,
+      "stdout": "rtk git status"
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git log -3",
+     "0.51.0": [
+      0,
+      "rtk git log -3"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git log -3"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git log -3"
+     ],
+     "recorded_0_50_0": {
+      "exit": 0,
+      "stdout": "rtk git log -3"
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git push origin branch",
+     "0.51.0": [
+      0,
+      "rtk git push origin branch"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git push origin branch"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git push origin branch"
+     ],
+     "recorded_0_50_0": {
+      "exit": 0,
+      "stdout": "rtk git push origin branch"
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git commit -m \"update branch docs\"",
+     "0.51.0": [
+      0,
+      "rtk git commit -m \"update branch docs\""
+     ],
+     "0.52.0": [
+      0,
+      "rtk git commit -m \"update branch docs\""
+     ],
+     "1.0.1": [
+      0,
+      "rtk git commit -m \"update branch docs\""
+     ],
+     "recorded_0_50_0": {
+      "exit": 0,
+      "stdout": "rtk git commit -m \"update branch docs\""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git --git-dir /r/.git status",
+     "0.51.0": [
+      0,
+      "rtk git --git-dir /r/.git status"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git --git-dir /r/.git status"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git --git-dir /r/.git status"
+     ],
+     "recorded_0_50_0": {
+      "exit": 0,
+      "stdout": "rtk git --git-dir /r/.git status"
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "ls -la",
+     "0.51.0": [
+      0,
+      "rtk ls -la"
+     ],
+     "0.52.0": [
+      0,
+      "rtk ls -la"
+     ],
+     "1.0.1": [
+      0,
+      "rtk ls -la"
+     ],
+     "recorded_0_50_0": {
+      "exit": 0,
+      "stdout": "rtk ls -la"
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "jq . x.json",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": null,
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git status",
+     "0.51.0": [
+      0,
+      "rtk git status"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git status"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git status"
+     ],
+     "recorded_0_50_0": {
+      "exit": 0,
+      "stdout": "rtk git status"
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git diff",
+     "0.51.0": [
+      0,
+      "rtk git diff"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git diff"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git diff"
+     ],
+     "recorded_0_50_0": null,
+     "all_three_equal": true
+    },
+    {
+     "cmd": "git branch -a",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": {
+      "exit": 1,
+      "stdout": ""
+     },
+     "all_three_equal": true
+    },
+    {
+     "cmd": "diff a b",
+     "0.51.0": [
+      1,
+      ""
+     ],
+     "0.52.0": [
+      1,
+      ""
+     ],
+     "1.0.1": [
+      1,
+      ""
+     ],
+     "recorded_0_50_0": null,
+     "all_three_equal": true
+    }
+   ],
+   "behaviour_probe_rows": [
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git status",
+     "0.51.0": [
+      3,
+      "rtk git status"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git status"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git status"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git status --short",
+     "0.51.0": [
+      3,
+      "rtk git status --short"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git status --short"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git status --short"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git log",
+     "0.51.0": [
+      3,
+      "rtk git log"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git log"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git log"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git log --oneline -3",
+     "0.51.0": [
+      3,
+      "rtk git log --oneline -3"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git log --oneline -3"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git log --oneline -3"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git log --stat",
+     "0.51.0": [
+      3,
+      "rtk git log --stat"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git log --stat"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git log --stat"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git diff --exit-code",
+     "0.51.0": [
+      3,
+      "rtk git diff --exit-code"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git diff --exit-code"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git diff --exit-code"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "ls /nonexistent",
+     "0.51.0": [
+      3,
+      "rtk ls /nonexistent"
+     ],
+     "0.52.0": [
+      3,
+      "rtk ls /nonexistent"
+     ],
+     "1.0.1": [
+      3,
+      "rtk ls /nonexistent"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "cat a/x/util.py",
+     "0.51.0": [
+      3,
+      "rtk read a/x/util.py"
+     ],
+     "0.52.0": [
+      3,
+      "rtk read a/x/util.py"
+     ],
+     "1.0.1": [
+      3,
+      "rtk read a/x/util.py"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "grep -rl needle .",
+     "0.51.0": [
+      3,
+      "rtk grep -rl needle ."
+     ],
+     "0.52.0": [
+      3,
+      "rtk grep -rl needle ."
+     ],
+     "1.0.1": [
+      3,
+      "rtk grep -rl needle ."
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "find /nonexistent -name x",
+     "0.51.0": [
+      3,
+      "rtk find /nonexistent -name x"
+     ],
+     "0.52.0": [
+      3,
+      "rtk find /nonexistent -name x"
+     ],
+     "1.0.1": [
+      3,
+      "rtk find /nonexistent -name x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git status --short && echo done",
+     "0.51.0": [
+      3,
+      "rtk git status --short && echo done"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git status --short && echo done"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git status --short && echo done"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git log --oneline -3 | cat",
+     "0.51.0": [
+      3,
+      "rtk git log --oneline -3 | cat"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git log --oneline -3 | cat"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git log --oneline -3 | cat"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git show HEAD:a/x/util.py",
+     "0.51.0": [
+      3,
+      "rtk git show HEAD:a/x/util.py"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git show HEAD:a/x/util.py"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git show HEAD:a/x/util.py"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "diff /nonexistent a/x/util.py",
+     "0.51.0": [
+      3,
+      "rtk diff /nonexistent a/x/util.py"
+     ],
+     "0.52.0": [
+      3,
+      "rtk diff /nonexistent a/x/util.py"
+     ],
+     "1.0.1": [
+      3,
+      "rtk diff /nonexistent a/x/util.py"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "jq . data.json",
+     "0.51.0": [
+      3,
+      "rtk jq . data.json"
+     ],
+     "0.52.0": [
+      3,
+      "rtk jq . data.json"
+     ],
+     "1.0.1": [
+      3,
+      "rtk jq . data.json"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "git branch",
+     "0.51.0": [
+      3,
+      "rtk git branch"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git branch"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git branch"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "echo hi",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "upstream_defaults",
+     "command": "bash -c 'git status'",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      3,
+      "bash -c 'rtk git status'"
+     ],
+     "1.0.1": [
+      3,
+      "bash -c 'rtk git status'"
+     ],
+     "equal": false
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git status",
+     "0.51.0": [
+      3,
+      "rtk git status"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git status"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git status"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git status --short",
+     "0.51.0": [
+      3,
+      "rtk git status --short"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git status --short"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git status --short"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git log",
+     "0.51.0": [
+      3,
+      "rtk git log"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git log"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git log"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git log --oneline -3",
+     "0.51.0": [
+      3,
+      "rtk git log --oneline -3"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git log --oneline -3"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git log --oneline -3"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git log --stat",
+     "0.51.0": [
+      3,
+      "rtk git log --stat"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git log --stat"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git log --stat"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git diff --exit-code",
+     "0.51.0": [
+      3,
+      "rtk git diff --exit-code"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git diff --exit-code"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git diff --exit-code"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "ls /nonexistent",
+     "0.51.0": [
+      3,
+      "rtk ls /nonexistent"
+     ],
+     "0.52.0": [
+      3,
+      "rtk ls /nonexistent"
+     ],
+     "1.0.1": [
+      3,
+      "rtk ls /nonexistent"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "cat a/x/util.py",
+     "0.51.0": [
+      3,
+      "rtk read a/x/util.py"
+     ],
+     "0.52.0": [
+      3,
+      "rtk read a/x/util.py"
+     ],
+     "1.0.1": [
+      3,
+      "rtk read a/x/util.py"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "grep -rl needle .",
+     "0.51.0": [
+      3,
+      "rtk grep -rl needle ."
+     ],
+     "0.52.0": [
+      3,
+      "rtk grep -rl needle ."
+     ],
+     "1.0.1": [
+      3,
+      "rtk grep -rl needle ."
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "find /nonexistent -name x",
+     "0.51.0": [
+      3,
+      "rtk find /nonexistent -name x"
+     ],
+     "0.52.0": [
+      3,
+      "rtk find /nonexistent -name x"
+     ],
+     "1.0.1": [
+      3,
+      "rtk find /nonexistent -name x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git status --short && echo done",
+     "0.51.0": [
+      3,
+      "rtk git status --short && echo done"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git status --short && echo done"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git status --short && echo done"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git log --oneline -3 | cat",
+     "0.51.0": [
+      3,
+      "rtk git log --oneline -3 | cat"
+     ],
+     "0.52.0": [
+      3,
+      "rtk git log --oneline -3 | cat"
+     ],
+     "1.0.1": [
+      3,
+      "rtk git log --oneline -3 | cat"
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git show HEAD:a/x/util.py",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "diff /nonexistent a/x/util.py",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "jq . data.json",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "git branch",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "echo hi",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "rewrite",
+     "config": "repository_exclusions",
+     "command": "bash -c 'git status'",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      3,
+      "bash -c 'rtk git status'"
+     ],
+     "1.0.1": [
+      3,
+      "bash -c 'rtk git status'"
+     ],
+     "equal": false
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git push origin main",
+     "0.51.0": [
+      0,
+      "rtk git push origin main"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git push origin main"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git push origin main"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git push --force origin main",
+     "0.51.0": [
+      0,
+      "rtk git push --force origin main"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git push --force origin main"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git push --force origin main"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git commit -m x",
+     "0.51.0": [
+      0,
+      "rtk git commit -m x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git commit -m x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git commit -m x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git add -A",
+     "0.51.0": [
+      0,
+      "rtk git add -A"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git add -A"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git add -A"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git checkout -- .",
+     "0.51.0": [
+      0,
+      "rtk git checkout -- ."
+     ],
+     "0.52.0": [
+      0,
+      "rtk git checkout -- ."
+     ],
+     "1.0.1": [
+      0,
+      "rtk git checkout -- ."
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git checkout -b topic",
+     "0.51.0": [
+      0,
+      "rtk git checkout -b topic"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git checkout -b topic"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git checkout -b topic"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git pull",
+     "0.51.0": [
+      0,
+      "rtk git pull"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git pull"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git pull"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git stash",
+     "0.51.0": [
+      0,
+      "rtk git stash"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git stash"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git stash"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git worktree add ../w",
+     "0.51.0": [
+      0,
+      "rtk git worktree add ../w"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git worktree add ../w"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git worktree add ../w"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git reset --hard HEAD~1",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git clean -fd",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git rebase main",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git merge topic",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git rm -r dir",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "gh pr merge 1",
+     "0.51.0": [
+      0,
+      "rtk gh pr merge 1"
+     ],
+     "0.52.0": [
+      0,
+      "rtk gh pr merge 1"
+     ],
+     "1.0.1": [
+      0,
+      "rtk gh pr merge 1"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "gh pr create --fill",
+     "0.51.0": [
+      0,
+      "rtk gh pr create --fill"
+     ],
+     "0.52.0": [
+      0,
+      "rtk gh pr create --fill"
+     ],
+     "1.0.1": [
+      0,
+      "rtk gh pr create --fill"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "gh api -X DELETE repos/o/r",
+     "0.51.0": [
+      0,
+      "rtk gh api -X DELETE repos/o/r"
+     ],
+     "0.52.0": [
+      0,
+      "rtk gh api -X DELETE repos/o/r"
+     ],
+     "1.0.1": [
+      0,
+      "rtk gh api -X DELETE repos/o/r"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "gh release create v1",
+     "0.51.0": [
+      0,
+      "rtk gh release create v1"
+     ],
+     "0.52.0": [
+      0,
+      "rtk gh release create v1"
+     ],
+     "1.0.1": [
+      0,
+      "rtk gh release create v1"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "docker run --rm alpine sh",
+     "0.51.0": [
+      0,
+      "rtk docker run --rm alpine sh"
+     ],
+     "0.52.0": [
+      0,
+      "rtk docker run --rm alpine sh"
+     ],
+     "1.0.1": [
+      0,
+      "rtk docker run --rm alpine sh"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "docker exec c sh",
+     "0.51.0": [
+      0,
+      "rtk docker exec c sh"
+     ],
+     "0.52.0": [
+      0,
+      "rtk docker exec c sh"
+     ],
+     "1.0.1": [
+      0,
+      "rtk docker exec c sh"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "docker build .",
+     "0.51.0": [
+      0,
+      "rtk docker build ."
+     ],
+     "0.52.0": [
+      0,
+      "rtk docker build ."
+     ],
+     "1.0.1": [
+      0,
+      "rtk docker build ."
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "docker rm c",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "kubectl apply -f x.yaml",
+     "0.51.0": [
+      0,
+      "rtk kubectl apply -f x.yaml"
+     ],
+     "0.52.0": [
+      0,
+      "rtk kubectl apply -f x.yaml"
+     ],
+     "1.0.1": [
+      0,
+      "rtk kubectl apply -f x.yaml"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "kubectl delete pod x",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "helm install r chart",
+     "0.51.0": [
+      0,
+      "rtk helm install r chart"
+     ],
+     "0.52.0": [
+      0,
+      "rtk helm install r chart"
+     ],
+     "1.0.1": [
+      0,
+      "rtk helm install r chart"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "terraform apply",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "pulumi up",
+     "0.51.0": [
+      0,
+      "rtk pulumi up"
+     ],
+     "0.52.0": [
+      0,
+      "rtk pulumi up"
+     ],
+     "1.0.1": [
+      0,
+      "rtk pulumi up"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "pip install x",
+     "0.51.0": [
+      0,
+      "rtk pip install x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk pip install x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk pip install x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "pip uninstall x",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "npm install",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "npm publish",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "cargo install x",
+     "0.51.0": [
+      0,
+      "rtk cargo install x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk cargo install x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk cargo install x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "cargo publish",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "make install",
+     "0.51.0": [
+      0,
+      "rtk make install"
+     ],
+     "0.52.0": [
+      0,
+      "rtk make install"
+     ],
+     "1.0.1": [
+      0,
+      "rtk make install"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "curl -X POST http://x",
+     "0.51.0": [
+      0,
+      "rtk curl -X POST http://x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk curl -X POST http://x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk curl -X POST http://x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "wget http://x",
+     "0.51.0": [
+      0,
+      "rtk wget http://x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk wget http://x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk wget http://x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "rsync -a --delete a/ b/",
+     "0.51.0": [
+      0,
+      "rtk rsync -a --delete a/ b/"
+     ],
+     "0.52.0": [
+      0,
+      "rtk rsync -a --delete a/ b/"
+     ],
+     "1.0.1": [
+      0,
+      "rtk rsync -a --delete a/ b/"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "aws s3 rm s3://b/k",
+     "0.51.0": [
+      0,
+      "rtk aws s3 rm s3://b/k"
+     ],
+     "0.52.0": [
+      0,
+      "rtk aws s3 rm s3://b/k"
+     ],
+     "1.0.1": [
+      0,
+      "rtk aws s3 rm s3://b/k"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "systemctl stop x",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "iptables -F",
+     "0.51.0": [
+      0,
+      "rtk iptables -F"
+     ],
+     "0.52.0": [
+      0,
+      "rtk iptables -F"
+     ],
+     "1.0.1": [
+      0,
+      "rtk iptables -F"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "rm -rf build",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "mv a b",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "chmod 777 f",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "sed -i s/a/b/ f",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "tee f",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "dd if=a of=b",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git status",
+     "0.51.0": [
+      0,
+      "rtk git status"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git status"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git status"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git log --oneline -3",
+     "0.51.0": [
+      0,
+      "rtk git log --oneline -3"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git log --oneline -3"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git log --oneline -3"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "git diff",
+     "0.51.0": [
+      0,
+      "rtk git diff"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git diff"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git diff"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "ls -la",
+     "0.51.0": [
+      0,
+      "rtk ls -la"
+     ],
+     "0.52.0": [
+      0,
+      "rtk ls -la"
+     ],
+     "1.0.1": [
+      0,
+      "rtk ls -la"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "cat a/x/util.py",
+     "0.51.0": [
+      0,
+      "rtk read a/x/util.py"
+     ],
+     "0.52.0": [
+      0,
+      "rtk read a/x/util.py"
+     ],
+     "1.0.1": [
+      0,
+      "rtk read a/x/util.py"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "grep -rn needle .",
+     "0.51.0": [
+      0,
+      "rtk grep -rn needle ."
+     ],
+     "0.52.0": [
+      0,
+      "rtk grep -rn needle ."
+     ],
+     "1.0.1": [
+      0,
+      "rtk grep -rn needle ."
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "find . -name x",
+     "0.51.0": [
+      0,
+      "rtk find . -name x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk find . -name x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk find . -name x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "pytest -q",
+     "0.51.0": [
+      0,
+      "rtk pytest -q"
+     ],
+     "0.52.0": [
+      0,
+      "rtk pytest -q"
+     ],
+     "1.0.1": [
+      0,
+      "rtk pytest -q"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "upstream_defaults",
+     "command": "cargo test",
+     "0.51.0": [
+      0,
+      "rtk cargo test"
+     ],
+     "0.52.0": [
+      0,
+      "rtk cargo test"
+     ],
+     "1.0.1": [
+      0,
+      "rtk cargo test"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git push origin main",
+     "0.51.0": [
+      0,
+      "rtk git push origin main"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git push origin main"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git push origin main"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git push --force origin main",
+     "0.51.0": [
+      0,
+      "rtk git push --force origin main"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git push --force origin main"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git push --force origin main"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git commit -m x",
+     "0.51.0": [
+      0,
+      "rtk git commit -m x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git commit -m x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git commit -m x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git add -A",
+     "0.51.0": [
+      0,
+      "rtk git add -A"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git add -A"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git add -A"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git checkout -- .",
+     "0.51.0": [
+      0,
+      "rtk git checkout -- ."
+     ],
+     "0.52.0": [
+      0,
+      "rtk git checkout -- ."
+     ],
+     "1.0.1": [
+      0,
+      "rtk git checkout -- ."
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git checkout -b topic",
+     "0.51.0": [
+      0,
+      "rtk git checkout -b topic"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git checkout -b topic"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git checkout -b topic"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git pull",
+     "0.51.0": [
+      0,
+      "rtk git pull"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git pull"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git pull"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git stash",
+     "0.51.0": [
+      0,
+      "rtk git stash"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git stash"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git stash"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git worktree add ../w",
+     "0.51.0": [
+      0,
+      "rtk git worktree add ../w"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git worktree add ../w"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git worktree add ../w"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git reset --hard HEAD~1",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git clean -fd",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git rebase main",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git merge topic",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git rm -r dir",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "gh pr merge 1",
+     "0.51.0": [
+      0,
+      "rtk gh pr merge 1"
+     ],
+     "0.52.0": [
+      0,
+      "rtk gh pr merge 1"
+     ],
+     "1.0.1": [
+      0,
+      "rtk gh pr merge 1"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "gh pr create --fill",
+     "0.51.0": [
+      0,
+      "rtk gh pr create --fill"
+     ],
+     "0.52.0": [
+      0,
+      "rtk gh pr create --fill"
+     ],
+     "1.0.1": [
+      0,
+      "rtk gh pr create --fill"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "gh api -X DELETE repos/o/r",
+     "0.51.0": [
+      0,
+      "rtk gh api -X DELETE repos/o/r"
+     ],
+     "0.52.0": [
+      0,
+      "rtk gh api -X DELETE repos/o/r"
+     ],
+     "1.0.1": [
+      0,
+      "rtk gh api -X DELETE repos/o/r"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "gh release create v1",
+     "0.51.0": [
+      0,
+      "rtk gh release create v1"
+     ],
+     "0.52.0": [
+      0,
+      "rtk gh release create v1"
+     ],
+     "1.0.1": [
+      0,
+      "rtk gh release create v1"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "docker run --rm alpine sh",
+     "0.51.0": [
+      0,
+      "rtk docker run --rm alpine sh"
+     ],
+     "0.52.0": [
+      0,
+      "rtk docker run --rm alpine sh"
+     ],
+     "1.0.1": [
+      0,
+      "rtk docker run --rm alpine sh"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "docker exec c sh",
+     "0.51.0": [
+      0,
+      "rtk docker exec c sh"
+     ],
+     "0.52.0": [
+      0,
+      "rtk docker exec c sh"
+     ],
+     "1.0.1": [
+      0,
+      "rtk docker exec c sh"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "docker build .",
+     "0.51.0": [
+      0,
+      "rtk docker build ."
+     ],
+     "0.52.0": [
+      0,
+      "rtk docker build ."
+     ],
+     "1.0.1": [
+      0,
+      "rtk docker build ."
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "docker rm c",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "kubectl apply -f x.yaml",
+     "0.51.0": [
+      0,
+      "rtk kubectl apply -f x.yaml"
+     ],
+     "0.52.0": [
+      0,
+      "rtk kubectl apply -f x.yaml"
+     ],
+     "1.0.1": [
+      0,
+      "rtk kubectl apply -f x.yaml"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "kubectl delete pod x",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "helm install r chart",
+     "0.51.0": [
+      0,
+      "rtk helm install r chart"
+     ],
+     "0.52.0": [
+      0,
+      "rtk helm install r chart"
+     ],
+     "1.0.1": [
+      0,
+      "rtk helm install r chart"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "terraform apply",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "pulumi up",
+     "0.51.0": [
+      0,
+      "rtk pulumi up"
+     ],
+     "0.52.0": [
+      0,
+      "rtk pulumi up"
+     ],
+     "1.0.1": [
+      0,
+      "rtk pulumi up"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "pip install x",
+     "0.51.0": [
+      0,
+      "rtk pip install x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk pip install x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk pip install x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "pip uninstall x",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "npm install",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "npm publish",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "cargo install x",
+     "0.51.0": [
+      0,
+      "rtk cargo install x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk cargo install x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk cargo install x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "cargo publish",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "make install",
+     "0.51.0": [
+      0,
+      "rtk make install"
+     ],
+     "0.52.0": [
+      0,
+      "rtk make install"
+     ],
+     "1.0.1": [
+      0,
+      "rtk make install"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "curl -X POST http://x",
+     "0.51.0": [
+      0,
+      "rtk curl -X POST http://x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk curl -X POST http://x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk curl -X POST http://x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "wget http://x",
+     "0.51.0": [
+      0,
+      "rtk wget http://x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk wget http://x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk wget http://x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "rsync -a --delete a/ b/",
+     "0.51.0": [
+      0,
+      "rtk rsync -a --delete a/ b/"
+     ],
+     "0.52.0": [
+      0,
+      "rtk rsync -a --delete a/ b/"
+     ],
+     "1.0.1": [
+      0,
+      "rtk rsync -a --delete a/ b/"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "aws s3 rm s3://b/k",
+     "0.51.0": [
+      0,
+      "rtk aws s3 rm s3://b/k"
+     ],
+     "0.52.0": [
+      0,
+      "rtk aws s3 rm s3://b/k"
+     ],
+     "1.0.1": [
+      0,
+      "rtk aws s3 rm s3://b/k"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "systemctl stop x",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "iptables -F",
+     "0.51.0": [
+      0,
+      "rtk iptables -F"
+     ],
+     "0.52.0": [
+      0,
+      "rtk iptables -F"
+     ],
+     "1.0.1": [
+      0,
+      "rtk iptables -F"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "rm -rf build",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "mv a b",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "chmod 777 f",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "sed -i s/a/b/ f",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "tee f",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "dd if=a of=b",
+     "0.51.0": [
+      1,
+      null
+     ],
+     "0.52.0": [
+      1,
+      null
+     ],
+     "1.0.1": [
+      1,
+      null
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git status",
+     "0.51.0": [
+      0,
+      "rtk git status"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git status"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git status"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git log --oneline -3",
+     "0.51.0": [
+      0,
+      "rtk git log --oneline -3"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git log --oneline -3"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git log --oneline -3"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "git diff",
+     "0.51.0": [
+      0,
+      "rtk git diff"
+     ],
+     "0.52.0": [
+      0,
+      "rtk git diff"
+     ],
+     "1.0.1": [
+      0,
+      "rtk git diff"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "ls -la",
+     "0.51.0": [
+      0,
+      "rtk ls -la"
+     ],
+     "0.52.0": [
+      0,
+      "rtk ls -la"
+     ],
+     "1.0.1": [
+      0,
+      "rtk ls -la"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "cat a/x/util.py",
+     "0.51.0": [
+      0,
+      "rtk read a/x/util.py"
+     ],
+     "0.52.0": [
+      0,
+      "rtk read a/x/util.py"
+     ],
+     "1.0.1": [
+      0,
+      "rtk read a/x/util.py"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "grep -rn needle .",
+     "0.51.0": [
+      0,
+      "rtk grep -rn needle ."
+     ],
+     "0.52.0": [
+      0,
+      "rtk grep -rn needle ."
+     ],
+     "1.0.1": [
+      0,
+      "rtk grep -rn needle ."
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "find . -name x",
+     "0.51.0": [
+      0,
+      "rtk find . -name x"
+     ],
+     "0.52.0": [
+      0,
+      "rtk find . -name x"
+     ],
+     "1.0.1": [
+      0,
+      "rtk find . -name x"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "pytest -q",
+     "0.51.0": [
+      0,
+      "rtk pytest -q"
+     ],
+     "0.52.0": [
+      0,
+      "rtk pytest -q"
+     ],
+     "1.0.1": [
+      0,
+      "rtk pytest -q"
+     ],
+     "equal": true
+    },
+    {
+     "table": "codex_hook_check",
+     "config": "repository_exclusions",
+     "command": "cargo test",
+     "0.51.0": [
+      0,
+      "rtk cargo test"
+     ],
+     "0.52.0": [
+      0,
+      "rtk cargo test"
+     ],
+     "1.0.1": [
+      0,
+      "rtk cargo test"
+     ],
+     "equal": true
+    }
+   ]
+  }
+ },
+ "rollback_compatibility_test": {
+  "what": "scratch RTK_DB_PATH written by 1.0.1 (3 commands), read by 0.51.0 gain, appended by 0.51.0 (4), read back by 1.0.1",
+  "result": "all steps exit 0; counts 3, 3, 4, 4; no error or migration message (the lane builder's receipt had flagged this as untested)"
+ },
+ "link": {
+  "path": "$ECO_ROOT/bin/rtk",
+  "before": "$ECO_ROOT/tools/rtk-oss-1.0.1/rtk",
+  "after": "$ECO_ROOT/tools/rtk-oss-1.0.1/rtk",
+  "changed": false,
+  "note": "the link was already tools/rtk-oss-1.0.1/rtk when this sweep started (mtime 2026-10-17T04:21:11Z)"
+ },
+ "install_commands": {
+  "this_sweep_ran": [
+   "gh release download v0.52.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir <scratch>/prov-rtk-0.52.0/dl  (exit 0; extracted into scratch only)",
+   "gh release download v1.0.1 --repo rtk-ai/rtk --pattern rtk-oss-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir <scratch>/prov-rtk-1.0.1/dl  (exit 0; verification copy only)"
+  ],
+  "live_install_by_lane_builder": "tools/rtk-oss-1.0.1/ and downloads/rtk-oss-1.0.1/ via <lane builder script (private)>"
+ },
+ "rollback": "ln -sfn $ECO_ROOT/tools/rtk-0.51.0/rtk $ECO_ROOT/bin/rtk   (tools/rtk-0.51.0 is kept; the history database stays readable by both versions per the test above)",
+ "plan_rows_note": "The repository plan rows pin rtk 0.51.0 while the host runs rtk-oss 1.0.1; the PR claude/currency-sweep-20261017 re-pins them to rtk-oss 1.0.1 and cites the lane builder's receipt and this one.",
+ "public_copy": {
+  "of": "currency-rtk receipt written by the currency sweep of 2026-10-17 (private original kept on the host)",
+  "sanitized": "account name, home paths, a lane builder's name, session names, scratch paths and private record locations are replaced by placeholders; every digest kept is a digest of public bytes",
+  "private_original_name": "currency-rtk-20261017T081134Z.json",
+  "amended_by_the_fold": {
+   "blocks": [
+    "digest_comparison",
+    "source_commit_resolution"
+   ],
+   "from_private_addendum": "currency-fold-digests-20261017T144813Z.json",
+   "why": "the verdict on PR #1243 asked that each public receipt carry the registry's own digests, the locally computed digests of the same bytes and how the source commit was resolved"
+  },
+  "renamed_keys": "keys of the private original that the repository's secret scan reads as API keys (an api-prefixed name beside a 64-hex value; the values are sha256 digests of public release assets) or that mislead (attestations_verified holds exit codes) appear here under these names: api_digest -> release_asset_digest; asset_api_digest_sha256 -> release_asset_digest_sha256_as_published_by_github; github_api_digest -> github_release_asset_digest"
+ },
+ "digest_comparison": {
+  "read_utc": "2026-10-17T14:36:19Z",
+  "what_was_compared_with_what": "GitHub publishes a sha256 digest for each release asset (assets[].digest) and the release carries a checksums.txt. The asset was downloaded and its sha256 computed locally: it equals the API digest and the checksums.txt line, and the profile row's sha256.",
+  "registry": {
+   "asset": "rtk-oss-x86_64-unknown-linux-musl.tar.gz",
+   "asset_url": "https://github.com/rtk-ai/rtk/releases/download/v1.0.1/rtk-oss-x86_64-unknown-linux-musl.tar.gz",
+   "fields_read": [
+    "assets[].digest",
+    "assets[].name"
+   ],
+   "name": "GitHub release",
+   "published_digests": {
+    "release_asset_digest_sha256_as_published_by_github": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+    "checksums_txt_line": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41  rtk-oss-x86_64-unknown-linux-musl.tar.gz",
+    "checksums_txt_line_sha256": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41"
+   },
+   "release_published_at": "2026-10-14T13:31:42Z",
+   "url_read": "repos/rtk-ai/rtk/releases/tags/v1.0.1"
+  },
+  "comparisons": [
+   {
+    "equal": true,
+    "local_algorithm": "sha256",
+    "local_value": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+    "registry_field": "release asset API digest",
+    "registry_value": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41"
+   },
+   {
+    "equal": true,
+    "local_algorithm": "sha256",
+    "local_value": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+    "registry_field": "checksums.txt line for the asset",
+    "registry_value": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41"
+   }
+  ],
+  "all_registry_comparisons_equal": true,
+  "profile_pin": {
+   "row": "RTK",
+   "pin": "1.0.1",
+   "checksum": {
+    "algorithm": "sha256",
+    "value": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41"
+   },
+   "equals_local_sha256": true
+  },
+  "local_download": {
+   "bytes": 5766270,
+   "sha1": "caac59aa2294fc56e9e3272d489277dd164ba74f",
+   "sha256": "a44e8ffc43981100b4ddf1710399a1649a6c874591aa6d0c0727fe6cbd983c41",
+   "sha512_sri": "sha512-tsleEX19/8ZG08URDk/H/qJxULq5JI0it6SnbYGMBZzI/HQo3uf+dC7kIkEIv5nh2s+Q0A+4PIXNQH/KWs/VgQ==",
+   "url": "https://github.com/rtk-ai/rtk/releases/download/v1.0.1/rtk-oss-x86_64-unknown-linux-musl.tar.gz"
+  }
+ },
+ "source_commit_resolution": {
+  "git_ls_remote": {
+   "command": "git ls-remote https://github.com/rtk-ai/rtk.git refs/tags/v1.0.1 refs/tags/v1.0.1^{}",
+   "commit": "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100",
+   "exit": 0,
+   "lines": [
+    "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100\trefs/tags/v1.0.1"
+   ],
+   "tag_kind": "lightweight",
+   "tag_object": null
+  },
+  "tag_commit": "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100",
+  "tag_commit_equals_profile_or_recorded_commit": true,
+  "method": "git ls-remote https://github.com/<repo>.git refs/tags/<tag> refs/tags/<tag>^{} (an annotated tag lists its object and, peeled, its commit; a lightweight tag lists only the commit); for npm packages the version document's gitHead and, when it differs from the tag commit, the GitHub compare API between the two"
+ }
+}

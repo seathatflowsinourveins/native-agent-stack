@@ -33,7 +33,7 @@
       "names": [
         "promptfoo"
       ],
-      "source": "promptfoo/promptfoo 0.123.1 at 34f74d34e140b5e17d23770dfb2340057b1936b8: site/docs/integrations/mcp-server.md L37 (`promptfoo mcp --transport stdio`), L49-52 (the client entry) and L169 (stdio is the transport of desktop AI tools that talk over stdin/stdout); src/commands/mcp/server.ts L94-112 registers its 14 tools. The entry runs the installed global package of the manifest's promptfoo slot (install plan row 'Promptfoo 0.123.1'), not `npx promptfoo@latest`, so the version is the installed one and never a floating one (the manifest pins 0.123.1, the first host runs 0.124.0: a currency item for the version owner); the state directory is the distribution's own and telemetry and the update check are off. Registered for Claude Code only here: the Codex entry forwards a gateway key by name and is a separate decision (docs/decisions/2026-10-12-mcp-template-live-reconciliation.md)."
+      "source": "promptfoo/promptfoo 0.124.1 at 421e7959642c5d4cc1c983259a268de1c6f847b9: site/docs/integrations/mcp-server.md L37 (`promptfoo mcp --transport stdio`), L49-52 (the client entry) and L169 (stdio is the transport of desktop AI tools that talk over stdin/stdout); src/commands/mcp/server.ts L94-112 registers its 14 tools. The entry runs the installed global package of the manifest's promptfoo slot (install plan row 'Promptfoo 0.123.1'), not `npx promptfoo@latest`, so the version is the installed one and never a floating one (the profile pins 0.124.1, which the host has run since 2026-10-17; the install plan's row still names 0.123.1, a carrier owed in its own change); the state directory is the distribution's own and telemetry and the update check are off. Registered for Claude Code only here: the Codex entry forwards a gateway key by name and is a separate decision (docs/decisions/2026-10-12-mcp-template-live-reconciliation.md)."
     },
     {
       "match": [
@@ -46,7 +46,7 @@
         "RTK_TELEMETRY_DISABLED",
         "rtk"
       ],
-      "note": "RTK 0.51.0 owns command-output under the owner's full-stack decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md). A copy of the variable inside an MCP server's table follows that server's own entry, so an unwired server never gets a table of its own.",
+      "note": "RTK (the rtk-oss 1.0.1 edition) owns command-output under the owner's full-stack decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md). A copy of the variable inside an MCP server's table follows that server's own entry, so an unwired server never gets a table of its own.",
       "directive": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md"
     },
     {
@@ -212,7 +212,7 @@
       "names": [
         "claude-hud"
       ],
-      "note": "The statusline row of the definitive manifest (layer consensus, wave-2 batch): claude-hud 0.10.0 for Claude Code."
+      "note": "The statusline row of the definitive manifest (layer consensus, wave-2 batch): claude-hud 0.10.0 for Claude Code, its tag moved to 0.11.3 on 2026-10-17 (the marketplace entry below carries the tag)."
     },
     {
       "match": [
@@ -227,10 +227,10 @@
         "source": {
           "source": "github",
           "repo": "jarrodwatts/claude-hud",
-          "ref": "v0.10.0"
+          "ref": "v0.11.3"
         }
       },
-      "source": "Wave-2 usage ruling, change 8: the marketplace at the v0.10.0 tag (tag object 801f75c6, commit 75683c6d). The shared template keeps v0.8.0, the pin manifests/stack.json records for the workstation; this entry renders the new distribution's."
+      "source": "Wave-2 usage ruling, change 8: the marketplace at the v0.10.0 tag (tag object 801f75c6, commit 75683c6d), moved to the v0.11.2 tag (tag object 8b16685a, commit ad322b8d) on 2026-10-17 for GHSA-fq7j-8hxj-jfqh and on to the v0.11.3 tag (a lightweight tag, commit 5621429b) the same day, the newest release (the host itself runs v0.11.2 until the command center applies v0.11.3). The shared template carries the same tag since that change; manifests/stack.json still records the workstation's v0.10.0 pin until its own change; this entry renders the new distribution's."
     },
     {
       "match": [
@@ -247,7 +247,7 @@
         "command": "'${HOME}/.local/share/mise/installs/node/24.21.0/bin/node' '${HOME}/.claude/plugins/claude-hud/statusline.mjs'",
         "refreshInterval": 5
       },
-      "source": "The command upstream's setup.mjs writes for --shell posix: the quoted runtime that ran it, then the launcher it copies to <config dir>/plugins/claude-hud/statusline.mjs (jarrodwatts/claude-hud@75683c6d scripts/setup.mjs L21-32 and L69-80), with refreshInterval 5 (wave-2 usage ruling, changes 3-5 and 8). The runtime is the install plan's mise Node 24.21.0 (mise.toml). keep_existing: setup.mjs writes the runtime that actually ran it (step 1.7 of the wave-2 install order runs it before this tool's apply), so a value settings.json already has stays. The template's bash wrapper is retired here: Claude Code sets COLUMNS and the 0.10.0 launcher subtracts the padding (statusline.mjs L8-10)."
+      "source": "The command upstream's setup.mjs writes for --shell posix: the quoted runtime that ran it, then the launcher it copies to <config dir>/plugins/claude-hud/statusline.mjs (jarrodwatts/claude-hud@5621429b scripts/setup.mjs L21-32 and L69-80, the same lines at the v0.11.2 commit ad322b8d and the v0.10.0 commit 75683c6d), with refreshInterval 5 (wave-2 usage ruling, changes 3-5 and 8). The runtime is the install plan's mise Node 24.21.0 (mise.toml). keep_existing: setup.mjs writes the runtime that actually ran it (step 1.7 of the wave-2 install order runs it before this tool's apply), so a value settings.json already has stays. The template's bash wrapper is retired here: Claude Code sets COLUMNS and the 0.10.0 launcher subtracts the padding (statusline.mjs L8-10)."
     },
     {
       "match": [
