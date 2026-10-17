@@ -1,0 +1,4 @@
+./ai-memory
+./packaging/systemd/
+./packaging/systemd/ai-memory-user.service
+./packaging/systemd/ai-memory.service

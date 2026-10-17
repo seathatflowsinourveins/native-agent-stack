@@ -44,7 +44,10 @@ class StrictHostConsumerTests(unittest.TestCase):
             root = Path(tmp)
             with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": str(self.host(root))}):
                 servers = profiles.render_wsl_mcp(root, root / "ecosystem")
-            self.assertEqual(servers["ai-memory"]["url"], "http://127.0.0.1:39374/mcp")
+            # ai-memory 3.1.0's bridge, session-less for these clients (install_mcp.rs:181-185 and 214-225 at 11ca7c5b).
+            self.assertEqual(servers["ai-memory"]["args"],
+                             ["mcp-bridge", "--no-session-id", "--server-url", "http://127.0.0.1:39374/mcp"])
+            self.assertNotIn("url", servers["ai-memory"])
 
     def test_runtime_telemetry_uses_the_same_host_allocation(self):
         with tempfile.TemporaryDirectory() as tmp:

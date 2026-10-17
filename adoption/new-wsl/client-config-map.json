@@ -1,6 +1,6 @@
 {
   "schema": "native-agent-stack/new-wsl-client-config-map/v1",
-  "about": "Which pieces of the client templates the new WSL distribution wires, decided from the definitive manifest (evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json). tools/adoption/new_wsl_client_config.py reads this file. Each entry has `match`, a list of patterns over piece keys (fnmatch: * is any text; the keys are listed by `new_wsl_client_config.py --check`), and one `wiring`: `slot:<foundation slot id>` (the piece is wired while the manifest says that slot installs something and its default names `owner`; otherwise it is not wired and says why), `practice` (repository practice that needs no tool outside the repository; a hook of this kind may run only python3, jq and the shell's own words, which the recipe's F4 installs and adoption/bootstrap-linux.sh requires, and only files that tools/adoption/install_claude_profile.py copies), `not_wired:<reason>`, or `authorization:<reason>` (a setting that grants a permission or suppresses a confirmation: Claude Code permissions.defaultMode, skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, a Codex project's `trust_level` (any value), and the Codex tool approval modes `default_tools_approval_mode` (any value) and `approval_mode` when it approves; it is neither rendered nor written unless --with-authorization-settings is given, and then never over a value the file already has; an entry may also name a `slot` and its `owner`, and the piece is then written only while that slot installs the owner, as the tool approval modes of an MCP server are; the tool refuses such a setting classed practice or slot). The pieces are those of the client templates and, for the Claude settings, the Claude user MCP servers and the Codex user config, of the new distribution's additions in adoption/new-wsl/templates/ (keys only this tool renders, so each shared template stays what every other host renders; a key a template and its additions both define is refused). A piece goes to the first entry that matches it, so a specific entry stands before a general one. A piece no entry matches, and an entry that no piece reaches, fail the check. `names` lists how the tool appears in templates and instruction text; `--check` renders the example host, without and with --with-authorization-settings, and fails when a rendered file or an instruction block holds the name of a piece that is not wired. `override` replaces the piece's value (for an MCP server, the keys it names); `rewrite` replaces text inside a string value, and `{gateway_port}` is the install plan's port; `home_dir` is a directory under the home that a wired path piece adds to PATH. Sources: adoption/bootstrap.md steps 2, 4 and 4a; adoption/bootstrap-linux.sh (full_profile_* functions, install_native); docs/decisions/2026-10-02-new-wsl-client-configuration.md. `directive` (a slot entry only) names the dated record of the owner's directive that adds the entry's `owner` beside what its slot installs: the piece is wired while that slot installs anything and unwires with it, and --check fails when the record is not a file of the repository. `keep_existing` (a Claude setting only) writes the template's value only when the host's settings.json has no value for it. `dependent_sentences` declares a sentence of an instruction block that depends on the one before it on its line (`starts` is its opening words, `on` is always `previous`): the block filter drops it whenever that sentence goes, and the dropped list shows it. The dependency is declared here, never inferred.",
+  "about": "Which pieces of the client templates the new WSL distribution wires, decided from the definitive manifest (evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json). tools/adoption/new_wsl_client_config.py reads this file. Each entry has `match`, a list of patterns over piece keys (fnmatch: * is any text; the keys are listed by `new_wsl_client_config.py --check`), and one `wiring`: `slot:<foundation slot id>` (the piece is wired while the manifest says that slot installs something and its default names `owner`; otherwise it is not wired and says why), `practice` (repository practice that needs no tool outside the repository; a hook of this kind may run only python3, jq and the shell's own words, which the recipe's F4 installs and adoption/bootstrap-linux.sh requires, and only files that tools/adoption/install_claude_profile.py copies), `not_wired:<reason>`, or `authorization:<reason>` (a setting that grants a permission or suppresses a confirmation: Claude Code permissions.defaultMode, skipDangerousModePermissionPrompt, crossSessionInbound and remoteControlAtStartup, Codex approval_policy and sandbox_mode, a Codex project's `trust_level` (any value), and the Codex tool approval modes `default_tools_approval_mode` (any value) and `approval_mode` when it approves; it is neither rendered nor written unless --with-authorization-settings is given, and then never over a value the file already has; an entry may also name a `slot` and its `owner`, and the piece is then written only while that slot installs the owner, as the tool approval modes of an MCP server are; the tool refuses such a setting classed practice or slot). The pieces are those of the client templates and, for the Claude settings, the Claude user MCP servers and the Codex user config, of the new distribution's additions in adoption/new-wsl/templates/ (keys only this tool renders, so each shared template stays what every other host renders; a key a template and its additions both define is refused). A piece goes to the first entry that matches it, so a specific entry stands before a general one. A piece no entry matches, and an entry that no piece reaches, fail the check. `names` lists how the tool appears in templates and instruction text; `--check` renders the example host, without and with --with-authorization-settings, and fails when a rendered file or an instruction block holds the name of a piece that is not wired. `override` replaces the piece's value (for an MCP server, the keys it names, and a key it names as null is removed); `rewrite` replaces text inside a string value, and `{gateway_port}` is the install plan's port; `home_dir` is a directory under the home that a wired path piece adds to PATH. Sources: adoption/bootstrap.md steps 2, 4 and 4a; adoption/bootstrap-linux.sh (full_profile_* functions, install_native); docs/decisions/2026-10-02-new-wsl-client-configuration.md. `directive` (a slot entry only) names the dated record of the owner's directive that adds the entry's `owner` beside what its slot installs: the piece is wired while that slot installs anything and unwires with it, and --check fails when the record is not a file of the repository. `keep_existing` (a Claude setting only) writes the template's value only when the host's settings.json has no value for it. `dependent_sentences` declares a sentence of an instruction block that depends on the one before it on its line (`starts` is its opening words, `on` is always `previous`): the block filter drops it whenever that sentence goes, and the dropped list shows it. The dependency is declared here, never inferred.",
   "dependent_sentences": [],
   "entries": [
     {
@@ -148,15 +148,8 @@
       "match": [
         "claude/settings/hook/*/*${AI_MEMORY_BIN}*"
       ],
-      "wiring": "slot:memory-owner",
-      "owner": "ai-memory",
-      "names": [
-        "ai-memory",
-        "AI_MEMORY_BIN",
-        "AI_MEMORY_URL",
-        "AI_MEMORY_CAPTURE_ASSISTANT"
-      ],
-      "note": "The memory slot's interim install is ai-memory 2.5.2 (definitive manifest, amendment 3); the memory head-to-head at its frozen revision decides the slot. The hooks run AI_MEMORY_BIN, which this tool takes from the install plan's memory-owner row (the link it makes, ~/.local/bin/ai-memory), against the host value AI_MEMORY_URL, 127.0.0.1:29374 (wave-2 synthesis X5). The hook lines were written against ai-memory 2.4.x: compare them with what ai-memory 2.5.2's own install-hooks writes before relying on them (synthesis, verification gaps)."
+      "wiring": "not_wired:ai-memory 3.1.0's own installer writes these hooks (setup runs install-hooks --apply for each agent it wires, akitaonrails/ai-memory@11ca7c5b crates/ai-memory-cli/src/commands/setup.rs:941-1016 and 982-1002) and writes them again on upgrade (upgrade.rs:858-892 and 916-933) and on run's auto-wire (run_autowire.rs:1-19 and 320-335); its overlay replaces every entry that runs `ai-memory ... hook --event ... --agent ... --server-url`, this tool's included (install_hooks.rs:2053-2106, uninstall.rs:1155-1164), while this tool's merge never removes a hook (apply_claude_settings.py merge_hooks), so a second writer leaves two copies whenever the two differ (NativeHorizonNY, 2026-10-16: the plan's ~/.local/bin link against setup's ~/.local/lib file; the CC's ruling D1 for PR (b) condition 4)",
+      "note": "The one writer is ai-memory's installer, for Claude Code as for Codex (codex/hooks/hook/*), per the CC's ruling D1; docs/decisions/2026-10-17-ai-memory-one-hook-writer.md records it and the supersession. The plan's memory-owner row runs `ai-memory install-hooks --agent claude-code --no-capture-prompts --apply` after setup: setup passes no_capture_prompts false (setup.rs:982-997) and a first install captures prompts (install_hooks.rs:1247-1260), which recipes/README.md:382-383 keeps off; a bare re-apply keeps that opt-out while an ai-memory hook stays in Claude's settings (install_hooks.rs:148-158 and 1263-1274). AI_MEMORY_BIN stays the file the installer embeds (ai_memory_link; render_shared.rs:2094-2125 and 2235-2251), so a later return to rendered hooks would name the same path; no rendered file carries it now. tests/test_new_wsl_client_config.py OneHookWriterTests merges this render with a print-mode capture of 3.1.0's own Claude hooks (tests/fixtures/ai-memory-3.1.0-claude-hooks.json) and asserts exactly the upstream hook set."
     },
     {
       "match": [
@@ -188,7 +181,7 @@
         "codex/hooks/hook/*",
         "codex/hooks/setting/description"
       ],
-      "wiring": "not_wired:~/.codex/hooks.json is written by ai-memory 2.5.2's own install-hooks (the hooks.state entry below), so this tool would be a second writer of that file, and the template's handler has no reviewed trust hash; the Claude Code notice is wired"
+      "wiring": "not_wired:~/.codex/hooks.json is written by ai-memory 3.1.0's own installer (setup's install-hooks --apply, again on upgrade) (the hooks.state entry below), so this tool would be a second writer of that file, and the template's handler has no reviewed trust hash; the Claude Code notice is wired"
     },
     {
       "match": [
@@ -341,8 +334,15 @@
       "match": [
         "claude/settings/setting/crossSessionInbound"
       ],
-      "wiring": "authorization:\"accept\" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has",
+      "wiring": "authorization:\"accept\" delivers each message from the user's other sessions to Claude (cross-session-messaging.md:195 at https://code.claude.com/docs/en/cross-session-messaging.md, read 2026-10-17), where Claude Code otherwise holds a message for approval in two cases (:203-206): a session that prompts holds a message from a session that bypasses permission prompts, and a session that bypasses holds a message from a session that does not; \"accept\" delivers both. It decides only whether a message is delivered; whether tool calls prompt is permissions.defaultMode's effect. It is written only with --with-authorization-settings and never over a value the file already has",
       "note": "Claude Code crossSessionInbound = \"accept\" (one of \"accept\", \"hold\" or \"refuse\": settings reference, crossSessionInbound, and https://code.claude.com/docs/en/cross-session-messaging#control-inbound-messages, read 2026-10-04), which NativeStack carries. It overturns the wave-2 messaging ruling, which left the key unset because a message between two bypass-mode sessions delivers anyway, on the owner's directive of 2026-10-04 to enable every current upstream feature and changelog addition in the new distribution's native workflow, and the owner's yes on the Claude-Codex messaging posture of 2026-10-02 (the new-WSL must-haves)."
+    },
+    {
+      "match": [
+        "claude/settings/setting/remoteControlAtStartup"
+      ],
+      "wiring": "authorization:true starts the Remote Control bridge in every interactive session, so claude.ai/code or the Claude app can drive this host's sessions, a bypassPermissions one included, which makes it a remote ingress wider than the launchers' named --remote-control sessions; it is a separate opt-in inside the authorization class, off by default: written only with --with-authorization-settings and --with-remote-control-at-startup together, and never over a value the file already has",
+      "note": "Claude Code remoteControlAtStartup = true at user scope: a true is honored only from user or managed settings and ignored from project or local ones, where a false wins (https://code.claude.com/docs/en/remote-control.md#L198 and settings.md#L741, read 2026-10-17; the installed 2.1.302 reads it from policy, flag and user settings only). Adopted for the new distribution by docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md (the CC's ruling D6 for PR (b) condition 4), as its own opt-in, --with-remote-control-at-startup, off by default (the CC's ruling G3, 2026-10-17; the tool's SEPARATE_OPT_INS); widening it to every session by default is the owner's choice; agentPushNotifEnabled stays a host choice and is not carried."
     },
     {
       "match": [
@@ -407,10 +407,16 @@
         "ai-memory"
       ],
       "override": {
-        "type": "http",
-        "url": "http://${AI_MEMORY_URL}/mcp"
+        "type": "stdio",
+        "url": null,
+        "command": "ai-memory",
+        "args": [
+          "mcp-bridge",
+          "--server-url",
+          "http://${AI_MEMORY_URL}/mcp"
+        ]
       },
-      "source": "adoption/mcp/claude-user.json names the repository's default bind, 127.0.0.1:49374; this entry takes the host file's AI_MEMORY_URL, as the Codex entry and the Claude hooks do, so the new distribution's 127.0.0.1:29374 (its host template; the install plan's memory-owner bind) is the one port truth (wave-2 synthesis X5). This tool fills the host value in the override; install_claude_profile.py fills only ${HOME} and ${ECO_ROOT}."
+      "source": "The session-aware stdio bridge ai-memory 3.1.0's own setup registers for Claude Code when the server's bearer lives in [auth].bearer_token_file, as init sets it: setup's install-mcp routes such a token to the bridge (akitaonrails/ai-memory@11ca7c5b crates/ai-memory-cli/src/commands/setup.rs:960-981; install_mcp.rs:106-136 and 173-202), whose entry is type stdio, command ai-memory (resolved through PATH; install.sh links ~/.local/bin/ai-memory) and args mcp-bridge --server-url <bind>/mcp, with no env and no headers because no token is passed (install_mcp.rs:1541-1552; docs/install.md:637-649). setup keeps an existing stdio entry that runs mcp-bridge (setup.rs:961-962, install_mcp.rs:922-952), so this render and setup's entry are one. The URL is the host file's AI_MEMORY_URL, as the Codex entry's: the memory port of the host allocation (the plan's port renderer refuses an AI_MEMORY_URL that differs from NS_PORT_MEMORY, config/observability_config.py service_ports; the CC's ruling D3). url: null removes the shared template's http url (adoption/mcp/claude-user.json), which other hosts keep. This tool fills the host value in the override; install_claude_profile.py fills only ${HOME} and ${ECO_ROOT}."
     },
     {
       "match": [
@@ -422,15 +428,18 @@
         "socraticode"
       ],
       "override": {
+        "command": "${HOME}/.local/share/mise/shims/node",
         "args": [
           "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
         ],
         "env": {
           "QDRANT_URL": "http://${QDRANT_URL}",
-          "LMSTUDIO_URL": "http://${EMBED_URL}/v1"
+          "LMSTUDIO_URL": "http://${EMBED_URL}/v1",
+          "EMBEDDING_MODEL": "nvidia/Nemotron-3.5-Embed-1B-BF16",
+          "EMBEDDING_DIMENSIONS": "2048"
         }
       },
-      "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md#configuration documents QDRANT_URL and LMSTUDIO_URL (including /v1). https://code.claude.com/docs/en/mcp documents the native server env object. Fill both endpoint variables from the selected host, as adoption/templates/codex.config.template.toml does, and retain the template's other env settings.",
+      "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md#configuration documents QDRANT_URL and LMSTUDIO_URL (including /v1). https://code.claude.com/docs/en/mcp documents the native server env object. Fill both endpoint variables from the selected host, as adoption/templates/codex.config.template.toml does, and retain the template's other env settings. The command is the mise shim: the template's ${ECO_ROOT}/bin/node exists only where adoption/bootstrap-linux.sh:370-383 (install_node) links the bootstrap's Node, and this plan's Node owner is mise, which creates no such link (nhny-resolver receipt 3.7, 2026-10-16). The embedder is the host's live vLLM one, nvidia/Nemotron-3.5-Embed-1B-BF16 at 2a4f9cb5 (the CC's never-stale ruling, 2026-10-16): its card prints 2048-dimensional embeddings (README.md at 2a4f9cb5), and SocratiCode 1.15.0's lmstudio provider never sends a dimensions parameter (dist/services/provider-lmstudio.js:10 and :262) and refuses a width mismatch, so EMBEDDING_DIMENSIONS is the native 2048. The query: and passage: prefixes keep their trailing space; Claude Code's whitespace lint warning on them is expected.",
       "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; the owner's full-stack decision of 2026-10-04 makes both its interim install."
     },
     {
@@ -555,8 +564,8 @@
       "match": [
         "codex/config/hooks.state*"
       ],
-      "wiring": "not_wired:each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then",
-      "source": "tools/adoption/codex_home.py L85-87; akitaonrails/ai-memory 7580b74d crates/ai-memory-cli/src/commands/install_hooks.rs L2071-2093 (the installer writes the Codex hooks.json and prints that Codex needs explicit trust) and render_shared.rs L907-915 (the seven events)"
+      "wiring": "not_wired:each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 3.1.0's own installer writes (setup, and again on upgrade and run's auto-wire; the install plan's memory-owner row; the CC's ruling D1 replaces synthesis X11's run-once exception) and whose template hashes were taken from ai-memory 2.4.x on another host; their 3.1.0 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then",
+      "source": "tools/adoption/codex_home.py L85-87; akitaonrails/ai-memory@11ca7c5b crates/ai-memory-cli/src/commands/install_hooks.rs:2760-2791 (the installer writes the Codex hooks.json and prints that Codex needs explicit trust), render_shared.rs:1360-1368 (the seven events) and codex_hook_trust.rs:1-9 (a new binary path, data dir or server URL voids the trust)"
     },
     {
       "match": [
@@ -651,6 +660,33 @@
     },
     {
       "match": [
+        "codex/config/mcp_servers.socraticode.command"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "SocratiCode",
+      "override": "${HOME}/.local/share/mise/shims/node",
+      "source": "The template's ${ECO_ROOT}/bin/node exists only where adoption/bootstrap-linux.sh:370-383 (install_node) links the bootstrap's Node; this plan's Node owner is mise (node 24.21.0 in ~/.config/mise/config.toml), which creates no such link, so the server failed with ENOENT (nhny-resolver receipt 3.7, 2026-10-16). The mise shim runs without PATH and follows the mise pin, the mechanism accept.sh prepare_path uses (jdx/mise@bc11f90c docs/dev-tools/shims.md#L70)."
+    },
+    {
+      "match": [
+        "codex/config/mcp_servers.socraticode.env.EMBEDDING_MODEL"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "SocratiCode",
+      "override": "nvidia/Nemotron-3.5-Embed-1B-BF16",
+      "source": "The host's live embedder is nvidia/Nemotron-3.5-Embed-1B-BF16 on vLLM (the CC's never-stale ruling, 2026-10-16). Its native width is 2048 (model card at 2a4f9cb5), and SocratiCode 1.15.0's lmstudio provider sends no dimensions parameter (dist/services/provider-lmstudio.js:10 and :262)."
+    },
+    {
+      "match": [
+        "codex/config/mcp_servers.socraticode.env.EMBEDDING_DIMENSIONS"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "SocratiCode",
+      "override": "2048",
+      "source": "The host's live embedder is nvidia/Nemotron-3.5-Embed-1B-BF16 on vLLM (the CC's never-stale ruling, 2026-10-16). Its native width is 2048 (model card at 2a4f9cb5), and SocratiCode 1.15.0's lmstudio provider sends no dimensions parameter (dist/services/provider-lmstudio.js:10 and :262)."
+    },
+    {
+      "match": [
         "codex/*/mcp_servers.socraticode.*"
       ],
       "wiring": "slot:code-search",
@@ -668,6 +704,15 @@
       "names": [
         "headroom"
       ]
+    },
+    {
+      "match": [
+        "codex/config/mcp_servers.context-mode.command"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "context-mode",
+      "override": "${HOME}/.local/share/mise/shims/node",
+      "source": "The template's ${ECO_ROOT}/bin/node (adoption/templates/codex.config.template.toml:147) exists only where adoption/bootstrap-linux.sh:370-383 (install_node) links the bootstrap's Node; this plan's Node owner is mise, which creates no such link, so Codex's context-mode server could not start on NativeHorizonNY (nhny-resolver receipt 3.7b, 2026-10-16). The mise shim runs without PATH and follows the mise pin, the mechanism accept.sh prepare_path uses (jdx/mise@bc11f90c docs/dev-tools/shims.md#L70)."
     },
     {
       "match": [

@@ -1929,15 +1929,15 @@
   },
   {
    "key": "claude:setting:remoteControlAtStartup",
-   "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-09-27-mac-single-writer-staged.md:57 names it",
-   "source": "docs/decisions/2026-09-27-mac-single-writer-staged.md:57",
-   "carrier": null,
-   "value": null,
-   "scope": null,
-   "overturn": "the record is superseded by a measured result",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "disposition": "enabled",
+   "reason": "Enabled as the NativeHorizonNY host read (user settings true); the repository default is off: a separate opt-in inside the authorization class.",
+   "source": "docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md:98-108",
+   "carrier": "adoption/new-wsl/templates/claude.settings.additions.json (authorization class)",
+   "value": true,
+   "scope": "NativeHorizonNY",
+   "overturn": "a measured unwanted remote tool call on a bypassPermissions host, or the owner asks for launcher-flag-only Remote Control",
+   "reviewed_utc": "2026-10-17T09:52:24Z",
+   "version": "2.1.302"
   },
   {
    "key": "claude:setting:sandbox",

@@ -11,6 +11,7 @@ Claude Code or Codex session on a new distribution uses what the render wires.
 from __future__ import annotations
 
 import contextlib
+import copy
 import fnmatch
 import hashlib
 import io
@@ -19,6 +20,7 @@ import json
 import os
 import random
 import re
+import runpy
 import shutil
 import signal
 import stat
@@ -1606,16 +1608,17 @@ class RenderTests(unittest.TestCase):
                        "'/home/example/.claude/plugins/claude-hud/statusline.mjs'"})
         events = {event: [h["command"] for g in groups for h in g["hooks"]] for event, groups in settings["hooks"].items()}
         commands = [command for v in events.values() for command in v]
-        # Each hook runs a file the repository copies, ai-memory (an interim install) at the link the plan's
-        # memory-owner row makes, rtk (the owner's directive of 2026-10-04), or the logging-only ConfigChange audit command
-        # that NativeStack runs; context-mode writes its own cache-heal hook.
-        ai_memory = "/home/example/.local/bin/ai-memory "
+        # Each hook runs a file the repository copies, rtk (the owner's directive of 2026-10-04), or the logging-only
+        # ConfigChange audit command that NativeStack runs. context-mode writes its own cache-heal hook, and ai-memory 3.1.0's
+        # own installer writes its hooks (the map's not_wired entry: one writer, the CC's ruling D1), so this render carries
+        # neither.
         audit = "jq -c '{timestamp: now | todate, source: .source, file: .file_path}' >> ~/claude-config-audit.log || true"
         self.assertEqual(events["ConfigChange"], [audit])
         self.assertEqual(sum(".claude/hooks/" in command for command in commands), 6)
-        self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command in ("rtk hook claude", audit)
-                            for command in commands), commands)
-        self.assertTrue(any(command.startswith(ai_memory) for command in events["SessionStart"]), events)
+        self.assertTrue(all(".claude/hooks/" in command or command in ("rtk hook claude", audit) for command in commands),
+                        commands)
+        self.assertEqual([command for command in commands if "ai-memory" in command], [])
+        self.assertFalse({"PostToolUse", "PreCompact", "Stop", "SubagentStart", "SubagentStop"} & set(events), events)
         self.assertEqual([command for command in commands if "cache-heal" in command], [])
         self.assertFalse([e for e in settings["permissions"]["deny"] if e.startswith("Agent(codex")])
         self.assertEqual(len([e for e in settings["permissions"]["deny"] if e.startswith("Bash(rtk git push")]), 6)
@@ -1644,7 +1647,10 @@ class RenderTests(unittest.TestCase):
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
         self.assertEqual(servers["qmd"], {"type": "http", "url": "http://127.0.0.1:21851/mcp"})
         host = json.loads((ROOT / "adoption/hosts/example.json").read_text())
-        self.assertEqual(servers["ai-memory"], {"type": "http", "url": f"http://{host['AI_MEMORY_URL']}/mcp"})
+        # ai-memory 3.1.0's session-aware stdio bridge, the entry its own setup registers (install_mcp.rs:1541-1552 at
+        # akitaonrails/ai-memory@11ca7c5b): no env, no headers; the shared template's http url is removed by the null.
+        self.assertEqual(servers["ai-memory"], {"type": "stdio", "command": "ai-memory",
+                                                "args": ["mcp-bridge", "--server-url", f"http://{host['AI_MEMORY_URL']}/mcp"]})
         # semble: the pinned model's local snapshot and Claude Code's own cache (wave-2 code-search ruling, changes 4, 5);
         # ${HOME} is filled when install_claude_profile.py registers the file.
         self.assertEqual((servers["semble"]["command"], servers["semble"]["args"]), ("semble", []))
@@ -1663,6 +1669,14 @@ class RenderTests(unittest.TestCase):
         pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
         self.assertEqual(servers["socraticode"]["args"], [pinned_search.replace(host["ECO_ROOT"], "${ECO_ROOT}")])
         self.assertEqual(config["mcp_servers"]["socraticode"]["args"], [pinned_search])
+        # SocratiCode runs on the plan's mise Node: the template's ${ECO_ROOT}/bin/node is a bootstrap-only link
+        # (adoption/bootstrap-linux.sh:370-383), absent where mise owns Node, and the server failed with ENOENT.
+        self.assertEqual(servers["socraticode"]["command"], "${HOME}/.local/share/mise/shims/node")
+        self.assertEqual(config["mcp_servers"]["socraticode"]["command"], host["HOME"] + "/.local/share/mise/shims/node")
+        # The live embedder on this distribution, at its native width (the lmstudio provider sends no dimensions).
+        for env in (servers["socraticode"]["env"], config["mcp_servers"]["socraticode"]["env"]):
+            self.assertEqual((env["EMBEDDING_MODEL"], env["EMBEDDING_DIMENSIONS"]), ("nvidia/Nemotron-3.5-Embed-1B-BF16", "2048"))
+            self.assertEqual((env["EMBEDDING_QUERY_PREFIX"], env["EMBEDDING_DOCUMENT_PREFIX"]), ("query: ", "passage: "))
         # jCodeMunch at user scope, with the documented opt-out of its anonymous savings counter in the server's env block
         # (the user's directive of 2026-10-04; JCODEMUNCH_SHARE_SAVINGS=0, CONFIGURATION.md at the pinned revision).
         self.assertEqual(servers["jcodemunch"], {"type": "stdio", "command": "${ECO_ROOT}/bin/jcodemunch-mcp", "args": [],
@@ -1675,7 +1689,13 @@ class RenderTests(unittest.TestCase):
             "env": {"RTK_TELEMETRY_DISABLED": "1", "PATH": config["mcp_servers"]["context-mode"]["env"]["PATH"],
                     "JCODEMUNCH_SHARE_SAVINGS": "0"}})
         self.assertTrue(config["mcp_servers"]["jcodemunch"]["env"]["PATH"].startswith(host["ECO_ROOT"] + "/bin:"))
-        self.assertEqual(config["mcp_servers"]["ai-memory"], {"url": f"http://{host['AI_MEMORY_URL']}/mcp"})
+        # Codex's context-mode server runs on the plan's mise Node too: the template's ${ECO_ROOT}/bin/node is a
+        # bootstrap-only link (adoption/bootstrap-linux.sh:370-383), absent where mise owns Node.
+        self.assertEqual(config["mcp_servers"]["context-mode"]["command"], host["HOME"] + "/.local/share/mise/shims/node")
+        # Setup's Codex table (install_mcp.rs:1909-1925 at 11ca7c5b): the url and the bearer variable's name; its approval
+        # mode is an authorization piece, written only with the option.
+        self.assertEqual(config["mcp_servers"]["ai-memory"], {"url": f"http://{host['AI_MEMORY_URL']}/mcp",
+                                                              "bearer_token_env_var": "AI_MEMORY_AUTH_TOKEN"})
         semble = config["mcp_servers"]["semble"]
         self.assertEqual((semble["command"], semble["enabled_tools"]), ("semble", ["search", "find_related"]))
         self.assertEqual(semble["env"]["SEMBLE_CACHE_LOCATION"], "/home/example/.cache/semble-codex")
@@ -1809,16 +1829,20 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(f"http://{host['OTEL_ENDPOINT']}", settings["env"]["OTEL_EXPORTER_OTLP_ENDPOINT"])
         self.assertEqual(host["OTEL_ENDPOINT"], f"127.0.0.1:{ports['http']}")
         # ai-memory's port is the host file's AI_MEMORY_URL in both clients (the example host names the repository
-        # default); the new distribution's host template names 29374, the bind of the plan's memory-owner row (X5).
+        # default); the new distribution's host template names 29374, the default of the plan's memory-owner bind (X5),
+        # which the row states as @PORT_MEMORY@ and the plan renders from the host allocation (the CC's ruling D3).
         example = json.loads((ROOT / "adoption/hosts/example.json").read_text())["AI_MEMORY_URL"]
-        self.assertEqual(json.loads(self.files["mcp-servers.json"])["mcpServers"]["ai-memory"]["url"],
-                         f"http://{example}/mcp")
+        bridge = json.loads(self.files["mcp-servers.json"])["mcpServers"]["ai-memory"]["args"]
+        self.assertEqual(bridge[bridge.index("--server-url") + 1], f"http://{example}/mcp")
         self.assertEqual(config["mcp_servers"]["ai-memory"]["url"], f"http://{example}/mcp")
         self.assertEqual(host["AI_MEMORY_URL"], "127.0.0.1:29374")
         memory = next(row for row in json.loads((ROOT / cfg.PLAN_REL / "install-plan.json").read_text())["owners"]
                       if row["slot"] == "memory-owner")
-        self.assertTrue(any(f'bind = "{host["AI_MEMORY_URL"]}"' in command for command in memory["commands"]),
-                        memory["commands"])
+        renderer = runpy.run_path(str(ROOT / cfg.PLAN_REL / "config/observability_config.py"))
+        ports = renderer["service_ports"]({"AI_MEMORY_URL": host["AI_MEMORY_URL"]})
+        self.assertTrue(any('bind = "127.0.0.1:@PORT_MEMORY@"' in command
+                            and f'bind = "{host["AI_MEMORY_URL"]}"' in renderer["render_command"](command, ports)
+                            for command in memory["commands"]), memory["commands"])
 
     def test_the_render_follows_the_host_and_refuses_a_plan_that_states_a_port_twice(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1984,7 +2008,8 @@ class TemplateAdditionsTests(unittest.TestCase):
         keys = {v.piece.key for v in results}
         for key in ("codex/config/shell_environment_policy.inherit", "codex/config/shell_environment_policy.set.XDG_RUNTIME_DIR",
                     "codex/config/shell_environment_policy.set.DOCKER_HOST", "codex/config/mcp_servers.semble.command",
-                    "codex/config/mcp_servers.ai-memory.default_tools_approval_mode", "claude/mcp/server/semble",
+                    "codex/config/mcp_servers.ai-memory.default_tools_approval_mode",
+                    "codex/config/mcp_servers.ai-memory.bearer_token_env_var", "claude/mcp/server/semble",
                     "claude/settings/permission/allow/mcp__semble__search"):
             self.assertIn(key, keys)
         self.assertFalse([key for key in keys if "_comment" in key])    # a file's note is not a piece
@@ -2772,10 +2797,9 @@ class ApplyTests(ApplyCase):
                          ["ai-memory", "chrome-devtools", "codebase-memory-mcp", "headroom", "jcodemunch", "promptfoo", "qmd", "semble",
                           "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
-        # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
-        self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
-                                                     "SessionEnd", "SessionStart", "Stop", "SubagentStart",
-                                                     "SubagentStop", "UserPromptSubmit"])
+        # The repository's hooks and the overlay's Notification; ai-memory's own installer writes its hooks, this apply none.
+        self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PreToolUse", "SessionEnd", "SessionStart",
+                                                     "UserPromptSubmit"])
         self.assertEqual(settings["env"]["PATH"].split(":")[:3],
                          [f"{self.eco}/bin", f"{self.home}/.local/bin", f"{self.home}/.local/share/mise/shims"])
         codex = self.home / ".codex"
@@ -3099,14 +3123,16 @@ def leaves(node, prefix=()):
 
 
 class AuthorizationTests(ApplyCase):
-    """The settings that grant a permission or suppress a confirmation are written only on request: the five that stand
+    """The settings that grant a permission or suppress a confirmation are written only on request: the six that stand
     alone, the main checkout's Codex trust grant, and the tool approval modes and allow rules tied to the slot that wires
     their server."""
 
     STANDALONE = ("claude/settings/setting/permissions.defaultMode", "claude/settings/setting/skipDangerousModePermissionPrompt",
                   "codex/config/approval_policy", "codex/config/sandbox_mode",
                   # the user's directive of 2026-10-04 (the wave-2 messaging ruling left it unset)
-                  "claude/settings/setting/crossSessionInbound")
+                  "claude/settings/setting/crossSessionInbound",
+                  # the CC's ruling D6 for PR (b) condition 4 (docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md)
+                  "claude/settings/setting/remoteControlAtStartup")
     # The coordinator's decision of 2026-10-04: the main checkout is trusted, and Codex looks a linked worktree's trust
     # up under it (codex-rs/git-utils/src/trust.rs at rust-v0.160.0); every other project still asks.
     TRUST = ('codex/config/projects."${PROJECT_ROOT}".trust_level',)
@@ -3131,13 +3157,21 @@ class AuthorizationTests(ApplyCase):
                                           ("code-search", "SocratiCode"), ("output-compression", "headroom"),
                                           ("code-search", "semble"), ("code-search", "semble"))))
     WAITING = APPROVAL[6:]                        # the same two negative-control owners, after Chrome's insertion
-    WRITTEN = STANDALONE + TRUST + APPROVAL + ALLOW     # what the option writes today
+    # remoteControlAtStartup is a separate opt-in inside the class, off by default (the CC's ruling G3): the bundle alone
+    # does not write it.
+    OPT_IN = ("claude/settings/setting/remoteControlAtStartup",)
+    WRITTEN = STANDALONE[:-1] + TRUST + APPROVAL + ALLOW     # what the option writes: all but OPT_IN, STANDALONE's last
     OPTION = "--with-authorization-settings"
+    RC_OPTION = "--with-remote-control-at-startup"
     DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
-                    "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
+                    "skipDangerousModePermissionPrompt, crossSessionInbound and remoteControlAtStartup, Codex approval_policy "
+                    "and sandbox_mode, the trust_level of the wired "
                     "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
                     "and a value of theirs that a file has is not touched; --with-authorization-settings adds the ones a "
-                    "file lacks, except existing create-only profile files)")
+                    "file lacks, except existing create-only profile files and remoteControlAtStartup, which also needs "
+                    "--with-remote-control-at-startup; ai-memory's own setup, which the install plan's memory-owner row "
+                    "runs, writes ai-memory's Codex default_tools_approval_mode = \"approve\" regardless, "
+                    "akitaonrails/ai-memory@11ca7c5b install_mcp.rs:1923)")
 
     def render(self, *extra: str):
         with tempfile.TemporaryDirectory() as tmp:
@@ -3202,6 +3236,7 @@ class AuthorizationTests(ApplyCase):
         self.assertNotIn("allow", settings["permissions"])
         self.assertNotIn("skipDangerousModePermissionPrompt", settings)
         self.assertNotIn("crossSessionInbound", settings)
+        self.assertNotIn("remoteControlAtStartup", settings)
         self.assertNotIn("approval_policy", codex)
         self.assertNotIn("sandbox_mode", codex)
         self.assertNotIn("projects", codex)
@@ -3211,6 +3246,7 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(settings_on["permissions"]["defaultMode"], "bypassPermissions")
         self.assertIs(settings_on["skipDangerousModePermissionPrompt"], True)
         self.assertEqual(settings_on["crossSessionInbound"], "accept")
+        self.assertNotIn("remoteControlAtStartup", settings_on)     # its own opt-in, off by default
         self.assertEqual(settings_on["permissions"]["allow"], ["mcp__semble__search", "mcp__semble__find_related"])
         self.assertEqual((codex_on["approval_policy"], codex_on["sandbox_mode"]), ("never", "danger-full-access"))
         self.assertEqual({name: server["default_tools_approval_mode"] for name, server in codex_on["mcp_servers"].items()
@@ -3242,6 +3278,8 @@ class AuthorizationTests(ApplyCase):
     ALLOW_LABELS = "Claude Code allow rule mcp__semble__search, Claude Code allow rule mcp__semble__find_related"
     ADDED_CLAUDE = (f"added: Claude Code permissions.defaultMode, {ALLOW_LABELS}, Claude Code skipDangerousModePermissionPrompt, "
                     "Claude Code crossSessionInbound")
+    # Every line with the bundle and without the opt-in ends by naming the setting that waits for it.
+    HELD = "; not written without --with-remote-control-at-startup: Claude Code remoteControlAtStartup"
     CODEX_CONFIG = ("Codex approval_policy, Codex sandbox_mode, Codex mcp_servers.ai-memory.default_tools_approval_mode, "
                     "Codex mcp_servers.context-mode.default_tools_approval_mode, "
                     "Codex mcp_servers.jcodemunch.default_tools_approval_mode, "
@@ -3281,14 +3319,15 @@ class AuthorizationTests(ApplyCase):
         line = self.authorization_line(out)
         self.assertEqual(line, f"authorization settings: partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
                                f"{self.CODEX_CONFIG}; not reached, its step codex-files ended differs, not written: "
-                               f"{self.STACK_WORKER})")
+                               f"{self.STACK_WORKER}{self.HELD})")
         # Main configuration settings are now present; missing keys in create-only profiles remain not reached.
         code, out, _ = self.apply(self.OPTION)
         self.assertEqual(code, 0, out[-800:])
         line = self.authorization_line(out)
         self.assertEqual(line, f"authorization settings: not applied (--with-authorization-settings; already the same: "
                                f"{self.ADDED_CLAUDE[len('added: '):]}, {self.CODEX_CONFIG}; "
-                               f"not reached, its step codex-files ended differs, not written: {self.STACK_WORKER})")
+                               f"not reached, its step codex-files ended differs, not written: {self.STACK_WORKER}"
+                               f"{self.HELD})")
 
     def test_profile_formatting_and_model_drift_do_not_change_equal_authorization_values(self):
         self.seed()
@@ -3474,7 +3513,7 @@ class AuthorizationTests(ApplyCase):
                     self.assertIn("kept your value: Claude Code permissions.defaultMode, Claude Code "
                                   "skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode", line)
                     self.assertIn("not reached, its step codex-files ended differs, not written: "
-                                  f"{self.STACK_WORKER})", line)
+                                  f"{self.STACK_WORKER}{self.HELD})", line)
                 else:
                     self.assertNotIn("kept your permissions.defaultMode", out)
                     self.assertNotIn("conflict kept: approval_policy", out)
@@ -3514,7 +3553,7 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(self.authorization_line(out), (
             "authorization settings: not applied (--with-authorization-settings; not reached, its step claude-settings was "
             f"skipped: {self.ADDED_CLAUDE[len('added: '):]}; not reached, its step codex-config was skipped: "
-            f"{self.CODEX_CONFIG}; not reached, its step codex-files was skipped: {self.STACK_WORKER})"))
+            f"{self.CODEX_CONFIG}; not reached, its step codex-files was skipped: {self.STACK_WORKER}{self.HELD})"))
 
     def test_a_skipped_step_leaves_the_line_partly_applied_and_says_it_was_skipped(self):
         self.seed()
@@ -3522,7 +3561,7 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(self.authorization_line(out), (
             f"authorization settings: partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
-            f"{self.STACK_WORKER}; not reached, its step codex-config was skipped: {self.CODEX_CONFIG})"))
+            f"{self.STACK_WORKER}; not reached, its step codex-config was skipped: {self.CODEX_CONFIG}{self.HELD})"))
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         self.assertEqual(settings["permissions"]["defaultMode"], "bypassPermissions")    # what was reached is written
         self.assertFalse((self.home / ".codex/config.toml").exists())                      # what was not, is not
@@ -3533,7 +3572,7 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(code, 1)
         self.assertEqual(self.authorization_line(out), (
             f"authorization settings: partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
-            f"{self.STACK_WORKER}; not reached, its step codex-config failed: {self.CODEX_CONFIG})"))
+            f"{self.STACK_WORKER}; not reached, its step codex-config failed: {self.CODEX_CONFIG}{self.HELD})"))
         self.assertEqual((self.home / ".codex/config.toml").read_text(), "[tui\nbroken = \n")
 
     def test_a_dry_run_with_a_skipped_step_says_it_would_be_partly_applied(self):
@@ -3543,14 +3582,15 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(self.authorization_line(out), (
             f"authorization settings: would be partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
-            f"{self.STACK_WORKER}; not reached, its step codex-config was skipped: {self.CODEX_CONFIG})"))
+            f"{self.STACK_WORKER}; not reached, its step codex-config was skipped: {self.CODEX_CONFIG}{self.HELD})"))
         self.assertEqual(tree(self.home), before)
 
     def test_settings_that_are_kept_beside_a_step_that_is_not_reached_say_not_applied(self):
         # The file already has every Claude Code one (three of its own values, and semble's two allow rules), and the steps
-        # that write the Codex ones are skipped: nothing is added.
+        # that write the Codex ones are skipped: nothing is added. A host's own remoteControlAtStartup false is not touched:
+        # without its own opt-in the setting is not written at all.
         self.seed({"permissions": {"defaultMode": "default", "allow": ["mcp__semble__search", "mcp__semble__find_related"]},
-                   "skipDangerousModePermissionPrompt": False, "crossSessionInbound": "hold"})
+                   "skipDangerousModePermissionPrompt": False, "crossSessionInbound": "hold", "remoteControlAtStartup": False})
         code, out, _ = self.apply(self.OPTION, "--skip", "codex-config", "--skip", "codex-files")
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(self.authorization_line(out), (
@@ -3558,7 +3598,34 @@ class AuthorizationTests(ApplyCase):
             f"permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Claude Code crossSessionInbound; "
             f"already the same: {self.ALLOW_LABELS}; "
             f"not reached, its step codex-config was skipped: {self.CODEX_CONFIG}; not reached, its step codex-files was "
-            f"skipped: {self.STACK_WORKER})"))
+            f"skipped: {self.STACK_WORKER}{self.HELD})"))
+        self.assertIs(json.loads((self.home / ".claude/settings.json").read_text())["remoteControlAtStartup"], False)
+
+    def test_remote_control_at_startup_is_written_only_with_its_own_opt_in_and_never_over_a_value(self):
+        # The CC's ruling G3: a separate opt-in inside the authorization class, default off.
+        for seeded, want, label in ((None, True, "added: "), (False, False, "kept your value: "), (True, True, "already the same: ")):
+            with self.subTest(seeded=seeded):
+                self.seed({} if seeded is None else {"remoteControlAtStartup": seeded})
+                code, out, _ = self.apply(self.OPTION, self.RC_OPTION, "--skip", "codex-config", "--skip", "codex-files")
+                self.assertEqual(code, 0, out[-600:])
+                settings = json.loads((self.home / ".claude/settings.json").read_text())
+                self.assertIs(settings["remoteControlAtStartup"], want)
+                line = self.authorization_line(out)
+                self.assertNotIn(self.HELD, line)
+                self.assertIn("Claude Code remoteControlAtStartup", line.split(label, 1)[1].split("; ", 1)[0].split(", "))
+
+    def test_remote_control_at_startup_alone_is_refused(self):
+        # Without the bundle the opt-in would add nothing; it is refused rather than ignored, and nothing is written.
+        self.seed()
+        before = tree(self.home)
+        code, out, err = self.apply(self.RC_OPTION)
+        self.assertEqual(code, 2, out[-400:])
+        self.assertIn("--with-remote-control-at-startup needs --with-authorization-settings", err)
+        self.assertEqual(tree(self.home), before)
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, err = run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp, self.RC_OPTION)
+            self.assertEqual(code, 2, err)
+            self.assertEqual(list(Path(tmp).iterdir()), [])
 
     def test_the_line_says_so_when_the_map_wires_no_authorization_setting(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -3847,7 +3914,8 @@ class AuthorizationTests(ApplyCase):
             rows_of_key = [row for row in tables[1].splitlines() if key in row]
             self.assertEqual(len(rows_of_key), 1, key)
             slot_cell = rows_of_key[0].rstrip("|").rsplit("|", 1)[1].strip()
-            self.assertEqual(slot_cell, "-" if key in self.STANDALONE + self.TRUST else
+            self.assertEqual(slot_cell, f"`{self.RC_OPTION}`" if key in self.OPT_IN else
+                             "-" if key in self.STANDALONE + self.TRUST else
                              "slot `%s` installing `%s`" % self.SLOT_OF[key], key)
 
     def test_the_help_text_names_the_option_what_it_writes_and_who_it_is_for(self):
@@ -3863,36 +3931,50 @@ class AuthorizationTests(ApplyCase):
 
 
 class AcknowledgementGateTests(ApplyCase):
-    """--apply wires no interim install (amendment 3 of the manifest's decision rule) while the layer consensus's wave-2
-    batch owes an acknowledgement: a real run refuses and writes nothing, and a dry run says that a real run would refuse
-    (wave-2 code-search ruling, change 1; install.sh's interim_acknowledged is the plan's side of the same gate)."""
+    """--apply wires no interim install (amendment 3 of the manifest's decision rule) while any wave batch of the layer
+    consensus owes an acknowledgement: a real run refuses and writes nothing, and a dry run says that a real run would
+    refuse (wave-2 code-search ruling, change 1). install.sh's interim_acknowledged is the plan's side of the same gate,
+    and both read every wave batch the same way (tests/test_new_wsl_definitive_defaults.py, InterimPlanChecks)."""
 
-    def test_the_list_is_read_from_the_committed_batch(self):
-        owed = json.loads((ROOT / cfg.CONSENSUS_REL).read_text(encoding="utf-8"))["wave2"]["acknowledgements_owed"]
+    def test_the_list_is_read_from_every_committed_batch(self):
+        consensus = json.loads((ROOT / cfg.CONSENSUS_REL).read_text(encoding="utf-8"))
+        owed = [f"{key}: {', '.join(batch['acknowledgements_owed'])}" for key, batch in consensus.items()
+                if re.fullmatch(r"wave[0-9]+", key) and batch["acknowledgements_owed"]]
         self.assertEqual(REAL_OWED_ACKNOWLEDGEMENTS(ROOT), owed)
 
     def test_a_list_that_cannot_be_read_is_an_error_and_an_empty_one_is_not(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / cfg.CONSENSUS_REL
             path.parent.mkdir(parents=True)
+            # install.sh's interim_acknowledged refuses the same inputs: no wave batch, a batch that cannot be read, a
+            # later batch that cannot be read, and a batch key that is not wave<n>.
             for broken in ({}, {"wave2": {}}, {"wave2": {"acknowledgements_owed": "gpt"}},
-                           {"wave2": {"acknowledgements_owed": [""]}}):
+                           {"wave2": {"acknowledgements_owed": [""]}},
+                           {"wave2": {"acknowledgements_owed": []}, "wave3": {}},
+                           {"wave2": {"acknowledgements_owed": []}, "wave_3": {"acknowledgements_owed": ["gpt"]}}):
                 with self.subTest(consensus=broken):
                     path.write_text(json.dumps(broken), encoding="utf-8")
                     with self.assertRaises(cfg.ConfigError):
                         REAL_OWED_ACKNOWLEDGEMENTS(Path(tmp))
             path.write_text(json.dumps({"wave2": {"acknowledgements_owed": []}}), encoding="utf-8")
             self.assertEqual(REAL_OWED_ACKNOWLEDGEMENTS(Path(tmp)), [])
+            # A later batch's owed acknowledgement holds the gate though wave 2 owes none.
+            path.write_text(json.dumps({"wave2": {"acknowledgements_owed": []}, "wave3": {"acknowledgements_owed": []},
+                                        "wave6": {"acknowledgements_owed": ["gpt"]}}), encoding="utf-8")
+            self.assertEqual(REAL_OWED_ACKNOWLEDGEMENTS(Path(tmp)), ["wave6: gpt"])
+            path.write_text(json.dumps({"wave2": {"acknowledgements_owed": ["claude"]},
+                                        "wave3": {"acknowledgements_owed": ["gpt"]}}), encoding="utf-8")
+            self.assertEqual(REAL_OWED_ACKNOWLEDGEMENTS(Path(tmp)), ["wave2: claude", "wave3: gpt"])
 
     def test_a_real_apply_refuses_while_one_is_owed_and_a_dry_run_says_so(self):
         self.installed_state()
         before = tree(self.home)
-        with mock.patch.object(cfg, "owed_acknowledgements", return_value=["claude", "gpt"]):
+        with mock.patch.object(cfg, "owed_acknowledgements", return_value=["wave6: claude, gpt"]):
             code, out, err = self.apply()
             self.assertEqual(code, 1, out + err)
             self.assertIn("apply refused: the render wires the interim installs of code-search, "
-                          "memory-owner (amendment 3 of the manifest's decision rule), and the acknowledgement of the "
-                          "wave-2 batch is still owed by claude, gpt", err)
+                          "memory-owner (amendment 3 of the manifest's decision rule), and the wave batches still owe "
+                          "acknowledgements: wave6: claude, gpt", err)
             self.assertNotIn("summary:", out)                  # no step ran
             self.assertEqual(tree(self.home), before)
             self.assertFalse(self.marker.exists())             # and no client was called
@@ -3920,7 +4002,9 @@ class RenderedScanTests(unittest.TestCase):
             with self.subTest(settings=settings):
                 with mock.patch.object(cfg, "render", return_value={"settings.json": json.dumps(settings)}):
                     errors = cfg.rendered_name_errors(ROOT)
-                self.assertEqual(len(errors), 2)
+                # Three renders are scanned: without the authorization settings, with them, and with them and every
+                # separate opt-in (SEPARATE_OPT_INS).
+                self.assertEqual(len(errors), 3)
                 self.assertTrue(all("settings.json names Loki, which is not wired" in error for error in errors), errors)
 
     def test_the_repository_render_names_no_tool_that_is_not_wired_either_way(self):
@@ -3948,7 +4032,9 @@ class RenderedScanTests(unittest.TestCase):
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
         self.assertEqual(errors, ["the render for the example host with --with-authorization-settings: settings.json "
-                                  "names Phoenix, which is not wired"])
+                                  "names Phoenix, which is not wired",
+                                  "the render for the example host with --with-authorization-settings and "
+                                  "--with-remote-control-at-startup: settings.json names Phoenix, which is not wired"])
         self.assertIn("with --with-authorization-settings: settings.json names Phoenix", err)
 
     def test_a_name_in_an_instruction_block_or_the_codex_config_is_found_too(self):
@@ -3965,7 +4051,7 @@ class RenderedScanTests(unittest.TestCase):
     def test_a_render_that_fails_is_reported_and_not_taken_for_a_clean_scan(self):
         with mock.patch.object(cfg, "render", side_effect=cfg.ConfigError("boom")):
             errors = cfg.rendered_name_errors(ROOT)
-        self.assertEqual(len(errors), 2)
+        self.assertEqual(len(errors), 3)
         self.assertTrue(all("failed, so it was not scanned: boom" in error for error in errors), errors)
 
     def test_the_scan_takes_whole_words_in_any_case(self):
@@ -4002,10 +4088,15 @@ class McpEndpointRepairTests(unittest.TestCase):
         self.assertEqual(claude["env"]["LMSTUDIO_URL"], "http://127.0.0.1:28231/v1")
         for key in ("QDRANT_URL", "LMSTUDIO_URL"):
             self.assertEqual(claude["env"][key], codex["env"][key], key)
-        # A partial host override must retain the native provider/model/dimension settings.
+        # A partial host override must retain the native provider and every other template setting. On this
+        # distribution the model and its native width follow the live embedder instead of the template's pin (the
+        # CC's never-stale ruling, 2026-10-16; nhny-resolver receipt 3.7): Nemotron-3.5-Embed-1B at 2048.
         template = json.loads((ROOT / cfg.TEMPLATES["claude/mcp"]).read_text())["mcpServers"]["socraticode"]
-        self.assertEqual({k: v for k, v in claude["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")},
-                         {k: v for k, v in template["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")})
+        live = ("QDRANT_URL", "LMSTUDIO_URL", "EMBEDDING_MODEL", "EMBEDDING_DIMENSIONS")
+        self.assertEqual({k: v for k, v in claude["env"].items() if k not in live},
+                         {k: v for k, v in template["env"].items() if k not in live})
+        for env in (claude["env"], codex["env"]):
+            self.assertEqual((env["EMBEDDING_MODEL"], env["EMBEDDING_DIMENSIONS"]), ("nvidia/Nemotron-3.5-Embed-1B-BF16", "2048"))
 
     def test_check_accepts_matching_host_endpoints_with_client_specific_cache_paths(self):
         code, out, err = run_main("--check")
@@ -4033,7 +4124,7 @@ class McpEndpointRepairTests(unittest.TestCase):
             def freeze_host_url(data):
                 entry = next(e for e in data["entries"] if e["match"] == ["claude/mcp/server/ai-memory"])
                 host = render_config.load_host_values(EXAMPLE_HOST)
-                entry["override"]["url"] = f"http://{host['AI_MEMORY_URL']}/mcp"
+                entry["override"]["args"][-1] = f"http://{host['AI_MEMORY_URL']}/mcp"    # the bridge's --server-url
 
             edit_json(root / cfg.MAP_REL, freeze_host_url)
             code, _, err = run_main("--check", "--root", str(root))
@@ -5183,6 +5274,195 @@ class PlanConfigurationTests(unittest.TestCase):
             result = subprocess.run(args, cwd=tmp, capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("config/uncopied-config.yaml is copied by no install function", result.stdout)
+
+
+class AiMemoryLinkTests(unittest.TestCase):
+    """AI_MEMORY_BIN names the file ai-memory 3.1.0's own installers embed, read from the plan's memory-owner row, whether
+    the row runs the vendor's install.sh or links a release archive by hand (akitaonrails/ai-memory@11ca7c5b
+    install.sh:151-152 and 216; crates/ai-memory-cli/src/commands/render_shared.rs:2094-2125 and 2235-2251). From R3's
+    prototype (r3-tests.diff), with the rest of that class: Claude Code's entry is the session-aware stdio bridge, Codex's
+    names the bearer variable, the URL is the host allocation's memory port, and the vendor's installer is the one writer
+    of the hooks (the CC's rulings D1, D3 and D4)."""
+
+    def test_an_override_of_null_removes_the_template_key(self):
+        results, manifest, plan, _, _ = cfg.analyse(ROOT)
+        files = cfg.render(ROOT, results, plan, cfg.host_values(EXAMPLE_HOST, plan, None, cfg.wired_path_dirs(results)),
+                           manifest)
+        entry = json.loads(files["mcp-servers.json"])["mcpServers"]["ai-memory"]
+        self.assertNotIn("url", entry)
+        self.assertEqual(entry["type"], "stdio")
+        self.assertFalse({"env", "headers"} & set(entry), entry)      # no token in the client's config
+        # Every other host keeps the shared template's http registration.
+        self.assertEqual(json.loads((ROOT / cfg.TEMPLATES["claude/mcp"]).read_text())["mcpServers"]["ai-memory"]["type"],
+                         "http")
+
+    def test_the_hooks_have_one_writer_and_the_name_stays_wired(self):
+        results, manifest, *_ = cfg.analyse(ROOT)
+        hooks = [v for v in results if v.piece.key.startswith("claude/settings/hook/") and "${AI_MEMORY_BIN}" in v.piece.key]
+        self.assertEqual(len(hooks), 8)
+        self.assertTrue(all(not v.wired and v.entry.wiring.startswith("not_wired:ai-memory 3.1.0's own installer")
+                            for v in hooks), [v.entry.wiring for v in hooks])
+        self.assertNotIn("ai-memory", cfg.unwired_names(results, manifest))     # the MCP entries still name it
+
+    def test_both_entries_take_the_memory_port_of_the_host_allocation(self):
+        results, manifest, plan, _, _ = cfg.analyse(ROOT)
+        values = cfg.host_values(EXAMPLE_HOST, plan, None, cfg.wired_path_dirs(results))
+        values.update(AI_MEMORY_URL="127.0.0.1:23374", NS_PORT_MEMORY="23374")
+        files = cfg.render(ROOT, results, plan, values, manifest)
+        bridge = json.loads(files["mcp-servers.json"])["mcpServers"]["ai-memory"]["args"]
+        self.assertEqual(bridge, ["mcp-bridge", "--server-url", "http://127.0.0.1:23374/mcp"])
+        self.assertEqual(tomllib.loads(files["codex.config.toml"])["mcp_servers"]["ai-memory"]["url"],
+                         "http://127.0.0.1:23374/mcp")
+        # The plan's port renderer refuses a host whose AI_MEMORY_URL and memory allocation disagree, so the entries never
+        # name a port the row's bind did not take.
+        values["NS_PORT_MEMORY"] = "23375"
+        with self.assertRaisesRegex(cfg.ConfigError, "NS_PORT_MEMORY and AI_MEMORY_URL disagree"):
+            cfg.render(ROOT, results, plan, values, manifest)
+
+    def test_ai_memory_bin_names_the_file_the_vendor_installers_embed(self):
+        row = {"installed": True, "commands": ['AI_MEMORY_VERSION=3.1.0 sh "$HOME/.local/opt/ai-memory-3.1.0/install.sh"',
+                                               "ai-memory setup --yes --agent claude-code --agent codex"]}
+        self.assertEqual(cfg.ai_memory_link(row), ".local/lib/ai-memory/ai-memory")
+        row["commands"][0] = ('AI_MEMORY_VERSION=3.1.0 AI_MEMORY_LIB_DIR="$HOME/opt/aim" '
+                              'sh "$HOME/.local/opt/ai-memory-3.1.0/install.sh"')
+        self.assertEqual(cfg.ai_memory_link(row), "opt/aim/ai-memory")
+        linked = {"installed": True,
+                  "commands": ['ln -sfn "$HOME/.local/opt/ai-memory-2.6.6/ai-memory" "$HOME/.local/bin/ai-memory"']}
+        self.assertEqual(cfg.ai_memory_link(linked), ".local/opt/ai-memory-2.6.6/ai-memory")
+        with self.assertRaises(cfg.ConfigError):
+            cfg.ai_memory_link({"installed": True, "commands": ["true"]})
+        self.assertIsNone(cfg.ai_memory_link({"installed": False}))
+
+
+class RemoteControlAtStartupTests(unittest.TestCase):
+    """Remote Control at startup on the new distribution: the user-scope additions carry remoteControlAtStartup true as an
+    authorization setting that is also its own opt-in, off by default: written only with --with-authorization-settings and
+    --with-remote-control-at-startup together, and never over a value the file has (the CC's rulings D6 and G3;
+    docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md). Claude Code honors a true only from user or managed
+    settings (https://code.claude.com/docs/en/remote-control.md#L198 and settings.md#L741)."""
+
+    PIECE = "claude/settings/setting/remoteControlAtStartup"
+
+    def test_it_is_an_authorization_piece_rendered_only_with_the_option(self):
+        self.assertTrue(cfg.is_authorization_piece(self.PIECE))
+        additions = json.loads((ROOT / cfg.TEMPLATE_ADDITIONS["claude/settings"]).read_text())
+        self.assertIs(additions["remoteControlAtStartup"], True)
+        self.assertNotIn("remoteControlAtStartup", json.loads((ROOT / cfg.TEMPLATES["claude/settings"]).read_text()))
+        results, manifest, plan, errors, _ = cfg.analyse(ROOT)
+        self.assertEqual(errors, [])
+        verdict = next(v for v in results if v.piece.key == self.PIECE)
+        self.assertTrue(verdict.authorization)
+        self.assertFalse(verdict.wired)
+        self.assertIn("remote ingress", verdict.entry.wiring)
+        self.assertEqual(cfg.SEPARATE_OPT_INS, {self.PIECE: "--with-remote-control-at-startup"})
+        with_option, *_ = cfg.analyse(ROOT, authorization=True)
+        bundle = next(v for v in with_option if v.piece.key == self.PIECE)
+        self.assertFalse(bundle.wired)                                  # default off, even with the bundle
+        self.assertIn("it also needs --with-remote-control-at-startup, off by default", bundle.reason)
+        opted, *_ = cfg.analyse(ROOT, authorization=True, opt_ins=frozenset({"--with-remote-control-at-startup"}))
+        self.assertTrue(next(v for v in opted if v.piece.key == self.PIECE).wired)
+        alone, *_ = cfg.analyse(ROOT, opt_ins=frozenset({"--with-remote-control-at-startup"}))
+        self.assertFalse(next(v for v in alone if v.piece.key == self.PIECE).wired)   # the opt-in is inside the class
+        # Nothing else changes with the opt-in: it adds this one piece.
+        self.assertEqual({v.piece.key for v in opted if v.wired} - {v.piece.key for v in with_option if v.wired},
+                         {self.PIECE})
+        values = cfg.host_values(EXAMPLE_HOST, plan, None, cfg.wired_path_dirs(results))
+        for verdicts, want in ((results, None), (with_option, None), (opted, True)):
+            settings = json.loads(cfg.render(ROOT, verdicts, plan, values, manifest)["settings.json"])
+            self.assertIs(settings.get("remoteControlAtStartup"), want)
+        tables = cfg.markdown_tables(ROOT, results, plan)
+        self.assertIn("`--with-remote-control-at-startup`", next(line for line in tables.splitlines() if self.PIECE in line))
+        # agentPushNotifEnabled is a host choice and is not carried (the same ruling).
+        self.assertNotIn("agentPushNotifEnabled", additions)
+
+    def test_a_map_that_classes_it_practice_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+
+            def as_practice(data):
+                entry = next(e for e in data["entries"] if e["match"] == [self.PIECE])
+                entry["wiring"] = "practice"
+
+            edit_json(root / cfg.MAP_REL, as_practice)
+            errors = cfg.analyse(root)[3]
+        self.assertTrue([e for e in errors if e.startswith(f"{self.PIECE}: a setting that grants a permission or suppresses "
+                                                           "a confirmation is classed authorization:<reason>, not practice")],
+                        errors)
+
+
+class OneHookWriterTests(unittest.TestCase):
+    """Render plus setup gives exactly the upstream hook set, with no duplicate (the CC's ruling D1;
+    docs/decisions/2026-10-17-ai-memory-one-hook-writer.md). The upstream set is a print-mode capture of ai-memory 3.1.0's
+    own `install-hooks --agent claude-code --no-capture-prompts` (the binary of the memory-owner run pin, sha256 bac68e51...;
+    tests/fixtures/ai-memory-3.1.0-claude-hooks.capture.sh records the command), the hooks setup writes followed by the
+    row's prompt-capture opt-out. The merge is the repository's own (apply_claude_settings.merge_settings), with the
+    installer's file as the base and the render as the template, as --apply's claude-settings step runs it. Before this
+    change the render carried eight ai-memory hooks of its own, and merge_hooks never removes a hook: whenever the two
+    writers' commands differed, Claude Code ran two of each (NativeHorizonNY, 2026-10-16)."""
+
+    FIXTURE = ROOT / "tests/fixtures/ai-memory-3.1.0-claude-hooks.json"
+
+    @staticmethod
+    def ai_memory_hooks(settings: dict) -> list:
+        """(event, matcher, command) of every hook ai-memory's overlay counts as its own: a command naming ai-memory with
+        the ` hook --event `, ` --agent ` and ` --server-url ` argv signature (akitaonrails/ai-memory@11ca7c5b
+        crates/ai-memory-cli/src/commands/uninstall.rs:1155-1164, install_hooks.rs:2053-2081)."""
+        found = []
+        for event, groups in (settings.get("hooks") or {}).items():
+            for group in groups:
+                for hook in group.get("hooks", []):
+                    command = (hook.get("command") or "").lower()
+                    if (("ai-memory" in command or "ai_memory" in command) and " hook --event " in command
+                            and " --agent " in command and " --server-url " in command):
+                        found.append((event, group.get("matcher"), hook["command"]))
+        return found
+
+    def setUp(self):
+        self.fixture = json.loads(self.FIXTURE.read_text(encoding="utf-8"))
+        self.results, self.manifest, self.plan, errors, _ = cfg.analyse(ROOT)
+        self.assertEqual(errors, [])
+
+    def render(self, **host) -> dict:
+        values = cfg.host_values(EXAMPLE_HOST, self.plan, None, cfg.wired_path_dirs(self.results))
+        values.update(host)
+        return json.loads(cfg.render(ROOT, self.results, self.plan, values, self.manifest)["settings.json"])
+
+    def test_the_fixture_is_the_pinned_binarys_own_hook_set(self):
+        self.assertEqual(self.fixture["binary"]["version"], "ai-memory 3.1.0")
+        run_pin = json.loads((ROOT / self.fixture["binary"]["run_pin"]).read_text())
+        self.assertIn(self.fixture["binary"]["sha256"], json.dumps(run_pin))
+        self.assertNotIn("--apply", self.fixture["command"])                  # print mode only
+        upstream = self.ai_memory_hooks(self.fixture["settings"])
+        # The eight Claude Code events the 3.1.0 installer wires, and no prompt capture (ruling D5).
+        self.assertEqual(sorted(event for event, _, _ in upstream),
+                         sorted(["SessionStart", "PreToolUse", "PostToolUse", "PreCompact", "Stop", "SessionEnd",
+                                 "SubagentStart", "SubagentStop"]))
+        self.assertNotIn("UserPromptSubmit", self.fixture["settings"]["hooks"])
+
+    def test_the_render_carries_no_ai_memory_hook(self):
+        self.assertEqual(self.ai_memory_hooks(self.render()), [])
+
+    def test_render_plus_setup_is_exactly_the_upstream_hook_set(self):
+        installed = self.fixture["settings"]
+        moved = json.loads(json.dumps(installed).replace("/home/example/.local/lib/ai-memory/ai-memory",
+                                                         "/home/example/.local/opt/ai-memory/ai-memory"))
+        cases = {
+            # setup on the example host: the installer embeds the file the row installs, as AI_MEMORY_BIN names it.
+            "as installed": (installed, {}),
+            # the installer embeds another path than AI_MEMORY_BIN (its current_exe, render_shared.rs:2094-2125), as
+            # NativeHorizonNY's two writers did with the ~/.local/bin link against the ~/.local/lib file.
+            "another binary path": (moved, {}),
+            # the host value file opts the template's Stop hook into assistant capture (render_config.py resolve_opt_ins),
+            # which setup does not pass.
+            "a host Stop opt-in": (installed, {"AI_MEMORY_CAPTURE_ASSISTANT": "true"}),
+        }
+        for case, (base, host) in cases.items():
+            with self.subTest(case=case):
+                upstream = self.ai_memory_hooks(base)
+                merged = cfg.file_io.merge_settings(copy.deepcopy(base), self.render(**host))
+                self.assertEqual(self.ai_memory_hooks(merged), upstream)
+                per_event = Counter(event for event, _, _ in self.ai_memory_hooks(merged))
+                self.assertEqual([event for event, count in per_event.items() if count > 1], [])
 
 
 class RecordTests(unittest.TestCase):

@@ -1679,5 +1679,70 @@
     }
    }
   ]
+ },
+ "wave6": {
+  "date_utc": "2026-10-17",
+  "meaning": "the wave-6 batch of 2026-10-17: one interim amendment by direct consensus of both model families, under amendment 3's direct-consensus authority: the memory-owner interim moves from ai-memory 2.5.2 to 3.1.0, the version the memory-owner 3.1.0 run pin receipts (tag v3.1.0 at 11ca7c5b), so the install plan and the new WSL distribution install the same verified release; the interim stays an interim, and the memory head-to-head still decides",
+  "interim_rule": "Amendment 3 (wave 2, 2026-10-03): a row whose decided default installs nothing may carry an interim install, recorded in the row's interim field beside the fields the rounds decided, which stay as they were. The interim names what it installs and at which pin, the measurement or comparison that replaces or removes it, the authority that installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision, as the record that relays it states it, or a direct consensus with both families' acknowledgements on record. On the owner's decision an interim may sit on a definitive row whose default installs nothing: the definitive verdict stays recorded beside it, and the named measurement reports to the owner instead of removing the interim by itself. An interim is never definitive and is neither a blind result nor a measurement; no other installed row may own its job; its label starts with 'interim install', names its authority and says what decides it. The install plan installs it as the row's owner, and the client configuration wires what it installs while the row carries it.",
+  "no_install_rule_exception": "Amendment 3 makes one exception to the no-install rule: an interim install puts something extra on the destination before measured evidence shows a gain, on documented fit and the authority it names, and only until its named measurement decides; the row's decided default, which installs nothing, stays recorded beside it.",
+  "records": {
+   "run_pin": {
+    "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/run-pin.json",
+    "sha256": "e1c84835aafdbe9a2c0742e22899507a83babc8e5bf81125e43a26b6cf251f32"
+   },
+   "upstream_tag_resolution": {
+    "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/upstream-tag-resolution.txt",
+    "sha256": "85a42159a3178b51956fe1f4989559f2060d878a502f45a665c1cfa609daaaa6"
+   },
+   "verify_release_checksum": {
+    "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/verify-release-checksum.txt",
+    "sha256": "4cf9beca8201431f08123596d1063a0d4f52419632a9c1d48cf5efb8b6bc672b"
+   },
+   "verify_install_script_checksum": {
+    "path": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/outputs/verify-install-script-checksum.txt",
+    "sha256": "a0e3d35f6402554912572b4d59d223771e9f23766fd8f7eda8957a7441384f8c"
+   }
+  },
+  "acknowledgements": [],
+  "acknowledgements_owed": [
+   "claude",
+   "gpt"
+  ],
+  "add_rows": [],
+  "amend_rows": [
+   {
+    "slot_id": "memory-owner",
+    "amendment": {
+     "date_utc": "2026-10-17",
+     "by": "direct consensus of both model families (wave 6; each family's pull-request acknowledgement is recorded under acknowledgements before the merge), on the command center's GO of 2026-10-16 at 16:51Z that moves ai-memory from 2.6.6 to 3.1.0 (the builder's private handoff receipt RECEIPT-model-picks-20261016.md, outside the repository, section 8, lines 99-114) and on its rulings D1-D9 for condition 4 of PR (b) (nhny-gino, hcom #9109, sent 2026-10-17T00:58:42Z by the hcom event time; the private record RULINGS-gino-9109.md, outside the repository) and on its rulings G1-G6 for the fold of that pull request (nhny-gino, hcom #14261, sent 2026-10-17T03:11:03Z by the hcom event time; the private record RULINGS-gino-fold.md, outside the repository)",
+     "decision": "install ai-memory 3.1.0 for the memory-owner interim: tag v3.1.0 at 11ca7c5b, its release archive verified against the publisher's sha256 sidecar (the memory-owner 3.1.0 run pin and its checksum receipt, which supersede the F1 run pin as the plan's pin source); the plan row follows in the same change, and the other interim fields stay as recorded except the open acceptance gates, which name 3.1.0, its client entries and the memory port of the host allocation; the configuration's listen, service and codex_tool_approval, which the 3.1.0 route makes false as recorded (the port is the host allocation's, setup renders and owns the unit, and setup writes Codex's tool approval unconditionally); and the sources, which move to the 3.1.0 run pin and the v3.1.0 release at 11ca7c5b; and the label, which named only the owner's decision, and now names both authorities: the owner's decision of 2026-10-03 to install ai-memory with a fresh store, and this direct consensus for the 3.1.0 version"
+    },
+    "interim": {
+     "default": "ai-memory 3.1.0",
+     "label": "interim install on the owner's decision of 2026-10-03 (amendment 3) to install ai-memory with a fresh store, at the version 3.1.0 that wave 6's direct consensus of 2026-10-17 set (amendment 3's direct-consensus authority); not a blind result and not a measurement; the memory head-to-head decides, and its result replaces or removes it",
+     "pin": "tag v3.1.0 (tag object 8daaf92829ccc55fc0d203a758eb455dd86eb4ac) = commit 11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea; release asset ai-memory-linux-x86_64.tar.gz sha256 10b2411ff6988e2a275e17734170a617341a51eec8162ba3166bdd4284cde651",
+     "open_acceptance_gates": [
+      "the user unit is active, /healthz on the memory port of the host allocation (NS_PORT_MEMORY in ~/.config/new-wsl-native-stack/.service-ports.json) returns 200, and ai-memory status reports 3.1.0 with the local embedder",
+      "claude mcp list shows its stdio entry (ai-memory mcp-bridge --server-url http://127.0.0.1:<that port>/mcp) connected, codex mcp list lists its HTTP entry at that port's /mcp with bearer_token_env_var = \"AI_MEMORY_AUTH_TOKEN\", and the hooks admit capture",
+      "a canary typed in an ordinary session of one client is returned by memory_query in a fresh session of the other, in both directions, without memory_write_page",
+      "a handoff survives an unrelated session started in between; restart, spool drain and cold boot pass",
+      "across every hook source of both clients, only ai-memory fills the memory slot"
+     ],
+     "configuration": {
+      "listen": "127.0.0.1 on the memory port of the host allocation (NS_PORT_MEMORY in ~/.config/new-wsl-native-stack/.service-ports.json, the CC's ruling D3), whose default is 29374, the port the host template and the client templates carry (synthesis X5); the ruling's 21374 is not used",
+      "service": "the systemd user unit ai-memory setup renders from packaging/systemd/ai-memory-user.service at the pin and owns, with the plan's drop-in ai-memory.service.d/override.conf (PATH, CPUWeight=idle, MemoryHigh=1G and MemoryMax=2G), under linger",
+      "codex_tool_approval": "default_tools_approval_mode = \"approve\", which ai-memory's own setup writes unconditionally (akitaonrails/ai-memory@11ca7c5b crates/ai-memory-cli/src/commands/install_mcp.rs:1923), and the client configuration only with --with-authorization-settings (memory change 13); accepted because it matches the host's approval_policy = never (the CC's ruling G1), and never stripped, since a second writer of the key would break the one-writer rule (D1)"
+     },
+     "sources": [
+      "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.memory: the dossier default, the GPT check and its conditions, the ruling's changes 1, 3-5 and 12-15; synthesis_extracts X5)",
+      "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/run-pin.json (the 3.1.0 run pin: tag, commit, release archive and install script, each verified against its sidecar)",
+      "https://github.com/akitaonrails/ai-memory/releases/tag/v3.1.0",
+      "https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/docs/install.md",
+      "https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/docs/local-embeddings.md"
+     ]
+    }
+   }
+  ],
+  "interim_rows": []
  }
 }

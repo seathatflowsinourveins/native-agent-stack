@@ -1,0 +1,3 @@
+d8f1ac1bbf54bd4adea152865c0be68c968b92cdc155017e78840f300585ea97  install.sh at 11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea (contents API)
+bytes 9265
+identical to the release asset install.sh (cmp exit 0)

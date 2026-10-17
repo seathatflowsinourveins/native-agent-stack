@@ -33,15 +33,17 @@ requirement needs, so the shared templates stay what render_config.py and the bo
              docs/decisions/2026-10-02-new-wsl-client-configuration.md.
              A piece mapped to a slot that does not install is not wired, not an error: the manifest decides, and the
              piece is wired when the slot installs the owner the entry names.
-  --render   --host NAME --out DIR [--with-authorization-settings]: settings.json (and the WSL overlay),
+  --render   --host NAME --out DIR [--with-authorization-settings [--with-remote-control-at-startup]]: settings.json (and the WSL overlay),
              mcp-servers.json, codex.config.toml, codex.hooks.json and the two Codex profiles for that host value file,
              with wired pieces only; the authorization settings (the ones that grant a permission or suppress a
-             confirmation: Claude Code permissions.defaultMode, skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy
-             and sandbox_mode, a Codex project's trust_level, and the tool approval mode of a Codex MCP server, which
-             also needs its server wired) only with the option. Placeholders
+             confirmation: Claude Code permissions.defaultMode, skipDangerousModePermissionPrompt and crossSessionInbound,
+             Codex approval_policy and sandbox_mode, a Codex project's trust_level, and the tool approval mode of a Codex MCP server, which
+             also needs its server wired) only with the option, and Claude Code remoteControlAtStartup only with it and
+             --with-remote-control-at-startup, its own opt-in, off by default (SEPARATE_OPT_INS). Placeholders
              are filled by tools/adoption/render_config.py. The telemetry endpoint and gateway port use the host's
-             NS_PORT_* values through the install plan's renderer. AI_MEMORY_BIN (the executable the memory-owner
-             row links) comes from the install plan; HOST_PATH gains
+             NS_PORT_* values through the install plan's renderer. AI_MEMORY_BIN (the file the memory-owner
+             row installs, the path ai-memory's own installers embed in its hooks) comes from the install plan; it
+             renders no hook here, because ai-memory's installer is the one writer of its hooks; HOST_PATH gains
              the directories of the wired path pieces.
   --write-blocks
              writes adoption/new-wsl/claude-user-instructions.md and codex-user-instructions.md: the two instruction blocks
@@ -49,13 +51,13 @@ requirement needs, so the shared templates stay what render_config.py and the bo
              paragraph and heading that names a tool that is not wired left out and nothing written in its place; --dropped
              lists every unit left out, in full. --check fails while a committed file differs from what the filter makes.
   --apply    --host NAME [--home DIR] [--claude-bin P] [--codex-bin P] [--codex-process-name N]
-             [--with-authorization-settings] [--dry-run] [--skip STEP]: puts the render in place with the repository's
+             [--with-authorization-settings [--with-remote-control-at-startup]] [--dry-run] [--skip STEP]: puts the render in place with the repository's
              own tools, one step each (the names --skip
              takes). It installs no tool and no pinned client; it backs up what it changes, runs again to the same files,
              and prints what it did and what it left out. --dry-run runs no client binary and writes nothing.
-             While the render wires an interim install (amendment 3 of the manifest's decision rule) and the layer
-             consensus's wave-2 batch still owes an acknowledgement (consensus.json wave2.acknowledgements_owed), a real
-             run refuses and writes nothing, and a dry run says so. While the map wires step/codex-remote-plugin-rules,
+             While the render wires an interim install (amendment 3 of the manifest's decision rule) and any wave
+             batch of the layer consensus still owes an acknowledgement (consensus.json wave<n>.acknowledgements_owed), a
+             real run refuses and writes nothing, and a dry run says so. While the map wires step/codex-remote-plugin-rules,
              the Codex config also gets a [[skills.config]] name rule per skill of the account's remote plugins and an off
              switch per plugin MCP server, read from the home's plugin cache (remote_plugin_rules); --render has no home
              and leaves them out.
@@ -123,8 +125,9 @@ from scripts import adoption_status  # noqa: E402
 MAP_REL = "adoption/new-wsl/client-config-map.json"
 MAP_SCHEMA = "native-agent-stack/new-wsl-client-config-map/v1"
 MANIFEST_REL = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
-# The layer consensus whose wave-2 batch records amendment 3 (the interim installs) and the acknowledgements both model
-# families owe it; --apply refuses to wire an interim install while one is owed (owed_acknowledgements).
+# The layer consensus whose wave-2 batch records amendment 3 (the interim installs) and whose wave batches record the
+# acknowledgements both model families owe them; --apply refuses to wire an interim install while any batch owes one
+# (owed_acknowledgements).
 CONSENSUS_REL = "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json"
 PLAN_REL = "evidence/artifacts/new-wsl-install-plan-20261002"
 HOST_TEMPLATE_REL = "adoption/templates/wsl/host.new-distro.json.template"
@@ -175,6 +178,9 @@ AUTHORIZATION_PIECES = (
     "claude/settings/setting/permissions.defaultMode",
     "claude/settings/setting/skipDangerousModePermissionPrompt",
     "claude/settings/setting/crossSessionInbound",
+    # Remote Control at startup lets claude.ai/code or the Claude app drive every session, a bypassPermissions one included
+    # (docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md).
+    "claude/settings/setting/remoteControlAtStartup",
     "codex/config/approval_policy",
     "codex/config/sandbox_mode",
 )
@@ -189,6 +195,13 @@ AUTHORIZATION_PATTERNS = ("claude/*/permission/allow/*", "codex/*/projects.*.tru
 APPROVAL_MODE_KEYS = ("default_tools_approval_mode", "approval_mode")
 APPROVING_MODES = ("approve",)
 AUTHORIZATION_OPTION = "--with-authorization-settings"
+# Authorization settings that also need an option of their own, off by default: the bundle above does not carry them, and
+# each is rendered and written only when both options are given (and, like every authorization setting, never over a value
+# the file already has). remoteControlAtStartup starts the Remote Control bridge in every interactive session, a wider
+# remote ingress than the launchers' named --remote-control sessions, so it is a separate choice inside the authorization
+# class (the CC's ruling G3 for PR (b) condition 4, 2026-10-17; docs/decisions/2026-10-17-new-wsl-remote-control-at-
+# startup.md). The tool, not the map, says which they are, as for AUTHORIZATION_PIECES.
+SEPARATE_OPT_INS = {"claude/settings/setting/remoteControlAtStartup": "--with-remote-control-at-startup"}
 # What the line --apply prints about the authorization settings starts with, and the words that follow it (documented in the
 # recipe, the decision record, the receipt example and above; tests/test_new_wsl_client_config.py pins every place).
 AUTHORIZATION_OUTCOMES = ("left to the clients' own defaults", "applied", "would be applied", "partly applied",
@@ -330,13 +343,25 @@ def installed_default(row: dict) -> str:
 
 
 def owed_acknowledgements(root: Path) -> list:
-    """The model families whose acknowledgement of the layer consensus's wave-2 batch is still owed (wave2.
-    acknowledgements_owed). The interim installs of amendment 3 wait for both: 'Until all of that exists, nothing is
-    installed' (wave-2 code-search ruling, change 1); install.sh's interim_acknowledged reads the same list."""
-    owed = (read_json(root / CONSENSUS_REL).get("wave2") or {}).get("acknowledgements_owed")
-    if not (isinstance(owed, list) and all(isinstance(name, str) and name for name in owed)):
-        raise ConfigError(f"{CONSENSUS_REL}: wave2.acknowledgements_owed is not a list of names, so whether the interim "
-                          "installs may be wired is not known")
+    """The acknowledgements every wave batch of the layer consensus still owes, one '<batch>: <families>' entry per batch
+    that owes any, in the file's order (wave2.acknowledgements_owed, wave3..., wave6...). The interim installs of
+    amendment 3 wait for them: 'Until all of that exists, nothing is installed' (wave-2 code-search ruling, change 1).
+    install.sh's interim_acknowledged reads the same batches the same way and refuses the same inputs: no wave batch, a
+    key starting with wave that is not wave<n>, or a batch whose acknowledgements_owed is not a list of names. Reading
+    only wave2 let --apply wire the memory-owner interim while wave6 owed both families, which install.sh refused."""
+    consensus = read_json(root / CONSENSUS_REL)
+    batches = [(key, batch) for key, batch in consensus.items() if key.startswith("wave")] if isinstance(consensus, dict) else []
+    if not batches:
+        raise ConfigError(f"{CONSENSUS_REL}: no wave batch, so whether the interim installs may be wired is not known")
+    owed = []
+    for key, batch in batches:
+        names = batch.get("acknowledgements_owed") if isinstance(batch, dict) else None
+        if not re.fullmatch(r"wave[0-9]+", key) or not (
+                isinstance(names, list) and all(isinstance(name, str) and name for name in names)):
+            raise ConfigError(f"{CONSENSUS_REL}: {key}.acknowledgements_owed is not a list of names under a wave<n> key, "
+                              "so whether the interim installs may be wired is not known")
+        if names:
+            owed.append(f"{key}: {', '.join(names)}")
     return owed
 
 
@@ -396,17 +421,24 @@ def load_plan(root: Path) -> dict:
 
 
 def ai_memory_link(row: dict):
-    """The path, under $HOME, of the ai-memory executable the plan's memory-owner row links, or None while the row does
-    not install it. The Claude hooks run AI_MEMORY_BIN; without it render_config.py derives the path from the platform's
-    pin (${ECO_ROOT}/tools/ai-memory-<version>/ai-memory), which is not where this plan installs ai-memory."""
+    """The path, under $HOME, of the ai-memory executable the plan's memory-owner row installs, or None while the row does
+    not install it. It names the file, never a link to it: ai-memory's own installers (setup, install-hooks, upgrade and
+    run's auto-wire) write the running binary, std::env::current_exe(), into every hook command, and that is the resolved
+    file (akitaonrails/ai-memory@11ca7c5b crates/ai-memory-cli/src/commands/render_shared.rs:2094-2125 and 2235-2251),
+    so AI_MEMORY_BIN and their hooks name one path. The vendor's install.sh unpacks the release into $AI_MEMORY_LIB_DIR
+    (default ~/.local/lib/ai-memory) and links ~/.local/bin/ai-memory to the ai-memory in it (install.sh:8, 151-152 and
+    216 at the same commit); a release archive linked by hand (ln -sfn <file> <link>) names the file first."""
     if not row.get("installed"):
         return None
     for command in row.get("commands", []):
-        link = re.search(r'ln -sfn "\$HOME/[^"]+/ai-memory" "\$HOME/([^"$]+/ai-memory)"', command)
+        if re.search(r"\binstall\.sh\b", command) and re.search(r"\bAI_MEMORY_VERSION=", command):
+            lib = re.search(r'\bAI_MEMORY_LIB_DIR="\$HOME/([^"$]+?)/?"', command)
+            return f"{lib.group(1) if lib else '.local/lib/ai-memory'}/ai-memory"
+        link = re.search(r'ln -sfn "\$HOME/([^"$]+/ai-memory)" "\$HOME/[^"$]+/ai-memory"', command)
         if link:
             return link.group(1)
-    raise ConfigError("the install plan's memory-owner row installs ai-memory but links no ai-memory executable under "
-                      "$HOME, so the hooks' AI_MEMORY_BIN could not be read")
+    raise ConfigError("the install plan's memory-owner row installs ai-memory but neither runs the vendor's install.sh nor "
+                      "links an ai-memory executable under $HOME, so AI_MEMORY_BIN could not be read")
 
 
 SKILLS_MANIFEST_REL = "adoption/skills/manifest.json"
@@ -646,9 +678,11 @@ def slot_verdict(piece: Piece, entry: Entry, slot: str, manifest: dict, plan: di
     return True, f"slot {slot} installs {default}{interim}"
 
 
-def verdicts(pieces: list, taken: dict, manifest: dict, plan: dict, authorization: bool = False) -> tuple:
-    """(verdicts, errors, warnings). An authorization piece is wired only when `authorization` is true, and, when its
-    entry names a slot, only while that slot installs the owner."""
+def verdicts(pieces: list, taken: dict, manifest: dict, plan: dict, authorization: bool = False,
+             opt_ins: frozenset = frozenset()) -> tuple:
+    """(verdicts, errors, warnings). An authorization piece is wired only when `authorization` is true, when its entry
+    names a slot, only while that slot installs the owner, and when SEPARATE_OPT_INS names an option for it, only when
+    `opt_ins` holds that option too."""
     out, errors, warnings = [], [], []
     for piece in pieces:
         entry = taken.get(piece.key)
@@ -667,14 +701,21 @@ def verdicts(pieces: list, taken: dict, manifest: dict, plan: dict, authorizatio
         if kind == "authorization":
             slot_wired, slot_reason = ((True, "") if not entry.slot else
                                        slot_verdict(piece, entry, entry.slot, manifest, plan, errors, warnings))
-            wired = authorization and slot_wired
+            option = SEPARATE_OPT_INS.get(piece.key)
+            opted = option is None or option in opt_ins
+            wired = authorization and slot_wired and opted
             tied = f"; {slot_reason}" if entry.slot else ""
+            given = AUTHORIZATION_OPTION + (f" and {option}" if option else "")
             if wired:
-                reason = f"authorization setting, written because {AUTHORIZATION_OPTION} was given: {argument}{tied}"
+                reason = f"authorization setting, written because {given} {'were' if option else 'was'} given: {argument}{tied}"
+            elif authorization and not opted:
+                reason = (f"authorization setting, not written although {AUTHORIZATION_OPTION} was given: it also needs "
+                          f"{option}, off by default: {argument}{tied}")
             elif authorization:
                 reason = f"authorization setting, not written although {AUTHORIZATION_OPTION} was given: {slot_reason}"
             else:
-                reason = f"authorization setting, not written unless {AUTHORIZATION_OPTION} is given: {argument}{tied}"
+                reason = (f"authorization setting, not written unless {AUTHORIZATION_OPTION} is given"
+                          f"{f' (and {option}, off by default)' if option else ''}: {argument}{tied}")
         elif kind == "practice":
             wired, reason = True, "repository practice"
             for word in command_words(piece.command or ""):
@@ -1173,7 +1214,9 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
     files["settings.linux-wsl2.overlay.json"] = json.dumps(overlay, indent=2, ensure_ascii=False) + "\n"
     # The user-scope MCP servers: a wired server with the launch the entry gives it. ${HOME} and ${ECO_ROOT} stay for
     # install_claude_profile.py, which fills them when it registers the file; an override's other placeholders are host
-    # values and are filled here (ai-memory's URL takes the host file's AI_MEMORY_URL, as the hooks and Codex do).
+    # values and are filled here (ai-memory's bridge URL takes the host file's AI_MEMORY_URL, as Codex's entry does: the
+    # memory port of the host allocation, which the plan's port renderer refuses to let differ from NS_PORT_MEMORY,
+    # config/observability_config.py service_ports).
     servers = {}
     host_only = {key: value for key, value in values.items() if key not in ("HOME", "ECO_ROOT")}
     for name, spec in template_data(root, "claude/mcp").get("mcpServers", {}).items():
@@ -1181,8 +1224,11 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
         if verdict:
             override = json.loads(string.Template(json.dumps(verdict.entry.raw.get("override", {}))).safe_substitute(
                 host_only))
-            servers[name] = {**spec, **override}
-            if "env" in override:
+            # A key the override sets to null is removed, so a transport change (http to stdio) drops the
+            # template's url instead of leaving it beside command and args (ai-memory 3.1.0's stdio bridge entry,
+            # akitaonrails/ai-memory@11ca7c5b crates/ai-memory-cli/src/commands/install_mcp.rs:1541-1552).
+            servers[name] = {key: value for key, value in {**spec, **override}.items() if value is not None}
+            if isinstance(override.get("env"), dict):
                 # Native MCP env is a variable map (https://code.claude.com/docs/en/mcp). A host's partial override
                 # replaces those variables while retaining the pinned template's required provider/model settings.
                 servers[name]["env"] = {**spec.get("env", {}), **override["env"]}
@@ -1336,14 +1382,15 @@ def wiring_table(results: list) -> str:
 # ---------------------------------------------------------------------------------------------------------------
 # checks and notes
 
-def analyse(root: Path, check_blocks: bool = True, authorization: bool = False):
+def analyse(root: Path, check_blocks: bool = True, authorization: bool = False, opt_ins: frozenset = frozenset()):
     """(results, manifest, plan, errors, warnings) for the catalog at root. check_blocks=False leaves the freshness of the
     two generated blocks out, for --write-blocks, which is what makes them fresh. authorization=True wires the
-    authorization settings (--with-authorization-settings)."""
+    authorization settings (--with-authorization-settings); opt_ins holds the options of SEPARATE_OPT_INS that were also
+    given."""
     manifest, plan = load_manifest(root), load_plan(root)
     pieces, entries = collect_pieces(root), load_map(root)
     taken, errors = assign(pieces, entries)
-    results, more_errors, warnings = verdicts(pieces, taken, manifest, plan, authorization)
+    results, more_errors, warnings = verdicts(pieces, taken, manifest, plan, authorization, frozenset(opt_ins))
     errors += more_errors
     names = unwired_names(results, manifest)
     results = resolve_blocks(root, results, names)
@@ -1477,7 +1524,9 @@ def markdown_tables(root: Path, results: list, plan: dict) -> str:
     for v in results:
         if v.authorization:
             reason = v.entry.wiring.partition(":")[2]
-            also = f"slot `{v.entry.slot}` installing `{v.entry.owner}`" if v.entry.slot else "-"
+            needs = ([f"slot `{v.entry.slot}` installing `{v.entry.owner}`"] if v.entry.slot else []) + (
+                [f"`{SEPARATE_OPT_INS[v.piece.key]}`"] if v.piece.key in SEPARATE_OPT_INS else [])
+            also = "; ".join(needs) or "-"
             rows.append(f"| {markdown_code(v.piece.key)} | {markdown_code(json.dumps(v.piece.value))} | no | "
                         f"{markdown_cell(reason)} | {also} |")
     gaps = agent_gaps(root, results, plan)
@@ -1491,14 +1540,17 @@ def markdown_tables(root: Path, results: list, plan: dict) -> str:
 
 
 def rendered_name_errors(root: Path) -> list:
-    """Render for the example host without and with the authorization settings and scan every file for the name of a
-    tool that is not wired (the names the map declares and the former defaults of the manifest rows that install
-    nothing). The instruction blocks are among the files."""
+    """Render for the example host without and with the authorization settings, and with them and every option of
+    SEPARATE_OPT_INS, and scan every file for the name of a tool that is not wired (the names the map declares and the
+    former defaults of the manifest rows that install nothing). The instruction blocks are among the files."""
     errors = []
-    for with_authorization in (False, True):
-        label = f"{'with' if with_authorization else 'without'} {AUTHORIZATION_OPTION}"
+    every = frozenset(SEPARATE_OPT_INS.values())
+    for with_authorization, opt_ins in ((False, frozenset()), (True, frozenset()), (True, every)):
+        label = (f"{'with' if with_authorization else 'without'} {AUTHORIZATION_OPTION}"
+                 + "".join(f" and {option}" for option in sorted(opt_ins)))
         try:
-            results, manifest, plan, _, _ = analyse(root, check_blocks=False, authorization=with_authorization)
+            results, manifest, plan, _, _ = analyse(root, check_blocks=False, authorization=with_authorization,
+                                                    opt_ins=opt_ins)
             files = render(root, results, plan, host_values(EXAMPLE_HOST, plan, None, wired_path_dirs(results)), manifest)
         except (ConfigError, render_config.RenderError, OSError, KeyError, ValueError) as error:
             errors.append(f"the render for the example host {label} failed, so it was not scanned: {error}")
@@ -1544,7 +1596,13 @@ def rendered_mcp_endpoint_errors(root: Path) -> list:
                     tomllib.loads(files["codex.config.toml"]).get("mcp_servers", {}))
 
         def fields(spec: dict) -> dict:
-            return {**({"url": spec["url"]} if "url" in spec else {}),
+            # A stdio bridge's upstream is the argument after --server-url (akitaonrails/ai-memory@11ca7c5b
+            # crates/ai-memory-cli/src/commands/install_mcp.rs:227-254, bridge_entry_url): compared as the url.
+            args = spec.get("args") or []
+            bridge = (args[args.index("--server-url") + 1] if args[:1] == ["mcp-bridge"] and "--server-url" in args[:-1]
+                      else None)
+            url = spec.get("url", bridge)
+            return {**({"url": url} if url is not None else {}),
                     **{f"env.{key}": value for key, value in spec.get("env", {}).items()}}
 
         claude_before, codex_before = servers(before)
@@ -1593,6 +1651,8 @@ def cmd_check(args: argparse.Namespace) -> int:
               "value of them is never changed), with the value the option would write:", file=out)
         for v in apart:
             also = f"  (and only while slot {v.entry.slot} installs {v.entry.owner})" if v.entry.slot else ""
+            if v.piece.key in SEPARATE_OPT_INS:
+                also += f"  (and only with {SEPARATE_OPT_INS[v.piece.key]}, off by default)"
             print(f"  {v.piece.key} = {json.dumps(v.piece.value)}{also}", file=out)
         for reason in dict.fromkeys(v.entry.wiring.partition(":")[2] for v in apart):
             print(f"  why: {reason}", file=out)
@@ -1622,7 +1682,8 @@ def cmd_render(args: argparse.Namespace) -> int:
         print(f"--host must match {HOST_NAME.pattern}", file=sys.stderr)
         return 2
     try:
-        results, manifest, plan, errors, _ = analyse(args.root, authorization=args.with_authorization_settings)
+        results, manifest, plan, errors, _ = analyse(args.root, authorization=args.with_authorization_settings,
+                                                     opt_ins=given_opt_ins(args))
         if errors:
             print("render refused: the check fails:\n  " + "\n  ".join(errors), file=sys.stderr)
             return 1
@@ -2075,7 +2136,7 @@ class Apply:
             return 2
         try:
             self.results, self.manifest, self.plan, errors, _ = analyse(
-                self.root, authorization=args.with_authorization_settings)
+                self.root, authorization=args.with_authorization_settings, opt_ins=given_opt_ins(args))
             if errors:
                 print("apply refused: the check fails:\n  " + "\n  ".join(errors), file=sys.stderr)
                 return 1
@@ -2090,8 +2151,8 @@ class Apply:
             # The gate of amendment 3 (wave-2 code-search ruling, change 1), recorded in the wave-2 section of
             # docs/decisions/2026-10-02-new-wsl-layer-consensus.md: no interim install is wired before both acknowledgements.
             why = (f"the render wires the interim installs of {', '.join(interims)} (amendment 3 of the manifest's decision "
-                   f"rule), and the acknowledgement of the wave-2 batch is still owed by {', '.join(owed)} "
-                   f"({CONSENSUS_REL}, wave2.acknowledgements_owed)")
+                   f"rule), and the wave batches still owe acknowledgements: {'; '.join(owed)} "
+                   f"({CONSENSUS_REL}, acknowledgements_owed)")
             if not self.dry:
                 print(f"apply refused: {why}; nothing is written. Record both acknowledgements, then run again.",
                       file=sys.stderr)
@@ -2145,10 +2206,14 @@ class Apply:
         because its step was skipped or failed."""
         if not self.args.with_authorization_settings:
             print("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
-                  "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
+                  "skipDangerousModePermissionPrompt, crossSessionInbound and remoteControlAtStartup, Codex approval_policy "
+                  "and sandbox_mode, the trust_level of the wired "
                   "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
                   f"and a value of theirs that a file has is not touched; {AUTHORIZATION_OPTION} adds the ones a file "
-                  "lacks, except existing create-only profile files)")
+                  "lacks, except existing create-only profile files and remoteControlAtStartup, which also needs "
+                  f"{SEPARATE_OPT_INS['claude/settings/setting/remoteControlAtStartup']}; ai-memory's own setup, which "
+                  "the install plan's memory-owner row runs, writes ai-memory's Codex default_tools_approval_mode = "
+                  '"approve" regardless, akitaonrails/ai-memory@11ca7c5b install_mcp.rs:1923)')
             return
         verdict_of = {v.piece.key: v for v in self.results if v.authorization and v.wired}
         by_status = {status: [authorization_label(key) for key in verdict_of if self.authorization.get(key) == status]
@@ -2165,6 +2230,12 @@ class Apply:
             how = {"skipped": "was skipped", "failed": "failed", None: "did not run"}.get(outcome, f"ended {outcome}")
             missed.setdefault((step, how), []).append(authorization_label(key))
         parts += [f"not reached, its step {step} {how}: {', '.join(labels)}" for (step, how), labels in missed.items()]
+        given = given_opt_ins(self.args)
+        held: dict = {}
+        for v in self.results:     # an authorization setting that waits for its own option (SEPARATE_OPT_INS)
+            option = SEPARATE_OPT_INS.get(v.piece.key)
+            if v.authorization and not v.wired and option and option not in given:
+                held.setdefault(option, []).append(authorization_label(v.piece.key))
         if not verdict_of:
             state = "not applied"
             parts = ["no authorization setting is wired: the map leaves each out, or its slot does not install"]
@@ -2174,6 +2245,7 @@ class Apply:
             state = "would be applied" if self.dry else "applied"
         else:
             state = "kept"
+        parts += [f"not written without {option}: {', '.join(labels)}" for option, labels in held.items()]
         print(f"authorization settings: {state} ({AUTHORIZATION_OPTION}; {'; '.join(parts)})")
 
     # -- Claude
@@ -2671,7 +2743,8 @@ class Apply:
             self.record("verify", "skipped", "a dry run starts no shell")
             return
         servers = json.loads((self.stage / "mcp-servers.json").read_text())["mcpServers"]
-        # A stdio server runs a command a login shell must find; an http server (ai-memory) runs none here.
+        # A stdio server runs a command a login shell must find (ai-memory's mcp-bridge included: install.sh links
+        # ~/.local/bin/ai-memory); an http server (qmd) runs none here.
         commands = (spec["command"] for spec in servers.values() if "command" in spec)
         names = list(dict.fromkeys(["claude", "codex", "mise", *commands]))
         found = login_shell_resolution(self.home, names)
@@ -2753,12 +2826,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--with-authorization-settings", action="store_true",
                         help="--render and --apply: also render and write the authorization settings, the ones that grant "
                              "a permission or suppress a confirmation (Claude Code permissions.defaultMode, "
-                             "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level "
+                             "skipDangerousModePermissionPrompt and crossSessionInbound, Codex "
+                             "approval_policy and sandbox_mode, the trust_level "
                              "of the host's main checkout in Codex, and the tool approval mode of a Codex MCP server "
-                             "whose slot installs it). By default they "
+                             "whose slot installs it; Claude Code remoteControlAtStartup only with "
+                             "--with-remote-control-at-startup as well). By default they "
                              "are neither rendered nor written and a value a file already has is never touched; with this "
                              "option a missing one is added and a differing one is kept and printed beside the render's. "
                              "Use it only on a host whose owner asked for the repository's permission practice.")
+    parser.add_argument("--with-remote-control-at-startup", action="store_true",
+                        help="--render and --apply, with --with-authorization-settings only: also render and write Claude "
+                             "Code remoteControlAtStartup = true, which starts the Remote Control bridge in every "
+                             "interactive session (a remote ingress on a bypassPermissions host), never over a value "
+                             "settings.json already has. Off by default: the authorization bundle does not carry it "
+                             "(docs/decisions/2026-10-17-new-wsl-remote-control-at-startup.md).")
     parser.add_argument("--codex-process-name", default="codex",
                         help="--apply: the executable name whose running processes stop either write of the Codex "
                              "config.toml, the merge into an existing one and the creation of an absent one (default: "
@@ -2797,8 +2878,19 @@ def cmd_write_blocks(args: argparse.Namespace) -> int:
     return 0
 
 
+def given_opt_ins(args: argparse.Namespace) -> frozenset:
+    """The options of SEPARATE_OPT_INS given on the command line."""
+    return frozenset(option for option in SEPARATE_OPT_INS.values()
+                     if getattr(args, option.lstrip("-").replace("-", "_"), False))
+
+
 def main(argv: list | None = None) -> int:
     args = build_parser().parse_args(argv)
+    lone = sorted(given_opt_ins(args)) if not args.with_authorization_settings else []
+    if lone:
+        print(f"{', '.join(lone)} needs {AUTHORIZATION_OPTION}: it adds one authorization setting to that bundle",
+              file=sys.stderr)
+        return 2
     if args.write_blocks:
         return cmd_write_blocks(args)
     if args.check:

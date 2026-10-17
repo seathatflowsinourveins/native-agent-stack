@@ -1,0 +1,110 @@
+{
+  "schema": "native-agent-stack/ai-memory-print-mode-fixture/v1",
+  "captured_utc": "2026-10-17T02:36:09Z",
+  "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/sandbox-home CLAUDE_CONFIG_DIR=<scratch>/sandbox-home/.claude <bin> --data-dir <scratch>/data install-hooks --agent claude-code --no-capture-prompts",
+  "capture_script": "tests/fixtures/ai-memory-3.1.0-claude-hooks.capture.sh",
+  "binary": {
+    "version": "ai-memory 3.1.0",
+    "sha256": "bac68e5122614913e447dd7286a9092ea2237f2d6a0f684f334e907002164872",
+    "run_pin": "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/run-pin.json"
+  },
+  "upstream": "akitaonrails/ai-memory@11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea (tag v3.1.0)",
+  "server_url": "http://127.0.0.1:49374",
+  "replacements": [
+    "<bin> -> /home/example/.local/lib/ai-memory/ai-memory",
+    "<bin directory> -> /home/example/.local/lib/ai-memory",
+    "<scratch>/data -> /home/example/.local/share/ai-memory"
+  ],
+  "settings": {
+    "hooks": {
+      "SessionStart": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/home/example/.local/lib/ai-memory/ai-memory --data-dir /home/example/.local/share/ai-memory hook --event session-start --agent claude-code --server-url http://127.0.0.1:49374"
+            }
+          ]
+        }
+      ],
+      "SubagentStop": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/home/example/.local/lib/ai-memory/ai-memory --data-dir /home/example/.local/share/ai-memory hook --event subagent-stop --agent claude-code --server-url http://127.0.0.1:49374"
+            }
+          ]
+        }
+      ],
+      "PreToolUse": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/home/example/.local/lib/ai-memory/ai-memory --data-dir /home/example/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://127.0.0.1:49374"
+            }
+          ]
+        }
+      ],
+      "PostToolUse": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/home/example/.local/lib/ai-memory/ai-memory --data-dir /home/example/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://127.0.0.1:49374"
+            }
+          ]
+        }
+      ],
+      "PreCompact": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/home/example/.local/lib/ai-memory/ai-memory --data-dir /home/example/.local/share/ai-memory hook --event pre-compact --agent claude-code --server-url http://127.0.0.1:49374"
+            }
+          ]
+        }
+      ],
+      "Stop": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/home/example/.local/lib/ai-memory/ai-memory --data-dir /home/example/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://127.0.0.1:49374"
+            }
+          ]
+        }
+      ],
+      "SessionEnd": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/home/example/.local/lib/ai-memory/ai-memory --data-dir /home/example/.local/share/ai-memory hook --event session-end --agent claude-code --server-url http://127.0.0.1:49374"
+            }
+          ]
+        }
+      ],
+      "SubagentStart": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/home/example/.local/lib/ai-memory/ai-memory --data-dir /home/example/.local/share/ai-memory hook --event subagent-start --agent claude-code --server-url http://127.0.0.1:49374"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

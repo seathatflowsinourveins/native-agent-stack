@@ -166,22 +166,23 @@ class ActivationInstructionsTests(unittest.TestCase):
 
 
 class CurrentMemoryInitTests(unittest.TestCase):
-    def test_v266_fresh_init_settings_accept_the_local_provider_migration(self):
-        # v2.6.6 /04a9e8f5 init.rs:99-106 copies the default template and appends
-        # render_default_auth_block. Its only active added field is token_pepper.
-        template = (ROOT / "tests/fixtures/ai-memory-2.6.6-init-active.toml").read_text()
+    def test_v310_fresh_init_settings_accept_the_local_provider_migration(self):
+        # v3.1.0 /11ca7c5b init.rs:207-212 copies the default template and appends
+        # render_default_auth_block (token_pepper) and, on a fresh data dir, bearer_token_file.
+        # The file is <data_dir>/config.toml, setup's config (setup.rs:318-320).
+        template = (ROOT / "tests/fixtures/ai-memory-3.1.0-init-active.toml").read_text()
         initial = template + '\ntoken_pepper = "' + "ab" * 32 + '"\n'
         before = tomllib.loads(initial)
         self.assertEqual(before["bind"], "127.0.0.1:49374")
         self.assertNotIn("embedding_provider", before)
-        checker = module(PLAN / "check_plan.py", "wave7_v266_commands")
-        renderer = module(PLAN / "config/observability_config.py", "wave7_v266_ports")
+        checker = module(PLAN / "check_plan.py", "wave7_v310_commands")
+        renderer = module(PLAN / "config/observability_config.py", "wave7_v310_ports")
         functions = checker.functions((PLAN / "install.sh").read_text())
         command = next(command for command in checker.run_commands("memory-owner", functions, set())
                        if "embedding_provider" in command)
         for port in (29374, 49374):
             with self.subTest(port=port), tempfile.TemporaryDirectory() as tmp:
-                config = Path(tmp) / ".config/ai-memory/config.toml"
+                config = Path(tmp) / ".local/share/ai-memory/config.toml"
                 config.parent.mkdir(parents=True)
                 config.write_text(initial)
                 selected = renderer.render_command(command, renderer.service_ports({"NS_PORT_MEMORY": str(port)}))

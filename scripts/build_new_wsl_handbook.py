@@ -1115,6 +1115,20 @@ def inventory_sentence(counts):
             f"Measurements not yet returned: {counts['measurements_pending']}; returned: {counts['measurements_returned']}.")
 
 
+def amendment_sentence(data):
+    """What an amendment by direct consensus changes in its row, and on what authority. It changes no field the rounds decided;
+    an amendment of a row's interim (amendment 3) changes the interim fields it names, on the same direct-consensus authority,
+    and the install cell of the row's table shows the interim as amended."""
+    sentence = "An amendment by direct consensus is listed under its layer's table, on the authority of a direct consensus of the two model families."
+    amended = [item for layer in data["layers"] for slot in layer.get("default_slots", [])
+               for item in slot["record"].get("amendments", []) if "interim_replaced" in item]
+    if amended:
+        return (sentence + " It changes no field of its row that the rounds decided; the exception is an amendment of the row's "
+                "interim (amendment 3), which replaces the interim fields it names, and the row's install cell says which fields "
+                "that amendment set.")
+    return sentence + " It changes no field of its row."
+
+
 def render_paired_record(paired):
     """The recipe page's W5 paired record: prose is quoted and commands are fenced, all of it read from the page."""
     return [f"### {paired['step']}: the paired record, as the recipe page gives it", "",
@@ -1209,7 +1223,7 @@ def render_markdown(data):
                   inventory_sentence(defaults["inventory"]), "",
                   "An empty source state is displayed as open. A row that installs nothing by the manifest's own rule (a default, and not installs_nothing_extra) is shown as not installed, with the manifest's reason; that includes every split row, every measurement row whose measurement has not returned and every row resolved as not installed. A row that carries an interim install (amendment 3 of the decision rule) is shown with that install, beside its decided default's reason. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.", ""]
         if defaults["inventory"]["by_row_kind"].get("consensus") or defaults["inventory"]["amendments"]:
-            lines += ["A row of kind `consensus` was added by a recorded direct consensus of the two model families; its source basis says so and it is never definitive. An amendment by direct consensus is listed under its layer's table and changes no field of its row. "
+            lines += [f"A row of kind `consensus` was added by a recorded direct consensus of the two model families; its source basis says so and it is never definitive. {amendment_sentence(data)} "
                       f"Rows of kind consensus: {defaults['inventory']['by_row_kind'].get('consensus', 0)}; amendments: {defaults['inventory']['amendments']}.", ""]
         if defaults["inventory"]["by_row_kind"].get("owner_decision") or defaults["inventory"]["owner_amendments"]:
             lines += ["A row of kind `owner_decision` was added by the owner's decision (amendment 4 of the decision rule), and a row whose decided default installed nothing may carry an owner default, or an interim the owner amended; the source basis says so and none of them is definitive. The table shows the row as the owner's decision left it; what that decision replaced stays on the row under `overturned` and is listed under its layer's table. "
@@ -1250,7 +1264,12 @@ def render_markdown(data):
                     repositories = [part.strip() for part in interim["repository"].split(";")]
                     named = (f"[{interim['default']}]({repositories[0]})" if len(repositories) == 1
                              else f"{interim['default']} ({', '.join(repositories)})")
-                    install = (f"interim install ({interim['date_utc']}, amendment 3): {named}"
+                    # A direct consensus that amended the interim (a wave-6 amendment) says what it changed and on whose authority.
+                    changed = [key for item in record.get("amendments", []) for key in item.get("interim_replaced", {})]
+                    amended = [item for item in record.get("amendments", []) if "interim_replaced" in item]
+                    note = (f"; amended {amended[-1]['date_utc']} by direct consensus, which set its "
+                            f"{', '.join(sorted(set(changed)))}" if amended else "")
+                    install = (f"interim install ({interim['date_utc']}, amendment 3{note}): {named}"
                                f"; its decided default is {install}")
                 lines.append("| " + " | ".join(map(cell, [
                     record["slot_id"], slot["state"], record["job"], recommendation, install,

@@ -44,7 +44,7 @@
   "cross_family_boundary": "One model family judged (Claude Opus 5.5). The GPT-6.1 Sol reviews of 2026-10-01 (PR #575) reviewed the source host's record, not these blind packets, so they are not a second blind judgment; a blind GPT-6.1 Sol run on the same packets is requested from the Codex lane. Where both families agree, the recommendation stands as an arm; where they differ, both picks enter the comparison.",
   "default_decisions": {
     "inventory": {
-      "amendments": 8,
+      "amendments": 9,
       "by_row_kind": {
         "added": 10,
         "consensus": 6,
@@ -124,6 +124,15 @@
         },
         "date_utc": "2026-10-04",
         "meaning": "the wave-5 batch of 2026-10-04: decide round 2 under the owner's repository-quality rule, as its Opus verification left it: four rows added and owner defaults on two split rows whose decided default installs nothing; selection records only: no comparison named here has run"
+      },
+      "consensus_wave6": {
+        "acknowledgements": [],
+        "acknowledgements_owed": [
+          "claude",
+          "gpt"
+        ],
+        "date_utc": "2026-10-17",
+        "meaning": "the wave-6 batch of 2026-10-17: one interim amendment by direct consensus of both model families, under amendment 3's direct-consensus authority: the memory-owner interim moves from ai-memory 2.5.2 to 3.1.0, the version the memory-owner 3.1.0 run pin receipts (tag v3.1.0 at 11ca7c5b), so the install plan and the new WSL distribution install the same verified release; the interim stays an interim, and the memory head-to-head still decides"
       },
       "counts": {
         "by_row_kind": {
@@ -210,7 +219,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "3d35d64d44571ee4bc91b5ffb0329eefdbbc5017c11c57f16fbfea5a59e3b9c7"
+          "sha256": "437c98171d6843ee215b7c94e7a808c6346a1ae5d999ad6c2f86a4a47f157e88"
         },
         "convergence": {
           "file": "convergence.json",
@@ -1824,6 +1833,36 @@
           "installed": false,
           "not_installed_reason": "waits for or was settled by a measurement: outside the combination rule",
           "record": {
+            "amendments": [
+              {
+                "by": "direct consensus of both model families (wave 6; each family's pull-request acknowledgement is recorded under acknowledgements before the merge), on the command center's GO of 2026-10-16 at 16:51Z that moves ai-memory from 2.6.6 to 3.1.0 (the builder's private handoff receipt RECEIPT-model-picks-20261016.md, outside the repository, section 8, lines 99-114) and on its rulings D1-D9 for condition 4 of PR (b) (nhny-gino, hcom #9109, sent 2026-10-17T00:58:42Z by the hcom event time; the private record RULINGS-gino-9109.md, outside the repository) and on its rulings G1-G6 for the fold of that pull request (nhny-gino, hcom #14261, sent 2026-10-17T03:11:03Z by the hcom event time; the private record RULINGS-gino-fold.md, outside the repository)",
+                "date_utc": "2026-10-17",
+                "decision": "install ai-memory 3.1.0 for the memory-owner interim: tag v3.1.0 at 11ca7c5b, its release archive verified against the publisher's sha256 sidecar (the memory-owner 3.1.0 run pin and its checksum receipt, which supersede the F1 run pin as the plan's pin source); the plan row follows in the same change, and the other interim fields stay as recorded except the open acceptance gates, which name 3.1.0, its client entries and the memory port of the host allocation; the configuration's listen, service and codex_tool_approval, which the 3.1.0 route makes false as recorded (the port is the host allocation's, setup renders and owns the unit, and setup writes Codex's tool approval unconditionally); and the sources, which move to the 3.1.0 run pin and the v3.1.0 release at 11ca7c5b; and the label, which named only the owner's decision, and now names both authorities: the owner's decision of 2026-10-03 to install ai-memory with a fresh store, and this direct consensus for the 3.1.0 version",
+                "interim_replaced": {
+                  "configuration": {
+                    "codex_tool_approval": "default_tools_approval_mode = \"approve\", written by the client configuration only with --with-authorization-settings (memory change 13)",
+                    "listen": "127.0.0.1:29374, the port the host template and the client templates carry (synthesis X5); the ruling's 21374 is not used",
+                    "service": "the upstream systemd user unit packaging/systemd/ai-memory-user.service at the pin, under linger"
+                  },
+                  "default": "ai-memory 2.5.2",
+                  "label": "interim install on the owner's decision (amendment 3), with a fresh store; not a blind result and not a measurement; the memory head-to-head decides, and its result replaces or removes it",
+                  "open_acceptance_gates": [
+                    "the user unit is active, /healthz on 127.0.0.1:29374 returns 200, and ai-memory status reports 2.5.2 with the local embedder",
+                    "claude mcp list shows it connected at :29374/mcp, codex mcp list lists it, and the hooks admit capture",
+                    "a canary typed in an ordinary session of one client is returned by memory_query in a fresh session of the other, in both directions, without memory_write_page",
+                    "a handoff survives an unrelated session started in between; restart, spool drain and cold boot pass",
+                    "across every hook source of both clients, only ai-memory fills the memory slot"
+                  ],
+                  "pin": "tag v2.5.2 (tag object af8c6820bbbcca0b8d3604d7b2d59c0e0263ea85) = commit 7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83; release asset ai-memory-linux-x86_64.tar.gz sha256 acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8",
+                  "sources": [
+                    "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.memory: the dossier default, the GPT check and its conditions, the ruling's changes 1, 3-5 and 12-15; synthesis_extracts X5)",
+                    "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+                    "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md",
+                    "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/local-embeddings.md"
+                  ]
+                }
+              }
+            ],
             "catalog": "foundation",
             "claude": "converged",
             "coincides_with_lane_record": null,
@@ -1840,25 +1879,25 @@
               },
               "configuration": {
                 "backup": "staged by the Restic backup job (synthesis X6): no ai-memory timer and no copy under /mnt/c",
-                "codex_tool_approval": "default_tools_approval_mode = \"approve\", written by the client configuration only with --with-authorization-settings (memory change 13)",
+                "codex_tool_approval": "default_tools_approval_mode = \"approve\", which ai-memory's own setup writes unconditionally (akitaonrails/ai-memory@11ca7c5b crates/ai-memory-cli/src/commands/install_mcp.rs:1923), and the client configuration only with --with-authorization-settings (memory change 13); accepted because it matches the host's approval_policy = never (the CC's ruling G1), and never stripped, since a second writer of the key would break the one-writer rule (D1)",
                 "embedding_provider": "local: all-MiniLM-L6-v2, 384 dimensions, in process, set explicitly, so a failed model fetch is a visible start failure",
-                "listen": "127.0.0.1:29374, the port the host template and the client templates carry (synthesis X5); the ruling's 21374 is not used",
+                "listen": "127.0.0.1 on the memory port of the host allocation (NS_PORT_MEMORY in ~/.config/new-wsl-native-stack/.service-ports.json, the CC's ruling D3), whose default is 29374, the port the host template and the client templates carry (synthesis X5); the ruling's 21374 is not used",
                 "llm": "none (zero-LLM)",
-                "service": "the upstream systemd user unit packaging/systemd/ai-memory-user.service at the pin, under linger",
+                "service": "the systemd user unit ai-memory setup renders from packaging/systemd/ai-memory-user.service at the pin and owns, with the plan's drop-in ai-memory.service.d/override.conf (PATH, CPUWeight=idle, MemoryHigh=1G and MemoryMax=2G), under linger",
                 "store": "fresh: no seed from another host, whose open handoffs a seed would carry"
               },
               "date_utc": "2026-10-03",
               "decided_by": "the memory head-to-head at its frozen revision (D3r2 or later), binding once its hash is posted and the Codex lane has read it; it checks that each arm actually uses its vectors, and its best eligible system takes the slot with no protected incumbent",
-              "default": "ai-memory 2.5.2",
-              "label": "interim install on the owner's decision (amendment 3), with a fresh store; not a blind result and not a measurement; the memory head-to-head decides, and its result replaces or removes it",
+              "default": "ai-memory 3.1.0",
+              "label": "interim install on the owner's decision of 2026-10-03 (amendment 3) to install ai-memory with a fresh store, at the version 3.1.0 that wave 6's direct consensus of 2026-10-17 set (amendment 3's direct-consensus authority); not a blind result and not a measurement; the memory head-to-head decides, and its result replaces or removes it",
               "open_acceptance_gates": [
-                "the user unit is active, /healthz on 127.0.0.1:29374 returns 200, and ai-memory status reports 2.5.2 with the local embedder",
-                "claude mcp list shows it connected at :29374/mcp, codex mcp list lists it, and the hooks admit capture",
+                "the user unit is active, /healthz on the memory port of the host allocation (NS_PORT_MEMORY in ~/.config/new-wsl-native-stack/.service-ports.json) returns 200, and ai-memory status reports 3.1.0 with the local embedder",
+                "claude mcp list shows its stdio entry (ai-memory mcp-bridge --server-url http://127.0.0.1:<that port>/mcp) connected, codex mcp list lists its HTTP entry at that port's /mcp with bearer_token_env_var = \"AI_MEMORY_AUTH_TOKEN\", and the hooks admit capture",
                 "a canary typed in an ordinary session of one client is returned by memory_query in a fresh session of the other, in both directions, without memory_write_page",
                 "a handoff survives an unrelated session started in between; restart, spool drain and cold boot pass",
                 "across every hook source of both clients, only ai-memory fills the memory slot"
               ],
-              "pin": "tag v2.5.2 (tag object af8c6820bbbcca0b8d3604d7b2d59c0e0263ea85) = commit 7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83; release asset ai-memory-linux-x86_64.tar.gz sha256 acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8",
+              "pin": "tag v3.1.0 (tag object 8daaf92829ccc55fc0d203a758eb455dd86eb4ac) = commit 11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea; release asset ai-memory-linux-x86_64.tar.gz sha256 10b2411ff6988e2a275e17734170a617341a51eec8162ba3166bdd4284cde651",
               "records": [
                 {
                   "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
@@ -1872,9 +1911,10 @@
               },
               "sources": [
                 "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (layers.memory: the dossier default, the GPT check and its conditions, the ruling's changes 1, 3-5 and 12-15; synthesis_extracts X5)",
-                "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
-                "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md",
-                "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/local-embeddings.md"
+                "evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/run-pin.json (the 3.1.0 run pin: tag, commit, release archive and install script, each verified against its sidecar)",
+                "https://github.com/akitaonrails/ai-memory/releases/tag/v3.1.0",
+                "https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/docs/install.md",
+                "https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/docs/local-embeddings.md"
               ]
             },
             "job": "long-term memory across sessions and clients",
@@ -8015,7 +8055,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "5bace4abad48ef09ddf80f77ef42461668706a0617859bfda0c1304ea3adac3f"
+      "sha256": "e7478ef16794eedfd4d3bd33a1ccf3b6ba526bad9b28b3da126db0ac3c8ecaca"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -8039,7 +8079,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "3d35d64d44571ee4bc91b5ffb0329eefdbbc5017c11c57f16fbfea5a59e3b9c7"
+      "sha256": "437c98171d6843ee215b7c94e7a808c6346a1ae5d999ad6c2f86a4a47f157e88"
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",

@@ -632,19 +632,19 @@ returned("list_console_messages"; "native-stack-chrome-devtools-ready")'"'"' "$n
 }
 
 memory-owner() {
-  # ai-memory 2.5.2 (interim, amendment 3); https://github.com/akitaonrails/ai-memory
+  # ai-memory 3.1.0 (interim, amendment 3; 2.5.2 until 2026-10-16); https://github.com/akitaonrails/ai-memory
   # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/cli.rs#L11 (--version); https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/render_shared.rs#L907 (the seven Codex events install-hooks writes)
-      # The hooks.json line is this project's integration check, not upstream acceptance.
-      check memory-owner smoke 'ai-memory --version
-jq -e '\''[("SessionStart", "UserPromptSubmit", "PreToolUse", "PostToolUse", "PreCompact", "Stop", "SessionEnd") as $event | any(.hooks[$event][]?.hooks[]?; (.command // "") | contains("ai-memory"))] | all'\'' "${CODEX_HOME:-$HOME/.codex}/hooks.json" >/dev/null'
+      # Kind: smoke; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/cli.rs#L93 (--version); https://raw.githubusercontent.com/akitaonrails/ai-memory/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/commands/render_shared.rs#L1360 (the seven Codex events install-hooks writes); https://raw.githubusercontent.com/akitaonrails/ai-memory/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/commands/install_hooks.rs#L1247 (Claude prompt capture: the UserPromptSubmit hook, off after --no-capture-prompts); https://raw.githubusercontent.com/akitaonrails/ai-memory/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/commands/render_shared.rs#L37 (CLAUDE_CODE_EVENTS: the nine Claude events)
+      # The hooks.json and settings.json lines and the drop-in line are this project's integration checks, not upstream acceptance; the settings.json line requires exactly the Claude hook set that setup installs once the opt-out ran (the nine events of render_shared.rs:37-50 at 11ca7c5b without UserPromptSubmit), each once, so a partial, an extra or a duplicated set fails; the drop-in is the only ai-memory.service.d/*.conf, in setup's unit directory (user_service.rs:236-249 at 11ca7c5b), and equals the plan's bytes (|| exit 1: under errexit a failure inside an && list stops nothing, only the line's status).
+      check memory-owner smoke 'ai-memory --version && dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/ai-memory.service.d" && test "$(printf "%s\n" "$dir"/*.conf)" = "$dir/override.conf" && cmp -s -- "$plan_dir/config/ai-memory-override.conf" "$dir/override.conf" || exit 1
+jq -e '\''[("SessionStart", "UserPromptSubmit", "PreToolUse", "PostToolUse", "PreCompact", "Stop", "SessionEnd") as $event | any(.hooks[$event][]?.hooks[]?; (.command // "") | contains("ai-memory"))] | all'\'' "${CODEX_HOME:-$HOME/.codex}/hooks.json" >/dev/null && jq -e '\''[(.hooks // {}) | to_entries[] | .key as $event | .value[]?.hooks[]? | select((.command // "") | contains("ai-memory") and contains(" hook --event ")) | $event] | sort == ["PostToolUse", "PreCompact", "PreToolUse", "SessionEnd", "SessionStart", "Stop", "SubagentStart", "SubagentStop"]'\'' "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json" >/dev/null'
       ;;
     service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/serve.rs#L2712 (/healthz); status: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L2149
-      check memory-owner health 'curl -fsS http://127.0.0.1:29374/healthz
-AI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory status --json'
+      # Kind: health; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/commands/serve.rs#L3118 (/healthz); status: https://raw.githubusercontent.com/akitaonrails/ai-memory/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/docs/install.md#L3189; the CLI reads the data dir's config, whose bind sets the server URL: https://raw.githubusercontent.com/akitaonrails/ai-memory/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/templates/config.default.toml#L12
+      check memory-owner health 'curl -fsS http://127.0.0.1:@PORT_MEMORY@/healthz
+ai-memory --data-dir "$HOME/.local/share/ai-memory" status --json'
       ;;
     *) skipped memory-owner ;;
   esac

@@ -1,0 +1,27 @@
+{
+  "filter": "fields kept: ref, object.sha, object.type; tag sha, tag, message, tagger.name, tagger.date, object, verification.verified, verification.reason (tagger.email dropped)",
+  "git_ref": {
+    "object": {
+      "sha": "8daaf92829ccc55fc0d203a758eb455dd86eb4ac",
+      "type": "tag"
+    },
+    "ref": "refs/tags/v3.1.0"
+  },
+  "git_tag": {
+    "message": "Release v3.1.0\n",
+    "object": {
+      "sha": "11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea",
+      "type": "commit"
+    },
+    "sha": "8daaf92829ccc55fc0d203a758eb455dd86eb4ac",
+    "tag": "v3.1.0",
+    "tagger": {
+      "date": "2026-10-16T05:22:51Z",
+      "name": "AkitaOnRails"
+    },
+    "verification": {
+      "reason": "unsigned",
+      "verified": false
+    }
+  }
+}

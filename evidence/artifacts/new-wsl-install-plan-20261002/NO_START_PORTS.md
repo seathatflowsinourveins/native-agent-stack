@@ -622,3 +622,52 @@ a synthetic pepper. The fresh configuration has no active provider key, so the
 migration inserts local exactly once and succeeds on repeated runs at29374 and
 49374. This is fixture/source evidence, not a native init or service run; no
 real credentials or credential store were used.
+
+## Memory-owner at ai-memory 3.1.0 (2026-10-17, PR (b) condition 4)
+
+Appended; the sections above are unchanged history. The memory-owner row moves to ai-memory 3.1.0 and the vendor's
+route (install.sh, then `setup`), under the command center's rulings D1-D5 for condition 4 of PR (b) (recorded outside
+the repository; the row's notes cite them).
+
+- Port (ruling D3): the row states `@PORT_MEMORY@` where it sets the bind and where its service check reads
+  `/healthz`, instead of the quoted default spelling the first section describes. `run_command` and `check` render
+  the marker from the staged allocation, the same `render_command` path that maps the default spelling, so a moved
+  allocation reaches the config the row writes. `service.port` keeps 29374, the allocation's default
+  (`SERVICE_PORTS`), and the interim's open acceptance gates name the allocation instead of a port.
+- No-start: `setup` enables and starts the unit and self-checks the server
+  ([akitaonrails/ai-memory@11ca7c5b, user_service.rs:855–864](https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/commands/user_service.rs#L855)),
+  so with `--no-start` the row installs the release, writes the config and its drop-in
+  `ai-memory.service.d/override.conf`, runs `daemon-reload`, and defers `setup` to the normal install, as Dagu's
+  bootstrap is deferred. It still writes Codex's seven hooks with `install-hooks --agent codex --apply`, as the 2.6.6
+  run above did, so ai-memory's Codex hook groups precede rtk's and Codex's index-bearing trust keys match a normal
+  install's, and it runs the Claude prompt-capture opt-out. Neither starts anything.
+- Init: the source-backed migration test now reads a 3.1.0 fixture at setup's config path, `<data_dir>/config.toml`
+  ([init.rs:207–212](https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/commands/init.rs#L207);
+  [setup.rs:318–320](https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/commands/setup.rs#L318)):
+  the template's active settings, then `bearer_token_file`, with a synthetic pepper. The 2.6.6 fixture stays as the
+  record of the paragraph above. This is fixture and source evidence, not a native init or service run.
+
+## Corrections to the memory-owner 3.1.0 section (2026-10-17, PR (b) condition 4 fold)
+
+Appended; the sections above, the 3.1.0 section included, are unchanged history. Where they differ, this section
+governs.
+
+- No native 2.6.6 `--no-start` run is recorded. The 3.1.0 section says the no-start step writes Codex's hooks "as the
+  2.6.6 run above did". No section above records such a run: the 2.6.6 paragraph is fixture and source evidence, not a
+  native init or service run, and NativeHorizonNY's `install.sh --no-start --only memory-owner` acceptance stays unrun
+  by this lane. That clause is withdrawn (the command center's ruling G6, hcom #14261, 2026-10-17), and the row's notes
+  no longer claim a native 2.6.6 run.
+- The Codex hook order holds only until the deferred setup. With `--no-start` the row writes Codex's seven hooks with
+  `install-hooks --agent codex --apply` before rtk's (command-output, later in the run), so ai-memory's groups come
+  first. The normal install that follows runs the deferred `setup`, and every re-apply drops ai-memory's own entries
+  and appends them after the third-party ones it keeps
+  ([akitaonrails/ai-memory@11ca7c5b, install_hooks.rs:2083–2106](https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/commands/install_hooks.rs#L2083)).
+  A no-start host followed by a normal install therefore ends with ai-memory's Codex groups after rtk's, unlike a fresh
+  normal install. Codex's trust keys carry the group index, so they match a normal install's only until that setup,
+  and the ai-memory hooks may then need a `/hooks` re-review.
+- The drop-in goes to the directory of setup's unit, `${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/ai-memory.service.d/`
+  ([user_service.rs:236–249](https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/crates/ai-memory-cli/src/commands/user_service.rs#L236)),
+  in both modes. It is installed from the plan's own bytes, and any other `*.conf` there, or an `override.conf` that
+  differs, is refused, as the Dagu step refuses an unknown drop-in. The vendor's install.sh now reads a release archive
+  and sidecar the row fetched and verified first, through a `file://` `AI_MEMORY_RELEASE_BASE_URL`. Neither change
+  starts anything.

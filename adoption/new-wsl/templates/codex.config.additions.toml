@@ -26,11 +26,32 @@ tool_suggest = false
 # ai-memory, the memory slot's interim install (definitive manifest, amendment 3): its tools carry no MCP annotations, so
 # under approval_policy = "never" Codex refuses every call unless the approval mode approves it (codex-rs/core/src/
 # mcp_tool_call.rs at rust-v0.160.0). The new distribution's standing requirement is no permission prompts (wave-2
-# memory ruling, change 13; ai-memory 2.5.2's own install-mcp --client codex writes the same key, install_mcp.rs L1078,
-# L1203-1206 at 7580b74d). The map classes the key authorization, so it is written only with
-# --with-authorization-settings and only while the memory slot installs ai-memory.
+# memory ruling, change 13). The map classes the key authorization, so this tool writes it only with
+# --with-authorization-settings and only while the memory slot installs ai-memory. ai-memory 3.1.0's own setup, which the
+# install plan's memory-owner row runs, writes the same key unconditionally, whatever this tool was given: install-mcp
+# --client codex sets default_tools_approval_mode = "approve" on every write of this table
+# (akitaonrails/ai-memory@11ca7c5b crates/ai-memory-cli/src/commands/install_mcp.rs:1923, in 1909-1932; setup.rs:960-981).
+# That is recorded and accepted (the CC's ruling G1, 2026-10-17): it matches the host's approval_policy = "never"
+# posture, and nothing strips the key afterwards, because a second writer of it would break the one-writer rule (D1).
 [mcp_servers.ai-memory]
 default_tools_approval_mode = "approve"
+# The server requires its root bearer (init writes auth-tokens/default and [auth] bearer_token_file), and Codex names
+# the variable that holds it, as ai-memory 3.1.0's own setup writes for Codex when the token lives in that file
+# (install_mcp.rs:106-136, 173-202 and 1924-1925 at 11ca7c5b; docs/install.md:637-649): the name only, never the
+# token. Codex takes an MCP bearer only from an environment variable it names: it reads the variable from its own
+# process environment and refuses an unset or empty one (openai/codex@83086188 codex-rs/codex-mcp/src/rmcp_client.rs:
+# 877-905; streamable_http only, mcp_types.rs:382-386 and 489-495), which is why the token is an environment variable.
+# On NativeHorizonNY the host launcher ~/.local/bin/codex-lane exports it from ai-memory's owner-only token file before
+# it runs codex (the CC's ruling D4; host state, outside this repository); Codex's other load path is $CODEX_HOME/.env
+# (codex-rs/arg0/src/lib.rs:268-288). The shells' inherit = "none" keeps it from them. Recorded residual (the CC's
+# ruling G2, 2026-10-17), traced in source, not measured: the variable reaches every hook process of that Codex session,
+# because Codex snapshots its whole environment (codex-rs/hooks/src/registry.rs:79) and replays it into each hook
+# command, filtering only its own NON_INHERITABLE_ENV_VARS (codex-rs/hooks/src/engine/command_runner.rs:424-436;
+# codex-rs/protocol/src/shell_environment.rs:15-22). That stays inside the same user's trust boundary, for a
+# loopback-only service whose token file is already owner-only; the export must stay out of every global environment
+# (shell profile, user manager), so only a codex-lane session carries it. ai-memory's own hooks read the token persisted
+# under their data dir (install_hooks.rs:676-754 at 11ca7c5b), not this variable.
+bearer_token_env_var = "AI_MEMORY_AUTH_TOKEN"
 
 # semble 0.6.1 (MinishLab/semble, a uv tool), the code-search slot's interim install (definitive manifest, amendment 3;
 # wave-2 code-search ruling, changes 2-5). Stdio, CPU only, no port. Its two tools carry no MCP annotations, so Codex

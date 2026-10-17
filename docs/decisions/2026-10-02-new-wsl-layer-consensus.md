@@ -536,3 +536,84 @@ sides.
   receipts, not by this record.
 - The GPT family's whole-wave read blocks the synthesis as a final architecture and keeps it as a conditional proposal;
   this batch records the owner's decisions and the selections, not a final architecture.
+
+## Wave 6 (2026-10-17): an interim amendment by direct consensus (memory-owner to ai-memory 3.1.0)
+
+The record gains `wave6` in `consensus.json`, a batch of a direct consensus under amendment 3, with no added row. Its one
+amendment moves the `memory-owner` interim from ai-memory 2.5.2 to 3.1.0:
+- `default` becomes `ai-memory 3.1.0`;
+- `pin` becomes tag v3.1.0 (tag object `8daaf92829ccc55fc0d203a758eb455dd86eb4ac`) =
+  `11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea` and the release archive's sha256
+  `10b2411ff6988e2a275e17734170a617341a51eec8162ba3166bdd4284cde651`;
+- `open_acceptance_gates` name 3.1.0 and its two client entries: Claude Code's stdio `ai-memory mcp-bridge` entry and
+  Codex's HTTP entry with `bearer_token_env_var`. They name the memory port of the host allocation
+  (`NS_PORT_MEMORY` in `~/.config/new-wsl-native-stack/.service-ports.json`) instead of a literal 29374, which is already
+  false on NativeHorizonNY (the CC's ruling D3);
+- `configuration` changes three keys that the 3.1.0 route makes false as wave 2 recorded them: `listen` names the memory
+  port of the host allocation; `service` is the unit setup renders and owns, with the plan's drop-in; and
+  `codex_tool_approval` records that setup writes `default_tools_approval_mode = "approve"` unconditionally
+  (akitaonrails/ai-memory@11ca7c5b `install_mcp.rs`:1923), accepted because it matches the host's
+  `approval_policy = never` (the CC's ruling G1);
+- `sources` move to the 3.1.0 run pin and the v3.1.0 release at `11ca7c5b`;
+- `label` is corrected. Wave 2 labelled the interim "on the owner's decision", and the manifest kept that label (and the
+  tables printed the interim's authority as the owner's decision) beside a version that the owner did not choose. The
+  label now names both authorities: the owner's decision of 2026-10-03 authorizes installing ai-memory with a fresh
+  store, and this direct consensus sets the version, 3.1.0. The interim's `authority` field stays the owner's
+  decision, which is what authorizes the install; the generated tables and the handbook say that this amendment changed
+  the interim's fields, and on whose authority.
+
+Every other interim field stays as wave 2 recorded it, and the memory head-to-head still decides. The batch is dated
+2026-10-17, the date its evidence exists: the run pin was captured at 2026-10-17T01:15:59Z, after the CC's rulings D1-D9
+(hcom #9109, sent 2026-10-17T00:58:42Z by the hcom event time).
+
+The batch's hashed records are the memory-owner 3.1.0 run pin and its native captures
+(`evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/run-pin.json`, and under `outputs/` the tag resolution, the
+release archive's `sha256sum -c` receipt and the install script's). They hold the version, its commit, the release
+archive verified against the publisher's sha256 sidecar, and the vendor install script verified against its own sidecar.
+
+**Supersession.** The run pin supersedes the durable-memory F1 run pin
+(`evidence/artifacts/final-durable-memory-20261016/F1-run-pin.json`, sha256
+`10d1afa5960d867d553ef5852f849a7353eda06580b9710bce6d3ec11e5fc6a0`) as the install plan's `memory-owner` pin source, and
+nothing else. An earlier, unlanded form of this batch moved the interim to 2.6.6 on F1, whose own limits say it changes no
+install plan. F1 is not edited and keeps its qualification meaning.
+
+The command center's GO of 2026-10-16 at 16:51Z moved ai-memory from 2.6.6 to 3.1.0, and its rulings D1-D9 for condition 4
+of PR (b) direct the plan to follow; its rulings G1-G6 for the pull request's fold (hcom #14261, 2026-10-17) settle the
+configuration text. All are recorded outside this repository: the ns51 handoff receipt (section 8) and the two rulings
+files, each named by file only in the amendment's `by`. The plan's `memory-owner` row moves in the same
+change. `check_plan.py` binds the row's owner to this interim's default.
+
+### The assembler's amendment path
+
+Amendment 3 names two authorities for an interim: the owner's dated decision, or a direct consensus that carries both
+families' acknowledgements. Until this batch, only an owner batch (amendment 4) could amend an existing interim: a
+direct-consensus batch could add one but not amend one. The owner path's authority needs a record that quotes the owner's
+words verbatim, and this repository publishes no owner quote.
+
+`assemble_manifest.py` therefore gains the direct-consensus path, `apply_consensus_interim_amendments`:
+- it changes only the amendable fields, through the same step as the owner path (`amend_interim`);
+- the amendable fields (`INTERIM_AMENDABLE`) now include `configuration`, amended key by key and only for keys the
+  interim already carries, and `sources`, replaced as a list. That widens the owner path as well, since both paths share
+  `amend_interim`;
+- it records the amendment in the row's `amendments`, the record of amendments by direct consensus, with the interim
+  values it replaced (`interim_replaced`);
+- `overturned` stays the record of the owner's decisions.
+
+`tests/test_consensus_interim_amendment.py` covers the path and its refusals.
+
+### Acknowledgements owed
+
+As for wave 2, the gate on the acknowledgements is held where installing happens, not in the assembler. While `wave6`
+names a family in `acknowledgements_owed`, install.sh's `interim_acknowledged` refuses every interim install: memory-owner's
+and code-search's alike. The client configuration's `--apply` gate (`owed_acknowledgements` in
+`tools/adoption/new_wsl_client_config.py`) read only `wave2` until this change, so it measured an empty list while
+`wave6` owed both families; it now reads every wave batch the way `interim_acknowledged` does and refuses the same
+unreadable inputs. The batch lands only with both families' pull-request acknowledgements recorded under
+`acknowledgements`: a test requires every direct-consensus batch to owe none.
+
+### Not established by this batch
+
+- No comparison of memory owners has run. The 3.1.0 run pin is an install pin, not evidence that 3.1.0 is better than
+  a survivor or another release.
+- This record changes nothing on any host. The 3.1.0 install on NativeHorizonNY is the command center's host change,
+  recorded by the ns51 handoff receipt outside this repository; this install.sh has not run at 3.1.0.

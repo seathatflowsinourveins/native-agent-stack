@@ -133,16 +133,16 @@ class NoStartTests(unittest.TestCase):
                     checker.no_start_contract(rows, changed, text, lambda tag, msg: errors.append(msg))
                     self.assertTrue(any(row["slot"] + ": direct service activation" in e for e in errors), errors)
 
-    def test_memory_unit_is_installed_and_reloaded_without_enable_or_start(self):
+    def test_memory_drop_in_is_installed_and_reloaded_without_enable_or_start(self):
+        # ai-memory 3.1.0's setup writes, enables and starts the unit and is deferred with --no-start; the row's own
+        # service step installs the plan's drop-in and only reloads (akitaonrails/ai-memory@11ca7c5b
+        # crates/ai-memory-cli/src/commands/user_service.rs:855-864).
         checker = module(PLAN / "check_plan.py", "plan_check")
         funcs = checker.functions((PLAN / "install.sh").read_text())
         commands = checker.run_commands("memory-owner", funcs, set())
         command = next(c for c in commands if "systemd/user" in c)
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
-            unit = home / ".local/opt/ai-memory-2.5.2/packaging/systemd/ai-memory-user.service"
-            unit.parent.mkdir(parents=True)
-            unit.write_text("[Service]\nExecStart=/usr/bin/ai-memory serve\n[Install]\nWantedBy=default.target\n")
             helper = ("activate_user_unit() {\n" + funcs["activate_user_unit"] + "\n}\n"
                       if "activate_user_unit" in funcs else "")
             script = "set -euo pipefail\n" + helper + "\n" + (
@@ -150,11 +150,24 @@ class NoStartTests(unittest.TestCase):
                 'export -f systemctl\n'
             ) + command
             result = subprocess.run(["bash", "-c", script], text=True, capture_output=True,
-                                    env={"PATH": "/usr/bin:/bin", "HOME": tmp, "NS2604_NO_START": "1"})
+                                    env={"PATH": "/usr/bin:/bin", "HOME": tmp, "NS2604_NO_START": "1",
+                                         "config_root": str(PLAN / "config"), "plan_dir": str(PLAN)})
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertTrue((home / ".config/systemd/user/ai-memory.service").is_file())
+            drop = home / ".config/systemd/user/ai-memory.service.d/override.conf"
+            self.assertEqual(drop.read_bytes(), (PLAN / "config/ai-memory-override.conf").read_bytes())
+            self.assertFalse((home / ".config/systemd/user/ai-memory.service").exists())
             self.assertIn("--user daemon-reload", result.stdout)
             self.assertNotRegex(result.stdout, r"\b(enable|start|restart|preset)\b")
+            # A drop-in the plan did not write is the operator's: refused, kept, and nothing reloads.
+            drop.write_text("[Service]\nMemoryMax=1G\n")
+            result = subprocess.run(["bash", "-c", script], text=True, capture_output=True,
+                                    env={"PATH": "/usr/bin:/bin", "HOME": tmp, "NS2604_NO_START": "1",
+                                         "config_root": str(PLAN / "config"), "plan_dir": str(PLAN)})
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("needs_owner: existing ai-memory drop-in", result.stderr)
+            self.assertIn("is not the plan copy; retained.", result.stderr)
+            self.assertEqual(drop.read_text(), "[Service]\nMemoryMax=1G\n")
+            self.assertNotIn("daemon-reload", result.stdout)
 
     def test_no_start_is_an_install_option(self):
         self.assertTrue(re.search(r"--no-start\)", (PLAN / "install.sh").read_text()), "missing --no-start option")

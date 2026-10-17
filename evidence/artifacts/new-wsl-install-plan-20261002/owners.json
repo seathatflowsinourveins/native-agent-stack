@@ -256,10 +256,10 @@
   {
    "layer": "durable-memory",
    "slot": "memory-owner",
-   "owner": "ai-memory 2.5.2",
+   "owner": "ai-memory 3.1.0",
    "repository": "https://github.com/akitaonrails/ai-memory",
    "installed": true,
-   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pin is the wave-2 memory dossier's, in install-plan.json; repository metadata was not read for this row"
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03), amended to 3.1.0 by the wave-6 direct consensus; the pin is the memory-owner 3.1.0 run pin's (evidence/artifacts/memory-owner-v3.1.0-run-pin-20261017/run-pin.json), in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "token-efficiency",

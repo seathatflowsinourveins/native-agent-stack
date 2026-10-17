@@ -9,7 +9,9 @@ The last step reads the layer-consensus record (evidence/artifacts/new-wsl-layer
 record's rows and records its amendments, and changes no field that the rounds decided. Each later batch of the record
 (wave2, wave3, ..., in their numeric order) is folded the same way, under its own records and acknowledgements. A batch of a
 direct consensus (wave 2) records the interim installs of its amendment 3: an interim is written to the row's own `interim`
-field, beside the fields the rounds decided, which stay as they were. A batch on the owner's decision (wave 3, amendment 4)
+field, beside the fields the rounds decided, which stay as they were. A later batch of a direct consensus (wave 6) may amend
+such an interim under the same authority; the amendment, with the interim values it replaced, is recorded in the row's
+`amendments`, and install.sh holds every interim install while the batch owes an acknowledgement. A batch on the owner's decision (wave 3, amendment 4)
 adds rows of kind owner_decision and gives a row whose decided default installs nothing an owner default; the fields an owner
 default replaces, and an interim it drops or amends, are kept on the row under `overturned`.
 
@@ -397,8 +399,12 @@ OWNER_DEFAULT_FIELDS = ("default", "repository", "label", "claude", "gpt", "repl
 OVERTURNED_FIELDS = ("default", "repository", "installs_nothing_extra", "definitive", "label", "state", "measurement", "claude",
                      "gpt", "resolution")
 OWNER_RESOLUTION_TEXT = ("by", "batch", "reason", "pin", "overturn")
-# The interim fields an owner batch may amend, beside the ones the interim's own authority set.
-INTERIM_AMENDABLE = ("default", "repository", "pin", "label", "decided_by", "open_acceptance_gates")
+# The interim fields an amendment may change (an owner batch, or a later direct consensus), beside the ones the interim's
+# own authority set. configuration is amended key by key, only keys the interim already carries; sources, like the
+# gates, is replaced as a whole list. Both were added so that a version amendment can correct what the new route makes
+# false (the wave-6 memory-owner amendment: its listen port, its service, setup's Codex tool approval and its sources).
+INTERIM_AMENDABLE = ("default", "repository", "pin", "label", "decided_by", "open_acceptance_gates", "configuration",
+                     "sources")
 
 
 def relayed_decision(sid, interim, authority):
@@ -613,26 +619,81 @@ def apply_owner_amendments(rows, by_slot, name, batch):
                         "claude": default["claude"], "gpt": default["gpt"],
                         "resolution": json.loads(json.dumps(default["resolution"]))})
         else:
-            change = entry["interim"]
-            if not isinstance(row.get("interim"), dict):
-                raise ValueError(f"consensus {sid}: an interim amendment needs a row that carries an interim")
-            if not isinstance(change, dict) or not change or set(change) - set(INTERIM_AMENDABLE):
-                raise ValueError(f"consensus {sid}: an interim amendment changes only " + ", ".join(INTERIM_AMENDABLE))
-            for key, value in change.items():
-                ok = (isinstance(value, list) and value and all(isinstance(item, str) and item.strip() for item in value)
-                      if key == "open_acceptance_gates" else isinstance(value, str) and value.strip())
-                if not ok:
-                    raise ValueError(f"consensus {sid}: an interim amendment needs a non-empty {key}")
-            if "repository" in change and https_parts(change["repository"]) is None:
-                raise ValueError(f"consensus {sid}: an interim names its repository by an https URL")
-            if "label" in change and not change["label"].startswith("interim install"):
-                raise ValueError(f"consensus {sid}: an interim's label starts with 'interim install'")
-            overturned["interim"] = {key: json.loads(json.dumps(row["interim"].get(key))) for key in change}
-            row["interim"].update(json.loads(json.dumps(change)))
+            overturned["interim"] = amend_interim(sid, row, entry["interim"])
         owners = [other["slot_id"] for other in rows if other is not row and other["job"] == row["job"] and installs_now(other)]
         if owners:
             raise ValueError(f"consensus {sid}: installed job also owned by {owners[0]}: {row['job']}")
         row["overturned"] = overturned
+
+
+def amend_interim(sid, row, change):
+    """Change only the amendable fields of a row's interim (INTERIM_AMENDABLE), and return the values they replace, for the
+    row's overturned. Both amendment authorities use it: an owner batch (amendment 4) and a direct consensus (amendment 3).
+    A configuration change names only the keys it changes, each one the interim already carries, and what it replaces is
+    those keys' values."""
+    if not isinstance(row.get("interim"), dict):
+        raise ValueError(f"consensus {sid}: an interim amendment needs a row that carries an interim")
+    if not isinstance(change, dict) or not change or set(change) - set(INTERIM_AMENDABLE):
+        raise ValueError(f"consensus {sid}: an interim amendment changes only " + ", ".join(INTERIM_AMENDABLE))
+    for key, value in change.items():
+        if key in ("open_acceptance_gates", "sources"):
+            ok = isinstance(value, list) and value and all(isinstance(item, str) and item.strip() for item in value)
+        elif key == "configuration":
+            ok = isinstance(value, dict) and value and all(isinstance(item, str) and item.strip() for item in value.values())
+        else:
+            ok = isinstance(value, str) and value.strip()
+        if not ok:
+            raise ValueError(f"consensus {sid}: an interim amendment needs a non-empty {key}")
+    if "repository" in change and https_parts(change["repository"]) is None:
+        raise ValueError(f"consensus {sid}: an interim names its repository by an https URL")
+    if "label" in change and not change["label"].startswith("interim install"):
+        raise ValueError(f"consensus {sid}: an interim's label starts with 'interim install'")
+    if "configuration" in change:
+        current = row["interim"].get("configuration")
+        unknown = sorted(set(change["configuration"]) - set(current if isinstance(current, dict) else {}))
+        if unknown:
+            raise ValueError(f"consensus {sid}: an interim amendment changes only configuration keys the interim carries, "
+                             f"not {', '.join(unknown)}")
+    copy = json.loads(json.dumps(change))
+    replaced = {key: json.loads(json.dumps(row["interim"].get(key))) for key in copy if key != "configuration"}
+    if "configuration" in copy:
+        replaced["configuration"] = {key: row["interim"]["configuration"][key] for key in copy["configuration"]}
+        row["interim"]["configuration"].update(copy.pop("configuration"))
+    row["interim"].update(copy)
+    return {key: replaced[key] for key in change}
+
+
+def apply_consensus_interim_amendments(rows, by_slot, name, batch, entries):
+    """An amendment of a row's interim by a direct consensus: amendment 3 names a direct consensus that carries both families'
+    acknowledgements as an interim's authority, so it may amend an interim as an owner batch does (amend_interim). The
+    amendment is recorded in the row's amendments, the record of amendments by direct consensus, with the interim values it
+    replaced (interim_replaced); overturned stays the record of the owner's decisions. As for wave 2's interims, the gate on
+    the acknowledgements is held where installing happens, not here, so the records and their checks pass while the pull
+    request collects them: install.sh's interim_acknowledged refuses every interim install while a batch owes one, and the
+    batch names the families it still owes (check_batch)."""
+    for entry in entries:
+        sid = entry.get("slot_id")
+        if not isinstance(sid, str) or sid not in by_slot:
+            raise ValueError(f"consensus {sid}: amendment for unknown slot")
+        if set(entry) != {"slot_id", "amendment", "interim"}:
+            raise ValueError(f"consensus {sid}: a consensus interim amendment is its slot_id, its amendment and its interim")
+        amendment = entry["amendment"]
+        if not isinstance(amendment, dict) or not all(
+                isinstance(amendment.get(key), str) and amendment[key].strip() for key in ("date_utc", "by", "decision")):
+            raise ValueError(f"consensus {sid}: an amendment needs date_utc, by and decision")
+        if amendment["date_utc"] != batch["date_utc"]:
+            raise ValueError(f"consensus {sid}: the amendment is dated {amendment['date_utc']}, and its batch {batch['date_utc']}")
+        replaced = sorted((set(amendment) & set(PROTECTED)) | ({"interim"} & set(amendment)))
+        if replaced:
+            raise ValueError(f"consensus {sid}: an amendment's own text cannot carry {', '.join(replaced)}")
+        row = by_slot[sid]
+        if "overturned" in row or any("interim_replaced" in item for item in row.get("amendments", [])):
+            raise ValueError(f"consensus {sid}: the row's interim already carries an amendment")
+        replaced = amend_interim(sid, row, entry["interim"])
+        owners = [other["slot_id"] for other in rows if other is not row and other["job"] == row["job"] and installs_now(other)]
+        if owners:
+            raise ValueError(f"consensus {sid}: installed job also owned by {owners[0]}: {row['job']}")
+        row.setdefault("amendments", []).append({**json.loads(json.dumps(amendment)), "interim_replaced": replaced})
 
 
 def apply_interims(rows, by_slot, entries):
@@ -828,8 +889,12 @@ def apply_consensus(rows, layers):
     amend(data["amend_rows"])
     for name, batch in batches:
         if not is_owner_batch(batch):
-            amend(batch["amend_rows"])
+            # A direct consensus may amend an earlier batch's interim (apply_consensus_interim_amendments), after that
+            # batch has recorded it; every other amendment of the batch is recorded beside the decided fields.
+            changes = [entry for entry in batch["amend_rows"] if isinstance(entry, dict) and "interim" in entry]
+            amend([entry for entry in batch["amend_rows"] if not (isinstance(entry, dict) and "interim" in entry)])
             apply_interims(rows, by_slot, batch["interim_rows"])
+            apply_consensus_interim_amendments(rows, by_slot, name, batch, changes)
     # Owner amendments come last: an owner default may drop an interim, and an interim amendment changes one.
     for name, batch in batches:
         if is_owner_batch(batch):

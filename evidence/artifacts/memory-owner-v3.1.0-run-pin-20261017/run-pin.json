@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "kind": "install_plan_run_pin",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "slot": "memory-owner",
+  "checked_at": "2026-10-17T01:15:59Z",
+  "base_commit": "90471d63f20918efa3a63ef949caffd8c012656c",
+  "status": "INSTALL_PLAN_PIN",
+  "scope": "The memory-owner interim of the new WSL install plan (evidence/artifacts/new-wsl-install-plan-20261002) and its wave-6 direct-consensus amendment (evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave6). Nothing else: no catalog, operational pin, canonical angle record, default or head-to-head arm changes.",
+  "supersedes": {
+    "path": "evidence/artifacts/final-durable-memory-20261016/F1-run-pin.json",
+    "sha256": "10d1afa5960d867d553ef5852f849a7353eda06580b9710bce6d3ec11e5fc6a0",
+    "pointer": "/proposed_run_pin",
+    "value": "ai-memory 2.6.6, tag v2.6.6 (tag object bc79858954d4636dc0d70d960a89249515c88381) = 04a9e8f576de67e1d2282ee29415d1b0d5b979c8, archive sha256 b0de4f2002be388170aa81a91252832aa5d234b3511196806d0ca1708de75353",
+    "for": "the install plan's memory-owner pin only",
+    "note": "F1's own limits say it changes no install plan; the unlanded wave-6 work used it as the plan's pin source. This record replaces it for that one use. F1 itself is not edited and keeps its durable-memory qualification meaning."
+  },
+  "authority": [
+    {
+      "kind": "command_center_ruling",
+      "value": "The command center's GO of 2026-10-16 at 16:51Z moves ai-memory from 2.6.6 to 3.1.0; condition 4 of PR (b) retargets the plan to it.",
+      "record": "RECEIPT-model-picks-20261016.md, the builder's private handoff receipt",
+      "lines": [99, 114],
+      "citation": "by name only: a private record outside the repository",
+      "read_at": "2026-10-17T01:05:27Z",
+      "note": "Outside the repository. The file is a running handoff receipt that later sections extend, so the lines are the ones read at read_at."
+    },
+    {
+      "kind": "command_center_ruling",
+      "value": "The CC's rulings D1-D9 for PR (b) condition 4 (nhny-gino, hcom #9109): the vendor's install.sh then setup is the one writer (D1, D2); the port comes from the host allocation (D3); prompt capture stays off (D5).",
+      "record": "RULINGS-gino-9109.md, nhny-mipe's private record of the hcom message",
+      "hcom": "#9109, sent 2026-10-17T00:58:42Z by the hcom event time",
+      "read_at": "2026-10-17T01:05:27Z",
+      "note": "Outside the repository, cited by name only; recorded by nhny-mipe from the hcom message."
+    }
+  ],
+  "sources": [
+    {
+      "kind": "upstream_tag_resolution",
+      "command": ["git", "ls-remote", "https://github.com/akitaonrails/ai-memory", "refs/tags/v3.1.0", "refs/tags/v3.1.0^{}"],
+      "exit_code": 0,
+      "native_capture": "outputs/upstream-tag-resolution.txt:1-2"
+    },
+    {
+      "kind": "github_api",
+      "urls": [
+        "https://api.github.com/repos/akitaonrails/ai-memory/git/ref/tags/v3.1.0",
+        "https://api.github.com/repos/akitaonrails/ai-memory/git/tags/8daaf92829ccc55fc0d203a758eb455dd86eb4ac"
+      ],
+      "native_capture": "outputs/github-api-tag.json",
+      "note": "Field-filtered: the tagger's e-mail is dropped; every kept field is listed in the capture's filter key."
+    },
+    {
+      "kind": "github_api",
+      "urls": ["https://api.github.com/repos/akitaonrails/ai-memory/releases/tags/v3.1.0"],
+      "native_capture": "outputs/github-api-release-assets.json",
+      "note": "Only the four assets this pin uses. Each asset's GitHub digest equals its local sha256: the archive's and install.sh's in outputs/download-sha256.txt (lines 1-2), the two sidecars' in outputs/sidecar-sha256.txt (lines 1-2, recorded by capture-supplement.sh)."
+    },
+    {
+      "kind": "upstream_source",
+      "value": "version = \"3.1.0\"",
+      "url": "https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/Cargo.toml#L38",
+      "line": 38
+    },
+    {
+      "kind": "upstream_source",
+      "value": "install.sh downloads ai-memory-<target>.tar.gz and its .sha256 from the release named by AI_MEMORY_VERSION, refuses a missing or mismatched checksum before unpacking, unpacks under ~/.local/lib/ai-memory and links ~/.local/bin/ai-memory",
+      "url": "https://github.com/akitaonrails/ai-memory/blob/11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea/install.sh#L148",
+      "lines": [148, 216]
+    }
+  ],
+  "proposed_run_pin": {
+    "repository": "https://github.com/akitaonrails/ai-memory",
+    "tag": "v3.1.0",
+    "commit": "11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea",
+    "version": "3.1.0",
+    "reason": "The install plan installs the version the command center moved the host to (3.1.0), through the vendor's own installer, so the plan and the host run the same verified release. This is an install pin, not evidence that 3.1.0 is better than any survivor; the memory head-to-head still decides.",
+    "tag_resolution": {
+      "annotated_tag_object": "8daaf92829ccc55fc0d203a758eb455dd86eb4ac",
+      "commit": "11ca7c5b3b65e7fc216c7eae5a9aac67d38c11ea",
+      "tagger_date": "2026-10-16T05:22:51Z",
+      "signed": false,
+      "sources": [
+        "https://api.github.com/repos/akitaonrails/ai-memory/git/ref/tags/v3.1.0",
+        "https://api.github.com/repos/akitaonrails/ai-memory/git/tags/8daaf92829ccc55fc0d203a758eb455dd86eb4ac"
+      ],
+      "read_at": "2026-10-17T01:15:59Z",
+      "native_capture": [
+        "outputs/upstream-tag-resolution.txt:1-2 (line 1 the annotated tag object, line 2 the commit it peels to)",
+        "outputs/github-api-tag.json (git_tag.tagger.date is the tagger date; git_tag.verification is verified false with reason unsigned)"
+      ]
+    },
+    "release_archive": {
+      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v3.1.0/ai-memory-linux-x86_64.tar.gz",
+      "sha256": "10b2411ff6988e2a275e17734170a617341a51eec8162ba3166bdd4284cde651",
+      "bytes": 19666305,
+      "verification": "sha256sum -c against the publisher's .sha256 sidecar, run in a fresh download directory; exit 0",
+      "receipt": "outputs/verify-release-checksum.txt:1",
+      "binary_sha256": "bac68e5122614913e447dd7286a9092ea2237f2d6a0f684f334e907002164872",
+      "binary_receipt": "outputs/release-binary-sha256.txt:1",
+      "binary_note": "The ai-memory file extracted from the verified archive (never run). The vendor's install.sh unpacks this file to ~/.local/lib/ai-memory/ai-memory."
+    },
+    "install_script": {
+      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v3.1.0/install.sh",
+      "sha256": "d8f1ac1bbf54bd4adea152865c0be68c968b92cdc155017e78840f300585ea97",
+      "bytes": 9265,
+      "verification": "sha256sum -c against the publisher's install.sh.sha256 sidecar, run in a fresh download directory; exit 0. The same digest as the install.sh blob at the tagged commit, read through the GitHub contents API at 11ca7c5b (outputs/install-script-blob-at-tag.txt, recorded by capture-supplement.sh)",
+      "receipt": "outputs/verify-install-script-checksum.txt:1",
+      "blob_at_tag_receipt": "outputs/install-script-blob-at-tag.txt:1-3"
+    }
+  },
+  "limits": [
+    "No operational pin, catalog, canonical angle record or default changes; adoption/new-wsl-profile.json's head-to-head arm is untouched.",
+    "The vendor's install.sh verifies the archive against the release's sidecar at install time; the plan pins the installer's digest and checks the installed binary against binary_sha256.",
+    "Nothing was installed or run from these downloads: the archive was checksum-verified and one file was extracted to read its digest.",
+    "The 3.1.0 install on NativeHorizonNY is the command center's host change, recorded outside the repository; this record does not receipt it."
+  ]
+}

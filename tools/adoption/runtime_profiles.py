@@ -266,7 +266,16 @@ def render_wsl_mcp(home: Path, eco_root: Path) -> dict:
     try: files = render_files(home, eco_root=eco_root, host_file=Path(selected))
     except DriftError as error: raise ProfileError(str(error)) from error
     install = module("runtime_claude_install", ROOT / "tools/adoption/install_claude_profile.py")
-    return install.render_servers(json.loads(files["mcp-servers.json"]), home, eco_root)
+    servers = install.render_servers(json.loads(files["mcp-servers.json"]), home, eco_root)
+    # The rendered ai-memory entry is Claude Code's session-aware bridge, which refuses to start without
+    # CLAUDE_CODE_SESSION_ID; upstream gives every other stdio client the session-less bridge (akitaonrails/ai-memory@11ca7c5b
+    # crates/ai-memory-cli/src/commands/install_mcp.rs:182-185 and 214-225; `ai-memory mcp-bridge --help`). Upstream leaves
+    # Pi out of that route, because its generated extension reads the hook credential file (install_mcp.rs:181 and 193);
+    # giving Pi the session-less bridge here is this repository's adaptation, since Pi's profile takes the rendered servers.
+    bridge = servers.get("ai-memory", {})
+    if bridge.get("args", [])[:1] == ["mcp-bridge"] and "--no-session-id" not in bridge["args"]:
+        servers["ai-memory"] = {**bridge, "args": ["mcp-bridge", "--no-session-id", *bridge["args"][1:]]}
+    return servers
 
 
 def selected_service_ports() -> dict:

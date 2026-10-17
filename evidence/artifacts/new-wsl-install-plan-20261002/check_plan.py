@@ -307,6 +307,62 @@ def agent_messaging_contract(plan_dir, by_slot, bad):
                                "HCOM_DIR, and report retired Claude hcom denies")
 
 
+def memory_owner_contract(funcs, bad):
+    """The memory-owner row's one-writer route (the CC's rulings D1, D2 and D5 for PR (b) condition 4, hcom #9109,
+    2026-10-17). The vendor's install.sh reads the release archive and its sidecar only from a local release tree the row
+    filled with fetch_verified first, through AI_MEMORY_RELEASE_BASE_URL as a file:// base, because on its own it checks
+    the archive only against a sidecar from the same origin and runs the binary before the row's own check (install.sh:20-23,
+    162-166 and 186-197). ai-memory setup writes and owns the systemd user unit, under $XDG_CONFIG_HOME when that is
+    absolute, so the row writes none and adds its settings in a drop-in in that unit's directory, from the plan's own bytes,
+    refusing any other drop-in there, written before setup starts the service; setup runs only without --no-start, because
+    it enables and starts the unit, and with --no-start install-hooks writes Codex's hooks instead (ahead of rtk's until the
+    deferred setup re-applies them); and the Claude prompt-capture opt-out follows in the same command, run whatever setup
+    returns, because setup passes no capture flag and a first install captures prompts. Sources: akitaonrails/ai-memory@
+    11ca7c5b install.sh, crates/ai-memory-cli/src/commands/setup.rs:755-860 and 982-997, user_service.rs:193-249 and
+    855-864, install_hooks.rs:1247-1261 and 2274-2276."""
+    body = "\n".join(line for line in funcs.get("memory-owner", "").splitlines() if not line.lstrip().startswith("#"))
+    if not body:
+        return
+    if (re.search(r'>\s*"\$HOME/\.config/systemd/user/ai-memory\.service"', body)
+            or "packaging/systemd/ai-memory-user.service" in body):
+        bad("memory-owner", "ai-memory setup writes and owns the user unit; the row adds its settings in "
+                            "ai-memory.service.d/override.conf")
+    vendor = next((text for text in body.splitlines() if re.search(r'\bsh "[^"]*/install\.sh"', text)), "")
+    base = re.search(r'\bAI_MEMORY_RELEASE_BASE_URL="file://([^"]+)" ', vendor)
+    version = re.search(r"\bAI_MEMORY_VERSION=([0-9A-Za-z.+-]+) ", vendor)
+    before = body[:body.find(vendor)] if vendor else ""
+    if not (base and version) or not all(
+            re.search(r"fetch_verified https://\S+/ai-memory-linux-x86_64\.tar\.gz" + re.escape(suffix) + r" [0-9a-f]{64} \""
+                      + re.escape(f"{base.group(1)}/download/v{version.group(1)}/ai-memory-linux-x86_64.tar.gz{suffix}")
+                      + '"', before) for suffix in ("", ".sha256")):
+        bad("memory-owner", "the vendor's install.sh reads the release archive and its sidecar only from a local release "
+                            "tree that fetch_verified filled first (AI_MEMORY_RELEASE_BASE_URL=\"file://<tree>\", "
+                            "<tree>/download/v<version>/)")
+    drop_line = next((text for text in body.splitlines() if "ai-memory.service.d" in text), "")
+    drop, setup = body.find(drop_line) if drop_line else -1, body.find(" setup --yes ")
+    if (drop < 0 or setup < 0 or drop > setup
+            or 'dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/ai-memory.service.d"; drop="$dir/override.conf";'
+            not in drop_line or 'install -m 0644 "$plan_dir/config/ai-memory-override.conf" "$drop"' not in drop_line):
+        bad("memory-owner", "the drop-in ai-memory.service.d/override.conf is written before setup starts the service, "
+                            "from the plan's own bytes, in the directory of setup's unit "
+                            "(${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user)")
+    if ('for f in "$dir"/*.conf;' not in drop_line or '"$f" != "$drop"' not in drop_line
+            or '! cmp -s -- "$plan_dir/config/ai-memory-override.conf" "$f"' not in drop_line):
+        bad("memory-owner", "an ai-memory.service.d/*.conf other than the plan's override.conf is refused, as the Dagu "
+                            "step refuses an unknown drop-in")
+    line = next((text for text in body.splitlines() if " setup --yes " in text), "")
+    deferred = line.find(" else ")
+    if (not line.lstrip().startswith("run_command 'rc=0; if [[ \"${NS2604_NO_START:-0}\" != 1 ]]; then ")
+            or deferred < line.find(" setup --yes ") or "install-hooks --agent codex --apply" not in line[deferred:]):
+        bad("memory-owner", "setup enables and starts the service: it runs only without --no-start, where Codex's hooks "
+                            "are written by install-hooks instead")
+    opt_out = "install-hooks --agent claude-code --no-capture-prompts --apply"
+    if (opt_out not in line or line.find(opt_out) < line.find("; fi; ") or line.count("|| rc=$?;") != 2
+            or not line.rstrip().endswith('exit "$rc"\' || return "$?"')):
+        bad("memory-owner", "the Claude prompt-capture opt-out follows setup in the same command and runs whatever setup "
+                            "returns")
+
+
 def code_docs_contract(plan_dir, by_slot, bad):
     """The three g3 fixes: selected Serena pin, search AND rewrite, and local MinerU skill/quality wiring."""
     serena = by_slot.get("serena", {})
@@ -448,6 +504,7 @@ def main():
     install_text, accept_text = (plan_dir / "install.sh").read_text(), (plan_dir / "accept.sh").read_text()
     install_funcs, accept_funcs = functions(install_text), functions(accept_text)
     no_start_contract(rows, install_funcs, install_text, bad)
+    memory_owner_contract(install_funcs, bad)
     host_port_contract(plan_dir, rows, args.host_file, bad)
     renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
     if renderer["SERVICE_PORTS"].get("CODE_GRAPH_UI") != ("code-graph", 9749):

@@ -3,11 +3,11 @@
   "kind": "new-wsl-handbook-profile-integration",
   "source_main": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
   "evidence_class": "local_integration",
-  "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+  "generator_sha256": "c861fa6a8a35ec5178b151dae03f20c9615a6f1d42b79ab3300102fc8a36c332",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "eecab4436abed523af18d7f35a12248835621dd74a13409959280d6eb416c5ba",
-    "docs/new-wsl-handbook.json": "ebc83bb69269c45b1f02edb4ad544fcb6621922f6aa85d1c23b19668001078b4"
+    "docs/new-wsl-handbook.md": "af33aac0b7fdd6264b2a8e8a8527a31612e9c683a9d32d3c109ef8429f1bd4f8",
+    "docs/new-wsl-handbook.json": "9193818a41e0fa99b20019225408e88aeeff1df13ce1744d9e626e59fc86fbb2"
   },
   "inventory": {
     "layers": 37,
@@ -1093,6 +1093,19 @@
       },
       "evidence_class": "local_integration",
       "scope": "CC196662 MinerU activation prerequisite; binding refresh under grant186741. No native service acceptance."
+    },
+    {
+      "date": "2026-10-17",
+      "source_base": "93aabf30a5c954411326fce8a353083a121a1b65",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "c861fa6a8a35ec5178b151dae03f20c9615a6f1d42b79ab3300102fc8a36c332",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "af33aac0b7fdd6264b2a8e8a8527a31612e9c683a9d32d3c109ef8429f1bd4f8",
+        "docs/new-wsl-handbook.json": "9193818a41e0fa99b20019225408e88aeeff1df13ce1744d9e626e59fc86fbb2"
+      },
+      "evidence_class": "local_integration",
+      "scope": "Condition 4 of the CC's ruling (a), retargeted by its GO of 2026-10-16 (16:51Z), rulings D1-D9 (hcom #9109, 2026-10-17) and the fold rulings G1-G6 (hcom #14261, 2026-10-17): the memory-owner interim and plan row move to ai-memory 3.1.0; and the PR #1242 fold (finding B2): the generator says what an amendment by direct consensus changed and on whose authority, and the memory-owner interim's label names both authorities. No native service acceptance."
     }
   ],
   "previous_outputs": [
@@ -1352,6 +1365,23 @@
       "superseded_at_utc": "2026-10-16",
       "source_head": "c231aebcc29d70f88aeac0ae92385e25d1b6c241",
       "reason": "CC196662 adds the normal MinerU configuration step before activation; native handbook regeneration refreshes its source bindings."
+    },
+    {
+      "generator_sha256": "a57a56c5d9d935d0f5a73eec9fab9b716b37924a43f0022bd66ec542d9566048",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "eecab4436abed523af18d7f35a12248835621dd74a13409959280d6eb416c5ba",
+        "docs/new-wsl-handbook.json": "ebc83bb69269c45b1f02edb4ad544fcb6621922f6aa85d1c23b19668001078b4"
+      },
+      "inventory": {
+        "layers": 37,
+        "profile_entries": 78,
+        "projected_tools": 82,
+        "canonical_package_ids": 26
+      },
+      "superseded_at_utc": "2026-10-17",
+      "source_head": "90471d63f20918efa3a63ef949caffd8c012656c",
+      "reason": "The wave-6 batch amends the memory-owner interim to ai-memory 3.1.0 (the CC's condition 4, retargeted by its GO of 2026-10-16); native handbook regeneration refreshes its source bindings."
     }
   ]
 }

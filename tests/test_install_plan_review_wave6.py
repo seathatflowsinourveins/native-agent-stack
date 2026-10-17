@@ -139,7 +139,7 @@ class MemoryMigrationTests(unittest.TestCase):
         command = self.migration(49374)
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            config = root / ".config/ai-memory/config.toml"
+            config = root / ".local/share/ai-memory/config.toml"
             config.parent.mkdir(parents=True)
             config.write_text('bind = "127.0.0.1:49374"\nlog_level = "info"\n')
             env = {"PATH": "/usr/bin:/bin", "HOME": tmp}
@@ -158,7 +158,7 @@ class MemoryMigrationTests(unittest.TestCase):
             for provider in (None, "local", "openai"):
                 with self.subTest(port=port, provider=provider), tempfile.TemporaryDirectory() as tmp:
                     root = Path(tmp)
-                    config = root / ".config/ai-memory/config.toml"
+                    config = root / ".local/share/ai-memory/config.toml"
                     config.parent.mkdir(parents=True)
                     original = 'bind = "127.0.0.1:49374"\nlog_level = "info"\n'
                     if provider:
