@@ -1,0 +1,36 @@
+# Loopback-only listener census (docs/decisions/2026-10-17-loopback-listener-census.md). loopback-census.timer starts
+# it every 5 minutes.
+#
+# It runs scripts/loopback_census.py, which reads `ss -H -l -t -u -n -p` (iproute2 ss(8)). The script prints one JSON
+# line and exits 1 when any TCP or UDP listener binds anything other than loopback (127.0.0.0/8, ::1). The one exception
+# is WSL's DNS tunnel at 10.255.255.254:53.
+#
+# A breach fails this oneshot, so OnFailure= starts stack-alert@%n.service. That unit sends the command center one
+# named hcom message; it is this directory's OnFailure convention, as in mineru.service.
+#
+# StandardOutput=truncate: keeps only the newest run's JSON line in the state directory. StateDirectory= creates
+# $XDG_STATE_HOME/loopback-census (systemd.exec(5)), and %S is that root in user mode (systemd.unit(5)).
+#
+# @REPOSITORY@ is the checkout that holds scripts/loopback_census.py. On the workstation that is the live clone,
+# %h/code/native-agent-stack-live, as for stack-currency.service. Never use the working checkout, whose revision moves,
+# or a build worktree. Substitute it before installing, then verify both units together:
+#   sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/loopback-census.service > ~/.config/systemd/user/loopback-census.service
+#   cp adoption/templates/systemd/loopback-census.timer ~/.config/systemd/user/
+#   systemd-analyze --user verify ~/.config/systemd/user/loopback-census.service ~/.config/systemd/user/loopback-census.timer
+#
+# It has no [Install] section, because this directory's timer-triggered oneshots have none. UMask=0077,
+# NoNewPrivileges=true and the idle scheduling settings match this directory's other oneshots.
+[Unit]
+Description=Loopback-only listener census (alerts on any non-loopback listener)
+OnFailure=stack-alert@%n.service
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+Nice=19
+IOSchedulingClass=idle
+Environment=PYTHONDONTWRITEBYTECODE=1
+StateDirectory=loopback-census
+StandardOutput=truncate:%S/loopback-census/last.json
+ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/loopback_census.py

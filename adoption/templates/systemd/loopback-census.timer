@@ -1,0 +1,14 @@
+# Every 5 minutes, start loopback-census.service. See that unit for the placeholder and deployment notes.
+# OnBootSec= delays the first run until the services have bound. OnUnitActiveSec= then repeats it 5 minutes after each
+# start. AccuracySec=30s keeps the runs close to that interval (systemd.timer(5)).
+[Unit]
+Description=Run the loopback-only listener census every 5 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Unit=loopback-census.service
+
+[Install]
+WantedBy=timers.target
